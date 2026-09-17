@@ -11,6 +11,6 @@ public class kari_player : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        transform.Translate(1, 0, 0);
+        transform.Translate(0.25f, 0, 0);
     }
 }
