@@ -13,7 +13,7 @@ public class kari_player : MonoBehaviour
     public Sprite rightSprite;
 
     // 移動速度
-    private float moveSpeed = 0.1f;
+    public float moveSpeed = 0.1f;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
