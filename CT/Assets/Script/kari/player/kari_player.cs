@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using System.Collections.Generic;
 
 public class kari_player : MonoBehaviour
 { 
@@ -15,17 +16,26 @@ public class kari_player : MonoBehaviour
     // 移動速度
     public float moveSpeed = 0.1f;
 
+    // プレイヤーの位置履歴を保存するリスト
+    public List<Vector3> posHistory = new List<Vector3>();
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         Application.targetFrameRate = 60;
 
         spriteRenderer = GetComponent<SpriteRenderer>();
+
+        // 初期位置を履歴に追加
+        posHistory.Add(transform.position);
     }
 
     // Update is called once per frame
     void Update()
     {
+        // 移動前の位置を保持
+        Vector3 oldPos = transform.position;
+
         if(Keyboard.current.dKey.isPressed ||
             Keyboard.current.rightArrowKey.isPressed)
         {
@@ -53,6 +63,12 @@ public class kari_player : MonoBehaviour
             transform.Translate(0, -moveSpeed, 0);
 
             spriteRenderer.sprite = downSprite;
+        }
+
+        if(oldPos != transform.position)
+        {
+            // 移動した場合のみ履歴に追加
+            posHistory.Add(transform.position);
         }
     }
 }
