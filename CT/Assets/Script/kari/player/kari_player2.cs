@@ -32,8 +32,35 @@ public class kari_player2 : MonoBehaviour
         // プレイヤーの位置に追従する
         if(player.posHistory.Count > followDistance)
         {
-            // プレイヤーの位置履歴のfollowDistance個前の位置に追従する
-            transform.position = player.posHistory[player.posHistory.Count - followDistance];
+            // 追従する位置
+            int targetIndex = player.posHistory.Count - followDistance;
+
+            // プレイヤーの位置に追従する
+            transform.position = player.posHistory[targetIndex];
+
+            // 1つ前の履歴
+            Vector3 previousPosition = player.posHistory[targetIndex - 1];
+
+            // 今の履歴
+            Vector3 currentPosition = player.posHistory[targetIndex];
+
+            // 移動方向によって画像を変更
+            if(currentPosition.x > previousPosition.x)
+            {
+                spriteRenderer.sprite = rightSprite;
+            }
+            else if(currentPosition.x < previousPosition.x)
+            {
+                spriteRenderer.sprite = leftSprite;
+            }
+            else if(currentPosition.y > previousPosition.y)
+            {
+                spriteRenderer.sprite = upSprite;
+            }
+            else if(currentPosition.y < previousPosition.y)
+            {
+                spriteRenderer.sprite = downSprite;
+            }
         }
 
         // プレイヤーの位置に応じて画像レイヤーを切り替える

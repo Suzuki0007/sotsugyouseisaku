@@ -1,6 +1,16 @@
+/*********************************************************************/
+// * \file   FocusCamera.cs
+// * \brief  追従カメラクラス
+// *
+// * \author 成田悠真
+/*********************************************************************/
+
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
+/// <summary>
+/// 追従カメラクラス
+/// </summary>
 public class Focus : MonoBehaviour
 {
     public Transform player;
