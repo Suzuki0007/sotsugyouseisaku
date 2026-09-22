@@ -31,7 +31,7 @@ public class SigleMovement : CharaBase
             return;
         }
 
-        noah = GameObject.Find("Noah");
+        noah = GameObject.Find("Player_Noah");
         if(noah == null)
         {
             Debug.LogError("Noahオブジェクトが見つかりません");

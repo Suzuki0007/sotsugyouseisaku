@@ -21,7 +21,7 @@ public class CharacterSorting : CharaBase
     /// </summary>
     void Start()
     {
-        player = GameObject.Find("Noah");
+        player = GameObject.Find("Player_Noah");
         if(player == null)
         {
             Debug.LogError("Noahオブジェクトが見つかりません");
