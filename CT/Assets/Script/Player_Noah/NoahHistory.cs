@@ -7,7 +7,6 @@
 
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 /// <summary>
 /// 履歴クラス
