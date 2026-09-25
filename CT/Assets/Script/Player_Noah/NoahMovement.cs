@@ -39,49 +39,6 @@ public class NoahMovement : CharaBase
     {
         Vector2 moveDirection = Vector2.zero;
 
-        //// 右方向に移動　
-        //if(Keyboard.current.dKey.isPressed ||
-        //    Keyboard.current.rightArrowKey.isPressed)
-        //{
-        //    moveDirection = Vector2.right;
-        //    transform.Translate(moveDirection * moveSpeed);
-        //}
-
-        //if(Keyboard.current.aKey.isPressed ||
-        //    Keyboard.current.leftArrowKey.isPressed)
-        //{
-        //    moveDirection = Vector2.left;
-        //    transform.Translate(moveDirection * moveSpeed);
-        //}
-
-        //if(Keyboard.current.wKey.isPressed ||
-        //    Keyboard.current.upArrowKey.isPressed)
-        //{
-        //    moveDirection = Vector2.up;
-        //    transform.Translate(moveDirection * moveSpeed);
-        //}
-
-        //if(Keyboard.current.sKey.isPressed ||
-        //    Keyboard.current.downArrowKey.isPressed)
-        //{
-        //    moveDirection = Vector2.down;
-        //    transform.Translate(moveDirection * moveSpeed);
-        //}
-
-        //// 移動するa
-        //if(moveDirection != Vector2.zero)
-        //{
-        //    //transform.Translate(moveDirection * moveSpeed);
-
-        //    // 見た目に移動方向を伝える
-        //    noahAnimation.SetDirection(moveDirection);
-
-        //    // 移動したことを履歴に記録
-        //    noahHistory.RecordPosition(transform.position);
-        //}
-
-
-
         if(Keyboard.current.dKey.isPressed ||
        Keyboard.current.rightArrowKey.isPressed)
         {

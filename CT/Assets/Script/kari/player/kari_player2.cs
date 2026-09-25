@@ -1,5 +1,15 @@
+/*********************************************************************/
+// * \file   kari_player2.cs
+// * \brief  仮のプレイヤー2クラス
+// *
+// * \author 成田悠真
+/*********************************************************************/
+
 using UnityEngine;
 
+/// <summary>
+/// 仮のプレイヤー2クラス
+/// </summary>
 public class kari_player2 : MonoBehaviour
 {
     public kari_player player;

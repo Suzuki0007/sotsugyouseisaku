@@ -1,7 +1,17 @@
+/*********************************************************************/
+// * \file   kari_player.cs
+// * \brief  仮のプレイヤークラス
+// *
+// * \author 成田悠真
+/*********************************************************************/
+
 using UnityEngine;
 using UnityEngine.InputSystem;
 using System.Collections.Generic;
 
+/// <summary>
+/// 仮のプレイヤークラス
+/// </summary>
 public class kari_player : MonoBehaviour
 { 
     // 画像を表示するためのSpriteRendererコンポーネントを取得するための変数
