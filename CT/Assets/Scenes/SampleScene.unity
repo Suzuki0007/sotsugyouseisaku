@@ -30563,6 +30563,7 @@ GameObject:
   - component: {fileID: 1053650276}
   - component: {fileID: 1053650280}
   - component: {fileID: 1053650279}
+  - component: {fileID: 1053650281}
   m_Layer: 0
   m_Name: Player_Noah
   m_TagString: Player
@@ -30619,7 +30620,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 100
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 2503557244916395158, guid: d7bb875e5aeb71145bc59b45b2fba276, type: 3}
+  m_Sprite: {fileID: -2397078625104975803, guid: 931d819f830aa104f8b3f28b7185050b, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -30657,7 +30658,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6da1d12c42c29dd46973e6839ea9e5e0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NoahMovement
-  moveSpeed: 0.1
+  moveSpeed: 0.05
 --- !u!114 &1053650277
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -30683,10 +30684,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 032b0e16a7d38b94c95d7d91b6fb391d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NoahAnimation
-  upSprite: {fileID: 6836994171098647155, guid: 2f003931192a4a0459cd89b125b943e9, type: 3}
-  downSprite: {fileID: 2503557244916395158, guid: d7bb875e5aeb71145bc59b45b2fba276, type: 3}
-  leftSprite: {fileID: -5571872863377737890, guid: 3e0c42c9d4c5cc34382887ff6ed65bbe, type: 3}
-  rightSprite: {fileID: 1250343391161554716, guid: c724277140529124c8918dc6fb67852b, type: 3}
+  upSprite: {fileID: -5715957288639430718, guid: 170f24635ce422e4abb63a938263c669, type: 3}
+  downSprite: {fileID: -2397078625104975803, guid: 931d819f830aa104f8b3f28b7185050b, type: 3}
+  leftSprite: {fileID: 5893658483924868506, guid: ca3917da6eeb37e45932cfda98d769c1, type: 3}
+  rightSprite: {fileID: 7059661818181411105, guid: 58959b83057c1624586e227ac77935a6, type: 3}
 --- !u!50 &1053650279
 Rigidbody2D:
   serializedVersion: 5
@@ -30751,6 +30752,28 @@ CapsuleCollider2D:
   m_Offset: {x: 0, y: 0}
   m_Size: {x: 0.58, y: 1.21}
   m_Direction: 0
+--- !u!95 &1053650281
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1053650272}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 0ab93cec895826c4b9a8d16a6308b0c3, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &1503902674
 GameObject:
   m_ObjectHideFlags: 0
