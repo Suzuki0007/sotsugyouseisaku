@@ -30564,6 +30564,7 @@ GameObject:
   - component: {fileID: 1053650279}
   - component: {fileID: 1053650281}
   - component: {fileID: 1053650282}
+  - component: {fileID: 1053650283}
   m_Layer: 0
   m_Name: Player_Noah
   m_TagString: Player
@@ -30773,6 +30774,19 @@ CircleCollider2D:
   m_CompositeOrder: 0
   m_Offset: {x: 0, y: -0.34}
   m_Radius: 0.3
+--- !u!114 &1053650283
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1053650272}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0484cb61086228545af47d17c18dce0a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::NoahMapLimit
+  tilemap: {fileID: 185692953}
 --- !u!1 &1503902674
 GameObject:
   m_ObjectHideFlags: 0

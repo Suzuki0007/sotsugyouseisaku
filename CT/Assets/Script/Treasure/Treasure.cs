@@ -39,7 +39,7 @@ public class Treasure : MonoBehaviour
         // シングルトンのインスタンスを設定
         instance = this;
     }
-
+    
     /// <summary>
     /// OnCollisionEnter2D関数は、他のオブジェクトと衝突したときに呼ばれる
     /// </summary>
