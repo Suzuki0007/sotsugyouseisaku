@@ -40,7 +40,7 @@ public class NoahMovement : CharaBase
         Vector2 moveDirection = Vector2.zero;
 
         if(Keyboard.current.dKey.isPressed ||
-       Keyboard.current.rightArrowKey.isPressed)
+            Keyboard.current.rightArrowKey.isPressed)
         {
             moveDirection.x = 1;
         }
