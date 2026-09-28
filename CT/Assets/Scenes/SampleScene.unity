@@ -30603,9 +30603,9 @@ GameObject:
   m_Component:
   - component: {fileID: 1053650275}
   - component: {fileID: 1053650274}
+  - component: {fileID: 1053650276}
   - component: {fileID: 1053650278}
   - component: {fileID: 1053650277}
-  - component: {fileID: 1053650276}
   - component: {fileID: 1053650283}
   - component: {fileID: 1053650284}
   - component: {fileID: 1053650279}

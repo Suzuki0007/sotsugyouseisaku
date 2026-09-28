@@ -12,9 +12,9 @@ using UnityEngine;
 /// </summary>
 public class SigleMovement : CharaBase
 {
-    NoahHistory noahHistory;
+    private NoahHistory noahHistory;
 
-    SigleAnimation sigleAnimation;
+    private SigleAnimation sigleAnimation;
 
     //GameObject noah;
     [SerializeField] private GameObject noah;

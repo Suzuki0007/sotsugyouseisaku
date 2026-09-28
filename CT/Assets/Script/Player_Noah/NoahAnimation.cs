@@ -12,7 +12,7 @@ using UnityEngine;
 /// </summary>
 public class NoahAnimation : CharaBase
 {
-    SpriteRenderer spriteRenderer;
+    private SpriteRenderer spriteRenderer;
 
     [SerializeField] private Sprite upSprite;
     [SerializeField] private Sprite downSprite;

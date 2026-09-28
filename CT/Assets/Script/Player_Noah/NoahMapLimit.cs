@@ -16,7 +16,7 @@ public class NoahMapLimit : CharaBase
     /// <summary>
     /// ノアの移動クラス
     /// </summary>
-    NoahMovement movement;
+    private NoahMovement movement;
 
     /// <summary>
     /// マップのタイルマップ
