@@ -17,6 +17,18 @@ public class KeyItem : MonoBehaviour
 
     private NoahInventory noahInventory;
 
+    private void Start()
+    {
+        // 鍵を一度でも拾っていた場合、鍵のオブジェクトを非表示にする
+        if(InventoryManager.Instance.NoahData.hasKey)
+        {
+            Debug.Log("鍵を一度でも拾っていたため、鍵のオブジェクトを非表示にします");
+
+            // 鍵のオブジェクトを非表示にする
+            gameObject.SetActive(false);
+        }
+    }
+
     /// <summary>
     /// OnTriggerEnter2D関数は、プレイヤーがトリガーに入ったときに呼ばれる
     /// </summary>
@@ -44,7 +56,7 @@ public class KeyItem : MonoBehaviour
             playerInRange = false;
             noahInventory = null;
 
-            Debug.Log("鍵から離れました");
+            //Debug.Log("鍵から離れました");
         }
     }
 
@@ -77,6 +89,6 @@ public class KeyItem : MonoBehaviour
         // この関数は、UnityのGameObjectクラスのメソッドであり、オブジェクトを非表示にするために使用される
         gameObject.SetActive(false);
 
-        Debug.Log("鍵を拾いました");
+        //Debug.Log("鍵を拾いました");
     }
 }

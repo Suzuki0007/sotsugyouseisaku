@@ -12,15 +12,19 @@ using UnityEngine;
 /// </summary>
 public class NoahInventory : CharaBase
 {
-    public bool hasKey = false;
-
     /// <summary>
     /// 鍵を手に入れる関数
     /// </summary>
     public void GetKey()
     {
-        hasKey = true;
+        InventoryManager.Instance.NoahData.hasKey = true;
 
         Debug.Log("鍵を手に入れた！");
+    }
+
+    public bool HasKey()
+    {
+        // InventoryManagerのHasKeyプロパティの値を返す
+        return InventoryManager.Instance.NoahData.hasKey;
     }
 }

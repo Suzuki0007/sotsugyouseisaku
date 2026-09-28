@@ -18,6 +18,7 @@ public class Singleton<T> : MonoBehaviour where T : MonoBehaviour
         // 2つ目以降あれば破棄する
         if(Instance != null && Instance != this)
         {
+            Debug.Log($"重複した{typeof(T).Name}を削除します");
             Destroy(gameObject);
             return;
         }
