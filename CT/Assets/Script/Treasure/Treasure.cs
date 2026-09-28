@@ -68,12 +68,6 @@ public class Treasure : MonoBehaviour
                 beforeRenderer.sprite = afterSprite;
                 getKey = true;
             }
-
-            // プレイヤーが鍵を取得していない場合
-            if(InventoryManager.Instance.NoahData.hasKey == true)
-            {
-                
-            }
         }
     }
 
