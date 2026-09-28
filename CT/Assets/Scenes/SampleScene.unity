@@ -30548,6 +30548,51 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &884893183
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 884893185}
+  - component: {fileID: 884893184}
+  m_Layer: 0
+  m_Name: InventryManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &884893184
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 884893183}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5120817ef3f19a64885bd2744ef9673e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::InventoryManager
+  persistAcrossScenes: 1
+--- !u!4 &884893185
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 884893183}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -1.44647, y: 0.28893, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1053650272
 GameObject:
   m_ObjectHideFlags: 0
@@ -30800,7 +30845,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d7614da98f86047428b59d07b8b5fdcf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NoahInventory
-  hasKey: 0
 --- !u!1 &1503902674
 GameObject:
   m_ObjectHideFlags: 0
@@ -30845,9 +30889,9 @@ GameObject:
   - component: {fileID: 1525000496}
   - component: {fileID: 1525000495}
   - component: {fileID: 1525000497}
+  - component: {fileID: 1525000500}
   - component: {fileID: 1525000499}
   - component: {fileID: 1525000498}
-  - component: {fileID: 1525000500}
   m_Layer: 0
   m_Name: OB_TRbox
   m_TagString: Untagged
@@ -31027,7 +31071,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 35fbfee1b0df5df48a654f498e832044, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Treasure
-  getkey: 0
+  needKey: 1
+  getKey: 0
   beforeRenderer: {fileID: 1525000495}
   afterSprite: {fileID: 1315817458, guid: 8b0c508b056873a46b1820fe8083f2dc, type: 3}
 --- !u!1 &1723348671
@@ -31618,3 +31663,4 @@ SceneRoots:
   - {fileID: 1503902675}
   - {fileID: 1525000496}
   - {fileID: 1791839633}
+  - {fileID: 884893185}

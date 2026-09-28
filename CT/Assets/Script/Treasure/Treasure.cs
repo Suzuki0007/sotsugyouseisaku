@@ -13,7 +13,8 @@ using UnityEngine;
 public class Treasure : MonoBehaviour
 {
     public static Treasure instance;
-    public bool getkey;
+    public bool needKey;
+    public bool getKey;
 
     /// <summary>
     /// 宝箱のスプライトレンダラー
@@ -36,7 +37,6 @@ public class Treasure : MonoBehaviour
     /// </summary>
     private void Awake()
     {
-        // シングルトンのインスタンスを設定
         instance = this;
     }
     
@@ -48,13 +48,39 @@ public class Treasure : MonoBehaviour
     {
         if(other.gameObject.CompareTag("Player"))
         {
-            // プレイヤーが鍵を取得していない場合
-            if(getkey == false)
+            if(needKey)
+            {
+                if(!HasKey())
+                {
+                    Debug.Log("宝箱を開けるには鍵が必要です");
+                    return;
+                }
+                else
+                {
+                    Debug.Log("宝箱を開けました");
+
+                    // 宝箱のスプライト変更、鍵を取得したことを示すフラグを立てる
+                    beforeRenderer.sprite = afterSprite;
+                    getKey = true;
+                }
+            }
+            else
             {
                 // 宝箱のスプライト変更、鍵を取得したことを示すフラグを立てる
                 beforeRenderer.sprite = afterSprite;
-                getkey = true;
+                getKey = true;
+            }
+
+            // プレイヤーが鍵を取得していない場合
+            if(InventoryManager.Instance.NoahData.hasKey == true)
+            {
+                
             }
         }
+    }
+
+    private bool HasKey()
+    {
+        return InventoryManager.Instance.NoahData.hasKey;
     }
 }
