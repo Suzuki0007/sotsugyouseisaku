@@ -15,7 +15,7 @@ using System.Collections.Generic;
 public class NoahMovement : CharaBase
 {
     // 移動速度
-    public float moveSpeed = 0.1f;
+    [SerializeField] private float moveSpeed = 0.1f;
 
     // 別機能クラスの参照
     NoahAnimation noahAnimation;

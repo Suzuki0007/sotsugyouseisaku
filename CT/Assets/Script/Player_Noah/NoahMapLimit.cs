@@ -21,7 +21,7 @@ public class NoahMapLimit : CharaBase
     /// <summary>
     /// マップのタイルマップ
     /// </summary>
-    public Tilemap tilemap;
+    [SerializeField] private Tilemap tilemap;
 
     /// <summary>
     /// 最初に一度だけ呼ばれる関数

@@ -17,10 +17,10 @@ public class SigleMovement : CharaBase
     SigleAnimation sigleAnimation;
 
     //GameObject noah;
-    public GameObject noah;
+    [SerializeField] private GameObject noah;
 
     // 何個前の位置を追いかけるか
-    public int followDistance = 10;
+    [SerializeField] private int followDistance = 10;
 
     void Start()
     {

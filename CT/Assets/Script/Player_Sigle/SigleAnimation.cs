@@ -14,10 +14,10 @@ public class SigleAnimation : CharaBase
 {
     SpriteRenderer spriteRenderer;
 
-    public Sprite upSprite;
-    public Sprite downSprite;
-    public Sprite leftSprite;
-    public Sprite rightSprite;
+    [SerializeField] private Sprite upSprite;
+    [SerializeField] private Sprite downSprite;
+    [SerializeField] private Sprite leftSprite;
+    [SerializeField] private Sprite rightSprite;
 
     void Start()
     {
