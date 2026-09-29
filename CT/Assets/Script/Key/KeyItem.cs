@@ -12,13 +12,23 @@ using UnityEngine;
 /// </summary>
 public class KeyItem : Intaractable
 {
+    [SerializeField] private NoahInventory noahInventory;
+
+    private void Start()
+    {
+        if(noahInventory != null && noahInventory.HasKey())
+        {
+            gameObject.SetActive(false);
+        }
+    }
+
     /// <summary>
     /// Interact関数は、プレイヤーが鍵を拾うときに呼ばれる
     /// </summary>
     protected override void Interact()
     {
-        NoahInventory noahInventory = player.GetComponent<NoahInventory>();
         if(noahInventory == null){ return; }
+        if(noahInventory.HasKey()) { return; }
 
         noahInventory.GetKey();
 

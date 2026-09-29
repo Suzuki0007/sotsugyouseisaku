@@ -31717,7 +31717,6 @@ GameObject:
   - component: {fileID: 1997557906}
   - component: {fileID: 1997557905}
   - component: {fileID: 1997557908}
-  - component: {fileID: 1997557907}
   - component: {fileID: 1997557909}
   m_Layer: 0
   m_Name: Itm_Key
@@ -31801,18 +31800,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1997557907
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1997557904}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6301fb88153f1f14d8fe2088df2c697b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::CharacterSorting
 --- !u!58 &1997557908
 CircleCollider2D:
   m_ObjectHideFlags: 0
@@ -31861,6 +31848,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 82c7f8deda5b6434a97f26d070483c22, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::KeyItem
+  noahInventory: {fileID: 1053650284}
 --- !u!1 &2011798005
 GameObject:
   m_ObjectHideFlags: 0
