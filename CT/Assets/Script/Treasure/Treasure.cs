@@ -10,7 +10,7 @@ using UnityEngine;
 /// <summary>
 /// 宝箱クラス
 /// </summary>
-public class Treasure : MonoBehaviour
+public class Treasure : Intaractable
 {
     [SerializeField] private static Treasure instance;
     [SerializeField] private bool needKey;
@@ -30,44 +30,39 @@ public class Treasure : MonoBehaviour
     /// SerializeField属性を使用して、Inspector上で設定できるようにする
     [SerializeField] private Sprite afterSprite;
 
-    /// <summary>
-    /// Awake関数は、オブジェクトが有効化されたときに一度だけ呼ばれる
-    /// </summary>
     private void Awake()
     {
         instance = this;
     }
-    
-    /// <summary>
-    /// OnCollisionEnter2D関数は、他のオブジェクトと衝突したときに呼ばれる
-    /// </summary>
-    /// <param name="other"></param>
-    private void OnCollisionEnter2D(Collision2D other)
-    {
-        if(other.gameObject.CompareTag("Player"))
-        {
-            if(needKey)
-            {
-                if(!HasKey())
-                {
-                    Debug.Log("宝箱を開けるには鍵が必要です");
-                    return;
-                }
-                else
-                {
-                    Debug.Log("宝箱を開けました");
 
-                    // 宝箱のスプライト変更、鍵を取得したことを示すフラグを立てる
-                    beforeRenderer.sprite = afterSprite;
-                    getKey = true;
-                }
+    /// <summary>
+    /// Interact関数は、プレイヤーが宝箱を開けるときに呼ばれる
+    /// </summary>
+    protected override void Interact()
+    {
+        Debug.Log("宝箱にインタラクトした");
+
+        if(needKey)
+        {
+            if(!HasKey())
+            {
+                Debug.Log("宝箱を開けるには鍵が必要です");
+                return;
             }
             else
             {
+                Debug.Log("宝箱を開けました");
+
                 // 宝箱のスプライト変更、鍵を取得したことを示すフラグを立てる
                 beforeRenderer.sprite = afterSprite;
                 getKey = true;
             }
+        }
+        else
+        {
+            // 宝箱のスプライト変更、鍵を取得したことを示すフラグを立てる
+            beforeRenderer.sprite = afterSprite;
+            getKey = true;
         }
     }
 

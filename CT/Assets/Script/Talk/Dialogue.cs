@@ -11,7 +11,7 @@ using UnityEngine.UI;
 /// <summary>
 /// ダイアログクラス
 /// </summary>
-public class Dialogue : MonoBehaviour
+public class Dialogue : Intaractable
 {
     public GameObject dialoguePanel;
     public Text dialogueTextUI;
@@ -26,18 +26,28 @@ public class Dialogue : MonoBehaviour
         dialoguePanel.SetActive(false);
     }
 
+    protected override void Interact()
+    {
+        if(dialoguePanel == null) { return; }
+        if(dialogueTextUI == null) { return; }
+
+        dialogueTextUI.text = dialogueText;
+        dialoguePanel.SetActive(true);
+        Debug.Log("ダイアログが有効");
+    }
+
     /// <summary>
     /// OnCollisionEnter2D関数は、他のオブジェクトとの衝突が開始したときに呼ばれる
     /// </summary>
     /// <param name="other"></param>
     private void OnCollisionEnter2D(Collision2D other)
     {
-        if(other.gameObject.CompareTag("Player"))
-        {
-            dialogueTextUI.text = dialogueText;
-            dialoguePanel.SetActive(true);
-            Debug.Log("ダイアログが有効");
-        }
+        //if(other.gameObject.CompareTag("Player"))
+        //{
+        //    dialogueTextUI.text = dialogueText;
+        //    dialoguePanel.SetActive(true);
+        //    Debug.Log("ダイアログが有効");
+        //}
     }
 
     /// <summary>
