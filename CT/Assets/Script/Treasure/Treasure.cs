@@ -16,18 +16,7 @@ public class Treasure : Intaractable
     [SerializeField] private bool needKey;
     [SerializeField] private bool getKey;
 
-    /// <summary>
-    /// 宝箱のスプライトレンダラー
-    /// </summary>
-    /// 
-    /// SerializeField属性を使用して、Inspector上で設定できるようにする
     [SerializeField] private SpriteRenderer beforeRenderer;
-
-    /// <summary>
-    /// 宝箱を開けた後のスプライト
-    /// </summary>
-    /// 
-    /// SerializeField属性を使用して、Inspector上で設定できるようにする
     [SerializeField] private Sprite afterSprite;
 
     private void Awake()
