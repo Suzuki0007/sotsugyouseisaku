@@ -2,7 +2,7 @@
 // * \file   SceneChange.cs
 // * \brief  シーン遷移クラス
 // *
-// * \author 成田悠真
+// * \author 成田悠真, 鈴木裕稀
 /*********************************************************************/
 
 using UnityEngine;
@@ -22,6 +22,8 @@ public class SceneChange : MonoBehaviour
         if(collision.gameObject.CompareTag("Player"))
         {
             Debug.Log("PlayerがDoorに衝突しました");
+
+            Save.Commit(); // セーブデータを保存する
 
             SceneManager.LoadScene(sceneName);
         }
