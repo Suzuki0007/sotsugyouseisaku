@@ -2,7 +2,7 @@
 // * \file   NoahMovement.cs
 // * \brief  ノアの移動クラス
 // *
-// * \author 成田悠真
+// * \author 成田悠真, 鈴木裕稀
 /*********************************************************************/
 
 using UnityEngine;
@@ -26,7 +26,7 @@ public class NoahMovement : CharaBase
     /// </summary>
     void Start()
     {
-        Application.targetFrameRate = 60;
+        //Application.targetFrameRate = 60;
 
         noahAnimation = GetComponent<NoahAnimation>();
         noahHistory = GetComponent<NoahHistory>();
