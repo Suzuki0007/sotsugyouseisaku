@@ -18,15 +18,17 @@ public partial class AbcdefuckAction : Action
     protected override Status OnStart()
     {
         movement = Self.Value.GetComponent<EnemyMovement>();
-        if(movement == null) { return Status.Failure; }
+        if(movement == null) 
+        {
+            Debug.Log("EnemyMoveComponentがnullですぞ");
+            return Status.Failure; 
+        }
 
         return Status.Running;
     }
 
     protected override Status OnUpdate()
     {
-        if(movement == null) { return Status.Failure; }
-
         movement.Move(0.5f);
 
         return Status.Running;

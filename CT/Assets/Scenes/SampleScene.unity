@@ -31137,6 +31137,9 @@ MonoBehaviour:
   m_Graph: {fileID: -7949268204192683098, guid: 9ae377d5a91f06f418fdad36cbc3a2be, type: 2}
   m_BlackboardVariableOverridesList:
   - rid: 8432779314880577790
+  - rid: 8432779333810782776
+  - rid: 8432779333810782777
+  - rid: 8432779333810782819
   m_OriginalGraph: {fileID: -7949268204192683098, guid: 9ae377d5a91f06f418fdad36cbc3a2be, type: 2}
   m_IsInitialised: 0
   m_IsStarted: 0
@@ -31151,6 +31154,30 @@ MonoBehaviour:
           m_Value1: 0
         Name: Self
         m_Value: {fileID: 1383956524}
+    - rid: 8432779333810782776
+      type: {class: 'BlackboardVariable`1[[UnityEngine.GameObject, UnityEngine.CoreModule]]', ns: Unity.Behavior, asm: Unity.Behavior}
+      data:
+        GUID:
+          m_Value0: 10870875745165353008
+          m_Value1: 2713954555669715875
+        Name: TargetPlayer
+        m_Value: {fileID: 1053650272}
+    - rid: 8432779333810782777
+      type: {class: 'BlackboardVariable`1[[System.Single, mscorlib]]', ns: Unity.Behavior, asm: Unity.Behavior}
+      data:
+        GUID:
+          m_Value0: 6839224826628552974
+          m_Value1: 5785727692585696885
+        Name: MoveDuration
+        m_Value: 0.5
+    - rid: 8432779333810782819
+      type: {class: 'BlackboardVariable`1[[System.String, mscorlib]]', ns: Unity.Behavior, asm: Unity.Behavior}
+      data:
+        GUID:
+          m_Value0: 1326893529801438104
+          m_Value1: 17819568987303123962
+        Name: PlayerTag
+        m_Value: Player
 --- !u!212 &1383956526
 SpriteRenderer:
   serializedVersion: 3
