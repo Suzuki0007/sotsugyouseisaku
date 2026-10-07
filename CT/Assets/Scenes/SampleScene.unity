@@ -31477,6 +31477,7 @@ GameObject:
   - component: {fileID: 511772192}
   - component: {fileID: 511772193}
   - component: {fileID: 511772194}
+  - component: {fileID: 511772195}
   m_Layer: 0
   m_Name: Enemy
   m_TagString: Untagged
@@ -31491,7 +31492,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 511772188}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f0038c16c34866b4f9e25c9c0dc0f7e6, type: 3}
   m_Name: 
@@ -31501,6 +31502,8 @@ MonoBehaviour:
   - rid: 8432779333810782857
   - rid: 8432779333810782858
   - rid: 8432779333810782859
+  - rid: 8432779359954928090
+  - rid: 8432779359954928201
   m_OriginalGraph: {fileID: 0}
   m_IsInitialised: 0
   m_IsStarted: 0
@@ -31531,6 +31534,22 @@ MonoBehaviour:
           m_Value1: 5785727692585696885
         Name: MoveDuration
         m_Value: 3
+    - rid: 8432779359954928090
+      type: {class: 'BlackboardVariable`1[[System.Single, mscorlib]]', ns: Unity.Behavior, asm: Unity.Behavior}
+      data:
+        GUID:
+          m_Value0: 4866339897176143979
+          m_Value1: 18287121351534628403
+        Name: ShootInterval
+        m_Value: 1
+    - rid: 8432779359954928201
+      type: {class: 'BlackboardVariable`1[[System.Single, mscorlib]]', ns: Unity.Behavior, asm: Unity.Behavior}
+      data:
+        GUID:
+          m_Value0: 5458728241731665404
+          m_Value1: 11343017132142540790
+        Name: WaitDuration
+        m_Value: 6
 --- !u!212 &511772190
 SpriteRenderer:
   serializedVersion: 3
@@ -31678,7 +31697,7 @@ Rigidbody2D:
   m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 0
-  m_Constraints: 0
+  m_Constraints: 4
 --- !u!114 &511772194
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -31691,6 +31710,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6301fb88153f1f14d8fe2088df2c697b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CharacterSorting
+--- !u!114 &511772195
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 511772188}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bfb75d35f9648b741a0c242b18e8d95f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyShooter
+  player: {fileID: 1053650272}
+  bulletPrefab: {fileID: 5426302495904982311, guid: fc3f4e2eadd79e54698cc41ee6cc63b5, type: 3}
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0

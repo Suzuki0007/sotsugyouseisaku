@@ -34,6 +34,8 @@ public class KeyItem : Intaractable
 
         gameObject.SetActive(false);
 
+        Destroy(gameObject);
+
         //Debug.Log("鍵を拾いました");
     }
 }
