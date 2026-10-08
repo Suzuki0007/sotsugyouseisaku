@@ -17,12 +17,8 @@ public class SceneChange : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        Debug.Log("何かがDoorに衝突しました");
-
         if(collision.gameObject.CompareTag("Player"))
         {
-            Debug.Log("PlayerがDoorに衝突しました");
-
             Save.Commit(); // セーブデータを保存する
 
             SceneManager.LoadScene(sceneName);

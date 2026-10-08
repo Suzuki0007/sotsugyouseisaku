@@ -28,14 +28,6 @@ public class NoahAnimation : CharaBase
     }
 
     /// <summary>
-    /// 毎フレーム呼ばれる関数
-    /// </summary>
-    void Update()
-    {
-
-    }
-
-    /// <summary>
     /// 向きを設定する関数
     /// </summary>
     /// 

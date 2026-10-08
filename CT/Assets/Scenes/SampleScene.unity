@@ -30395,7 +30395,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!156049354 &275716279
 Grid:
   m_ObjectHideFlags: 0
@@ -31473,11 +31473,12 @@ GameObject:
   m_Component:
   - component: {fileID: 511772191}
   - component: {fileID: 511772190}
-  - component: {fileID: 511772189}
   - component: {fileID: 511772192}
   - component: {fileID: 511772193}
+  - component: {fileID: 511772189}
   - component: {fileID: 511772194}
   - component: {fileID: 511772195}
+  - component: {fileID: 511772196}
   m_Layer: 0
   m_Name: Enemy
   m_TagString: Untagged
@@ -31724,6 +31725,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EnemyShooter
   player: {fileID: 1053650272}
   bulletPrefab: {fileID: 5426302495904982311, guid: fc3f4e2eadd79e54698cc41ee6cc63b5, type: 3}
+--- !u!114 &511772196
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 511772188}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5bd47a2a0e74f6b43bf61a6620909c21, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Health
+  maxHealth: 100
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -32283,14 +32297,16 @@ GameObject:
   m_Component:
   - component: {fileID: 1053650275}
   - component: {fileID: 1053650274}
+  - component: {fileID: 1053650279}
+  - component: {fileID: 1053650282}
+  - component: {fileID: 1053650281}
   - component: {fileID: 1053650276}
   - component: {fileID: 1053650278}
   - component: {fileID: 1053650277}
   - component: {fileID: 1053650283}
   - component: {fileID: 1053650284}
-  - component: {fileID: 1053650279}
-  - component: {fileID: 1053650282}
-  - component: {fileID: 1053650281}
+  - component: {fileID: 1053650285}
+  - component: {fileID: 1053650286}
   m_Layer: 0
   m_Name: Player_Noah
   m_TagString: Player
@@ -32525,6 +32541,31 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d7614da98f86047428b59d07b8b5fdcf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NoahInventory
+--- !u!114 &1053650285
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1053650272}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5bd47a2a0e74f6b43bf61a6620909c21, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Health
+  maxHealth: 100
+--- !u!114 &1053650286
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1053650272}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2cab88607dfbeb841b53fab21c34edb0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::NoahDead
 --- !u!1 &1167110585
 GameObject:
   m_ObjectHideFlags: 0

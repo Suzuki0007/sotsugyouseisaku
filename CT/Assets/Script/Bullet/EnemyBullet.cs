@@ -12,10 +12,24 @@ using UnityEngine;
 /// </summary>
 public class EnemyBullet : MonoBehaviour
 {
-    [SerializeField] private float bulletSpeed;
+    //=====================================================================
+    // 変数
+    //=====================================================================
+
+    private GameObject shooter;
+
+    [SerializeField]
+    private float bulletSpeed;
+
+    [SerializeField]
+    private int bulletDamage = 0;
 
     Rigidbody2D rb;
-    
+
+    //=====================================================================
+    // 関数
+    //=====================================================================
+
     void Awake()
     {
         if(bulletSpeed <= 0) { Debug.LogError("弾の速度が設定されていません"); }
@@ -24,18 +38,35 @@ public class EnemyBullet : MonoBehaviour
         if(rb == null) { Debug.LogError("Rigidbody2Dがアタッチされていません"); }
     }
 
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if(collision.gameObject == shooter) { return; }
+
+        if(collision.CompareTag("Player"))
+        {
+            Health health = collision.GetComponent<Health>();
+            if(health == null) { return;}
+            health.Damage(bulletDamage);
+
+            Debug.Log($" {gameObject.name} の残り体力: " + health.CurrentHealth);
+
+            Destroy(gameObject);
+        }
+        else
+        {
+            Debug.Log($" {gameObject.name} に当たった");
+
+            Destroy(gameObject);
+        }
+    }
+
     public void SetDirection(Vector2 direction)
     {
         rb.linearVelocity = direction.normalized * bulletSpeed;
     }
 
-    private void OnTriggerEnter2D(Collider2D collision)
+    public void SetShooter(GameObject shooter)
     {
-        if(collision.CompareTag("Player"))
-        {
-            Debug.Log("プレイヤーに弾が当たった！");
-
-            Destroy(gameObject);
-        }
+        this.shooter = shooter;
     }
 }

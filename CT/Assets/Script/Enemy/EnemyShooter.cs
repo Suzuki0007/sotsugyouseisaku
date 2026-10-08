@@ -13,9 +13,17 @@ using UnityEngine.InputSystem;
 /// </summary>
 public class EnemyShooter : CharaBase
 {
+    //=====================================================================
+    // 変数
+    //===================================================================== 
+
     [SerializeField] private GameObject player;
 
     [SerializeField] private EnemyBullet bulletPrefab;
+
+    //=====================================================================
+    // 関数
+    //=====================================================================
 
     void Start()
     {
@@ -41,5 +49,6 @@ public class EnemyShooter : CharaBase
         Vector2 direction = (player.transform.position - transform.position).normalized;
         bullet.SetDirection(direction);
 
+        bullet.SetShooter(gameObject);
     }
 }
