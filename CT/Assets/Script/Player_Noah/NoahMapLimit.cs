@@ -13,15 +13,10 @@ using UnityEngine.Tilemaps;
 /// </summary>
 public class NoahMapLimit : CharaBase
 {
-    /// <summary>
-    /// ノアの移動クラス
-    /// </summary>
     private NoahMovement movement;
 
-    /// <summary>
-    /// マップのタイルマップ
-    /// </summary>
-    [SerializeField] private Tilemap tilemap;
+    [SerializeField]
+    private Tilemap tilemap;
 
     /// <summary>
     /// 最初に一度だけ呼ばれる関数
