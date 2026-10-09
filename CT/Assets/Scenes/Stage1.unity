@@ -834,7 +834,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b093a980bfcd0d948a2d34a05967eedf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SigleMovement
-  noah: {fileID: 0}
+  noah: {fileID: 1712267234}
   followDistance: 10
 --- !u!114 &1237100111
 MonoBehaviour:
