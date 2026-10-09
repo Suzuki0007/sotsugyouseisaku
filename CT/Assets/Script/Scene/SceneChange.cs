@@ -19,9 +19,19 @@ public class SceneChange : MonoBehaviour
     {
         if(collision.gameObject.CompareTag("Player"))
         {
-            Save.Commit(); // セーブデータを保存する
+            Save.Commit();
 
             SceneManager.LoadScene(sceneName);
         }
+    }
+
+    /// <summary>
+    /// シーンを変更するメソッド
+    /// </summary>
+    /// <param name="sceneName"></param>
+    public void ChangeScene(string sceneName)
+    {
+        Save.Commit();
+        SceneManager.LoadScene(sceneName);
     }
 }
