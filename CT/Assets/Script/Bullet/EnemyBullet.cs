@@ -16,13 +16,16 @@ public class EnemyBullet : MonoBehaviour
     // 変数
     //=====================================================================
 
-    private GameObject shooter;
-
     [SerializeField]
     private float bulletSpeed;
 
     [SerializeField]
     private int bulletDamage = 0;
+
+    [SerializeField]
+    private float bulletLifeTime = 0f;
+
+    private GameObject shooter;
 
     Rigidbody2D rb;
 
@@ -34,8 +37,18 @@ public class EnemyBullet : MonoBehaviour
     {
         if(bulletSpeed <= 0) { Debug.LogError("弾の速度が設定されていません"); }
 
+        if(bulletDamage <= 0) { Debug.LogError("弾のダメージが設定されていません"); }
+
+        if(bulletLifeTime <= 0f) { Debug.LogError("弾の寿命が設定されていません"); }
+
         rb = GetComponent<Rigidbody2D>();
         if(rb == null) { Debug.LogError("Rigidbody2Dがアタッチされていません"); }
+    }
+
+    private void Update()
+    {
+        // 弾の寿命を更新
+        UpdateLifeTime();
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
@@ -54,8 +67,16 @@ public class EnemyBullet : MonoBehaviour
         }
         else
         {
-            Debug.Log($" {gameObject.name} に当たった");
+            Debug.Log($" {collision.name} に当たった");
+            Destroy(gameObject);
+        }
+    }
 
+    private void UpdateLifeTime()
+    {
+        bulletLifeTime -= Time.deltaTime;
+        if(bulletLifeTime <= 0f)
+        {
             Destroy(gameObject);
         }
     }
