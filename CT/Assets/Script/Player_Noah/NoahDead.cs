@@ -5,6 +5,7 @@
 // * \author 成田悠真
 /*********************************************************************/
 
+using Unity.VisualScripting;
 using UnityEngine;
 
 /// <summary>
@@ -12,12 +13,25 @@ using UnityEngine;
 /// </summary>
 public class NoahDead : CharaBase
 {
+    //=====================================================================
+    // 変数
+    //=====================================================================
+
     private Health health;
+
+    [SerializeField]
+    private SceneChange sceneChange;
+
+    //=====================================================================
+    // 関数
+    //=====================================================================
 
     void Awake()
     {
         health = GetComponent<Health>();
         if(health == null) { Debug.Log("Healthコンポーネントが見つかりません"); }
+
+        if(sceneChange == null) { Debug.Log("SceneChangeコンポーネントが見つかりません"); }
     }
 
     /// <summary>
@@ -39,5 +53,7 @@ public class NoahDead : CharaBase
     private void OnPlayerDied()
     {
         Debug.Log("プレイヤーが死亡しました！");
+
+        sceneChange.ChangeScene("SceneGameOver");
     }
 }

@@ -20,7 +20,6 @@ public class SceneChange : MonoBehaviour
         if(collision.gameObject.CompareTag("Player"))
         {
             Save.Commit();
-
             SceneManager.LoadScene(sceneName);
         }
     }
