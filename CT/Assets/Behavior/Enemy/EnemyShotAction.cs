@@ -8,6 +8,10 @@ using Unity.Properties;
 [NodeDescription(name: "EnemyShot", story: "敵の弾発射アクション", category: "Action", id: "48e3bc1300d3e6dc39a43a969b7c71a8")]
 public partial class EnemyShotAction : Action
 {
+    //====================================================================================
+    // 変数
+    //====================================================================================
+
     [SerializeReference] 
     public BlackboardVariable<GameObject> Self;
 
@@ -21,6 +25,10 @@ public partial class EnemyShotAction : Action
     private float elapsedTimer;
 
     EnemyShooter shooter;
+
+    //====================================================================================
+    // 関数
+    //====================================================================================
 
     protected override Status OnStart()
     {

@@ -31665,8 +31665,8 @@ GameObject:
   - component: {fileID: 511772193}
   - component: {fileID: 511772189}
   - component: {fileID: 511772194}
-  - component: {fileID: 511772195}
   - component: {fileID: 511772196}
+  - component: {fileID: 511772195}
   m_Layer: 0
   m_Name: Enemy
   m_TagString: Untagged
@@ -31912,7 +31912,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyShooter
   player: {fileID: 1053650272}
-  bulletPrefab: {fileID: 5426302495904982311, guid: fc3f4e2eadd79e54698cc41ee6cc63b5, type: 3}
+  shootInterval: 1
+  enemyBulletPool: {fileID: 1287557234}
 --- !u!114 &511772196
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -32008,7 +32009,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 2
-  m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
+  m_BackGroundColor: {r: 0, g: 0, b: 0, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
@@ -32571,7 +32572,7 @@ Transform:
   m_GameObject: {fileID: 1053650272}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -15.64, y: -0.58, z: 0}
+  m_LocalPosition: {x: -11.03, y: -7.4, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -32858,6 +32859,53 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
+--- !u!1 &1287557233
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1287557235}
+  - component: {fileID: 1287557234}
+  m_Layer: 0
+  m_Name: EnemyBulletPool
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1287557234
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1287557233}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 04652f29336c53e4d8a56c5fb9855a52, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyBulletPool
+  bulletPrefab: {fileID: 5426302495904982311, guid: fc3f4e2eadd79e54698cc41ee6cc63b5, type: 3}
+  initialSize: 300
+  maxSize: 1000
+--- !u!4 &1287557235
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1287557233}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -3.35073, y: 2.0107, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1503902674
 GameObject:
   m_ObjectHideFlags: 0
@@ -34442,3 +34490,4 @@ SceneRoots:
   - {fileID: 275716280}
   - {fileID: 511772191}
   - {fileID: 1900527409}
+  - {fileID: 1287557235}

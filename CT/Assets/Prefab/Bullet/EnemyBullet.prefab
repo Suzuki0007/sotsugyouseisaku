@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 2805685800516852627}
   - component: {fileID: 2960025960325036639}
   - component: {fileID: 5426302495904982311}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: EnemyBullet
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -171,5 +171,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyBullet
   bulletSpeed: 5
-  bulletDamage: 10
-  bulletLifeTime: 3
+  bulletDamage: 1
+  bulletLifeTime: 10
