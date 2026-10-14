@@ -37,7 +37,7 @@ public class Health : MonoBehaviour
     // 関数
     //=====================================================================
 
-    void Start()
+    void Awake()
     {
         CurrentHealth = maxHealth;
     }
