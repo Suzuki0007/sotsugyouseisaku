@@ -45,6 +45,8 @@ public class NoahDead : CharaBase
     /// <summary>
     /// オブジェクトが無効化されたときに呼ばれる関数
     /// </summary>
+    /// 
+    /// 例えば、プレイヤーの体力が
     private void OnDisable()
     {
         health.OnDied -= OnPlayerDied;

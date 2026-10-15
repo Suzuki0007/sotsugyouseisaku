@@ -90,7 +90,7 @@ public class EnemyBullet : MonoBehaviour
         if(isReturned) { return; }
         if(collision.gameObject == shooter) { return; }
 
-        Debug.Log($"弾 {name} が {collision.name} に衝突。");
+        //Debug.Log($"弾 {name} が {collision.name} に衝突。");
 
         if(collision.CompareTag("Player"))
         {
@@ -102,7 +102,7 @@ public class EnemyBullet : MonoBehaviour
         }
         else
         {
-            Debug.Log($" {collision.name} に当たった");
+            //Debug.Log($" {collision.name} に当たった");
         }
 
         // 弾をプールに返却

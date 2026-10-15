@@ -52,6 +52,7 @@ public class Health : MonoBehaviour
         {
             CurrentHealth = 0;
 
+            // 死亡イベントをだす
             OnDied?.Invoke();
         }
     }
