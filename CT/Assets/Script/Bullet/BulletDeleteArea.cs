@@ -17,7 +17,11 @@ public class BulletDeleteArea : MonoBehaviour
     //=====================================================================
 
     [SerializeField]
-    private Transform playerPos;
+    private Transform defenderPos;
+
+    [Tooltip("削除範囲")]
+    [SerializeField]
+    private float deleteRadius = 5f;
 
     //=====================================================================
     // 関数
@@ -25,13 +29,13 @@ public class BulletDeleteArea : MonoBehaviour
 
     private void Awake()
     {
-        if(playerPos == null) { Debug.LogError("プレイヤーの位置が設定されていません"); }
+        if(defenderPos == null) { Debug.LogError("防御者の位置が設定されていません"); }
     }
 
     void Update()
     {
-        // プレイヤーの位置に追従する
-        transform.position = playerPos.position;
+        // 防御者の位置に追従する
+        transform.position = defenderPos.position;
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
@@ -44,5 +48,13 @@ public class BulletDeleteArea : MonoBehaviour
             // 弾をプールに返却する
             bullet.ReturnToPool();
         }
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.green;
+
+        // DrawWireSphereは、指定した位置と半径でワイヤーフレームの球を描画する関数
+        Gizmos.DrawWireSphere(defenderPos.position, deleteRadius);
     }
 }

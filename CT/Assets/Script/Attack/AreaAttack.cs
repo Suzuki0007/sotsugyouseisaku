@@ -24,7 +24,8 @@ public class AreaAttack : MonoBehaviour
     [SerializeField]
     private Transform attackerPos;
 
-    [SerializeField] 
+    [Tooltip("攻撃範囲")]
+    [SerializeField]
     private float attackRadius = 1.5f;
     
     [SerializeField] 
@@ -149,6 +150,6 @@ public class AreaAttack : MonoBehaviour
         Gizmos.color = Color.red;
 
         // DrawWireSphereは、指定した位置と半径でワイヤーフレームの球を描画する関数
-        Gizmos.DrawWireSphere(transform.position, attackRadius);
+        Gizmos.DrawWireSphere(attackerPos.position, attackRadius);
     }
 }

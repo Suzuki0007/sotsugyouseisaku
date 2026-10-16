@@ -55,17 +55,6 @@ public class EnemyShooter : CharaBase
 
     public void Shoot()
     {
-        //// 弾を生成する
-        //EnemyBullet bullet = Instantiate(bulletPrefab, transform.position, Quaternion.identity);
-
-        //Vector2 direction = (player.transform.position - transform.position).normalized;
-        //bullet.SetDirection(direction);
-
-        //bullet.SetShooter(gameObject);
-
-
-
-
         // プールから弾を取得する
         EnemyBullet bullet = enemyBulletPool.GetBullet(transform.position, Quaternion.identity);
 
