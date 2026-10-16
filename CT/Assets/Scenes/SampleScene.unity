@@ -31887,6 +31887,7 @@ GameObject:
   m_Component:
   - component: {fileID: 511772191}
   - component: {fileID: 511772190}
+  - component: {fileID: 511772198}
   - component: {fileID: 511772192}
   - component: {fileID: 511772193}
   - component: {fileID: 511772189}
@@ -32048,7 +32049,7 @@ BoxCollider2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 511772188}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Density: 1
   m_Material: {fileID: 0}
@@ -32166,6 +32167,42 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 93e7e6ed1bac32542a730f179e69e8e3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyDead
+--- !u!58 &511772198
+CircleCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 511772188}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: 0, y: -0.6}
+  m_Radius: 0.49
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -32873,7 +32910,7 @@ MonoBehaviour:
   focusTargetPos: {fileID: 1053650275}
   radius: 2.1
   segments: 32
-  lineWidth: 0.03
+  lineWidth: 0.1
   lineColor: {r: 0.014359593, g: 1, b: 0, a: 1}
   showCircle: 1
   zOffset: 0
@@ -33769,7 +33806,7 @@ MonoBehaviour:
   focusTargetPos: {fileID: 1053650275}
   radius: 1.65
   segments: 36
-  lineWidth: 0.03
+  lineWidth: 0.1
   lineColor: {r: 0.8113208, g: 0.06505875, b: 0.06505875, a: 1}
   showCircle: 1
   zOffset: 0
