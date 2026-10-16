@@ -98,7 +98,7 @@ public class EnemyBullet : MonoBehaviour
             if(health == null) { return;}
             health.Damage(bulletDamage);
 
-            Debug.Log($" {gameObject.name} の残り体力: " + health.CurrentHealth);
+            //Debug.Log($" {gameObject.name} の残り体力: " + health.CurrentHealth);
         }
         else
         {

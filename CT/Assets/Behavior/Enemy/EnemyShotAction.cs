@@ -50,14 +50,14 @@ public partial class EnemyShotAction : Action
 
         if(shotTimer >= shootInterval.Value)
         {
-            Debug.Log("弾発射");
+            //Debug.Log("弾発射");
             shotTimer = 0f;
             shooter.Shoot();
         }
 
         if(elapsedTimer >= waitDuration.Value)
         {
-            Debug.Log("waitDurationが経過したので成功を返す");
+            //Debug.Log("waitDurationが経過したので成功を返す");
             return Status.Success;
         }
 
