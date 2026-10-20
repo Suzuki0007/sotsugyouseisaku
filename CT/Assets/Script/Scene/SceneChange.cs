@@ -13,7 +13,9 @@ using UnityEngine.SceneManagement;
 /// </summary>
 public class SceneChange : MonoBehaviour
 {
-    [SerializeField] private string sceneName; // 遷移先のシーン名をInspectorで設定できるようにする
+    // 遷移先のシーン名をInspectorで設定できるようにする
+    [SerializeField] 
+    private string sceneName;
 
     private void OnCollisionEnter2D(Collision2D collision)
     {

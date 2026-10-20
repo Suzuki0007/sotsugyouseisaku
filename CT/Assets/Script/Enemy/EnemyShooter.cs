@@ -17,17 +17,12 @@ public class EnemyShooter : CharaBase
     // 変数
     //===================================================================== 
 
-    [SerializeField] 
     private GameObject player;
 
-    //[SerializeField] 
-    //private EnemyBullet bulletPrefab;
+    private EnemyBulletPool enemyBulletPool;
 
     [SerializeField]
     private float shootInterval = 1f;
-
-    [SerializeField]
-    private EnemyBulletPool enemyBulletPool;
 
     //=====================================================================
     // 関数
@@ -35,26 +30,13 @@ public class EnemyShooter : CharaBase
 
     void Awake()
     {
-        if(player == null)          { Debug.LogError("プレイヤーが設定されていません"); }
-        //if(bulletPrefab == null)    { Debug.LogError("弾のプレハブが設定されていません"); }
-        if(shootInterval <= 0)      { Debug.LogError("弾の発射間隔が正しく設定されていません"); }
-        if(enemyBulletPool == null)      { Debug.LogError("弾のプールが設定されていません"); }
-    }
-
-    void Update()
-    {
-        //// 一定間隔で弾を発射する
-        //if(Time.frameCount % (int)(shootInterval * 60) == 0)
-        //{
-        //    Debug.Log("弾発射キーが押されてしまいそうになりたいでしょう");
-
-        //    // 弾を発射する
-        //    Shoot();
-        //}
+        if(shootInterval <= 0) { Debug.LogError("弾の発射間隔が正しく設定されていません"); }
     }
 
     public void Shoot()
     {
+        if(player == null || enemyBulletPool == null) { return; }
+
         // プールから弾を取得する
         EnemyBullet bullet = enemyBulletPool.GetBullet(transform.position, Quaternion.identity);
 
@@ -64,5 +46,18 @@ public class EnemyShooter : CharaBase
         // 弾に必要な情報を設定する
         bullet.SetDirection(direction);
         bullet.SetShooter(gameObject);
+    }
+
+    public void InitializeReference(GameObject playerObject, EnemyBulletPool enemyBulletPool)
+    {
+        this.player = playerObject.transform.gameObject;
+        this.enemyBulletPool = enemyBulletPool;
+
+        if(player == null || enemyBulletPool == null)
+        {
+            Debug.LogError("プレイヤーまたは弾のプールが設定されていません");
+            enabled = false;
+            return;
+        }
     }
 }

@@ -62,19 +62,28 @@ public class EnemyBulletPool : MonoBehaviour
             // 弾を取得する関数
             actionOnGet: bullet =>
             {
-                bullet.gameObject.SetActive(true);
+                if(bullet)
+                {
+                    bullet.gameObject.SetActive(true);
+                }
             },
 
             // 弾を返却する関数
             actionOnRelease: bullet =>
             {
-                bullet.gameObject.SetActive(false);
+                if(bullet)
+                {
+                    bullet.gameObject.SetActive(false);
+                }
             },
 
             // 弾を破棄する関数
             actionOnDestroy: bullet =>
             {
-                Destroy(bullet.gameObject);
+                if(bullet)
+                {
+                    Destroy(bullet);
+                }
             },
 
             // プールの収集チェックを有効にするかどうか
@@ -118,7 +127,16 @@ public class EnemyBulletPool : MonoBehaviour
         bullet.transform.position = position;
         bullet.transform.rotation = rotation;
         return bullet; 
-    } 
+    }
+
+    /// <summary>
+    /// プールからすべての弾を取得する
+    /// </summary>
+    /// <returns></returns>
+    public EnemyBullet GetAllBullets()
+    {
+        return pool.Get();
+    }
 
     /// <summary> 
     /// 弾をプールに返却する

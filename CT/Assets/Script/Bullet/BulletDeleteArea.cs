@@ -40,14 +40,14 @@ public class BulletDeleteArea : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if(collision.CompareTag("EnemyBullet") == true)
-        {
-            EnemyBullet bullet = collision.GetComponent<EnemyBullet>();
-            if(bullet == null) { Debug.Log("敵の弾クラスがないです"); }
+        if(!collision.CompareTag("EnemyBullet")) { return; }
 
-            // 弾をプールに返却する
-            bullet.ReturnToPool();
-        }
+        EnemyBullet bullet = collision.GetComponent<EnemyBullet>();
+        if(bullet == null) { Debug.Log("敵の弾クラスがないです"); }
+
+        // 弾をプールに返却する
+        bullet.ReturnToPool();
+        
     }
 
     private void OnDrawGizmosSelected()

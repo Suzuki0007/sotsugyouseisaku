@@ -22,6 +22,7 @@ public partial class EnemyShotAction : Action
     public BlackboardVariable<float> waitDuration;
 
     private float shotTimer;
+
     private float elapsedTimer;
 
     EnemyShooter shooter;
