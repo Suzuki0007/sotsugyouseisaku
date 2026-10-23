@@ -30574,37 +30574,6 @@ Tilemap:
     e31: 0
     e32: 0
     e33: 1
---- !u!1 &229550075
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 229550076}
-  m_Layer: 0
-  m_Name: Enemies
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &229550076
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 229550075}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -122.66088, y: 15.89193, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &275716278
 GameObject:
   m_ObjectHideFlags: 0
@@ -30649,6 +30618,81 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1723348673}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &348674307
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 348674308}
+  - component: {fileID: 348674310}
+  - component: {fileID: 348674309}
+  m_Layer: 5
+  m_Name: JustTimingLight
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!224 &348674308
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 348674307}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 423259412}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 36.4}
+  m_SizeDelta: {x: 192, y: 192}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &348674309
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 348674307}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 8934912922244371724, guid: 11b0c4c6de92ddd4395f6f835b505792, type: 3}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!222 &348674310
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 348674307}
+  m_CullTransparentMesh: 1
 --- !u!1 &356396230
 GameObject:
   m_ObjectHideFlags: 0
@@ -32046,10 +32090,11 @@ RectTransform:
   m_Children:
   - {fileID: 2105947770}
   - {fileID: 2058228271}
-  - {fileID: 356396231}
   - {fileID: 823229330}
   - {fileID: 1457354722}
   - {fileID: 1206976742}
+  - {fileID: 348674308}
+  - {fileID: 356396231}
   m_Father: {fileID: 1167110589}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
@@ -32069,13 +32114,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5914fd217e060034c993009ca5562cdf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TimingGaugeUI
+  timingGauge: {fileID: 423259411}
   leftFill: {fileID: 823229331}
   rightFill: {fileID: 1457354723}
-  fillDuration: 1.72
-  judgeKey: 1
-  perfectWindow: 0.05
+  lightEffect: {fileID: 348674307}
+  fillDuration: 1.7
+  resultDisplayDuration: 1
+  judgeKey: 32
+  gaugeColor: {r: 1, g: 0.3443396, b: 0.3443396, a: 1}
+  perfectWindow: 0.025
   goodWindow: 0.12
-  missWindow: 0.15
+  missWindow: 0.05
   resultText: {fileID: 356396232}
 --- !u!222 &423259414
 CanvasRenderer:
@@ -32520,7 +32569,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 0.2688679, b: 0.2688679, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -33101,10 +33150,11 @@ GameObject:
   - component: {fileID: 1053650285}
   - component: {fileID: 1053650286}
   - component: {fileID: 1053650287}
-  - component: {fileID: 1053650288}
   - component: {fileID: 1053650289}
   - component: {fileID: 1053650290}
   - component: {fileID: 1053650291}
+  - component: {fileID: 1053650292}
+  - component: {fileID: 1053650293}
   m_Layer: 0
   m_Name: Player_Noah
   m_TagString: Player
@@ -33364,20 +33414,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NoahBulletDeleteAreaController
   bulletDeleteArea: {fileID: 54569702}
---- !u!114 &1053650288
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1053650272}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f560fdc7f0a846d40881e73eb9eaa21f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::AttackController
-  Attacker: {fileID: 1053650272}
-  areaAttack: {fileID: 1420506456}
 --- !u!114 &1053650289
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -33419,6 +33455,34 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerFollower
   targetPlayer: {fileID: 0}
   followDistance: 10
+--- !u!114 &1053650292
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1053650272}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2256f6609641d644093baa95c14bfce6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AreaAttackController
+  attackKey: 1
+  areaAttack: {fileID: 1420506456}
+--- !u!114 &1053650293
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1053650272}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0dfdf2fa3fb780e45a2a9ed131f2a176, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TimingGaugeAttackController
+  attackKey: 32
+  timingGauge: {fileID: 423259413}
 --- !u!1 &1167110585
 GameObject:
   m_ObjectHideFlags: 0
@@ -33851,7 +33915,7 @@ GameObject:
   - component: {fileID: 1420506456}
   - component: {fileID: 1420506457}
   m_Layer: 0
-  m_Name: AreaAttack
+  m_Name: NoahAreaAttack
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -34184,7 +34248,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 0.98823535, g: 0.27450982, b: 0.27450982, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -36194,7 +36258,6 @@ SceneRoots:
   - {fileID: 1167110589}
   - {fileID: 1325396621}
   - {fileID: 1703584050}
-  - {fileID: 229550076}
   - {fileID: 925343413}
   - {fileID: 12192314}
   - {fileID: 1743057622}

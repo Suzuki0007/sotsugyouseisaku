@@ -1,6 +1,6 @@
 /*********************************************************************/
 // * \file   AttackController.cs
-// * \brief  攻撃コントローラークラス
+// * \brief  攻撃コントローラー基底クラス
 // *
 // * \author 成田悠真
 /*********************************************************************/
@@ -9,29 +9,31 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 
 /// <summary>
-/// 攻撃コントローラークラス
+/// 攻撃コントローラー基底クラス
 /// </summary>
 public class AttackController : CharaBase
 {
-    [SerializeField]
-    private GameObject Attacker;
+    [Header("攻撃開始の入力設定")]
 
     [SerializeField]
-    private AreaAttack areaAttack;
+    private Key attackKey;
 
     void Awake()
     {
-        if(Attacker == null) { Debug.LogError("Attackerが設定されていません"); }
-        if(areaAttack == null) { Debug.LogError("AreaAttackが設定されていません"); }
+        if(attackKey == Key.None) { Debug.LogError("攻撃開始の入力設定が設定されていません"); }
     }
 
     private void Update()
     {
-        // スペースキーが押されたら攻撃を開始する
-        if(Keyboard.current.spaceKey.wasPressedThisFrame)
+        // 指定されたキーが押されたら攻撃を開始する
+        if(Keyboard.current[attackKey].wasPressedThisFrame)
         {
-            //Debug.Log("攻撃が開始されました");
-            areaAttack.StartAttack();
+            StartAttack();
         }
     }
+
+    /// <summary>
+    /// 攻撃開始時の処理を行う仮想関数
+    /// </summary>
+    virtual protected void StartAttack() { }
 }
