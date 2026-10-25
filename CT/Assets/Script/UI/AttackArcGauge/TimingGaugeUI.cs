@@ -16,11 +16,21 @@ using UnityEngine.InputSystem;
 public class TimingGaugeUI : MonoBehaviour
 {
     //=====================================================================
+    // 列挙型
+    //=====================================================================
+
+    public enum JudgeResult
+    {
+        PERFECT,
+        GOOD,
+        MISS
+    }
+
+    //=====================================================================
     // 変数
     //=====================================================================
 
-    // UI画像設定
-    [Header("Gauge Image")]
+    [Header("ゲージ画像")]
 
     [SerializeField] 
     private GameObject timingGauge;
@@ -34,8 +44,7 @@ public class TimingGaugeUI : MonoBehaviour
     [SerializeField] 
     private GameObject lightEffect;
 
-    // UI設定
-    [Header("Gauge Settings")]
+    [Header("ゲージ設定")]
 
     [SerializeField]
     private float fillDuration = 2f;
@@ -49,8 +58,7 @@ public class TimingGaugeUI : MonoBehaviour
     [SerializeField]
     private Color gaugeColor = Color.red;
 
-    // ジャッジ
-    [Header("Judge Window")]
+    [Header("ジャッジ設定")]
 
     //[SerializeField]
     //private float justWindow = 0.01f;
@@ -67,8 +75,7 @@ public class TimingGaugeUI : MonoBehaviour
     [SerializeField]
     private float missWindow = 0.15f;
 
-    // リザルトUI
-    [Header("Result UI")]
+    [Header("リザルトUI")]
 
     [SerializeField]
     private TMP_Text resultText;
@@ -78,6 +85,11 @@ public class TimingGaugeUI : MonoBehaviour
     private bool isRunning; 
 
     private bool isFinished;
+
+    [Header("範囲攻撃")]
+
+    [SerializeField]
+    private AreaAttack areaAttack;
 
     //=====================================================================
     // 関数

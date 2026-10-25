@@ -42,6 +42,8 @@ public class AreaAttack : MonoBehaviour
     // 現在の攻撃ですでにダメージを与えた対象
     private HashSet<GameObject> hitTargets = new();
 
+    private float defaultDamage = 1f;
+
     private bool isAttacking = false;
 
     //=====================================================================
@@ -52,14 +54,18 @@ public class AreaAttack : MonoBehaviour
     {
         if(attackerPos == null) { Debug.LogError("攻撃判定追従対象が設定されていません"); }
         if(targetLayer == 0) { Debug.LogError("ターゲットレイヤーが設定されていません"); }
+
+        defaultDamage = attackDamage;
     }
 
     /// <summary>
     /// 攻撃開始関数
     /// </summary>
-    public void StartAttack()
+    public void StartAttack(float damageMultiplier)
     {
         if(isAttacking) { return; }
+
+        attackDamage = (int)(defaultDamage * damageMultiplier);
 
         // 攻撃コルーチンを開始
         StartCoroutine(AttackCoroutine());
