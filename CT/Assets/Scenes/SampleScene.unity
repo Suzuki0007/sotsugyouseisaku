@@ -32085,8 +32085,8 @@ RectTransform:
   m_GameObject: {fileID: 423259411}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 0.25, y: 0.25, z: 0.25}
+  m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 2105947770}
   - {fileID: 2058228271}
@@ -32099,7 +32099,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 131.9}
+  m_AnchoredPosition: {x: 0, y: 43}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &423259413
@@ -32124,8 +32124,12 @@ MonoBehaviour:
   gaugeColor: {r: 1, g: 0.3443396, b: 0.3443396, a: 1}
   perfectWindow: 0.025
   goodWindow: 0.12
-  missWindow: 0.05
+  missWindow: 0.04
+  perfectMultiplier: 3
+  goodMultiplier: 2
+  missMultiplier: 1
   resultText: {fileID: 356396232}
+  areaAttack: {fileID: 1420506456}
 --- !u!222 &423259414
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -33469,6 +33473,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AreaAttackController
   attackKey: 1
   areaAttack: {fileID: 1420506456}
+  damageMultiplier: 1
 --- !u!114 &1053650293
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -33615,8 +33620,8 @@ RectTransform:
   m_GameObject: {fileID: 1168512690}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 0.73, y: 0.73, z: 0.73}
+  m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 160289648}
   - {fileID: 1357885122}
@@ -33625,7 +33630,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -655.9, y: 483.1}
+  m_AnchoredPosition: {x: -385.2, y: 197.2}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1168512692

@@ -121,7 +121,7 @@ public class ObjectSpawner : MonoBehaviour
         }
         else
         {
-            Debug.Log("最大生成数に達したため再生成しません", this);
+            Debug.Log($"{gameObject.name}: 最大生成数に達したため再生成しません", this);
         }
     }
 

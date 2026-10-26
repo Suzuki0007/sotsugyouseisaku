@@ -75,6 +75,17 @@ public class TimingGaugeUI : MonoBehaviour
     [SerializeField]
     private float missWindow = 0.15f;
 
+    [Header("ジャッジ結果倍率")]
+
+    [SerializeField]
+    private float perfectMultiplier = 1.5f;
+
+    [SerializeField]
+    private float goodMultiplier = 1.2f;
+
+    [SerializeField]
+    private float missMultiplier = 1.0f;
+
     [Header("リザルトUI")]
 
     [SerializeField]
@@ -104,6 +115,8 @@ public class TimingGaugeUI : MonoBehaviour
         // 初期状態では非表示
         if(timingGauge != null) { timingGauge.SetActive(false); }
         if(lightEffect != null) { lightEffect.SetActive(false); }
+
+        if(areaAttack == null) { Debug.LogWarning("AreaAttackが設定されていません"); }
     }
 
     private void Start()
@@ -122,17 +135,19 @@ public class TimingGaugeUI : MonoBehaviour
         leftFill.fillAmount = progress;
         rightFill.fillAmount = progress;
 
+        // キー入力があった場合、ジャッジ処理を行う
         if(Keyboard.current != null && 
            Keyboard.current[judgeKey].wasPressedThisFrame)
         {
-            Judge(); 
+            Judge();
         }
 
+        // ゲージが満タンになった後、missWindowの時間が経過したらMISS判定
         if(isRunning && elapsedTime >= fillDuration + missWindow)
         {
             leftFill.color = Color.gray;
             rightFill.color = Color.gray;
-            JudgeFinish("MISS");
+            JudgeFinish(JudgeResult.MISS);
         }
     }
 
@@ -166,15 +181,15 @@ public class TimingGaugeUI : MonoBehaviour
 
         if(timingError <= perfectWindow)
         {
-            JudgeFinish("PERFECT");
+            JudgeFinish(JudgeResult.PERFECT);
         }
         else if(timingError <= goodWindow)
         {
-            JudgeFinish("GOOD");
+            JudgeFinish(JudgeResult.GOOD);
         }
         else
         {
-            JudgeFinish("MISS");
+            JudgeFinish(JudgeResult.MISS);
         }
     }
 
@@ -182,15 +197,20 @@ public class TimingGaugeUI : MonoBehaviour
     /// ジャッジ終了時の処理
     /// </summary>
     /// <param name="result"></param>
-    private void JudgeFinish(string result)
+    private void JudgeFinish(JudgeResult result)
     {
         if(isFinished) { return; }
 
         isFinished = true;
         isRunning = false;
-        if(resultText != null) { resultText.text = result; }
+        if(resultText != null) { resultText.text = result.ToString(); }
 
-        if(lightEffect != null) { lightEffect.SetActive(result == "PERFECT"); }
+        // 判定結果がPerfectの場合、ライトエフェクトを表示する
+        if(lightEffect != null) { lightEffect.SetActive(result == JudgeResult.PERFECT); }
+
+        // 判定結果に応じたダメージ倍率を計算し、範囲攻撃を開始
+        float damageMultiplier = DamageMultiplierFromJudge(result);
+        if(areaAttack != null) { areaAttack.StartAttack(damageMultiplier); }
 
         // 一定時間後にゲージを非表示にする
         if(resultDisplayDuration > 0f)
@@ -199,7 +219,36 @@ public class TimingGaugeUI : MonoBehaviour
             Invoke("HideGauge", resultDisplayDuration);
         }
 
-        Debug.Log($"タイミング判定: {result}");
+        Debug.Log($"判定結果: {result} / ダメージ倍率: {damageMultiplier}");
+    }
+
+    /// <summary>
+    /// 判定結果に応じたダメージ倍率を返す関数
+    /// </summary>
+    /// <param name="result"></param>
+    /// <returns></returns>
+    private float DamageMultiplierFromJudge(JudgeResult result)
+    {
+        switch(result)
+        {
+            case JudgeResult.PERFECT:
+            {
+                return perfectMultiplier;
+            }
+
+            case JudgeResult.GOOD:
+            {
+                return goodMultiplier;
+            }
+
+            case JudgeResult.MISS:
+            { 
+                return missMultiplier;
+            }
+
+            default:
+                return 1.0f;
+        }
     }
 
     /// <summary>

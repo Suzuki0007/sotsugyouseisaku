@@ -17,7 +17,7 @@ public class PlayerSwitchManager : Singleton<PlayerSwitchManager>
     // 変数
     //=====================================================================
 
-    [Header("Characters")]
+    [Header("プレイヤーキャラクター")]
 
     [SerializeField]
     private GameObject noah;
@@ -25,12 +25,12 @@ public class PlayerSwitchManager : Singleton<PlayerSwitchManager>
     [SerializeField]
     private GameObject sigle;
 
-    [Header("Camera")]
+    [Header("カメラ")]
 
     [SerializeField]
     private FocusCamera focusCamera;
 
-    [Header("Setting")]
+    [Header("設定")]
 
     [SerializeField]
     private Key switchKey = Key.C;
@@ -53,6 +53,8 @@ public class PlayerSwitchManager : Singleton<PlayerSwitchManager>
 
     public GameObject CurrentPlayer => currentPlayer;
 
+    public GameObject Noah => noah;
+
     //=====================================================================
     // 関数
     //=====================================================================
@@ -66,7 +68,7 @@ public class PlayerSwitchManager : Singleton<PlayerSwitchManager>
         if(!InitializeReferences()) { enabled = false; return; }
 
         // 初期状態はノアを操作する
-        currentPlayer = noah; 
+        currentPlayer = noah;
         noahMovement.SetControlEnabled(true);
         sigleMovement.SetControlEnabled(false);
 
@@ -140,12 +142,12 @@ public class PlayerSwitchManager : Singleton<PlayerSwitchManager>
         Vector3 newPlayerPosition = newPlayer.transform.position; 
         
         // 位置を交換
-        oldPlayer.transform.position = newPlayerPosition; 
-        newPlayer.transform.position = oldPlayerPosition; 
+        oldPlayer.transform.position = newPlayerPosition;
+        newPlayer.transform.position = oldPlayerPosition;
         
         // 操作権を交換
-        noahMovement.SetControlEnabled(newPlayer == noah); 
-        sigleMovement.SetControlEnabled(newPlayer == sigle); 
+        noahMovement.SetControlEnabled(newPlayer == noah);
+        sigleMovement.SetControlEnabled(newPlayer == sigle);
         
         // 現在の操作キャラクターを更新
         currentPlayer = newPlayer;
