@@ -43,11 +43,9 @@ public class EnemyBullet : MonoBehaviour
     {
         initialLifeTime = bulletLifeTime;
 
-        if(bulletSpeed <= 0) { Debug.LogError("弾の速度が設定されていません"); }
-
-        if(bulletDamage <= 0) { Debug.LogError("弾のダメージが設定されていません"); }
-
-        if(bulletLifeTime <= 0f) { Debug.LogError("弾の寿命が設定されていません"); }
+        if(bulletSpeed    <= 0) { Debug.LogError("弾の速度が設定されていません"); }
+        if(bulletDamage   <= 0) { Debug.LogError("弾のダメージが設定されていません"); }
+        if(bulletLifeTime <= 0f){ Debug.LogError("弾の寿命が設定されていません"); }
 
         rb = GetComponent<Rigidbody2D>();
         if(rb == null) { Debug.LogError("Rigidbody2Dがアタッチされていません"); }

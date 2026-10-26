@@ -33418,6 +33418,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NoahBulletDeleteAreaController
   bulletDeleteArea: {fileID: 54569702}
+  isDebugMode: 1
 --- !u!114 &1053650289
 MonoBehaviour:
   m_ObjectHideFlags: 0

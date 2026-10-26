@@ -47,7 +47,6 @@ public class BulletDeleteArea : MonoBehaviour
 
         // 弾をプールに返却する
         bullet.ReturnToPool();
-        
     }
 
     private void OnDrawGizmosSelected()

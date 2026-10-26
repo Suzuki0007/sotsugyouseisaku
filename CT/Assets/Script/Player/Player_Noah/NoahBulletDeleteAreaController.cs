@@ -13,8 +13,21 @@ using UnityEngine.InputSystem;
 /// </summary>
 public class NoahBulletDeleteAreaController : CharaBase
 {
+    //=====================================================================
+    // 変数
+    //=====================================================================
+
     [SerializeField] 
     private GameObject bulletDeleteArea;
+
+    [Header("デバッグ設定")]
+
+    [SerializeField]
+    private bool isDebugMode = false;
+
+    //=====================================================================
+    // 関数
+    //=====================================================================
 
     private void Awake()
     {
@@ -23,14 +36,21 @@ public class NoahBulletDeleteAreaController : CharaBase
 
     void Update()
     {
-        // Qキーが押されている間はエリアを有効化する
-        if(Keyboard.current.qKey.isPressed)
+        if(isDebugMode)
         {
             bulletDeleteArea.SetActive(true);
         }
         else
         {
-            bulletDeleteArea.SetActive(false);
+            // Qキーが押されている間はエリアを有効化する
+            if(Keyboard.current.qKey.isPressed)
+            {
+                bulletDeleteArea.SetActive(true);
+            }
+            else
+            {
+                bulletDeleteArea.SetActive(false);
+            }
         }
     }
 }
