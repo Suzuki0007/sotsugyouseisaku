@@ -17,12 +17,12 @@ public class EnemyShooter : CharaBase
     // 変数
     //===================================================================== 
 
+    [SerializeField]
+    private float shootInterval = 1f;
+
     private GameObject player;
 
     private EnemyBulletPool enemyBulletPool;
-
-    [SerializeField]
-    private float shootInterval = 1f;
 
     //=====================================================================
     // 関数
