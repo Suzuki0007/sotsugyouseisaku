@@ -32,8 +32,8 @@ MonoBehaviour:
           rid: 8432779314880577546
         BlackboardGroupReferences: []
         Root:
-          rid: 8432779650758082794
-        m_VersionTimestamp: 639281130351255671
+          rid: 8432779810421080187
+        m_VersionTimestamp: 639287020771659317
     - rid: 8432779314880577546
       type: {class: BlackboardReference, ns: Unity.Behavior, asm: Unity.Behavior}
       data:
@@ -44,20 +44,11 @@ MonoBehaviour:
       type: {class: Blackboard, ns: Unity.Behavior, asm: Unity.Behavior}
       data:
         m_Variables:
-        - rid: 8432779650758082796
-        - rid: 8432779650758082797
-        - rid: 8432779650758082798
-        - rid: 8432779650758082799
-        - rid: 8432779650758082800
-    - rid: 8432779650758082785
-      type: {class: 'BlackboardVariable`1[[System.Boolean, mscorlib]]', ns: Unity.Behavior, asm: Unity.Behavior}
-      data:
-        GUID:
-          m_Value0: 0
-          m_Value1: 0
-        Name: 
-        m_Value: 0
-    - rid: 8432779650758082794
+        - rid: 8432779810421080189
+        - rid: 8432779810421080190
+        - rid: 8432779810421080191
+        - rid: 8432779810421080192
+    - rid: 8432779810421080187
       type: {class: Start, ns: Unity.Behavior, asm: Unity.Behavior}
       data:
         ID:
@@ -68,10 +59,10 @@ MonoBehaviour:
         m_Parent:
           rid: -2
         m_Child:
-          rid: 8432779650758082795
+          rid: 8432779810421080188
         Repeat: 1
         AllowMultipleRepeatsPerTick: 0
-    - rid: 8432779650758082795
+    - rid: 8432779810421080188
       type: {class: RepeaterModifier, ns: Unity.Behavior, asm: Unity.Behavior}
       data:
         ID:
@@ -80,11 +71,11 @@ MonoBehaviour:
         Graph:
           rid: 8432779314880577545
         m_Parent:
-          rid: 8432779650758082794
+          rid: 8432779810421080187
         m_Child:
-          rid: 8432779650758082801
+          rid: 8432779810421080193
         m_AllowMultipleRepeatsPerTick: 0
-    - rid: 8432779650758082796
+    - rid: 8432779810421080189
       type: {class: 'BlackboardVariable`1[[UnityEngine.GameObject, UnityEngine.CoreModule]]', ns: Unity.Behavior, asm: Unity.Behavior}
       data:
         GUID:
@@ -92,7 +83,7 @@ MonoBehaviour:
           m_Value1: 0
         Name: Self
         m_Value: {fileID: 0}
-    - rid: 8432779650758082797
+    - rid: 8432779810421080190
       type: {class: 'BlackboardVariable`1[[UnityEngine.GameObject, UnityEngine.CoreModule]]', ns: Unity.Behavior, asm: Unity.Behavior}
       data:
         GUID:
@@ -100,7 +91,7 @@ MonoBehaviour:
           m_Value1: 2713954555669715875
         Name: TargetPlayer
         m_Value: {fileID: 0}
-    - rid: 8432779650758082798
+    - rid: 8432779810421080191
       type: {class: 'BlackboardVariable`1[[System.Single, mscorlib]]', ns: Unity.Behavior, asm: Unity.Behavior}
       data:
         GUID:
@@ -108,15 +99,7 @@ MonoBehaviour:
           m_Value1: 5785727692585696885
         Name: MoveDuration
         m_Value: 0
-    - rid: 8432779650758082799
-      type: {class: 'BlackboardVariable`1[[System.Single, mscorlib]]', ns: Unity.Behavior, asm: Unity.Behavior}
-      data:
-        GUID:
-          m_Value0: 4866339897176143979
-          m_Value1: 18287121351534628403
-        Name: ShootInterval
-        m_Value: 0
-    - rid: 8432779650758082800
+    - rid: 8432779810421080192
       type: {class: 'BlackboardVariable`1[[System.Single, mscorlib]]', ns: Unity.Behavior, asm: Unity.Behavior}
       data:
         GUID:
@@ -124,7 +107,7 @@ MonoBehaviour:
           m_Value1: 11343017132142540790
         Name: WaitDuration
         m_Value: 0
-    - rid: 8432779650758082801
+    - rid: 8432779810421080193
       type: {class: SequenceComposite, ns: Unity.Behavior, asm: Unity.Behavior}
       data:
         ID:
@@ -133,12 +116,12 @@ MonoBehaviour:
         Graph:
           rid: 8432779314880577545
         m_Parent:
-          rid: 8432779650758082795
+          rid: 8432779810421080188
         m_Children:
-        - rid: 8432779650758082802
-        - rid: 8432779650758082803
+        - rid: 8432779810421080194
+        - rid: 8432779810421080195
         m_RegisteredObservers: []
-    - rid: 8432779650758082802
+    - rid: 8432779810421080194
       type: {class: EnemyShotAction, ns: , asm: Assembly-CSharp}
       data:
         ID:
@@ -147,14 +130,14 @@ MonoBehaviour:
         Graph:
           rid: 8432779314880577545
         m_Parent:
-          rid: 8432779650758082801
+          rid: 8432779810421080193
         Self:
-          rid: 8432779650758082796
+          rid: 8432779810421080189
         shootInterval:
-          rid: 8432779650758082799
+          rid: 8432779810421080196
         waitDuration:
-          rid: 8432779650758082800
-    - rid: 8432779650758082803
+          rid: 8432779810421080192
+    - rid: 8432779810421080195
       type: {class: SetPositionToTargetAction, ns: Unity.Behavior, asm: Unity.Behavior}
       data:
         ID:
@@ -163,16 +146,24 @@ MonoBehaviour:
         Graph:
           rid: 8432779314880577545
         m_Parent:
-          rid: 8432779650758082801
+          rid: 8432779810421080193
         Transform:
-          rid: 8432779650758082804
+          rid: 8432779810421080197
         Target:
-          rid: 8432779650758082805
+          rid: 8432779810421080198
         Duration:
-          rid: 8432779650758082798
+          rid: 8432779810421080191
         UseSlerp:
-          rid: 8432779650758082785
-    - rid: 8432779650758082804
+          rid: 8432779810421080199
+    - rid: 8432779810421080196
+      type: {class: 'BlackboardVariable`1[[System.Single, mscorlib]]', ns: Unity.Behavior, asm: Unity.Behavior}
+      data:
+        GUID:
+          m_Value0: 0
+          m_Value1: 0
+        Name: 
+        m_Value: 0
+    - rid: 8432779810421080197
       type: {class: 'GameObjectToComponentBlackboardVariable`1[[UnityEngine.Transform, UnityEngine.CoreModule]]', ns: Unity.Behavior, asm: Unity.Behavior}
       data:
         GUID:
@@ -181,8 +172,8 @@ MonoBehaviour:
         Name: 
         m_Value: {fileID: 0}
         m_LinkedVariable:
-          rid: 8432779650758082796
-    - rid: 8432779650758082805
+          rid: 8432779810421080189
+    - rid: 8432779810421080198
       type: {class: 'GameObjectToComponentBlackboardVariable`1[[UnityEngine.Transform, UnityEngine.CoreModule]]', ns: Unity.Behavior, asm: Unity.Behavior}
       data:
         GUID:
@@ -191,7 +182,15 @@ MonoBehaviour:
         Name: 
         m_Value: {fileID: 0}
         m_LinkedVariable:
-          rid: 8432779650758082797
+          rid: 8432779810421080190
+    - rid: 8432779810421080199
+      type: {class: 'BlackboardVariable`1[[System.Boolean, mscorlib]]', ns: Unity.Behavior, asm: Unity.Behavior}
+      data:
+        GUID:
+          m_Value0: 0
+          m_Value1: 0
+        Name: 
+        m_Value: 0
 --- !u!114 &-7797635752614779421
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -224,9 +223,8 @@ MonoBehaviour:
   - rid: 8432779314880577550
   - rid: 8432779333810782624
   - rid: 8432779333810782726
-  - rid: 8432779359954928035
   - rid: 8432779359954928161
-  m_VersionTimestamp: 639281166242765622
+  m_VersionTimestamp: 639287020767138509
   m_CommandBuffer:
     m_Commands: []
   m_RuntimeBlackboardAsset: {fileID: 568343879818560596}
@@ -260,16 +258,6 @@ MonoBehaviour:
           m_Value0: 6839224826628552974
           m_Value1: 5785727692585696885
         Name: MoveDuration
-        IsExposed: 1
-        m_IsShared: 0
-        m_Value: 0
-    - rid: 8432779359954928035
-      type: {class: 'TypedVariableModel`1[[System.Single, mscorlib]]', ns: Unity.Behavior.GraphFramework, asm: Unity.Behavior.GraphFramework}
-      data:
-        ID:
-          m_Value0: 4866339897176143979
-          m_Value1: 18287121351534628403
-        Name: ShootInterval
         IsExposed: 1
         m_IsShared: 0
         m_Value: 0
@@ -309,7 +297,7 @@ MonoBehaviour:
   - rid: 8432779359954927722
   - rid: 8432779359954927828
   - rid: 8432779359954927887
-  m_VersionTimestamp: 639281130351255671
+  m_VersionTimestamp: 639287020771659317
   m_SerializedVersion: 3
   m_DebugInfo: {fileID: -7797635752614779421}
   m_RuntimeGraph: {fileID: -7949268204192683098}
@@ -1205,7 +1193,7 @@ MonoBehaviour:
         LocalValue:
           rid: 8432779359954928072
         LinkedVariable:
-          rid: 8432779359954928073
+          rid: -2
     - rid: 8432779359954928072
       type: {class: 'BlackboardVariable`1[[System.Single, mscorlib]]', ns: Unity.Behavior, asm: Unity.Behavior}
       data:
@@ -1213,16 +1201,6 @@ MonoBehaviour:
           m_Value0: 0
           m_Value1: 0
         Name: 
-        m_Value: 0
-    - rid: 8432779359954928073
-      type: {class: 'TypedVariableModel`1[[System.Single, mscorlib]]', ns: Unity.Behavior.GraphFramework, asm: Unity.Behavior.GraphFramework}
-      data:
-        ID:
-          m_Value0: 4866339897176143979
-          m_Value1: 18287121351534628403
-        Name: ShootInterval
-        IsExposed: 1
-        m_IsShared: 0
         m_Value: 0
     - rid: 8432779359954928159
       type: {class: BehaviorGraphNodeModel/FieldModel, ns: Unity.Behavior, asm: Unity.Behavior.Authoring}
@@ -1275,7 +1253,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5c02bb70996b49eba31d0c206e28da24, type: 3}
   m_Name: Behavior Graph Blackboard
   m_EditorClassIdentifier: Unity.Behavior::Unity.Behavior.RuntimeBlackboardAsset
-  VersionTimestamp: 639281130347347519
+  VersionTimestamp: 639287020767138509
   AssetID:
     m_Value0: 17583776609406018458
     m_Value1: 13736757090996583704
@@ -1284,7 +1262,6 @@ MonoBehaviour:
     - rid: 8432779314880577553
     - rid: 8432779333810782629
     - rid: 8432779333810782737
-    - rid: 8432779359954928050
     - rid: 8432779359954928178
   m_SharedBlackboardVariableGuids: []
   references:
@@ -1313,14 +1290,6 @@ MonoBehaviour:
           m_Value0: 6839224826628552974
           m_Value1: 5785727692585696885
         Name: MoveDuration
-        m_Value: 0
-    - rid: 8432779359954928050
-      type: {class: 'BlackboardVariable`1[[System.Single, mscorlib]]', ns: Unity.Behavior, asm: Unity.Behavior}
-      data:
-        GUID:
-          m_Value0: 4866339897176143979
-          m_Value1: 18287121351534628403
-        Name: ShootInterval
         m_Value: 0
     - rid: 8432779359954928178
       type: {class: 'BlackboardVariable`1[[System.Single, mscorlib]]', ns: Unity.Behavior, asm: Unity.Behavior}

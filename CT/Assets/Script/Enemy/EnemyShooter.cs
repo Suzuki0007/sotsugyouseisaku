@@ -6,7 +6,6 @@
 /*********************************************************************/
 
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 /// <summary>
 /// 敵の弾発射クラス
@@ -18,11 +17,17 @@ public class EnemyShooter : CharaBase
     //===================================================================== 
 
     [SerializeField]
-    private float shootInterval = 1f;
+    private float shootInterval = 0f;
 
     private GameObject player;
 
     private EnemyBulletPool enemyBulletPool;
+
+    //=====================================================================
+    // プロパティ
+    //=====================================================================
+
+    public float ShootInterval => shootInterval;
 
     //=====================================================================
     // 関数

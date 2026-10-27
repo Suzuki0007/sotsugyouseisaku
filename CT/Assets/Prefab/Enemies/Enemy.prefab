@@ -179,7 +179,6 @@ MonoBehaviour:
   - rid: 8432779333810782857
   - rid: 8432779333810782858
   - rid: 8432779333810782859
-  - rid: 8432779359954928090
   - rid: 8432779359954928201
   m_OriginalGraph: {fileID: 0}
   m_IsInitialised: 0
@@ -211,14 +210,6 @@ MonoBehaviour:
           m_Value1: 5785727692585696885
         Name: MoveDuration
         m_Value: 3
-    - rid: 8432779359954928090
-      type: {class: 'BlackboardVariable`1[[System.Single, mscorlib]]', ns: Unity.Behavior, asm: Unity.Behavior}
-      data:
-        GUID:
-          m_Value0: 4866339897176143979
-          m_Value1: 18287121351534628403
-        Name: ShootInterval
-        m_Value: 1
     - rid: 8432779359954928201
       type: {class: 'BlackboardVariable`1[[System.Single, mscorlib]]', ns: Unity.Behavior, asm: Unity.Behavior}
       data:

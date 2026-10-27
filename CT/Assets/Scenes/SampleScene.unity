@@ -154,6 +154,7 @@ Transform:
   - {fileID: 1443821976}
   - {fileID: 1420506455}
   - {fileID: 821653544}
+  - {fileID: 1665152893}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &13313406
@@ -32075,7 +32076,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &423259412
 RectTransform:
   m_ObjectHideFlags: 0
@@ -33418,7 +33419,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NoahBulletDeleteAreaController
   bulletDeleteArea: {fileID: 54569702}
-  isDebugMode: 1
+  isDebugMode: 0
 --- !u!114 &1053650289
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -33784,8 +33785,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyBulletPool
   bulletPrefab: {fileID: 5426302495904982311, guid: fc3f4e2eadd79e54698cc41ee6cc63b5, type: 3}
-  initialSize: 300
-  maxSize: 500
+  initialSize: 200
+  maxSize: 1000
 --- !u!4 &1287557235
 Transform:
   m_ObjectHideFlags: 0
@@ -35031,6 +35032,53 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 5.02, y: 0.89}
   m_EdgeRadius: 0
+--- !u!1 &1665152892
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1665152893}
+  - component: {fileID: 1665152894}
+  m_Layer: 0
+  m_Name: PlayerBulletPool
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1665152893
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1665152892}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 12192314}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1665152894
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1665152892}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 85d457df3e19ab4418449c9141a7b1a2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerBulletPool
+  bulletPrefab: {fileID: 2729680019524291202, guid: cc4ccd96f0c4de0408ac4f6945d4bcf9, type: 3}
+  initialSize: 20
+  maxSize: 100
 --- !u!1 &1703584049
 GameObject:
   m_ObjectHideFlags: 0
@@ -35249,7 +35297,7 @@ GameObject:
   - component: {fileID: 1804071878}
   m_Layer: 0
   m_Name: Player_Sigle
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

@@ -16,9 +16,6 @@ public partial class EnemyShotAction : Action
     public BlackboardVariable<GameObject> Self;
 
     [SerializeReference]
-    public BlackboardVariable<float> shootInterval;
-
-    [SerializeReference]
     public BlackboardVariable<float> waitDuration;
 
     private float shotTimer;
@@ -33,8 +30,6 @@ public partial class EnemyShotAction : Action
 
     protected override Status OnStart()
     {
-        if(shootInterval.Value <= 0f) { Debug.Log("shootIntervalが0以下ですぞ"); }
-
         shooter = Self.Value.GetComponent<EnemyShooter>();
         if(shooter == null) { Debug.Log("EnemyShooterがnullですぞ"); }
 
@@ -49,7 +44,7 @@ public partial class EnemyShotAction : Action
         shotTimer += Time.deltaTime;
         elapsedTimer += Time.deltaTime;
 
-        if(shotTimer >= shootInterval.Value)
+        if(shotTimer >= shooter.ShootInterval)
         {
             //Debug.Log("弾発射");
             shotTimer = 0f;

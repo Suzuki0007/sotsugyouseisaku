@@ -10,6 +10,7 @@ using UnityEngine;
 /// <summary>
 /// 弾の基底クラス
 /// </summary>
+[RequireComponent(typeof(Rigidbody2D))]
 public abstract class BulletBase : MonoBehaviour
 {
     //=====================================================================

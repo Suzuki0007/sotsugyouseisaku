@@ -172,4 +172,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EnemyBullet
   bulletSpeed: 5
   bulletDamage: 1
-  bulletLifeTime: 10
+  bulletLifeTime: 5
