@@ -47,59 +47,14 @@ public class PlayerMovement : CharaBase
     protected virtual void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
+        if(rb == null) { Debug.LogError($"{name}: Rigidbody2Dがアタッチされていません。", this); }
 
-        if(moveSpeed <= 0f) { Debug.Log($"{name}: 移動速度が正しく設定されていません。", this); }
-    }
-
-    private void Update()
-    {
-        // 操作できない場合は移動方向をリセット
-        if(!canControl)
-        {
-            moveDirection = Vector2.zero;
-            return;
-        }
-
-        if(Keyboard.current == null)
-        {
-            moveDirection = Vector2.zero;
-            return;
-        }
-
-        float horizontal = 0f;
-        float vertical = 0f;
-
-        if(Keyboard.current.dKey.isPressed ||
-            Keyboard.current.rightArrowKey.isPressed)
-        {
-            horizontal = 1f;
-        }
-        else if(Keyboard.current.aKey.isPressed ||
-                 Keyboard.current.leftArrowKey.isPressed)
-        {
-            horizontal = -1f;
-        }
-
-        if(Keyboard.current.wKey.isPressed ||
-            Keyboard.current.upArrowKey.isPressed)
-        {
-            vertical = 1f;
-        }
-        else if(Keyboard.current.sKey.isPressed ||
-                 Keyboard.current.downArrowKey.isPressed)
-        {
-            vertical = -1f;
-        }
-
-        moveDirection = new Vector2(horizontal, vertical).normalized;
+        if(moveSpeed <= 0f) { Debug.LogWarning($"{name}: 移動速度が正しく設定されていません。", this); }
     }
 
     private void FixedUpdate()
     {
-        if(!canControl || moveDirection == Vector2.zero)
-        {
-            return;
-        }
+        if(!canControl || moveDirection == Vector2.zero) { return; }
 
         Vector2 nextPosition =
             rb.position + moveDirection * moveSpeed * Time.fixedDeltaTime;
@@ -108,16 +63,31 @@ public class PlayerMovement : CharaBase
     }
 
     /// <summary>
-    /// 操作可能状態を変更する。
+    /// 移動方向を設定するメソッド
+    /// </summary>
+    /// <param name="direction"></param>
+    public void SetMoveDirection(Vector2 direction)
+    {
+        if(!canControl) 
+        {
+            moveDirection = Vector2.zero;
+            return;
+        }
+
+        //moveDirection = direction.normalized;
+
+        // 移動方向を正規化して、その大きさを1に制限する
+        moveDirection = Vector2.ClampMagnitude(direction, 1f);
+    }
+
+    /// <summary>
+    /// 操作可能状態を変更する
     /// </summary>
     public void SetControlEnabled(bool enabled)
     {
         canControl = enabled;
 
-        if(!canControl)
-        {
-            moveDirection = Vector2.zero;
-        }
+        if(!canControl) { moveDirection = Vector2.zero; }
     }
 
     /// <summary>

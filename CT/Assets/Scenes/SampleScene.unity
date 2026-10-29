@@ -155,6 +155,7 @@ Transform:
   - {fileID: 1420506455}
   - {fileID: 821653544}
   - {fileID: 1665152893}
+  - {fileID: 1551081634}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &13313406
@@ -33148,16 +33149,16 @@ GameObject:
   - component: {fileID: 1053650279}
   - component: {fileID: 1053650282}
   - component: {fileID: 1053650281}
-  - component: {fileID: 1053650276}
   - component: {fileID: 1053650278}
-  - component: {fileID: 1053650283}
+  - component: {fileID: 1053650295}
   - component: {fileID: 1053650284}
-  - component: {fileID: 1053650285}
   - component: {fileID: 1053650286}
   - component: {fileID: 1053650287}
   - component: {fileID: 1053650289}
   - component: {fileID: 1053650290}
+  - component: {fileID: 1053650294}
   - component: {fileID: 1053650291}
+  - component: {fileID: 1053650285}
   - component: {fileID: 1053650292}
   - component: {fileID: 1053650293}
   m_Layer: 0
@@ -33242,18 +33243,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1325396621}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1053650276
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1053650272}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6da1d12c42c29dd46973e6839ea9e5e0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::NoahMovement
 --- !u!114 &1053650278
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -33355,19 +33344,6 @@ CircleCollider2D:
   m_CompositeOrder: 0
   m_Offset: {x: 0.00000035762787, y: -0.6076304}
   m_Radius: 0.4023701
---- !u!114 &1053650283
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1053650272}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0484cb61086228545af47d17c18dce0a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::NoahMapLimit
-  tilemap: {fileID: 185692953}
 --- !u!114 &1053650284
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -33419,7 +33395,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NoahBulletDeleteAreaController
   bulletDeleteArea: {fileID: 54569702}
-  isDebugMode: 0
+  isDebugMode: 1
 --- !u!114 &1053650289
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -33490,6 +33466,31 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TimingGaugeAttackController
   attackKey: 32
   timingGauge: {fileID: 423259413}
+--- !u!114 &1053650294
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1053650272}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 91e86cc82b519c942a84d161c268bd5c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerMapLimit
+  tilemap: {fileID: 185692953}
+--- !u!114 &1053650295
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1053650272}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6da1d12c42c29dd46973e6839ea9e5e0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::NoahMovement
 --- !u!1 &1167110585
 GameObject:
   m_ObjectHideFlags: 0
@@ -34551,6 +34552,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 35fbfee1b0df5df48a654f498e832044, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Treasure
+  interactKeyInput: 19
   id: 
   needKey: 1
   getKey: 0
@@ -34602,6 +34604,51 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 0.88, y: 0.94}
   m_EdgeRadius: 0
+--- !u!1 &1551081633
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1551081634}
+  - component: {fileID: 1551081635}
+  m_Layer: 0
+  m_Name: PlayerInput
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1551081634
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1551081633}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 12192314}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1551081635
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1551081633}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1ff4ac6b615784047a26641e5cc32d65, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerInput
+  playerSwitchManager: {fileID: 821653545}
 --- !u!1 &1614921300
 GameObject:
   m_ObjectHideFlags: 0
@@ -35291,10 +35338,11 @@ GameObject:
   - component: {fileID: 1804071874}
   - component: {fileID: 1804071872}
   - component: {fileID: 1804071871}
-  - component: {fileID: 1804071873}
   - component: {fileID: 1804071876}
   - component: {fileID: 1804071877}
   - component: {fileID: 1804071878}
+  - component: {fileID: 1804071879}
+  - component: {fileID: 1804071873}
   m_Layer: 0
   m_Name: Player_Sigle
   m_TagString: Player
@@ -35405,8 +35453,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b093a980bfcd0d948a2d34a05967eedf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SigleMovement
-  targetPlayer: {fileID: 1053650272}
-  followDistance: 10
+  targetPos: {fileID: 1053650275}
 --- !u!114 &1804071873
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -35523,6 +35570,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerFollower
   targetPlayer: {fileID: 0}
   followDistance: 10
+--- !u!114 &1804071879
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1804071867}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 91e86cc82b519c942a84d161c268bd5c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerMapLimit
+  tilemap: {fileID: 185692953}
 --- !u!1 &1825766587
 GameObject:
   m_ObjectHideFlags: 0
@@ -35919,6 +35979,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 82c7f8deda5b6434a97f26d070483c22, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::KeyItem
+  interactKeyInput: 19
   noahInventory: {fileID: 1053650284}
 --- !u!1 &2011798005
 GameObject:
@@ -36027,6 +36088,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0a27450fef6cbee43859bd0363eef3b5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Dialogue
+  interactKeyInput: 19
   dialoguePanel: {fileID: 952670969}
   dialogueTextUI: {fileID: 781712001}
   dialogueText: tintin

@@ -44,6 +44,8 @@ public abstract class BulletBase : MonoBehaviour
 
     public int BulletDamage => bulletDamage;
 
+    public GameObject Shooter => shooter;
+
     protected bool IsReturned => isReturned;
 
     //=====================================================================

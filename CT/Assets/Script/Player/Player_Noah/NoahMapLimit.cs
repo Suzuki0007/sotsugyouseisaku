@@ -13,7 +13,7 @@ using UnityEngine.Tilemaps;
 /// </summary>
 public class NoahMapLimit : CharaBase
 {
-    private NoahMovement movement;
+    private PlayerMovement movement;
 
     [SerializeField]
     private Tilemap tilemap;
@@ -23,7 +23,8 @@ public class NoahMapLimit : CharaBase
     /// </summary>
     void Start()
     {
-        movement = GetComponent<NoahMovement>();
+        movement = GetComponent<PlayerMovement>();
+        if(movement == null) { Debug.LogError($"{name}: PlayerMovementがアタッチされていません。", this); }
     }
     
     /// <summary>

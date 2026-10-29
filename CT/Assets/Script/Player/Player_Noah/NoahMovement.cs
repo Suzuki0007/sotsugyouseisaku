@@ -31,7 +31,10 @@ public class NoahMovement : CharaBase
         playerMovement = GetComponent<PlayerMovement>();
         noahAnimation = GetComponent<NoahAnimation>();
 
-        if(noahAnimation == null) { Debug.LogError($"{name}: NoahAnimationがアタッチされていません。", this); }
+        if(playerMovement == null || noahAnimation == null)
+        {
+            Debug.LogError($"{name}: PlayerMovementまたはNoahAnimationがアタッチされていません。", this); 
+        }
     }
 
     private void Update()
