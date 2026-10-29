@@ -10,32 +10,34 @@ using UnityEngine;
 /// <summary>
 /// 宝箱クラス
 /// </summary>
-public class Treasure : MonoBehaviour
+public class Treasure : Intaractable
 {
-    [SerializeField] private string id; // 宝箱を識別するためのID
+    //=====================================================================
+    // 変数
+    //=====================================================================
 
-    [SerializeField] private bool needKey;
-    [SerializeField] private bool getKey;
+    // 宝箱を識別するためのID
+    [SerializeField]
+    private string id;
 
-    /// <summary>
-    /// 宝箱のスプライトレンダラー
-    /// </summary>
-    /// 
-    /// SerializeField属性を使用して、Inspector上で設定できるようにする
-    [SerializeField] private SpriteRenderer beforeRenderer;
+    [SerializeField]
+    private bool needKey;
 
-    /// <summary>
-    /// 宝箱を開けた後のスプライト
-    /// </summary>
-    /// 
-    /// SerializeField属性を使用して、Inspector上で設定できるようにする
-    [SerializeField] private Sprite afterSprite;
+    [SerializeField] 
+    private bool getKey;
+
+    [SerializeField] 
+    private SpriteRenderer beforeRenderer;
+
+    [SerializeField]
+    private Sprite afterSprite;
 
     private string key; // セーブ用の名前
 
-    /// <summary>
-    /// Awake関数は、オブジェクトが有効化されたときに一度だけ呼ばれる
-    /// </summary>
+    //=====================================================================
+    // 関数
+    //=====================================================================
+
     private void Awake()
     {
         key = gameObject.scene.name + "/" + id;// セーブ用の名前を設定
@@ -48,54 +50,52 @@ public class Treasure : MonoBehaviour
     }
 
     /// <summary>
-    /// OnCollisionEnter2D関数は、他のオブジェクトと衝突したときに呼ばれる
+    /// Interact関数は、プレイヤーが宝箱を調べたときに呼ばれる
     /// </summary>
-    /// <param name="other"></param>
-    private void OnCollisionEnter2D(Collision2D other)
+    protected override void Interact()
     {
-        if(getKey)
-        {
-            return;
-        }
+        if(getKey) { return; }
 
-        if(other.gameObject.CompareTag("Player"))
+        if(needKey)
         {
-            if(needKey)
+            if(!HasKey())
             {
-                if(!HasKey())
-                {
-                    Debug.Log("宝箱を開けるには鍵が必要です");
-                    return;
-                }
-                else
-                {
-                    Debug.Log("宝箱を開けました");
-
-                    // 宝箱のスプライト変更、鍵を取得したことを示すフラグを立てる
-                    SetBeforeRenderer();
-
-                    //Debug.Log("[Treasure] 開封 key=" + key);
-
-                    // 開けた瞬間に仮置きで記録
-                    Save.SetPending(key, true);
-                }
+                Debug.Log("宝箱を開けるには鍵が必要です");
+                return;
             }
             else
             {
+                Debug.Log("宝箱を開けました");
+
                 // 宝箱のスプライト変更、鍵を取得したことを示すフラグを立てる
                 SetBeforeRenderer();
+
+                //Debug.Log("[Treasure] 開封 key=" + key);
+
+                // 開けた瞬間に仮置きで記録
+                Save.SetPending(key, true);
             }
+        }
+        else
+        {
+            // 宝箱のスプライト変更、鍵を取得したことを示すフラグを立てる
+            SetBeforeRenderer();
         }
     }
 
-
-    // 宝箱のスプライトを変更し、鍵を取得したことを示すフラグを立てる
+    /// <summary>
+    /// 画像を変更して、宝箱を開いた状態にする
+    /// </summary>
     private void SetBeforeRenderer()
     {
         beforeRenderer.sprite = afterSprite;
         getKey = true;
     }
 
+    /// <summary>
+    /// 鍵を持っているかどうかを判定する関数
+    /// </summary>
+    /// <returns></returns>
     private bool HasKey()
     {
         return InventoryManager.Instance.NoahData.hasKey;

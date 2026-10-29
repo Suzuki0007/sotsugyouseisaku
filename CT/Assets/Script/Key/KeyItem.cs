@@ -16,7 +16,8 @@ public class KeyItem : Intaractable
     // 変数
     //====================================================================================
 
-    [SerializeField] private NoahInventory noahInventory;
+    [SerializeField]
+    private NoahInventory noahInventory;
 
     //====================================================================================
     // 関数

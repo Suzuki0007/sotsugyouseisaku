@@ -15,14 +15,25 @@ using UnityEngine.InputSystem;
 /// 鍵や宝箱など、プレイヤーが調べることができるオブジェクトに継承させる
 public abstract class Intaractable : MonoBehaviour
 {
+    //=====================================================================
+    // 変数
+    //=====================================================================
+
+    [SerializeField]
+    private Key interactKeyInput = Key.E;
+
     protected GameObject player;
+
+    //=====================================================================
+    // 関数
+    //=====================================================================
 
     void Update()
     {
         if(!player) { return; }
 
-        // Eキーが押されたときにインタラクト処理を呼び出す
-        if(Keyboard.current.eKey.wasPressedThisFrame)
+        // インタラクトキーが押されたときに処理を呼び出す
+        if(Keyboard.current[interactKeyInput].wasPressedThisFrame)
         {
             Interact();
         }
