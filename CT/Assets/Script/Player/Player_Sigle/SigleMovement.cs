@@ -17,9 +17,6 @@ public class SigleMovement : CharaBase
     // 変数
     //=====================================================================
 
-    [SerializeField]
-    private Transform targetPos;
-
     private PlayerMovement playerMovement;
 
     private SigleAnimation sigleAnimation;
@@ -30,9 +27,6 @@ public class SigleMovement : CharaBase
 
     private void Awake()
     {
-        transform.position = targetPos.position;
-        if(targetPos == null) { Debug.LogError("targetPosが設定されていません"); return; }
-
         playerMovement = GetComponent<PlayerMovement>();
         if(playerMovement == null) { Debug.LogError("PlayerMovementが付いていません"); return; }
 

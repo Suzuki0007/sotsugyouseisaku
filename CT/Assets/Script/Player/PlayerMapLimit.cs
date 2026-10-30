@@ -19,7 +19,6 @@ public class PlayerMapLimit : CharaBase
 
     private PlayerMovement movement;
 
-    [SerializeField]
     private Tilemap tilemap;
 
     //=====================================================================
@@ -30,12 +29,12 @@ public class PlayerMapLimit : CharaBase
     {
         movement = GetComponent<PlayerMovement>();
         if(movement == null) { Debug.LogError($"{name}: PlayerMovementがアタッチされていません。", this); }
-
-        if(tilemap == null) { Debug.LogError($"{name}: Tilemapがアタッチされていません。", this); }
     }
 
     private void LateUpdate()
     {
+        if(movement == null || tilemap == null) { return; }
+
         Vector2 pos = movement.transform.position;
 
         // Tilemapが使用しているセルの範囲
@@ -60,5 +59,6 @@ public class PlayerMapLimit : CharaBase
     public void SetTilemap(Tilemap newTilemap)
     {
         tilemap = newTilemap;
+        if(tilemap == null) { Debug.LogError($"{name}: Tilemapの設定に失敗しました", this); }
     }
 }

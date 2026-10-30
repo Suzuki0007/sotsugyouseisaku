@@ -33,7 +33,7 @@ public class PlayerFollower : CharaBase
     // 関数
     //=====================================================================
 
-    private void Start()
+    private void Awake()
     {
         playerMovement = GetComponent<PlayerMovement>();
         if(playerMovement == null)
@@ -49,8 +49,6 @@ public class PlayerFollower : CharaBase
             enabled = false;
             return;
         }
-
-        SetTarget(targetPlayer);
     }
 
     private void LateUpdate()

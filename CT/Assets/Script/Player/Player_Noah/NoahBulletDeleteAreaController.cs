@@ -17,8 +17,7 @@ public class NoahBulletDeleteAreaController : CharaBase
     // 変数
     //=====================================================================
 
-    [SerializeField] 
-    private GameObject bulletDeleteArea;
+    private BulletDeleteArea bulletDeleteArea;
 
     [Header("デバッグ設定")]
 
@@ -26,31 +25,39 @@ public class NoahBulletDeleteAreaController : CharaBase
     private bool isDebugMode = false;
 
     //=====================================================================
-    // 関数
+    // 更新
     //=====================================================================
-
-    private void Awake()
-    {
-        if(bulletDeleteArea == null) { Debug.LogError("弾丸削除エリアが設定されていません"); }
-    }
 
     void Update()
     {
+        if(bulletDeleteArea == null) { return; }
+
+        // デバッグモードが有効な場合は常にエリアを有効化する
         if(isDebugMode)
         {
-            bulletDeleteArea.SetActive(true);
+            bulletDeleteArea.enabled = true;
         }
         else
         {
             // Qキーが押されている間はエリアを有効化する
             if(Keyboard.current.qKey.isPressed)
             {
-                bulletDeleteArea.SetActive(true);
+                bulletDeleteArea.enabled = true;
             }
             else
             {
-                bulletDeleteArea.SetActive(false);
+                bulletDeleteArea.enabled = false;
             }
         }
+    }
+
+    //=====================================================================
+    // 設定関数
+    //=====================================================================
+
+    public void SetBulletDeleteArea(BulletDeleteArea newBulletDeleteArea)
+    {
+        bulletDeleteArea = newBulletDeleteArea;
+        if(bulletDeleteArea == null) { Debug.LogError("弾丸削除エリアの設定に失敗しました"); }
     }
 }

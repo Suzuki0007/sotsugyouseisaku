@@ -12,21 +12,16 @@ using UnityEngine;
 /// </summary>
 public class CharacterSorting : CharaBase
 {
-    GameObject player;
+    private GameObject player;
 
-    SpriteRenderer spriteRenderer;
+    private SpriteRenderer spriteRenderer;
 
     /// <summary>
     /// 最初に一度だけ呼ばれる関数
     /// </summary>
     void Start()
     {
-        player = GameObject.Find("Player_Noah");
-        if(player == null)
-        {
-            Debug.LogError("Noahオブジェクトが見つかりません");
-            return;
-        }
+        if(player == null) { return; }
 
         spriteRenderer = GetComponent<SpriteRenderer>();
     }
@@ -47,5 +42,15 @@ public class CharacterSorting : CharaBase
         {
             spriteRenderer.sortingOrder = 101;
         }
+    }
+
+    //=====================================================================
+    // 設定関数
+    //=====================================================================
+
+    public void SetPlayer(GameObject newPlayer)
+    {
+        player = newPlayer;
+        if(player == null) { Debug.LogError("プレイヤーの設定に失敗しました"); }
     }
 }

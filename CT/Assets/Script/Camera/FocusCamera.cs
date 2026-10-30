@@ -20,24 +20,23 @@ public class FocusCamera : MonoBehaviour
     [SerializeField]
     public Transform player;
 
-    [SerializeField]
     public Tilemap tilemap;
 
     private Camera cam;
 
     //=====================================================================
-    // 関数
+    // 初期化
     //=====================================================================
 
     private void Awake()
     {
-        if(player == null) { Debug.LogError("追従対象のPlayerが設定されていません"); }
-
-        if(tilemap == null) { Debug.LogError("Tilemapが設定されていません"); }
-
         cam = GetComponent<Camera>();
         if(cam == null) { Debug.LogError("Cameraコンポーネントが付いていません"); }
     }
+
+    //=====================================================================
+    // 更新関数
+    //=====================================================================
 
     void LateUpdate()
     {
@@ -87,9 +86,19 @@ public class FocusCamera : MonoBehaviour
         transform.position = new Vector3(cameraX, cameraY, transform.position.z);
     }
 
+    //=====================================================================
+    // 設定関数
+    //=====================================================================
+
     public void SetTarget(Transform newTarget)
     {
-        if(newTarget == null) { Debug.LogError("追従対象がありません"); return; }
         player = newTarget;
+        if(player == null) { Debug.LogError("追従対象の設定に失敗しました"); return; }
+    }
+
+    public void SetTilemap(Tilemap newTilemap)
+    {
+        tilemap = newTilemap;
+        if(tilemap == null) { Debug.LogError("Tilemapの設定に失敗しました", this); }
     }
 }

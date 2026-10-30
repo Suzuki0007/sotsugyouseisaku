@@ -16,19 +16,11 @@ public class TimingGaugeAttackController : AttackController
     // 変数
     //=====================================================================
 
-    [Header("タイミングゲージの設定")]
-
-    [SerializeField]
     private TimingGaugeUI timingGauge;
 
     //=====================================================================
     // 関数
     //=====================================================================
-
-    private void Awake()
-    {
-        if(timingGauge == null) { Debug.LogError("タイミングゲージの設定が設定されていません"); }
-    }
 
     /// <summary>
     /// 攻撃を開始する
@@ -38,5 +30,15 @@ public class TimingGaugeAttackController : AttackController
         if(timingGauge.gameObject.activeSelf) { return; }
 
         timingGauge.StartGauge();
+    }
+
+    //=====================================================================
+    // 設定関数
+    //=====================================================================
+
+    public void SetTimingGauge(TimingGaugeUI newTimingGauge)
+    {
+        timingGauge = newTimingGauge;
+        if(timingGauge == null) { Debug.LogError("タイミングゲージの設定に失敗しました"); }
     }
 }

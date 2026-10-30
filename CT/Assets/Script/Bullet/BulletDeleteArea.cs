@@ -16,7 +16,6 @@ public class BulletDeleteArea : MonoBehaviour
     // 変数
     //=====================================================================
 
-    [SerializeField]
     private Transform defenderPos;
 
     [Tooltip("削除範囲")]
@@ -24,19 +23,34 @@ public class BulletDeleteArea : MonoBehaviour
     private float deleteRadius = 5f;
 
     //=====================================================================
-    // 関数
+    // 初期化
     //=====================================================================
-
-    private void Awake()
-    {
-        if(defenderPos == null) { Debug.LogError("防御者の位置が設定されていません"); }
-    }
 
     void Update()
     {
+        if(defenderPos == null) { return; }
+
         // 防御者の位置に追従する
         transform.position = defenderPos.position;
     }
+
+    //=====================================================================
+    // 設定関数
+    //=====================================================================
+
+    /// <summary>
+    /// 防御者のTransformを設定する
+    /// </summary>
+    /// <param name="defender"></param>
+    public void SetDefenderPos(Transform defender)
+    {
+        defenderPos = defender;
+        if(defenderPos == null) { Debug.LogError("防御者の設定に失敗しました"); }
+    }
+
+    //=====================================================================
+    // トリガーイベント
+    //=====================================================================
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
@@ -49,8 +63,14 @@ public class BulletDeleteArea : MonoBehaviour
         bullet.ReturnToPool();
     }
 
+    //=====================================================================
+    // デバッグ用
+    //=====================================================================
+
     private void OnDrawGizmosSelected()
     {
+        if(defenderPos == null) { return; }
+
         Gizmos.color = Color.green;
 
         // DrawWireSphereは、指定した位置と半径でワイヤーフレームの球を描画する関数

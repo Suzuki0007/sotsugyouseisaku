@@ -56,7 +56,7 @@ public class PlayerSwitchManager : Singleton<PlayerSwitchManager>
     public GameObject Noah => noah;
 
     //=====================================================================
-    // 関数
+    // 初期化
     //=====================================================================
 
     protected override void Awake()
@@ -65,7 +65,9 @@ public class PlayerSwitchManager : Singleton<PlayerSwitchManager>
         if(Instance != this) { return; }
 
         // 初期参照設定
-        if(!InitializeReferences()) { enabled = false; return; }
+        //if(!InitializeReferences()) { enabled = false; return; }
+
+        if(noah == null || sigle == null) { Debug.Log("NoahまたはSigleのプレハブが設定されていません"); return; }
 
         // 初期状態はノアを操作する
         currentPlayer = noah;
@@ -80,14 +82,34 @@ public class PlayerSwitchManager : Singleton<PlayerSwitchManager>
         focusCamera.SetTarget(noah.transform);
     }
 
-    private void Update()
+    /// <summary>
+    /// プレイヤーの初期化関数
+    /// </summary>
+    /// <param name="noahObject"></param>
+    /// <param name="sigleObject"></param>
+    public void InitializePlayers(GameObject noahObject, GameObject sigleObject)
     {
-        if(Keyboard.current == null) { return; }
+        if(noahObject == null || sigleObject == null)
+        { Debug.LogError("NoahまたはSigleのプレハブが設定されていません", this); return; }
 
-        if(Keyboard.current[switchKey].wasPressedThisFrame)
-        {
-            SwitchPlayer();
-        }
+        if(noahObject == sigleObject)
+        { Debug.LogError("ノアとシグルに同じオブジェクトが設定されています", this); return; }
+
+        noah = noahObject;
+        sigle = sigleObject;
+
+        // 初期参照設定、失敗した場合はスクリプトを無効化
+        if(!InitializeReferences()) { enabled = false; return; }
+
+        currentPlayer = noah;
+
+        noahMovement.SetControlEnabled(true);
+        sigleMovement.SetControlEnabled(false);
+
+        noahFollower.SetTarget(sigle);
+        sigleFollower.SetTarget(noah);
+
+        focusCamera.SetTarget(noah.transform);
     }
 
     /// <summary>
@@ -115,6 +137,24 @@ public class PlayerSwitchManager : Singleton<PlayerSwitchManager>
         return true;
     }
 
+    //=====================================================================
+    // 更新
+    //=====================================================================
+
+    private void Update()
+    {
+        if(Keyboard.current == null) { return; }
+
+        if(Keyboard.current[switchKey].wasPressedThisFrame)
+        {
+            SwitchPlayer();
+        }
+    }
+
+    //=====================================================================
+    // プレイヤー切り替え関数
+    //=====================================================================
+
     /// <summary>
     /// プレイヤー切り替え関数
     /// </summary>
@@ -139,16 +179,16 @@ public class PlayerSwitchManager : Singleton<PlayerSwitchManager>
     {
         // 2人の現在位置を保存
         Vector3 oldPlayerPosition = oldPlayer.transform.position;
-        Vector3 newPlayerPosition = newPlayer.transform.position; 
-        
+        Vector3 newPlayerPosition = newPlayer.transform.position;
+
         // 位置を交換
         oldPlayer.transform.position = newPlayerPosition;
         newPlayer.transform.position = oldPlayerPosition;
-        
+
         // 操作権を交換
         noahMovement.SetControlEnabled(newPlayer == noah);
         sigleMovement.SetControlEnabled(newPlayer == sigle);
-        
+
         // 現在の操作キャラクターを更新
         currentPlayer = newPlayer;
 

@@ -47,7 +47,7 @@ public class ObjectSpawner : MonoBehaviour
     private bool isRespawning = false;
 
     //=====================================================================
-    // 関数
+    // 初期化
     //=====================================================================
 
     private void Awake()
@@ -64,6 +64,10 @@ public class ObjectSpawner : MonoBehaviour
         // 初回スポーン
         SpawnObject();
     }
+
+    //=====================================================================
+    // 生成処理
+    //=====================================================================
 
     private void SpawnObject()
     {
@@ -96,11 +100,9 @@ public class ObjectSpawner : MonoBehaviour
         Debug.Log($"スポーンした。現在のスポーン数: {spawnCount}", this);
     }
 
-    /// <summary>
-    /// オブジェクトがスポーンしたときに呼び出される仮想関数
-    /// </summary>
-    /// <param name="spawnedObject"></param>
-    virtual protected void OnObjectSpawned(GameObject spawnedObject) { }
+    //=====================================================================
+    // 消滅処理
+    //=====================================================================
 
     /// <summary>
     /// オブジェクトが消滅したときに呼び出される処理
@@ -126,12 +128,6 @@ public class ObjectSpawner : MonoBehaviour
     }
 
     /// <summary>
-    /// オブジェクトが消滅したときに呼び出される仮想関数
-    /// </summary>
-    /// <param name="destroyedObject"></param>
-    virtual protected void OnObjectDestroyed(GameObject destroyedObject) { }
-
-    /// <summary>
     /// リスポーンコルーチン
     /// </summary>
     /// <returns></returns>
@@ -144,6 +140,22 @@ public class ObjectSpawner : MonoBehaviour
         // 次のオブジェクトを生成する
         SpawnObject();
     }
+
+    //=====================================================================
+    // 仮想関数
+    //=====================================================================
+
+    /// <summary>
+    /// オブジェクトがスポーンしたときに呼び出される仮想関数
+    /// </summary>
+    /// <param name="spawnedObject"></param>
+    virtual protected void OnObjectSpawned(GameObject spawnedObject) { }
+
+    /// <summary>
+    /// オブジェクトが消滅したときに呼び出される仮想関数
+    /// </summary>
+    /// <param name="destroyedObject"></param>
+    virtual protected void OnObjectDestroyed(GameObject destroyedObject) { }
 }
 
 

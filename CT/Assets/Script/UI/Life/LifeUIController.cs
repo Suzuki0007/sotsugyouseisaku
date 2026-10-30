@@ -28,29 +28,43 @@ public class LifeUIController : MonoBehaviour
     [SerializeField]
     private Sprite emptyLifeSprite;
 
-    [SerializeField]
     private GameObject player;
 
     private Health playerHealth;
 
     //=====================================================================
-    // 関数
+    // 初期化
     //=====================================================================
 
     private void Awake()
     {
-        if(player == null) { Debug.LogError("プレイヤーが設定されていません"); }
+        if(lifeImages == null || lifeImages.Length == 0)
+        {
+            Debug.LogError("LifeImagesが設定されていません", this);
+        }
 
-        playerHealth = player.GetComponent<Health>();
-        if(playerHealth == null) { Debug.LogError("プレイヤーにHealthコンポーネントがアタッチされていません"); }
+        if(fullLifeSprite == null || emptyLifeSprite == null)
+        {
+            Debug.LogError("ライフ画像が設定されていません", this);
+        }
     }
+
+    //=====================================================================
+    // 更新
+    //=====================================================================
 
     void Update()
     {
+        if(playerHealth == null) { return; }
+
         // プレイヤーの現在のライフ数に応じてUI画像を更新する
         UpdateLifeUI(playerHealth.CurrentHealth);
     }
-     
+
+    //=====================================================================
+    // 体力UI更新関数
+    //=====================================================================
+
     public void UpdateLifeUI(int currentLife)
     {
         for(int i = 0; i < lifeImages.Length; i++)
@@ -64,6 +78,32 @@ public class LifeUIController : MonoBehaviour
             {
                 lifeImages[i].sprite = emptyLifeSprite;
             }
+        }
+    }
+
+    //=====================================================================
+    // 設定関数
+    //=====================================================================
+
+    /// <summary>
+    /// プレイヤーを設定する
+    /// </summary>
+    /// <param name="targetPlayer">対象プレイヤー</param>
+    public void SetPlayer(GameObject targetPlayer)
+    {
+        if(targetPlayer == null)
+        {
+            Debug.LogError("LifeUIControllerの対象プレイヤーがnullです", this);
+            playerHealth = null;
+            return;
+        }
+
+        player = targetPlayer;
+        playerHealth = player.GetComponent<Health>();
+
+        if(playerHealth == null)
+        {
+            Debug.LogError($"{targetPlayer.name}にHealthコンポーネントがありません", targetPlayer);
         }
     }
 }

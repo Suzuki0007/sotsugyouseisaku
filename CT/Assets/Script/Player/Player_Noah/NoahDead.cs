@@ -19,7 +19,6 @@ public class NoahDead : CharaBase
 
     private Health health;
 
-    [SerializeField]
     private SceneChange sceneChange;
 
     //=====================================================================
@@ -30,8 +29,6 @@ public class NoahDead : CharaBase
     {
         health = GetComponent<Health>();
         if(health == null) { Debug.Log("Healthコンポーネントが見つかりません"); }
-
-        if(sceneChange == null) { Debug.Log("SceneChangeコンポーネントが見つかりません"); }
     }
 
     /// <summary>
@@ -57,5 +54,15 @@ public class NoahDead : CharaBase
         Debug.Log("プレイヤーが死亡しました！");
 
         sceneChange.ChangeScene("SceneGameOver");
+    }
+
+    //=====================================================================
+    // 設定関数
+    //=====================================================================
+
+    public void SetSceneChange(SceneChange sceneChange)
+    {
+        this.sceneChange = sceneChange;
+        if(this.sceneChange == null) { Debug.LogError($"SceneChangeの設定に失敗しました"); }
     }
 }

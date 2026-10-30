@@ -19,22 +19,28 @@ public class AreaAttackController : AttackController
     [Header("範囲攻撃の設定")]
 
     [SerializeField]
-    private AreaAttack areaAttack;
-
-    [SerializeField]
     private float damageMultiplier = 1.0f;
 
-    //=====================================================================
-    // 関数
-    //=====================================================================
+    private AreaAttack areaAttack;
 
-    private void Awake()
-    {
-        if(areaAttack == null) { Debug.LogError("範囲攻撃の設定が設定されていません"); }
-    }
+    //=====================================================================
+    // 更新関数
+    //=====================================================================
 
     protected override void StartAttack()
     {
+        if(areaAttack == null) { return; }
+
         areaAttack.StartAttack(damageMultiplier);
+    }
+
+    //=====================================================================
+    // 設定関数
+    //=====================================================================
+
+    public void SetAreaAttack(AreaAttack newAreaAttack)
+    {
+        areaAttack = newAreaAttack;
+        if(areaAttack == null) { Debug.LogError("範囲攻撃の設定に失敗しました"); }
     }
 }

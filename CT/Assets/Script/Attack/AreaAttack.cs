@@ -18,12 +18,6 @@ public class AreaAttack : MonoBehaviour
     // 変数
     //=====================================================================
 
-    [Header("攻撃設定")]
-
-    [Tooltip("攻撃判定追従対象")]
-    [SerializeField]
-    private Transform attackerPos;
-
     [Tooltip("攻撃範囲")]
     [SerializeField]
     private float attackRadius = 1.5f;
@@ -37,8 +31,10 @@ public class AreaAttack : MonoBehaviour
 
     // LayerMaskで指定されたレイヤーのオブジェクト
     [SerializeField]
-    private LayerMask targetLayer; 
-    
+    private LayerMask targetLayer;
+
+    private Transform attackerPos;
+
     // 現在の攻撃ですでにダメージを与えた対象
     private HashSet<GameObject> hitTargets = new();
 
@@ -47,22 +43,27 @@ public class AreaAttack : MonoBehaviour
     private bool isAttacking = false;
 
     //=====================================================================
-    // 関数
+    // 初期化
     //=====================================================================
 
     private void Awake()
     {
-        if(attackerPos == null) { Debug.LogError("攻撃判定追従対象が設定されていません"); }
         if(targetLayer == 0) { Debug.LogError("ターゲットレイヤーが設定されていません"); }
 
         defaultDamage = attackDamage;
     }
+
+    //=====================================================================
+    // 攻撃関数
+    //=====================================================================
 
     /// <summary>
     /// 攻撃開始関数
     /// </summary>
     public void StartAttack(float damageMultiplier)
     {
+        if(attackerPos == null) { return; }
+
         if(isAttacking) { return; }
 
         attackDamage = (int)(defaultDamage * damageMultiplier);
@@ -146,6 +147,10 @@ public class AreaAttack : MonoBehaviour
         }
     }
 
+    //=====================================================================
+    // Gizmos描画関数
+    //=====================================================================
+
     /// <summary>
     /// この関数は、Unityエディタ上でオブジェクトが選択されているときに、Gizmosを描画するために呼び出されます。
     /// </summary>
@@ -153,9 +158,21 @@ public class AreaAttack : MonoBehaviour
     /// Gizmosは、Unityエディタ上でオブジェクトの位置や範囲などを視覚的に表示するための機能です。
     private void OnDrawGizmosSelected()
     {
+        if(attackerPos == null) { return; }
+
         Gizmos.color = Color.red;
 
         // DrawWireSphereは、指定した位置と半径でワイヤーフレームの球を描画する関数
         Gizmos.DrawWireSphere(attackerPos.position, attackRadius);
+    }
+
+    //=====================================================================
+    // 設定関数
+    //=====================================================================
+
+    public void SetAttackerPos(Transform newAttackerPos)
+    {
+        attackerPos = newAttackerPos;
+        if(attackerPos == null) { Debug.LogError("攻撃判定追従対象の設定に失敗しました"); }
     }
 }

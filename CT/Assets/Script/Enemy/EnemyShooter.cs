@@ -53,8 +53,19 @@ public class EnemyShooter : CharaBase
         bullet.SetShooter(gameObject);
     }
 
+    /// <summary>
+    /// 参照の初期化関数
+    /// </summary>
+    /// <param name="playerObject"></param>
+    /// <param name="enemyBulletPool"></param>
     public void InitializeReference(GameObject playerObject, EnemyBulletPool enemyBulletPool)
     {
+        if(playerObject == null || enemyBulletPool == null)
+        {
+            Debug.Log("プレイヤーまたは弾のプールが設定されていません");
+            return;
+        }
+
         this.player = playerObject.transform.gameObject;
         this.enemyBulletPool = enemyBulletPool;
 
