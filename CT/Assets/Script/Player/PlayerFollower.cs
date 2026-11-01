@@ -17,9 +17,6 @@ public class PlayerFollower : CharaBase
     // 変数
     //=====================================================================
 
-    [Header("追従設定")]
-
-    [SerializeField]
     private GameObject targetPlayer;
 
     [SerializeField]

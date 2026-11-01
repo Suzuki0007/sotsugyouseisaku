@@ -13,10 +13,19 @@ using UnityEngine.UI;
 /// </summary>
 public class Dialogue : Intaractable
 {
+    //=====================================================================
+    // 変数
+    //=====================================================================
+
     public GameObject dialoguePanel;
     public Text dialogueTextUI;
 
-    [SerializeField] private string dialogueText;
+    [SerializeField]
+    private string dialogueText;
+
+    //=====================================================================
+    // 初期化
+    //=====================================================================
 
     private void Start()
     {
@@ -25,6 +34,10 @@ public class Dialogue : Intaractable
 
         dialoguePanel.SetActive(false);
     }
+
+    //=====================================================================
+    // インタラクション関数
+    //=====================================================================
 
     protected override void Interact()
     {
@@ -35,6 +48,10 @@ public class Dialogue : Intaractable
         dialoguePanel.SetActive(true);
         Debug.Log("ダイアログが有効");
     }
+
+    //=====================================================================
+    // 衝突関数
+    //=====================================================================
 
     /// <summary>
     /// OnCollisionEnter2D関数は、他のオブジェクトとの衝突が開始したときに呼ばれる

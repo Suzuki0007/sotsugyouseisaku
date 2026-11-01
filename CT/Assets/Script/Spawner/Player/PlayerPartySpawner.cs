@@ -53,7 +53,8 @@ public class PlayerPartySpawner : MonoBehaviour
             siglePrefab == null ||
             noahSpawnPoint == null ||
             sigleSpawnPoint == null ||
-            playerSwitchManager == null)
+            playerSwitchManager == null || 
+            sceneContext == null)
         {
             Debug.LogError("プレイヤー生成に必要な参照が設定されていません", this);
             return;
@@ -77,7 +78,10 @@ public class PlayerPartySpawner : MonoBehaviour
         // プレイヤーの初期化
 
         PlayerRuntimeInitializer noahInitializer = noah.GetComponent<PlayerRuntimeInitializer>();
+        if(noahInitializer == null) { Debug.LogError("NoahにPlayerRuntimeInitializerがアタッチされていません", noah); return; }
+
         PlayerRuntimeInitializer sigleInitializer = sigle.GetComponent<PlayerRuntimeInitializer>();
+        if(sigleInitializer == null) { Debug.LogError("SigleにPlayerRuntimeInitializerがアタッチされていません", sigle); return; }
 
         noahInitializer.InitializeSceneReferences(sceneContext);
         sigleInitializer.InitializeSceneReferences(sceneContext);
@@ -95,12 +99,15 @@ public class PlayerPartySpawner : MonoBehaviour
         noah.GetComponent<NoahDead>().SetSceneChange(sceneContext.SceneChange);
 
         noah.GetComponent<NoahBulletDeleteAreaController>().SetBulletDeleteArea(sceneContext.BulletDeleteArea);
+        noah.GetComponent<NoahBulletDeleteAreaController>().SetFollowTarget(noah);
 
         noah.GetComponent<AreaAttackController>().SetAreaAttack(sceneContext.AreaAttack);
 
         noah.GetComponent<TimingGaugeAttackController>().SetTimingGauge(sceneContext.TimingGaugeUI);
 
         sigle.GetComponent<CharacterSorting>().SetPlayer(noah);
+
+        sigle.GetComponent<SigleMovement>().SetStartPos(noah.transform);
 
         playerSwitchManager.InitializePlayers(noah, sigle);
     }

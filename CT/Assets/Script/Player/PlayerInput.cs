@@ -21,8 +21,6 @@ public class PlayerInput : CharaBase
     [SerializeField]
     private PlayerSwitchManager playerSwitchManager;
 
-    private GameObject currentPlayer;
-
     [Header("参照")]
 
     [SerializeField]
@@ -30,6 +28,13 @@ public class PlayerInput : CharaBase
 
     [SerializeField]
     private SigleShooter sigleShooter;
+
+    [Header("入力設定")]
+
+    [SerializeField]
+    private Key bulletDeleteAreaKey = Key.Q;
+
+    private GameObject currentPlayer;
 
     //=====================================================================
     // 初期化
@@ -40,18 +45,6 @@ public class PlayerInput : CharaBase
         if(playerSwitchManager == null)
         {
             Debug.LogError($"{name}: PlayerSwitchManagerが設定されていません");
-            enabled = false;
-            return;
-        }
-    }
-
-    private void Start()
-    {
-        // PlayerSwitchManagerのAwakeでCurrentPlayerが設定されるため、Startで取得する
-        currentPlayer = playerSwitchManager.CurrentPlayer;
-        if(currentPlayer == null)
-        {
-            Debug.LogError($"{name}: CurrentPlayerがnullです");
             enabled = false;
             return;
         }
@@ -70,6 +63,9 @@ public class PlayerInput : CharaBase
 
         // 移動入力を更新
         UpdateMoveInput(currentPlayer);
+
+        // 弾削除エリアの有効化を更新
+        UpdateBulletDeleteAreaInput(currentPlayer);
     }
 
     //=====================================================================
@@ -86,9 +82,27 @@ public class PlayerInput : CharaBase
         if(movement == null) { return; }
 
         Vector2 moveInput = GetMoveInput();
-        if(moveInput.sqrMagnitude <= 0f) { return; }
 
         movement.SetMoveDirection(moveInput);
+    }
+
+    /// <summary>
+    /// 弾削除エリアの有効化を更新する
+    /// </summary>
+    /// <param name="currentPlayer"></param>
+    private void UpdateBulletDeleteAreaInput(GameObject currentPlayer)
+    {
+        GameObject noah = playerSwitchManager.Noah;
+        if(noah == null) { return; }
+
+        NoahBulletDeleteAreaController areaController =
+            currentPlayer?.GetComponent<NoahBulletDeleteAreaController>();
+        if(areaController == null) { return; }
+
+        bool isPressed = Keyboard.current[bulletDeleteAreaKey].isPressed;
+
+        // 弾削除エリアを有効化
+        areaController.SetBulletDeleteAreaActive(isPressed);
     }
 
     /// <summary>

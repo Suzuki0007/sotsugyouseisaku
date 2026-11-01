@@ -30,7 +30,7 @@ public class PlayerHistory : CharaBase
     public IReadOnlyList<Vector3> PosHistory => posHistory;
 
     //=====================================================================
-    // 関数
+    // 初期化
     //=====================================================================
 
     private void Start()
@@ -38,11 +38,19 @@ public class PlayerHistory : CharaBase
         RecordPosition(transform.position);
     }
 
+    //=====================================================================
+    // 更新関数
+    //=====================================================================
+
     private void LateUpdate()
     {
         // 移動後の位置を記録する
         RecordPosition(transform.position);
     }
+
+    //=====================================================================
+    // 記録関数
+    //=====================================================================
 
     /// <summary>
     /// 位置を記録する関数
@@ -57,5 +65,18 @@ public class PlayerHistory : CharaBase
 
         // 古い履歴を削除
         if(posHistory.Count > maxHistoryCount) { posHistory.RemoveAt(0); }
+    }
+
+    //=====================================================================
+    // 履歴リセット関数
+    //=====================================================================
+
+    public void ResetHistory(Vector3 position)
+    {
+        //posHistory.Clear();
+        //RecordPosition(position);
+
+        posHistory.Clear();
+        for(int i = 0; i < maxHistoryCount; i++) { posHistory.Add(position); }
     }
 }

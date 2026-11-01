@@ -59,29 +59,6 @@ public class PlayerSwitchManager : Singleton<PlayerSwitchManager>
     // 初期化
     //=====================================================================
 
-    protected override void Awake()
-    {
-        base.Awake();
-        if(Instance != this) { return; }
-
-        // 初期参照設定
-        //if(!InitializeReferences()) { enabled = false; return; }
-
-        if(noah == null || sigle == null) { Debug.Log("NoahまたはSigleのプレハブが設定されていません"); return; }
-
-        // 初期状態はノアを操作する
-        currentPlayer = noah;
-        noahMovement.SetControlEnabled(true);
-        sigleMovement.SetControlEnabled(false);
-
-        // 追従対象を設定
-        noahFollower.SetTarget(sigle);
-        sigleFollower.SetTarget(noah);
-
-        // カメラはノアを追いかける
-        focusCamera.SetTarget(noah.transform);
-    }
-
     /// <summary>
     /// プレイヤーの初期化関数
     /// </summary>
@@ -184,6 +161,10 @@ public class PlayerSwitchManager : Singleton<PlayerSwitchManager>
         // 位置を交換
         oldPlayer.transform.position = newPlayerPosition;
         newPlayer.transform.position = oldPlayerPosition;
+
+        // 位置交換後の座標を履歴の開始位置にする
+        noahHistory.ResetHistory(noah.transform.position);
+        sigleHistory.ResetHistory(sigle.transform.position);
 
         // 操作権を交換
         noahMovement.SetControlEnabled(newPlayer == noah);

@@ -19,16 +19,33 @@ public class EnemySpawner : ObjectSpawner
 
     [Header("スポーンする敵の設定")]
 
-    [Tooltip("プレイヤー")]
-    [SerializeField]
-    private GameObject player;
-
     [Tooltip("弾のプール")]
     [SerializeField]
     private EnemyBulletPool bulletPool;
 
+    private GameObject player;
+
+    private GameObject spawnedEnemy;
+
     //====================================================================================
-    // 関数
+    // 更新関数
+    //====================================================================================
+
+    public void Update()
+    {
+        if(PlayerSwitchManager.Instance == null) { return; }
+
+        GameObject currentPlayer = PlayerSwitchManager.Instance.CurrentPlayer;
+
+        if(currentPlayer == null || currentPlayer == player) { return; }
+
+        player = currentPlayer;
+
+        UpdateEnemyTarget();
+    }
+
+    //====================================================================================
+    // 生成時の処理
     //====================================================================================
 
     /// <summary>
@@ -39,23 +56,48 @@ public class EnemySpawner : ObjectSpawner
     {
         base.OnObjectSpawned(spawnedObject);
 
-        EnemyShooter enemyShooter = spawnedObject.GetComponent<EnemyShooter>();
-        if(enemyShooter == null) { Debug.LogError("生成した敵にEnemyShooterがアタッチされていません"); return; }
+        spawnedEnemy = spawnedObject;
 
-        BehaviorGraphAgent behaviorAgent = spawnedObject.GetComponent<BehaviorGraphAgent>();
-        if(behaviorAgent == null) { Debug.LogError("生成した敵にBehaviorGraphAgentがアタッチされていません"); return; }
+        if(PlayerSwitchManager.Instance == null)
+        {
+            Debug.LogError("PlayerSwitchManagerが存在しません", this);
+            return;
+        }
 
-        bool success = behaviorAgent.SetVariableValue("TargetPlayer", player.gameObject);
-        if(!success) { Debug.LogError("BlackboardにTargetPlayerが見つからないか、型が一致していません。", spawnedObject); return; }
+        player = PlayerSwitchManager.Instance.CurrentPlayer;
+        if(player == null)
+        {
+            Debug.LogError("CurrentPlayerが設定されていません", this);
+            return;
+        }
 
-        // 参照の初期化
+        UpdateEnemyTarget();
+    }
+
+    /// <summary>
+    /// 敵の追跡対象を更新する
+    /// </summary>
+    private void UpdateEnemyTarget()
+    {
+        if(spawnedEnemy == null || player == null) { return; }
+
+        EnemyShooter enemyShooter = spawnedEnemy.GetComponent<EnemyShooter>();
+        if(enemyShooter == null) { Debug.LogError("生成した敵にEnemyShooterがアタッチされていません", spawnedEnemy); return; }
+
+        BehaviorGraphAgent behaviorAgent = spawnedEnemy.GetComponent<BehaviorGraphAgent>();
+        if(behaviorAgent == null) { Debug.LogError("生成した敵にBehaviorGraphAgentがアタッチされていません", spawnedEnemy); return; }
+
+        bool success = behaviorAgent.SetVariableValue("TargetPlayer", player);
+        if(!success) { Debug.LogError("BehaviorGraphAgentのTargetPlayer変数の設定に失敗しました", spawnedEnemy); return; }
+
+        enemyShooter.SetTargetPlayer(player);
         enemyShooter.InitializeReference(player, bulletPool);
     }
 
-    protected override void OnObjectDestroyed(GameObject destroyedObject)
-    {
-        base.OnObjectDestroyed(destroyedObject);
+    //====================================================================================
+    // 破棄時の処理
+    //====================================================================================
 
-        // 固有の処理が必要な場合ここに追加をできる
-    }
+    protected override void OnObjectDestroyed(GameObject destroyedObject) { base.OnObjectDestroyed(destroyedObject); }
+
 }

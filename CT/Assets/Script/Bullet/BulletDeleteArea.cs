@@ -16,14 +16,34 @@ public class BulletDeleteArea : MonoBehaviour
     // 変数
     //=====================================================================
 
-    private Transform defenderPos;
-
     [Tooltip("削除範囲")]
     [SerializeField]
     private float deleteRadius = 5f;
 
+    private Transform defenderPos;
+
+    private Collider2D areaCollider;
+
+    private bool isAreaActive = false;
+
     //=====================================================================
     // 初期化
+    //=====================================================================
+
+    private void Awake()
+    {
+        areaCollider = GetComponent<Collider2D>();
+        if(areaCollider == null)
+        {
+            Debug.LogError($"{name}: Collider2Dがアタッチされていません", this);
+            return;
+        }
+
+        areaCollider.enabled = false;
+    }
+
+    //=====================================================================
+    // 更新
     //=====================================================================
 
     void Update()
@@ -37,6 +57,12 @@ public class BulletDeleteArea : MonoBehaviour
     //=====================================================================
     // 設定関数
     //=====================================================================
+
+    public void SetAreaActive(bool isActive)
+    {
+        isAreaActive = isActive;
+        if(areaCollider != null) { areaCollider.enabled = isActive; }
+    }
 
     /// <summary>
     /// 防御者のTransformを設定する
@@ -54,6 +80,8 @@ public class BulletDeleteArea : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
+        if(!isAreaActive) { return; }
+
         if(!collision.CompareTag("EnemyBullet")) { return; }
 
         EnemyBullet bullet = collision.GetComponent<EnemyBullet>();
@@ -69,7 +97,7 @@ public class BulletDeleteArea : MonoBehaviour
 
     private void OnDrawGizmosSelected()
     {
-        if(defenderPos == null) { return; }
+        if(defenderPos == null || !isAreaActive) { return; }
 
         Gizmos.color = Color.green;
 

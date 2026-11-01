@@ -62,7 +62,7 @@ public class EnemyShooter : CharaBase
     {
         if(playerObject == null || enemyBulletPool == null)
         {
-            Debug.Log("プレイヤーまたは弾のプールが設定されていません");
+            //Debug.Log("プレイヤーまたは弾のプールが設定されていません");
             return;
         }
 
@@ -71,9 +71,19 @@ public class EnemyShooter : CharaBase
 
         if(player == null || enemyBulletPool == null)
         {
-            Debug.LogError("プレイヤーまたは弾のプールが設定されていません");
+            //Debug.LogError("プレイヤーまたは弾のプールが設定されていません");
             enabled = false;
             return;
         }
+    }
+
+    //=====================================================================
+    // 設定関数
+    //=====================================================================
+
+    public void SetTargetPlayer(GameObject targetPlayer)
+    {
+        if(targetPlayer == null) { Debug.LogError("ターゲットプレイヤーの設定に失敗しました", this); }
+        player = targetPlayer;
     }
 }

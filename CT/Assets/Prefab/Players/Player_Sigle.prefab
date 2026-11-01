@@ -19,6 +19,7 @@ GameObject:
   - component: {fileID: 7187852730256482387}
   - component: {fileID: 9184606015198540213}
   - component: {fileID: 6484146483934491467}
+  - component: {fileID: 2114953636450028307}
   m_Layer: 0
   m_Name: Player_Sigle
   m_TagString: Player
@@ -176,7 +177,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b093a980bfcd0d948a2d34a05967eedf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SigleMovement
-  targetPos: {fileID: 0}
 --- !u!114 &4479570829526272255
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -246,7 +246,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 91e86cc82b519c942a84d161c268bd5c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerMapLimit
-  tilemap: {fileID: 0}
 --- !u!114 &6484146483934491467
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -259,3 +258,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6301fb88153f1f14d8fe2088df2c697b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CharacterSorting
+--- !u!114 &2114953636450028307
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3848283961383208032}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ad3c55fa86a5aa64bbcbbf4cae49360f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerRuntimeInitializer

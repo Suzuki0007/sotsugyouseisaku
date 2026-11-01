@@ -19,10 +19,22 @@ public class NoahBulletDeleteAreaController : CharaBase
 
     private BulletDeleteArea bulletDeleteArea;
 
+    private GameObject followTargetObject;
+
+    private bool isBulletDeleteAreaActive = false;
+
     [Header("デバッグ設定")]
 
     [SerializeField]
     private bool isDebugMode = false;
+
+    //=====================================================================
+    // プロパティ
+    //=====================================================================
+
+    public bool IsBulletDeleteAreaActive => isBulletDeleteAreaActive;
+
+    public bool IsDebugMode => isDebugMode;
 
     //=====================================================================
     // 更新
@@ -30,25 +42,14 @@ public class NoahBulletDeleteAreaController : CharaBase
 
     void Update()
     {
-        if(bulletDeleteArea == null) { return; }
+        if(bulletDeleteArea == null || followTargetObject == null) { return; }
 
-        // デバッグモードが有効な場合は常にエリアを有効化する
-        if(isDebugMode)
-        {
-            bulletDeleteArea.enabled = true;
-        }
-        else
-        {
-            // Qキーが押されている間はエリアを有効化する
-            if(Keyboard.current.qKey.isPressed)
-            {
-                bulletDeleteArea.enabled = true;
-            }
-            else
-            {
-                bulletDeleteArea.enabled = false;
-            }
-        }
+        bool isActive = isDebugMode || isBulletDeleteAreaActive;
+
+        bulletDeleteArea.SetAreaActive(isActive);
+
+        // 追従ターゲットの位置にエリアを追従させる
+        bulletDeleteArea.transform.position = followTargetObject.transform.position;
     }
 
     //=====================================================================
@@ -59,5 +60,18 @@ public class NoahBulletDeleteAreaController : CharaBase
     {
         bulletDeleteArea = newBulletDeleteArea;
         if(bulletDeleteArea == null) { Debug.LogError("弾丸削除エリアの設定に失敗しました"); }
+    }
+
+    public void SetBulletDeleteAreaActive(bool isActive)
+    {
+        isBulletDeleteAreaActive = isActive;
+
+        //Debug.Log("弾削除エリアの有効化状態を設定: " + isActive);
+    }
+
+    public void SetFollowTarget(GameObject targetObject)
+    {
+        followTargetObject = targetObject;
+        if(followTargetObject == null) { Debug.LogError("追従ターゲットの設定に失敗しました"); }
     }
 }
