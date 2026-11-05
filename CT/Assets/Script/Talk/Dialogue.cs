@@ -17,11 +17,12 @@ public class Dialogue : Intaractable
     // 変数
     //=====================================================================
 
-    public GameObject dialoguePanel;
-    public Text dialogueTextUI;
-
     [SerializeField]
     private string dialogueText;
+
+    public GameObject dialoguePanel;
+
+    public Text dialogueTextUI;
 
     //=====================================================================
     // 初期化
@@ -29,10 +30,8 @@ public class Dialogue : Intaractable
 
     private void Start()
     {
-        if(dialoguePanel == null) { return; }
-        if(dialogueTextUI == null) { return; }
-
-        dialoguePanel.SetActive(false);
+        // ダイアログを非表示にする
+        HideDialogue();
     }
 
     //=====================================================================
@@ -41,42 +40,33 @@ public class Dialogue : Intaractable
 
     protected override void Interact()
     {
+        // ダイアログを表示する
+        ShowDialogue();
+    }
+
+    /// <summary>
+    /// ダイアログを表示する
+    /// </summary>
+    public void ShowDialogue()
+    {
         if(dialoguePanel == null) { return; }
         if(dialogueTextUI == null) { return; }
 
         dialogueTextUI.text = dialogueText;
         dialoguePanel.SetActive(true);
+
         Debug.Log("ダイアログが有効");
     }
 
-    //=====================================================================
-    // 衝突関数
-    //=====================================================================
-
     /// <summary>
-    /// OnCollisionEnter2D関数は、他のオブジェクトとの衝突が開始したときに呼ばれる
+    /// ダイアログを非表示にする
     /// </summary>
-    /// <param name="other"></param>
-    private void OnCollisionEnter2D(Collision2D other)
+    public void HideDialogue()
     {
-        //if(other.gameObject.CompareTag("Player"))
-        //{
-        //    dialogueTextUI.text = dialogueText;
-        //    dialoguePanel.SetActive(true);
-        //    Debug.Log("ダイアログが有効");
-        //}
-    }
+        if(dialoguePanel == null) { return; }
 
-    /// <summary>
-    /// OnCollisionExit2D関数は、他のオブジェクトとの衝突が終了したときに呼ばれる
-    /// </summary>
-    /// <param name="other"></param>
-    private void OnCollisionExit2D(Collision2D other)
-    {
-        if(other.gameObject.CompareTag("Player"))
-        {
-            dialoguePanel.SetActive(false);
-            Debug.Log("ダイアログが無効");
-        }
+        dialoguePanel.SetActive(false);
+
+        Debug.Log("ダイアログが無効");
     }
 }

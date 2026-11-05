@@ -36,9 +36,21 @@ public class EventSequence : MonoBehaviour
     {
         foreach(EventAction action in actions)
         {
-            if(action == null) { return; }
-
+            if(action == null) { continue; }
             action.Execute(gameObject);
+        }
+    }
+
+    /// <summary>
+    /// アクションが終了したときに呼ばれる関数
+    /// </summary>
+    /// <param name="gameObject"></param>
+    public void Exit(GameObject gameObject)
+    {
+        foreach(EventAction action in actions)
+        {
+            if(action == null) { continue; }
+            action.OnExit(gameObject);
         }
     }
 }

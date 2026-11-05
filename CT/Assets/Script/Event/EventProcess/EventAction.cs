@@ -17,4 +17,10 @@ public abstract class EventAction : MonoBehaviour
     /// </summary>
     /// <param name="gameObject"></param>
     public abstract void Execute(GameObject gameObject);
+
+    /// <summary>
+    /// アクションが終了したときに呼ばれる仮想関数
+    /// </summary>
+    /// <param name="gameObject"></param>
+    public abstract void OnExit(GameObject gameObject);
 }
