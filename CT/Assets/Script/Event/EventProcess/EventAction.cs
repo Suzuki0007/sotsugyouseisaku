@@ -13,7 +13,7 @@ using UnityEngine;
 public abstract class EventAction : MonoBehaviour
 {
     /// <summary>
-    /// アクションを実行する仮想関数
+    /// アクションを実行する純粋仮想関数
     /// </summary>
     /// <param name="gameObject"></param>
     public abstract void Execute(GameObject gameObject);
@@ -22,5 +22,5 @@ public abstract class EventAction : MonoBehaviour
     /// アクションが終了したときに呼ばれる仮想関数
     /// </summary>
     /// <param name="gameObject"></param>
-    public abstract void OnExit(GameObject gameObject);
+    public virtual void OnExit(GameObject gameObject) { }
 }

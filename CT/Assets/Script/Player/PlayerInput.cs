@@ -80,10 +80,10 @@ public class PlayerInput : CharaBase
     {
         PlayerMovement movement = currentPlayer?.GetComponent<PlayerMovement>();
         if(movement == null) { return; }
+        if(!movement.CanControl) { return; }
 
-        Vector2 moveInput = GetMoveInput();
-
-        movement.SetMoveDirection(moveInput);
+        // 移動入力を取得して、移動方向を設定
+        movement.SetMoveDirection(GetMoveInput());
     }
 
     /// <summary>

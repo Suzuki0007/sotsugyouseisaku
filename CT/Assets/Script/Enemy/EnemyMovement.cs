@@ -10,10 +10,7 @@ using UnityEngine;
 /// <summary>
 /// 敵の移動クラス
 /// </summary>
-public class EnemyMovement : CharaBase
+public class EnemyMovement : CharacterMovement
 {
-    public void Move(float speed)
-    {
-        transform.position += Vector3.left * speed * Time.deltaTime;
-    }
+
 }
