@@ -55,6 +55,7 @@ public class DialogueEventAction : EventAction
         if(Keyboard.current[closeKey].wasPressedThisFrame)
         {
             dialogue.HideDialogue();
+            isShowing = false;
         }
     }
 
@@ -76,6 +77,7 @@ public class DialogueEventAction : EventAction
     public override void OnExit(GameObject player)
     {
         if(closeMode != DialogueCloseMode.ExitArea) { return; }
+        if(dialogue == null) { return; }
 
         dialogue.HideDialogue();
         isShowing = false;

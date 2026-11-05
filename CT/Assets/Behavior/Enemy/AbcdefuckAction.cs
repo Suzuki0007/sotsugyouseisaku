@@ -29,8 +29,6 @@ public partial class AbcdefuckAction : Action
 
     protected override Status OnUpdate()
     {
-        movement.Move(0.5f);
-
         return Status.Running;
     }
 

@@ -20,9 +20,11 @@ public class Dialogue : Intaractable
     [SerializeField]
     private string dialogueText;
 
-    public GameObject dialoguePanel;
+    [SerializeField]
+    private GameObject dialoguePanel;
 
-    public Text dialogueTextUI;
+    [SerializeField]
+    private Text dialogueTextUI;
 
     //=====================================================================
     // 初期化

@@ -31,6 +31,8 @@ public abstract class Intaractable : MonoBehaviour
     void Update()
     {
         if(!player) { return; }
+        if(player == null) { return; }
+        if(Keyboard.current == null) { return; }
 
         // インタラクトキーが押されたときに処理を呼び出す
         if(Keyboard.current[interactKeyInput].wasPressedThisFrame)
