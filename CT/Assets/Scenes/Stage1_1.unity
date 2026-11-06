@@ -459,6 +459,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SceneChange
   sceneName: Stage1_2
   spawnPointId: FromStage1_1
+  leaveSe: {fileID: 11400000, guid: e86ee466dd048ff4293b06eebb170717, type: 2}
+  arriveSe: {fileID: 11400000, guid: 2069ed4d8ee708043b3e24961edd287f, type: 2}
 --- !u!61 &43570063
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -33541,6 +33543,7 @@ MonoBehaviour:
   sigle: {fileID: 3848283961383208032, guid: 96b593b4c0a0ac64d9ab2afdcc1dacea, type: 3}
   focusCamera: {fileID: 519420033}
   switchKey: 17
+  switchSe: {fileID: 0}
 --- !u!1 &823229329
 GameObject:
   m_ObjectHideFlags: 0
@@ -34938,6 +34941,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SceneChange
   sceneName: 
   spawnPointId: 
+  leaveSe: {fileID: 0}
+  arriveSe: {fileID: 0}
 --- !u!1 &1448037748
 GameObject:
   m_ObjectHideFlags: 0
@@ -35576,6 +35581,8 @@ MonoBehaviour:
   getKey: 0
   beforeRenderer: {fileID: 1525000495}
   afterSprite: {fileID: 1315817458, guid: 8b0c508b056873a46b1820fe8083f2dc, type: 3}
+  openSe: {fileID: 0}
+  lockedSe: {fileID: 0}
 --- !u!61 &1525000501
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -36964,6 +36971,9 @@ MonoBehaviour:
   defaultFadeTime: 1
   resumeDefault: 1
   effectProfile: {fileID: 0}
+  startFadeInTime: 2
+  fadeOutPrevious: 1
+  previousFadeOutTime: 0.5
   rules: []
   clearFlagsOnStart: 0
 --- !u!4 &1905514028
@@ -37287,6 +37297,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::KeyItem
   interactKeyInput: 19
   noahInventory: {fileID: 8908782603096249720, guid: dd9779ac97fbb06489888bc76e2e392a, type: 3}
+  pickupSe: {fileID: 0}
 --- !u!1 &2011798005
 GameObject:
   m_ObjectHideFlags: 0

@@ -23,6 +23,20 @@ public class NoahBulletDeleteAreaController : CharaBase
 
     private bool isBulletDeleteAreaActive = false;
 
+    [Header("SE")]
+
+    [SerializeField, Tooltip("エリアを展開したとき")]
+    private SeData areaStartSe;
+
+    [SerializeField, Tooltip("エリア展開中に鳴らし続ける (SeData の loop をオンにする)")]
+    private SeData areaLoopSe;
+
+    [SerializeField, Tooltip("エリアを閉じたとき")]
+    private SeData areaEndSe;
+
+    private bool wasAreaActive = false;
+    private SeHandle areaLoopHandle;
+
     [Header("デバッグ設定")]
 
     [SerializeField]
@@ -50,6 +64,36 @@ public class NoahBulletDeleteAreaController : CharaBase
 
         // 追従ターゲットの位置にエリアを追従させる
         bulletDeleteArea.transform.position = followTargetObject.transform.position;
+
+        UpdateAreaSe(isActive);
+    }
+
+    private void OnDisable()
+    {
+        SeManager.StopSe(areaLoopHandle);
+        areaLoopHandle = SeHandle.None;
+        wasAreaActive = false;
+    }
+
+    /// <summary>
+    /// エリアの開閉に合わせてSEを鳴らす
+    /// </summary>
+    private void UpdateAreaSe(bool isActive)
+    {
+        if(isActive == wasAreaActive) { return; }
+        wasAreaActive = isActive;
+
+        if(isActive)
+        {
+            SeManager.PlaySe(areaStartSe, transform.position);
+            areaLoopHandle = SeManager.PlaySe(areaLoopSe, followTargetObject.transform);
+        }
+        else
+        {
+            SeManager.StopSe(areaLoopHandle);
+            areaLoopHandle = SeHandle.None;
+            SeManager.PlaySe(areaEndSe, transform.position);
+        }
     }
 
     //=====================================================================

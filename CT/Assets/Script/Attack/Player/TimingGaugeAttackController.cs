@@ -30,6 +30,7 @@ public class TimingGaugeAttackController : AttackController
         if(timingGauge.gameObject.activeSelf) { return; }
 
         timingGauge.StartGauge();
+        PlayAttackSe();
     }
 
     //=====================================================================

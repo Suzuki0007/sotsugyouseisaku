@@ -21,6 +21,14 @@ public class SceneChange : MonoBehaviour
     [SerializeField]
     private string spawnPointId;
 
+    [Header("SE")]
+
+    [SerializeField, Tooltip("遷移を始めたとき (暗転の開始) に鳴らす。例: ドアを開ける音")]
+    private SeData leaveSe;
+
+    [SerializeField, Tooltip("遷移先に着いたとき (明転の開始) に鳴らす。例: ドアを閉める音")]
+    private SeData arriveSe;
+
     private void OnCollisionEnter2D(Collision2D collision)
     {
         if(collision.gameObject.CompareTag("Player"))
@@ -46,11 +54,20 @@ public class SceneChange : MonoBehaviour
     /// <param name="spawnPointId">遷移先での出現位置ID</param>
     public void ChangeScene(string sceneName, string spawnPointId)
     {
+        ChangeScene(sceneName, spawnPointId, leaveSe, arriveSe);
+    }
+
+    /// <summary>
+    /// SEを指定してシーンを変更するメソッド
+    /// (このコンポーネントに設定したSEではなく、呼び出し側のSEを鳴らしたいとき用。例: ゲームオーバー)
+    /// </summary>
+    public void ChangeScene(string sceneName, string spawnPointId, SeData leaveSe, SeData arriveSe)
+    {
         // 遷移中の多重呼び出し(連続接触など)を無視する
         if(SceneFader.Instance.IsFading) { return; }
 
         Save.Commit();
         PlayerSpawnPoint.PendingSpawnPointId = spawnPointId;
-        SceneFader.Instance.FadeAndLoad(sceneName);
+        SceneFader.Instance.FadeAndLoad(sceneName, leaveSe, arriveSe);
     }
 }

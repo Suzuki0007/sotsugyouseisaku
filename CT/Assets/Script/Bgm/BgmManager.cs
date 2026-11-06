@@ -152,7 +152,26 @@ public class BgmManager : MonoBehaviour
     /// <param name="resume">   以前に途中まで流した曲なら、続きから再生する </param>
     public void Play(AudioClip clip, float volume = 1.0f, float fadeTime = 1.0f, bool resume = false)
     {
-        if(clip == null) { Stop(fadeTime); return; }
+        PlayInternal(clip, volume, fadeTime, fadeTime, false, resume);
+    }
+
+    /// <summary>
+    /// 流れている曲をフェードアウトしきってから、新しい曲をフェードインで再生する
+    /// (無音から始まるときは、すぐにフェードインを始める)
+    /// </summary>
+    /// <param name="clip">        再生する曲 (nullなら停止) </param>
+    /// <param name="volume">      曲ごとの音量 </param>
+    /// <param name="fadeInTime">  フェードインにかける時間(秒) </param>
+    /// <param name="fadeOutTime"> 前の曲のフェードアウトにかける時間(秒) </param>
+    /// <param name="resume">      以前に途中まで流した曲なら、続きから再生する </param>
+    public void PlayAfterFadeOut(AudioClip clip, float volume = 1.0f, float fadeInTime = 2.0f, float fadeOutTime = 0.5f, bool resume = false)
+    {
+        PlayInternal(clip, volume, fadeInTime, fadeOutTime, true, resume);
+    }
+
+    private void PlayInternal(AudioClip clip, float volume, float fadeInTime, float fadeOutTime, bool waitFadeOut, bool resume)
+    {
+        if(clip == null) { Stop(fadeOutTime); return; }
 
         // 同じ曲なら流し続ける (音量だけ合わせる)
         if(clip == currentClip)
@@ -160,25 +179,45 @@ public class BgmManager : MonoBehaviour
             if(!Mathf.Approximately(volume, currentVolume))
             {
                 currentVolume = volume;
-                StartFade(fadeTime, false);
+
+                // フェードイン待ちで止めてしまわないように、再生されていなければ再生する
+                AudioSource active = channels[activeIndex].Source;
+                if(!active.isPlaying) { active.Play(); }
+
+                StartFade(fadeInTime, fadeInTime, 0.0f, false);
             }
             return;
         }
 
         RememberCurrentTime();
 
+        // 前の曲が聞こえているときだけ、消えるのを待つ
+        float delay = (waitFadeOut && IsAudible()) ? Mathf.Max(0.0f, fadeOutTime) : 0.0f;
+
         currentClip = clip;
         currentVolume = volume;
 
-        // 使っていない方のチャンネルで新しい曲を流す
+        // 使っていない方のチャンネルで新しい曲を準備する (再生はフェードイン開始時)
         activeIndex = 1 - activeIndex;
-        AudioSource next = channels[activeIndex].Source;
-        channels[activeIndex].FadeVolume = 0.0f;
-        next.clip = clip;
-        next.time = (resume && resumeTimes.TryGetValue(clip, out float time) && time < clip.length) ? time : 0.0f;
-        next.Play();
+        BgmChannel next = channels[activeIndex];
+        next.Source.Stop();
+        next.FadeVolume = 0.0f;
+        next.Source.clip = clip;
+        next.Source.time = (resume && resumeTimes.TryGetValue(clip, out float time) && time < clip.length) ? time : 0.0f;
 
-        StartFade(fadeTime, false);
+        StartFade(fadeInTime, fadeOutTime, delay, false);
+    }
+
+    /// <summary>
+    /// いずれかのチャンネルから音が聞こえているか
+    /// </summary>
+    private bool IsAudible()
+    {
+        foreach(BgmChannel channel in channels)
+        {
+            if(channel.Source.isPlaying && channel.FadeVolume > 0.001f) { return true; }
+        }
+        return false;
     }
 
     /// <summary>
@@ -191,7 +230,7 @@ public class BgmManager : MonoBehaviour
 
         RememberCurrentTime();
         currentClip = null;
-        StartFade(fadeTime, true);
+        StartFade(fadeTime, fadeTime, 0.0f, true);
     }
 
     /// <summary>
@@ -251,7 +290,7 @@ public class BgmManager : MonoBehaviour
         else
         {
             // 時間に依存しない滑らかな追従 (Time.timeScaleの影響を受けない)
-            float t = 1.0f - Mathf.Exp(-Time.unscaledDeltaTime * 3.0f / effectSmoothTime);
+            float t = 1.0f - Mathf.Exp(-DeltaTime * 3.0f / effectSmoothTime);
             BgmEffectSettings.Lerp(currentEffect, targetEffect, t, currentEffect);
         }
 
@@ -273,34 +312,60 @@ public class BgmManager : MonoBehaviour
         }
     }
 
-    private void StartFade(float fadeTime, bool stopAll)
+    /// <summary>
+    /// 1フレームの経過時間 (Time.timeScaleの影響を受けない)
+    /// シーン読み込み直後の長いフレームでフェードが一瞬で終わらないように上限をつける
+    /// </summary>
+    private static float DeltaTime => Mathf.Min(Time.unscaledDeltaTime, MaxFadeStep);
+
+    private const float MaxFadeStep = 1.0f / 30.0f;
+
+    private void StartFade(float fadeInTime, float fadeOutTime, float fadeInDelay, bool stopAll)
     {
         if(fadeRoutine != null) { StopCoroutine(fadeRoutine); }
-        fadeRoutine = StartCoroutine(FadeRoutine(fadeTime, stopAll));
+        fadeRoutine = StartCoroutine(FadeRoutine(fadeInTime, fadeOutTime, fadeInDelay, stopAll));
     }
 
     /// <summary>
     /// アクティブなチャンネルを目標音量へ、それ以外を0へ補間する
-    /// (Time.timeScaleの影響を受けない)
+    /// アクティブなチャンネルは fadeInDelay 秒待ってから再生・フェードインを始める
     /// </summary>
-    private IEnumerator FadeRoutine(float fadeTime, bool stopAll)
+    private IEnumerator FadeRoutine(float fadeInTime, float fadeOutTime, float fadeInDelay, bool stopAll)
     {
         float[] startVolumes = new float[channels.Length];
         for(int i = 0; i < channels.Length; i++) { startVolumes[i] = channels[i].FadeVolume; }
 
+        AudioSource activeSource = channels[activeIndex].Source;
+        float totalTime = Mathf.Max(fadeOutTime, fadeInDelay + fadeInTime);
+
         float time = 0.0f;
-        while(time < fadeTime)
+        while(time < totalTime)
         {
-            time += Time.unscaledDeltaTime;
-            float t = Mathf.Clamp01(time / fadeTime);
+            time += DeltaTime;
 
             for(int i = 0; i < channels.Length; i++)
             {
-                float target = (!stopAll && i == activeIndex) ? currentVolume : 0.0f;
-                channels[i].FadeVolume = Mathf.Lerp(startVolumes[i], target, t);
+                bool isActive = !stopAll && i == activeIndex;
+                if(isActive)
+                {
+                    if(time < fadeInDelay) { continue; }
+
+                    // 待ち時間が終わったら再生を始める
+                    if(!activeSource.isPlaying && activeSource.clip != null) { activeSource.Play(); }
+
+                    float t = fadeInTime > 0.0f ? Mathf.Clamp01((time - fadeInDelay) / fadeInTime) : 1.0f;
+                    channels[i].FadeVolume = Mathf.Lerp(startVolumes[i], currentVolume, t);
+                }
+                else
+                {
+                    float t = fadeOutTime > 0.0f ? Mathf.Clamp01(time / fadeOutTime) : 1.0f;
+                    channels[i].FadeVolume = Mathf.Lerp(startVolumes[i], 0.0f, t);
+                }
             }
             yield return null;
         }
+
+        if(!stopAll && !activeSource.isPlaying && activeSource.clip != null) { activeSource.Play(); }
 
         for(int i = 0; i < channels.Length; i++)
         {

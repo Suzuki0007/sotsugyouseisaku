@@ -109,19 +109,27 @@ public class SceneFader : MonoBehaviour
     /// 暗転してからシーンを遷移する
     /// </summary>
     /// <param name="sceneName">遷移先のシーン名</param>
-    public void FadeAndLoad(string sceneName)
+    /// <param name="leaveSe">  暗転を始めるときに鳴らすSE (任意) </param>
+    /// <param name="arriveSe"> 遷移先で明転を始めるときに鳴らすSE (任意) </param>
+    public void FadeAndLoad(string sceneName, SeData leaveSe = null, SeData arriveSe = null)
     {
         if(IsFading) { return; }
-        StartCoroutine(FadeAndLoadRoutine(sceneName));
+        StartCoroutine(FadeAndLoadRoutine(sceneName, leaveSe, arriveSe));
     }
 
-    private IEnumerator FadeAndLoadRoutine(string sceneName)
+    private IEnumerator FadeAndLoadRoutine(string sceneName, SeData leaveSe, SeData arriveSe)
     {
         IsFading = true;
         fadeImage.raycastTarget = true;// 遷移中はUI操作をブロック
 
+        // 出発のSE (SeManagerはシーンをまたいで残るので、読み込み中も途切れない)
+        SeManager.PlaySe(leaveSe);
+
         // 暗転
         yield return Fade(0.0f, 1.0f, fadeOutDuration);
+
+        // 前のシーンで鳴らしていたループSE (環境音など) を止める
+        SeManager.StopAllLoopSe();
 
         // 暗転中にシーン読み込み
         AsyncOperation operation = SceneManager.LoadSceneAsync(sceneName);
@@ -137,6 +145,9 @@ public class SceneFader : MonoBehaviour
         // 新しいシーンの初期化を1フレーム待つ
         yield return null;
         yield return new WaitForSecondsRealtime(blackHoldDuration);
+
+        // 到着のSE
+        SeManager.PlaySe(arriveSe);
 
         // 明転
         yield return Fade(1.0f, 0.0f, fadeInDuration);

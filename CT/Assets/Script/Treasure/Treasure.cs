@@ -32,6 +32,14 @@ public class Treasure : Intaractable
     [SerializeField]
     private Sprite afterSprite;
 
+    [Header("SE")]
+
+    [SerializeField, Tooltip("宝箱を開けたとき")]
+    private SeData openSe;
+
+    [SerializeField, Tooltip("鍵がなくて開けられなかったとき")]
+    private SeData lockedSe;
+
     private string key; // セーブ用の名前
 
     //=====================================================================
@@ -61,6 +69,7 @@ public class Treasure : Intaractable
             if(!HasKey())
             {
                 Debug.Log("宝箱を開けるには鍵が必要です");
+                SeManager.PlaySe(lockedSe, transform.position);
                 return;
             }
             else
@@ -69,6 +78,7 @@ public class Treasure : Intaractable
 
                 // 宝箱のスプライト変更、鍵を取得したことを示すフラグを立てる
                 SetBeforeRenderer();
+                SeManager.PlaySe(openSe, transform.position);
 
                 //Debug.Log("[Treasure] 開封 key=" + key);
 
@@ -80,6 +90,7 @@ public class Treasure : Intaractable
         {
             // 宝箱のスプライト変更、鍵を取得したことを示すフラグを立てる
             SetBeforeRenderer();
+            SeManager.PlaySe(openSe, transform.position);
         }
     }
 

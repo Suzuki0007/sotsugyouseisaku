@@ -25,6 +25,12 @@ public class Health : MonoBehaviour
 
     public event System.Action OnDied;
 
+    /// <summary> ダメージを受けたとき (引数: 受けたダメージ量) </summary>
+    public event System.Action<int> OnDamaged;
+
+    /// <summary> 回復したとき (引数: 実際に回復した量) </summary>
+    public event System.Action<int> OnHealed;
+
     //=====================================================================
     // プロパティ
     //=====================================================================
@@ -49,11 +55,13 @@ public class Health : MonoBehaviour
         if(IsDead) { return; }
 
         CurrentHealth -= damage;
+        if(CurrentHealth < 0) { CurrentHealth = 0; }
 
-        if(CurrentHealth <= 0) 
+        // 被ダメージイベントをだす
+        OnDamaged?.Invoke(damage);
+
+        if(CurrentHealth <= 0)
         {
-            CurrentHealth = 0;
-
             // 死亡イベントをだす
             OnDied?.Invoke();
         }
@@ -61,8 +69,13 @@ public class Health : MonoBehaviour
 
     public void Heal(int healAmount)
     {
+        int before = CurrentHealth;
+
         CurrentHealth += healAmount;
 
         if(CurrentHealth > maxHealth) { CurrentHealth = maxHealth; }
+
+        int healed = CurrentHealth - before;
+        if(healed > 0) { OnHealed?.Invoke(healed); }
     }
 }

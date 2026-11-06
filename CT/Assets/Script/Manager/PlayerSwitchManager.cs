@@ -35,6 +35,11 @@ public class PlayerSwitchManager : Singleton<PlayerSwitchManager>
     [SerializeField]
     private Key switchKey = Key.C;
 
+    [Header("SE")]
+
+    [SerializeField, Tooltip("キャラクターを切り替えたとき")]
+    private SeData switchSe;
+
     private PlayerMovement noahMovement;
     private PlayerMovement sigleMovement;
 
@@ -182,5 +187,7 @@ public class PlayerSwitchManager : Singleton<PlayerSwitchManager>
 
         // カメラの追従先を変更
         focusCamera.SetTarget(currentPlayer.transform);
+
+        SeManager.PlaySe(switchSe, currentPlayer.transform.position);
     }
 }

@@ -21,6 +21,14 @@ public class NoahDead : CharaBase
 
     private SceneChange sceneChange;
 
+    [Header("SE")]
+
+    [SerializeField, Tooltip("ゲームオーバー画面へ遷移し始めたとき")]
+    private SeData gameOverLeaveSe;
+
+    [SerializeField, Tooltip("ゲームオーバー画面に着いたとき")]
+    private SeData gameOverArriveSe;
+
     //=====================================================================
     // 関数
     //=====================================================================
@@ -53,7 +61,8 @@ public class NoahDead : CharaBase
     {
         Debug.Log("プレイヤーが死亡しました！");
 
-        sceneChange.ChangeScene("SceneGameOver");
+        // 借りている SceneChange (ドアなど) のSEではなく、ゲームオーバー用のSEを鳴らす
+        sceneChange.ChangeScene("SceneGameOver", null, gameOverLeaveSe, gameOverArriveSe);
     }
 
     //=====================================================================

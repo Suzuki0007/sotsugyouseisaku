@@ -19,6 +19,11 @@ public class KeyItem : Intaractable
     [SerializeField]
     private NoahInventory noahInventory;
 
+    [Header("SE")]
+
+    [SerializeField, Tooltip("鍵を拾ったとき")]
+    private SeData pickupSe;
+
     //====================================================================================
     // 初期化
     //====================================================================================
@@ -44,6 +49,9 @@ public class KeyItem : Intaractable
         if(noahInventory.HasKey()) { return; }
 
         noahInventory.GetKey();
+
+        // オブジェクトを消す前に鳴らす (SeManager側で鳴るので消えても途切れない)
+        SeManager.PlaySe(pickupSe, transform.position);
 
         gameObject.SetActive(false);
 

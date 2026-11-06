@@ -32,6 +32,7 @@ public class AreaAttackController : AttackController
         if(areaAttack == null) { return; }
 
         areaAttack.StartAttack(damageMultiplier);
+        PlayAttackSe();
     }
 
     //=====================================================================

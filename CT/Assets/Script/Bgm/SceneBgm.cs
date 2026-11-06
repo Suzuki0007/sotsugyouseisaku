@@ -87,6 +87,17 @@ public class SceneBgm : MonoBehaviour
     [SerializeField, Tooltip("このシーンのエフェクト (空ならエフェクトなし)")]
     private BgmEffectProfile effectProfile;
 
+    [Header("シーン開始時")]
+
+    [SerializeField, Tooltip("シーン開始時のフェードインにかける時間(秒)")]
+    private float startFadeInTime = 2.0f;
+
+    [SerializeField, Tooltip("前のシーンと曲が違うとき、オンなら前の曲が消えてからフェードイン / オフならクロスフェード")]
+    private bool fadeOutPrevious = true;
+
+    [SerializeField, Tooltip("前のシーンの曲を消す時間(秒)")]
+    private float previousFadeOutTime = 0.5f;
+
     [Header("条件付きBGM")]
 
     [SerializeField]
@@ -152,14 +163,26 @@ public class SceneBgm : MonoBehaviour
         BgmEffectProfile profile = (rule != null && rule.effectProfile != null) ? rule.effectProfile : effectProfile;
         BgmManager.Instance.SetEffectProfile(profile, instant);
 
-        if(rule == null)
+        AudioClip clip   = rule == null ? defaultClip     : rule.clip;
+        float     volume = rule == null ? defaultVolume   : rule.volume;
+        float     fade   = rule == null ? defaultFadeTime : rule.fadeTime;
+        bool      resume = rule == null && resumeDefault && !isSceneStart;
+
+        // シーン開始時はフェードインで始める
+        if(isSceneStart)
         {
-            BgmManager.Instance.Play(defaultClip, defaultVolume, defaultFadeTime, resumeDefault && !isSceneStart);
+            if(fadeOutPrevious)
+            {
+                BgmManager.Instance.PlayAfterFadeOut(clip, volume, startFadeInTime, previousFadeOutTime, resume);
+            }
+            else
+            {
+                BgmManager.Instance.Play(clip, volume, startFadeInTime, resume);
+            }
+            return;
         }
-        else
-        {
-            BgmManager.Instance.Play(rule.clip, rule.volume, rule.fadeTime, false);
-        }
+
+        BgmManager.Instance.Play(clip, volume, fade, resume);
     }
 
     //=====================================================================
