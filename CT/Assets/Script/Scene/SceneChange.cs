@@ -6,7 +6,6 @@
 /*********************************************************************/
 
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 /// <summary>
 /// シーン遷移クラス
@@ -21,18 +20,20 @@ public class SceneChange : MonoBehaviour
     {
         if(collision.gameObject.CompareTag("Player"))
         {
-            Save.Commit();
-            SceneManager.LoadScene(sceneName);
+            ChangeScene(sceneName);
         }
     }
 
     /// <summary>
-    /// シーンを変更するメソッド
+    /// シーンを変更するメソッド (暗転演出を挟んで遷移する)
     /// </summary>
     /// <param name="sceneName"></param>
     public void ChangeScene(string sceneName)
     {
+        // 遷移中の多重呼び出し(連続接触など)を無視する
+        if(SceneFader.Instance.IsFading) { return; }
+
         Save.Commit();
-        SceneManager.LoadScene(sceneName);
+        SceneFader.Instance.FadeAndLoad(sceneName);
     }
 }

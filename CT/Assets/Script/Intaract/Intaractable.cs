@@ -34,6 +34,12 @@ public abstract class Intaractable : MonoBehaviour
         if(player == null) { return; }
         if(Keyboard.current == null) { return; }
 
+        // 会話中・会話を閉じた直後は調べられない（同じキーで会話が開き直すのを防ぐ）
+        if(DialogueManager.IsBusy) { return; }
+
+        // シーン遷移中は調べられない
+        if(SceneFader.IsBusy) { return; }
+
         // インタラクトキーが押されたときに処理を呼び出す
         if(Keyboard.current[interactKeyInput].wasPressedThisFrame)
         {

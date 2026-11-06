@@ -25,6 +25,11 @@ public class AttackController : CharaBase
 
     private void Update()
     {
+        if(Keyboard.current == null) { return; }
+
+        // 会話中・シーン遷移中は攻撃しない
+        if(DialogueManager.IsBusy || SceneFader.IsBusy) { return; }
+
         // 指定されたキーが押されたら攻撃を開始する
         if(Keyboard.current[attackKey].wasPressedThisFrame)
         {

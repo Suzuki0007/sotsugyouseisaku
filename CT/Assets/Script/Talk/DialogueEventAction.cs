@@ -20,6 +20,9 @@ public class DialogueEventAction : EventAction
     /// <summary>
     /// ダイアログを閉じるモード
     /// </summary>
+    ///
+    /// Input    : 送りキーで最後の文まで進めると閉じる
+    /// ExitArea : 送りキーでも閉じるが、エリアから出たときにも強制的に閉じる
     public enum DialogueCloseMode
     {
         Input,
@@ -28,7 +31,7 @@ public class DialogueEventAction : EventAction
 
     //=====================================================================
     // 変数
-    //===================================================================== 
+    //=====================================================================
 
     [SerializeField]
     private Dialogue dialogue;
@@ -36,10 +39,15 @@ public class DialogueEventAction : EventAction
     [SerializeField]
     private DialogueCloseMode closeMode = DialogueCloseMode.ExitArea;
 
+    [Tooltip("旧方式（DialogueManagerがないシーン）で閉じるキー")]
     [SerializeField]
     private Key closeKey = Key.E;
 
-    private bool isShowing;
+    // 旧方式で表示中かどうか
+    private bool isShowingLegacy;
+
+    // 旧方式で表示したフレーム（同じフレームで閉じないため）
+    private int shownFrame = -1;
 
     //=====================================================================
     // 更新関数
@@ -47,15 +55,17 @@ public class DialogueEventAction : EventAction
 
     private void Update()
     {
-        if(!isShowing) { return; }
+        // DialogueManagerがあるシーンでは、送り・閉じる処理はDialogueManagerが行う
+        if(!isShowingLegacy) { return; }
         if(closeMode != DialogueCloseMode.Input) { return; }
         if(Keyboard.current == null) { return; }
+        if(Time.frameCount == shownFrame) { return; }
 
         // キーが押されたときにダイアログを閉じる
         if(Keyboard.current[closeKey].wasPressedThisFrame)
         {
             dialogue.HideDialogue();
-            isShowing = false;
+            isShowingLegacy = false;
         }
     }
 
@@ -67,8 +77,13 @@ public class DialogueEventAction : EventAction
     {
         if(dialogue == null) { return; }
 
-        dialogue.ShowDialogue();
-        isShowing = true;
+        dialogue.Talk();
+
+        if(dialogue.IsLegacy)
+        {
+            isShowingLegacy = true;
+            shownFrame = Time.frameCount;
+        }
     }
 
     /// <summary>
@@ -79,7 +94,7 @@ public class DialogueEventAction : EventAction
         if(closeMode != DialogueCloseMode.ExitArea) { return; }
         if(dialogue == null) { return; }
 
-        dialogue.HideDialogue();
-        isShowing = false;
+        dialogue.Close();
+        isShowingLegacy = false;
     }
 }
