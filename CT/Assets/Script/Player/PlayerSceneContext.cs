@@ -5,6 +5,7 @@
 // * \author 成田悠真
 /*********************************************************************/
 
+using System;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
@@ -60,6 +61,11 @@ public class PlayerSceneContext : MonoBehaviour
     [SerializeField]
     private BulletDeleteArea bulletDeleteArea;
 
+    [Header("マップ範囲")]
+
+    [SerializeField]
+    private MapBounds mapBounds;
+
     //=====================================================================
     // プロパティ
     //=====================================================================
@@ -81,4 +87,6 @@ public class PlayerSceneContext : MonoBehaviour
     public AreaAttack AreaAttack => areaAttack;
 
     public BulletDeleteArea BulletDeleteArea => bulletDeleteArea;
+
+    public MapBounds MapBounds => mapBounds;
 }

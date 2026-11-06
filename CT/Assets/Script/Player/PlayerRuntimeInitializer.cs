@@ -62,6 +62,7 @@ public class PlayerRuntimeInitializer : MonoBehaviour
         if(playerMapLimit != null)
         {
             playerMapLimit.SetTilemap(context.PlayerLimitTilemap);
+            playerMapLimit.SetMapBounds(context.MapBounds);
         }
 
         if(sigleShooter != null)

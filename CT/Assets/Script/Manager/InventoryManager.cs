@@ -13,21 +13,17 @@ using UnityEngine.SceneManagement;
 /// </summary>
 public class InventoryManager : Singleton<InventoryManager>
 {
-    /// <summary>
-    /// ノアのデータ
-    /// </summary>
-    /// 
-    /// getはこのクラスのインスタンスのHasKeyプロパティの値を返す
-    /// setはこのクラスのインスタンスのHasKeyプロパティに値を代入する
-    /// たとえるなら、ゲッターとセッターが合体したようなもの
-    /// 
-    /// setをprivateにすることで、外部からはnoahDataプロパティの値を変更できなくする
+    //=====================================================================
+    // プロパティ
+    //=====================================================================
+
     public NoahData NoahData { get; private set; }
 
-    /// <summary>
-    /// 鍵を持っているかどうか
-    /// </summary>
     public bool HasKey { get; set; }
+
+    //=====================================================================
+    // 初期化
+    //=====================================================================
 
     protected override void Awake()
     {
