@@ -220,6 +220,64 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EventSequence
   actions: []
+--- !u!1 &35119845
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 35119847}
+  - component: {fileID: 35119846}
+  m_Layer: 0
+  m_Name: Light
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &35119846
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 35119845}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: db857aa0bd6b3f44f827e2ee5426ce6f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LightSource
+  shape: 0
+  lightSprite: {fileID: 0}
+  spriteScale: 1
+  offset: {x: 0, y: 0}
+  radius: 3
+  innerRadius: 0.5
+  intensity: 1
+  color: {r: 1, g: 0.85, b: 0.6, a: 1}
+  falloff: 0.5
+  flickerAmount: 0
+  flickerSpeed: 3
+  onlyInDarkStage: 1
+  selfIlluminate: 0
+  unlitMaterial: {fileID: 0}
+--- !u!4 &35119847
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 35119845}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -118.25, y: 17.24, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &50382636 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 4195876310559675042, guid: ec0d40739ef5840449b2ed8734aafd55, type: 3}
@@ -32785,6 +32843,64 @@ MonoBehaviour:
   sigleSpawnPoint: {fileID: 1338695970}
   playerSwitchManager: {fileID: 821653545}
   sceneContext: {fileID: 1554118605}
+--- !u!1 &762254091
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 762254093}
+  - component: {fileID: 762254092}
+  m_Layer: 0
+  m_Name: Light (2)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &762254092
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 762254091}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: db857aa0bd6b3f44f827e2ee5426ce6f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LightSource
+  shape: 0
+  lightSprite: {fileID: 0}
+  spriteScale: 1
+  offset: {x: 0, y: 0}
+  radius: 3
+  innerRadius: 0.5
+  intensity: 1
+  color: {r: 1, g: 0.85, b: 0.6, a: 1}
+  falloff: 0.5
+  flickerAmount: 0
+  flickerSpeed: 3
+  onlyInDarkStage: 1
+  selfIlluminate: 0
+  unlitMaterial: {fileID: 0}
+--- !u!4 &762254093
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 762254091}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -102.82, y: 17.24, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &781711999
 GameObject:
   m_ObjectHideFlags: 0
@@ -33943,6 +34059,62 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1206976741}
   m_CullTransparentMesh: 1
+--- !u!1 &1232173726
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1232173728}
+  - component: {fileID: 1232173727}
+  m_Layer: 0
+  m_Name: StageDarkness
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1232173727
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1232173726}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 73fe514f8baede14a9164ae2a88d5823, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::StageDarkness
+  darkness: 0.813
+  ambientColor: {r: 1, g: 1, b: 1, a: 1}
+  globalLight: {fileID: 0}
+  target: {fileID: 0}
+  offset: {x: 0, y: 0}
+  radius: 2
+  innerRadius: 0
+  lightIntensity: 0.8
+  lightColor: {r: 1, g: 1, b: 1, a: 1}
+  falloff: 0.5
+  flickerAmount: 0.158
+  flickerSpeed: 1
+--- !u!4 &1232173728
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1232173726}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -114.68821, y: 23.02692, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1287557233
 GameObject:
   m_ObjectHideFlags: 0
@@ -35729,6 +35901,64 @@ Transform:
   - {fileID: 1999012010}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1719572414
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1719572416}
+  - component: {fileID: 1719572415}
+  m_Layer: 0
+  m_Name: Light (1)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1719572415
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1719572414}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: db857aa0bd6b3f44f827e2ee5426ce6f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LightSource
+  shape: 0
+  lightSprite: {fileID: 0}
+  spriteScale: 1
+  offset: {x: 0, y: 0}
+  radius: 3
+  innerRadius: 0.5
+  intensity: 1
+  color: {r: 1, g: 0.85, b: 0.6, a: 1}
+  falloff: 0.5
+  flickerAmount: 0
+  flickerSpeed: 3
+  onlyInDarkStage: 1
+  selfIlluminate: 0
+  unlitMaterial: {fileID: 0}
+--- !u!4 &1719572416
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1719572414}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -110.38, y: 17.24, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1723348671
 GameObject:
   m_ObjectHideFlags: 0
@@ -37049,3 +37279,7 @@ SceneRoots:
   - {fileID: 353919149}
   - {fileID: 1827520633}
   - {fileID: 791300647}
+  - {fileID: 1232173728}
+  - {fileID: 35119847}
+  - {fileID: 1719572416}
+  - {fileID: 762254093}
