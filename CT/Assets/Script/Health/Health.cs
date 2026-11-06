@@ -31,6 +31,8 @@ public class Health : MonoBehaviour
 
     public int CurrentHealth { get; private set; }
 
+    public int MaxHealth => maxHealth;
+
     public bool IsDead => CurrentHealth <= 0;
 
     //=====================================================================
