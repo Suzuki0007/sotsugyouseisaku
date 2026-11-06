@@ -17,8 +17,24 @@ public class FocusCamera : MonoBehaviour
     // 変数
     //=====================================================================
 
+    [Header("追従対象")]
+
     [SerializeField]
     public Transform player;
+
+    [Header("マップ範囲(画像)")]
+
+    [SerializeField]
+    private Transform upperLeftPosition;
+
+    [SerializeField]
+    private Transform upperRightPosition;
+
+    [SerializeField]
+    private Transform lowerLeftPosition;
+
+    [SerializeField]
+    private Transform lowerRightPosition;
 
     public Tilemap tilemap;
 
@@ -38,52 +54,96 @@ public class FocusCamera : MonoBehaviour
     // 更新関数
     //=====================================================================
 
-    void LateUpdate()
+    private void LateUpdate()
     {
-        if(player == null || tilemap == null || cam == null) { return; }
+        if(!IsValid()) { return; }
 
-        // カメラの位置はプレイヤーの位置
-        float cameraX = player.position.x; 
+        float cameraX = player.position.x;
         float cameraY = player.position.y;
 
-        // Tilemapが使用しているセルの範囲
-        BoundsInt cellBounds = tilemap.cellBounds;
+        float minX = Mathf.Min(
+            upperLeftPosition.position.x,
+            upperRightPosition.position.x,
+            lowerLeftPosition.position.x,
+            lowerRightPosition.position.x
+        );
 
-        // セルの範囲をワールド座標へ変換
-        Vector3 minWorld = tilemap.CellToWorld(cellBounds.min); 
-        Vector3 maxWorld = tilemap.CellToWorld(cellBounds.max);
+        float maxX = Mathf.Max(
+            upperLeftPosition.position.x,
+            upperRightPosition.position.x,
+            lowerLeftPosition.position.x,
+            lowerRightPosition.position.x
+        );
 
-        // カメラのサイズ
-        float cameraHeight = cam.orthographicSize; 
+        float minY = Mathf.Min(
+            upperLeftPosition.position.y,
+            upperRightPosition.position.y,
+            lowerLeftPosition.position.y,
+            lowerRightPosition.position.y
+        );
+
+        float maxY = Mathf.Max(
+            upperLeftPosition.position.y,
+            upperRightPosition.position.y,
+            lowerLeftPosition.position.y,
+            lowerRightPosition.position.y
+        );
+
+        float cameraHeight = cam.orthographicSize;
         float cameraWidth = cameraHeight * cam.aspect;
 
-        // カメラの移動範囲
-        float minX = minWorld.x + cameraWidth; 
-        float maxX = maxWorld.x - cameraWidth; 
-        float minY = minWorld.y + cameraHeight; 
-        float maxY = maxWorld.y - cameraHeight;
+        float minCameraX = minX + cameraWidth;
+        float maxCameraX = maxX - cameraWidth;
+        float minCameraY = minY + cameraHeight;
+        float maxCameraY = maxY - cameraHeight;
 
-        // マップがカメラより小さい場合は、マップの中央に配置する
-        if (minX > maxX)
+        if(minCameraX > maxCameraX)
         {
-            // 半分の幅を計算して中央に配置
-            cameraX = (minWorld.x + maxWorld.x) / 2f;
+            cameraX = (minX + maxX) / 2f;
         }
         else
         {
-            cameraX = Mathf.Clamp(cameraX, minX, maxX);
+            cameraX = Mathf.Clamp(cameraX, minCameraX, maxCameraX);
         }
-        if(minY > maxY)
+
+        if(minCameraY > maxCameraY)
         {
-            // 半分の高さを計算して中央に配置
-            cameraY = (minWorld.y + maxWorld.y) / 2f;
+            cameraY = (minY + maxY) / 2f;
         }
         else
         {
-            cameraY = Mathf.Clamp(cameraY, minY, maxY);
+            cameraY = Mathf.Clamp(cameraY, minCameraY, maxCameraY);
         }
 
-        transform.position = new Vector3(cameraX, cameraY, transform.position.z);
+        transform.position = new Vector3(
+            cameraX,
+            cameraY,
+            transform.position.z
+        );
+    }
+
+    //=====================================================================
+    // 判定関数
+    //=====================================================================
+
+    /// <summary>
+    /// カメラの追従が有効かどうかを判定する関数
+    /// </summary>
+    /// <returns></returns>
+    private bool IsValid()
+    {
+        if(cam == null) { return false; }
+        if(player == null) { return false; }
+
+        if(upperLeftPosition == null ||
+           upperRightPosition == null ||
+           lowerLeftPosition == null ||
+           lowerRightPosition == null)
+        {
+            return false;
+        }
+
+        return true;
     }
 
     //=====================================================================
@@ -92,13 +152,23 @@ public class FocusCamera : MonoBehaviour
 
     public void SetTarget(Transform newTarget)
     {
+        if(newTarget == null)
+        {
+            Debug.LogError("追従対象の設定に失敗しました。", this);
+            return;
+        }
+
         player = newTarget;
-        if(player == null) { Debug.LogError("追従対象の設定に失敗しました"); return; }
     }
 
     public void SetTilemap(Tilemap newTilemap)
     {
+        if(newTilemap == null)
+        {
+            Debug.LogError("タイルマップの設定に失敗しました。", this);
+            return;
+        }
+
         tilemap = newTilemap;
-        if(tilemap == null) { Debug.LogError("Tilemapの設定に失敗しました", this); }
     }
 }
