@@ -63,17 +63,30 @@ public class PlayerPartySpawner : MonoBehaviour
 
     private void Start()
     {
+        // 出現位置を決める
+        // 遷移元で出現位置IDが指定されていればその地点、なければデフォルトの地点
+
+        Transform noahPoint = noahSpawnPoint;
+        Transform siglePoint = sigleSpawnPoint;
+
+        PlayerSpawnPoint spawnPoint = PlayerSpawnPoint.ConsumePending();
+        if(spawnPoint != null)
+        {
+            noahPoint = spawnPoint.NoahPoint;
+            siglePoint = spawnPoint.SiglePoint;
+        }
+
         // NoahとSigleを生成する
 
         GameObject noah = Instantiate(
             noahPrefab,
-            noahSpawnPoint.position,
-            noahSpawnPoint.rotation);
+            noahPoint.position,
+            noahPoint.rotation);
 
         GameObject sigle = Instantiate(
             siglePrefab,
-            sigleSpawnPoint.position,
-            sigleSpawnPoint.rotation);
+            siglePoint.position,
+            siglePoint.rotation);
 
         // プレイヤーの初期化
 

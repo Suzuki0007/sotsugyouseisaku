@@ -12,4 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eac73eb13381b184b8a3fd1f6643eddc, type: 3}
   m_Name: NewDialogue
   m_EditorClassIdentifier: Assembly-CSharp::DialogueData
-  lines: []
+  lines:
+  - character: {fileID: 0}
+    expression: 0
+    speakerName: 
+    text: 
