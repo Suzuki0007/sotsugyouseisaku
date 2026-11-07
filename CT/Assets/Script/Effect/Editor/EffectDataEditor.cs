@@ -149,15 +149,13 @@ public class EffectDataEditor : Editor
 
     private void DrawPreview(EffectData data)
     {
-        Rect rect = GUILayoutUtility.GetRect(10.0f, PreviewHeight, GUILayout.ExpandWidth(true));
-        rect = EditorGUI.IndentedRect(rect);
-        EditorGUI.DrawRect(rect, new Color(0.16f, 0.16f, 0.16f));
+        Rect rect = SpritePreviewGUI.BeginArea(PreviewHeight);
 
         if(data.DisplayMode == EffectDisplayMode.SpriteFrames)
         {
             if(!data.HasFrames)
             {
-                CenterLabel(rect, "画像を入れるとここでプレビューできます");
+                SpritePreviewGUI.CenterLabel(rect, "画像を入れるとここでプレビューできます");
                 return;
             }
 
@@ -165,75 +163,41 @@ public class EffectDataEditor : Editor
             double cycle = data.FrameCycleTime;
             double loopLength = data.Lifetime == EffectLifetime.Auto ? cycle + 0.4 : cycle;
             double t = EditorApplication.timeSinceStartup % System.Math.Max(0.01, loopLength);
-            int index = Mathf.Min(Mathf.FloorToInt((float)(t * data.Fps)), data.Frames.Length - 1);
             if(data.Lifetime == EffectLifetime.Auto && t > cycle)
             {
-                CenterLabel(rect, "");
                 return;
             }
+            int index = SpriteFrameTiming.FrameAt((float)t, data.Frames.Length, data.Fps, false, out _);
 
             Sprite sprite = data.Frames[index];
             if(sprite == null)
             {
-                CenterLabel(rect, $"{index + 1} 枚目の画像が空です");
+                SpritePreviewGUI.CenterLabel(rect, $"{index + 1} 枚目の画像が空です");
                 return;
             }
 
-            DrawSprite(rect, sprite, data.Color, false);
-            GUI.Label(new Rect(rect.x + 4, rect.y + 2, 200, 16), $"{index + 1} / {data.Frames.Length}", EditorStyles.whiteMiniLabel);
+            SpritePreviewGUI.DrawSprite(rect, sprite, data.Color, false);
+            SpritePreviewGUI.CornerLabel(rect, $"{index + 1} / {data.Frames.Length}");
         }
         else
         {
             if(data.Prefab == null)
             {
-                CenterLabel(rect, "Prefab を入れてください");
+                SpritePreviewGUI.CenterLabel(rect, "Prefab を入れてください");
                 return;
             }
 
             Texture2D preview = AssetPreview.GetAssetPreview(data.Prefab);
             if(preview != null)
             {
-                GUI.DrawTexture(Fit(rect, preview.width, preview.height), preview, ScaleMode.ScaleToFit);
+                GUI.DrawTexture(SpritePreviewGUI.Fit(rect, preview.width, preview.height), preview, ScaleMode.ScaleToFit);
             }
             else
             {
-                CenterLabel(rect, "Prefab のプレビューは Playモードの「試し再生」で確認してください");
+                SpritePreviewGUI.CenterLabel(rect, "Prefab のプレビューは Playモードの「試し再生」で確認してください");
                 Repaint();// サムネイルの読み込みが終わったら表示されるように
             }
         }
-    }
-
-    private static void DrawSprite(Rect area, Sprite sprite, Color tint, bool flip)
-    {
-        Texture2D tex = sprite.texture;
-        if(tex == null) { return; }
-
-        Rect sr = sprite.rect;
-        Rect uv = new Rect(sr.x / tex.width, sr.y / tex.height, sr.width / tex.width, sr.height / tex.height);
-        if(flip) { uv = new Rect(uv.xMax, uv.y, -uv.width, uv.height); }
-
-        Color prev = GUI.color;
-        GUI.color = tint;
-        GUI.DrawTextureWithTexCoords(Fit(area, sr.width, sr.height), tex, uv, true);
-        GUI.color = prev;
-    }
-
-    /// <summary>
-    /// 縦横比を保って枠に収める
-    /// </summary>
-    private static Rect Fit(Rect area, float w, float h)
-    {
-        area = new Rect(area.x + 6, area.y + 6, area.width - 12, area.height - 12);
-        float s = Mathf.Min(area.width / Mathf.Max(1.0f, w), area.height / Mathf.Max(1.0f, h));
-        // 小さなドット絵はくっきり大きく、大きな画像は縮めて表示
-        float rw = w * s, rh = h * s;
-        return new Rect(area.center.x - rw * 0.5f, area.center.y - rh * 0.5f, rw, rh);
-    }
-
-    private static void CenterLabel(Rect rect, string text)
-    {
-        var style = new GUIStyle(EditorStyles.centeredGreyMiniLabel) { wordWrap = true };
-        GUI.Label(rect, text, style);
     }
 
     //=====================================================================

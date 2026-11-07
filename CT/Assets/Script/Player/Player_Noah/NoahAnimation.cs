@@ -8,11 +8,16 @@
 using UnityEngine;
 
 /// <summary>
-/// アニメーションクラス
+/// アニメーションクラス (古い仕組み : 向きごとに静止画を1枚差し替える)
+///
+/// 新しい仕組みは SpriteAnimator + CharacterAnimLink
+/// (Tools → Animation → サンプルを作成して割り当てる で置き換えられる)
+/// SpriteAnimator が付いている場合は、画像を上書きしないように何もしない
 /// </summary>
 public class NoahAnimation : CharaBase
 {
     private SpriteRenderer spriteRenderer;
+    private bool replaced;
 
     [SerializeField] private Sprite upSprite;
     [SerializeField] private Sprite downSprite;
@@ -25,6 +30,7 @@ public class NoahAnimation : CharaBase
     void Start()
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
+        replaced = GetComponent<SpriteAnimator>() != null;
     }
 
     /// <summary>
@@ -34,6 +40,8 @@ public class NoahAnimation : CharaBase
     /// <param name="direction"></param>
     public void SetDirection(Vector2 direction)
     {
+        if(replaced || spriteRenderer == null) { return; }
+
         // 移動方向によって画像を変更
         if(direction.x > 0)
         {

@@ -226,15 +226,10 @@ public class EffectInstance : MonoBehaviour
         Sprite[] frames = Data.Frames;
         if(frames == null || frames.Length == 0) { return false; }
 
-        int index = Mathf.FloorToInt(elapsed * Data.Fps);
-        if(Data.Lifetime == EffectLifetime.Auto)
-        {
-            if(index >= frames.Length) { return false; }
-        }
-        else
-        {
-            index %= frames.Length;
-        }
+        // 「自動」は1回で終わり、それ以外 (秒数指定・ループ) は繰り返す
+        bool loop = Data.Lifetime != EffectLifetime.Auto;
+        int index = SpriteFrameTiming.FrameAt(elapsed, frames.Length, Data.Fps, loop, out bool finished);
+        if(finished) { return false; }
 
         spriteRenderer.sprite = frames[index];
         return true;

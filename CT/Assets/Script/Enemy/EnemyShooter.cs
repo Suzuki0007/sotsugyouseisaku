@@ -47,6 +47,9 @@ public class EnemyShooter : CharaBase
     {
         if(player == null || enemyBulletPool == null) { return; }
 
+        // 死亡アニメ中など、コンポーネントが止められているときは撃たない
+        if(!enabled) { return; }
+
         // プールから弾を取得する
         EnemyBullet bullet = enemyBulletPool.GetBullet(transform.position, Quaternion.identity);
 

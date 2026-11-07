@@ -12,8 +12,6 @@ GameObject:
   - component: {fileID: 2074355167487936009}
   - component: {fileID: 2987307526874513268}
   - component: {fileID: 1627226003107619000}
-  - component: {fileID: 3248465918987602755}
-  - component: {fileID: 8077335194318802123}
   - component: {fileID: 5064697366618374898}
   - component: {fileID: 8908782603096249720}
   - component: {fileID: 3108716260187620851}
@@ -26,6 +24,8 @@ GameObject:
   - component: {fileID: 7073812536728877654}
   - component: {fileID: 9138810463731090671}
   - component: {fileID: 7948285446714576761}
+  - component: {fileID: 8366076621344917679}
+  - component: {fileID: 2958779922082440010}
   m_Layer: 0
   m_Name: Player_Noah
   m_TagString: Player
@@ -171,44 +171,6 @@ CircleCollider2D:
   m_CompositeOrder: 0
   m_Offset: {x: 0.00000035762787, y: -0.6076304}
   m_Radius: 0.4023701
---- !u!95 &3248465918987602755
-Animator:
-  serializedVersion: 7
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7158607269596121794}
-  m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 0ab93cec895826c4b9a8d16a6308b0c3, type: 2}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_StabilizeFeet: 0
-  m_AnimatePhysics: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorStateOnDisable: 0
-  m_WriteDefaultValuesOnDisable: 0
---- !u!114 &8077335194318802123
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7158607269596121794}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 032b0e16a7d38b94c95d7d91b6fb391d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::NoahAnimation
-  upSprite: {fileID: -5715957288639430718, guid: 170f24635ce422e4abb63a938263c669, type: 3}
-  downSprite: {fileID: -2397078625104975803, guid: 931d819f830aa104f8b3f28b7185050b, type: 3}
-  leftSprite: {fileID: 5893658483924868506, guid: ca3917da6eeb37e45932cfda98d769c1, type: 3}
-  rightSprite: {fileID: 7059661818181411105, guid: 58959b83057c1624586e227ac77935a6, type: 3}
 --- !u!114 &5064697366618374898
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -245,6 +207,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2cab88607dfbeb841b53fab21c34edb0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NoahDead
+  gameOverLeaveSe: {fileID: 0}
+  gameOverArriveSe: {fileID: 0}
+  deathAnimation: Dead
 --- !u!114 &2479628365523708284
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -257,6 +222,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 761a5ae7de3a2414bb226de0b4917ae8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NoahBulletDeleteAreaController
+  areaStartSe: {fileID: 0}
+  areaLoopSe: {fileID: 0}
+  areaEndSe: {fileID: 0}
   isDebugMode: 0
 --- !u!114 &6209929056071882744
 MonoBehaviour:
@@ -336,6 +304,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AreaAttackController
   attackKey: 1
+  attackSe: {fileID: 0}
   damageMultiplier: 1
 --- !u!114 &9138810463731090671
 MonoBehaviour:
@@ -350,6 +319,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TimingGaugeAttackController
   attackKey: 32
+  attackSe: {fileID: 0}
 --- !u!114 &7948285446714576761
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -362,3 +332,38 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ad3c55fa86a5aa64bbcbbf4cae49360f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerRuntimeInitializer
+--- !u!114 &8366076621344917679
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7158607269596121794}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7a619f8808802544ca47d78e5e4ef68a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SpriteAnimator
+  data: {fileID: 11400000, guid: 63d90215bcec06248b60f1ae83376df2, type: 2}
+  playOnEnable: 1
+  startClip: 
+  startFacing: 0
+  speed: 1
+  ignoreTimeScale: 0
+--- !u!114 &2958779922082440010
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7158607269596121794}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5feb6c6c7d99f974882d89cff7a1949e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CharacterAnimLink
+  idleClip: Idle
+  walkClip: Walk
+  damageClip: Damage
+  moveThreshold: 0.1
+  stopDelay: 0.1

@@ -33557,7 +33557,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SceneBgm
   defaultClip: {fileID: 8300000, guid: b889a3bc5c660124b9dcb04089f07f7a, type: 3}
-  defaultVolume: 1
+  defaultVolume: 0.602
   defaultFadeTime: 1
   resumeDefault: 1
   effectProfile: {fileID: 0}
@@ -36398,6 +36398,8 @@ MonoBehaviour:
   getKey: 0
   beforeRenderer: {fileID: 1525000495}
   afterSprite: {fileID: 1315817458, guid: 8b0c508b056873a46b1820fe8083f2dc, type: 3}
+  openAnimator: {fileID: 0}
+  openAnimation: Open
   openSe: {fileID: 0}
   lockedSe: {fileID: 0}
 --- !u!61 &1525000501

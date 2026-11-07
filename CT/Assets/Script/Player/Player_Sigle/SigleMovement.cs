@@ -32,8 +32,8 @@ public class SigleMovement : CharaBase
         playerMovement = GetComponent<PlayerMovement>();
         if(playerMovement == null) { Debug.LogError("PlayerMovementが付いていません"); return; }
 
-        sigleAnimation = GetComponent<SigleAnimation>(); 
-        if(sigleAnimation == null) { Debug.LogError("SigleAnimationが付いていません"); return; }
+        // 古い向き切り替え (SpriteAnimator + CharacterAnimLink を使う場合は付いていなくてよい)
+        sigleAnimation = GetComponent<SigleAnimation>();
     }
 
     private void Update()

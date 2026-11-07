@@ -1,19 +1,19 @@
 fileFormatVersion: 2
-guid: 58959b83057c1624586e227ac77935a6
+guid: ca3917da6eeb37e45932cfda98d769c1
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 7059661818181411105
-    second: animation_noah_left2_0
+      213: 5893658483924868506
+    second: animation_noah_right2_0
   - first:
-      213: -2615788197921333367
-    second: animation_noah_left2_1
+      213: -1672355047683435745
+    second: animation_noah_right2_1
   - first:
-      213: -3669245758401503425
-    second: animation_noah_left2_2
+      213: -7842738716331407938
+    second: animation_noah_right2_2
   - first:
-      213: 524242947044975657
-    second: animation_noah_left2_3
+      213: 5782052544405791778
+    second: animation_noah_right2_3
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -135,10 +135,10 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: animation_noah_left2_0
+      name: animation_noah_right2_0
       rect:
         serializedVersion: 2
-        x: 2
+        x: 6
         y: 0
         width: 56
         height: 121
@@ -150,17 +150,17 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 121671b1505f8f160800000000000000
-      internalID: 7059661818181411105
+      spriteID: a9d1fc94a2b7ac150800000000000000
+      internalID: 5893658483924868506
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: animation_noah_left2_1
+      name: animation_noah_right2_1
       rect:
         serializedVersion: 2
-        x: 66
+        x: 70
         y: 1
         width: 56
         height: 122
@@ -172,17 +172,17 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 98f5d373e7ad2bbd0800000000000000
-      internalID: -2615788197921333367
+      spriteID: f135f74d1f99ac8e0800000000000000
+      internalID: -1672355047683435745
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: animation_noah_left2_2
+      name: animation_noah_right2_2
       rect:
         serializedVersion: 2
-        x: 130
+        x: 134
         y: 0
         width: 56
         height: 121
@@ -194,17 +194,17 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: f3f9ed85c68341dc0800000000000000
-      internalID: -3669245758401503425
+      spriteID: eb50ddaa0bef82390800000000000000
+      internalID: -7842738716331407938
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: animation_noah_left2_3
+      name: animation_noah_right2_3
       rect:
         serializedVersion: 2
-        x: 194
+        x: 198
         y: 1
         width: 56
         height: 122
@@ -216,8 +216,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 924ae9ace2c764700800000000000000
-      internalID: 524242947044975657
+      spriteID: 22463fd872afd3050800000000000000
+      internalID: 5782052544405791778
       vertices: []
       indices: 
       edges: []
@@ -236,10 +236,10 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      animation_noah_left2_0: 7059661818181411105
-      animation_noah_left2_1: -2615788197921333367
-      animation_noah_left2_2: -3669245758401503425
-      animation_noah_left2_3: 524242947044975657
+      animation_noah_right2_0: 5893658483924868506
+      animation_noah_right2_1: -1672355047683435745
+      animation_noah_right2_2: -7842738716331407938
+      animation_noah_right2_3: 5782052544405791778
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

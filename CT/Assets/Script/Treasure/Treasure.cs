@@ -36,6 +36,14 @@ public class Treasure : Intaractable
     [SerializeField]
     private Sprite afterSprite;
 
+    [Header("アニメーション (任意)")]
+
+    [SerializeField, Tooltip("開くアニメを流す SpriteAnimator。空なら画像の差し替え (After Sprite) だけ")]
+    private SpriteAnimator openAnimator;
+
+    [SerializeField, Tooltip("開くアニメの動きの名前")]
+    private string openAnimation = "Open";
+
     [Header("SE")]
 
     [SerializeField, Tooltip("宝箱を開けたとき")]
@@ -57,7 +65,7 @@ public class Treasure : Intaractable
         // 保存済みで開いていたら、宝箱を開いた状態にする
         if(Save.Get(key, false))
         {
-            SetBeforeRenderer();
+            SetBeforeRenderer(true);
         }
     }
 
@@ -103,10 +111,19 @@ public class Treasure : Intaractable
 
     /// <summary>
     /// 画像を変更して、宝箱を開いた状態にする
+    /// 開くアニメがあればそれを流す (instant = true ならアニメを飛ばして開いた見た目にする)
     /// </summary>
-    private void SetBeforeRenderer()
+    private void SetBeforeRenderer(bool instant = false)
     {
-        beforeRenderer.sprite = afterSprite;
+        if(openAnimator != null && openAnimator.Has(openAnimation))
+        {
+            if(instant) { openAnimator.JumpToEnd(openAnimation); }
+            else        { openAnimator.Play(openAnimation, true); }
+        }
+        else
+        {
+            beforeRenderer.sprite = afterSprite;
+        }
         getKey = true;
     }
 

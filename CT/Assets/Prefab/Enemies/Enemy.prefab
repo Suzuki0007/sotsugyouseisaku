@@ -251,7 +251,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5030246986639903510}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: bfb75d35f9648b741a0c242b18e8d95f, type: 3}
   m_Name: 
@@ -271,6 +271,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyDead
   deathEffect: {fileID: 11400000, guid: db953535983d3f047a3398fdc6e212b4, type: 2}
+  deathAnimation: Dead
 --- !u!114 &8526623825328394561
 MonoBehaviour:
   m_ObjectHideFlags: 0
