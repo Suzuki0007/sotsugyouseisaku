@@ -287,18 +287,21 @@ public class DebugWindow : EditorWindow
         foldSave = EditorGUILayout.BeginFoldoutHeaderGroup(foldSave, "セーブ");
         if(foldSave)
         {
-            string path = Path.Combine(Application.persistentDataPath, "save.json");
-            EditorGUILayout.LabelField("セーブファイル", File.Exists(path) ? "あり" : "なし");
-
-            bool load = EditorPrefs.GetBool(AutoSave.EditorLoadOnPlayKey, true);
-            bool nextLoad = EditorGUILayout.ToggleLeft("再生するときにセーブを読み込む（オフ：毎回まっさらな状態で始める）", load);
-            if(nextLoad != load) { EditorPrefs.SetBool(AutoSave.EditorLoadOnPlayKey, nextLoad); }
-            if(!nextLoad)
+            if(Application.isPlaying)
             {
-                EditorGUILayout.HelpBox("オフの間にチェックポイントを通ると、それまでのセーブは今回の内容で上書きされます。", MessageType.Warning);
+                EditorGUILayout.LabelField("使っているスロット", Save.HasSlot ? $"スロット{Save.CurrentSlot}" : "なし（ファイルに保存されない）");
+                EditorGUILayout.LabelField("プレイ時間", SaveSlotInfo.FormatPlayTime(GameSession.PlayTime));
             }
 
-            using(new EditorGUI.DisabledScope(!Application.isPlaying))
+            // ステージから直接再生するときに使うスロット
+            var options = new string[Save.SlotCount + 1];
+            options[0] = "使わない（保存もしない）";
+            for(int i = 1; i <= Save.SlotCount; i++) { options[i] = $"スロット{i}"; }
+            int slotOnPlay = Mathf.Clamp(EditorPrefs.GetInt(AutoSave.EditorSlotOnPlayKey, 0), 0, Save.SlotCount);
+            int nextSlot = EditorGUILayout.Popup(new GUIContent("ステージから再生するとき", "タイトル以外のシーンで再生したときに読み込むスロット。タイトルから再生したときは、タイトル画面で選んだスロットを使う"), slotOnPlay, options);
+            if(nextSlot != slotOnPlay) { EditorPrefs.SetInt(AutoSave.EditorSlotOnPlayKey, nextSlot); }
+
+            using(new EditorGUI.DisabledScope(!Application.isPlaying || !Save.HasSlot))
             {
                 if(GUILayout.Button("今の状態をセーブ（チェックポイントと同じ）"))
                 {
@@ -307,18 +310,32 @@ public class DebugWindow : EditorWindow
                 }
             }
 
-            if(GUILayout.Button("セーブファイルを消す"))
+            EditorGUILayout.Space();
+            EditorGUILayout.LabelField("スロット", EditorStyles.boldLabel);
+            for(int slot = 1; slot <= Save.SlotCount; slot++)
             {
-                if(EditorUtility.DisplayDialog("セーブファイルを消す", "セーブファイルを削除します。元に戻せません。\n（再生中の所持品やフラグは、再生を止めるまでそのままです）", "消す", "やめる"))
+                SaveSlotInfo info = SaveSlotInfo.Load(slot);
+                using(new EditorGUILayout.HorizontalScope())
                 {
-                    if(Application.isPlaying) { Save.Clear(); }
-                    if(File.Exists(path)) { File.Delete(path); }
+                    string text = info.Exists
+                        ? $"{slot}: {(string.IsNullOrEmpty(info.SceneName) ? "場所不明" : info.SceneName)}  {SaveSlotInfo.FormatPlayTime(info.PlayTime)}  {(info.SavedAt.HasValue ? info.SavedAt.Value.ToString("yyyy/MM/dd HH:mm") : "")}"
+                        : $"{slot}: データなし";
+                    EditorGUILayout.LabelField(text);
+
+                    using(new EditorGUI.DisabledScope(!info.Exists))
+                    {
+                        if(GUILayout.Button("消す", GUILayout.Width(44)) &&
+                           EditorUtility.DisplayDialog("セーブデータを消す", $"スロット{slot}のセーブデータを削除します。元に戻せません。", "消す", "やめる"))
+                        {
+                            Save.DeleteSlot(slot);
+                        }
+                    }
                 }
             }
 
             if(GUILayout.Button("セーブファイルの場所を開く"))
             {
-                EditorUtility.RevealInFinder(File.Exists(path) ? path : Application.persistentDataPath);
+                EditorUtility.RevealInFinder(Application.persistentDataPath);
             }
         }
         EditorGUILayout.EndFoldoutHeaderGroup();

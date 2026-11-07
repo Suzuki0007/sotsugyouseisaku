@@ -50,11 +50,49 @@ public static class  Save
     // 前回の書き込み以降に変更があったか
     private static bool dirty = false;
 
+    //=====================================================================
+    // セーブスロット
+    //=====================================================================
+
+    /// <summary>
+    /// セーブスロットの数
+    /// </summary>
+    public const int SlotCount = 3;
+
+    /// <summary>
+    /// 今使っているスロット（1〜SlotCount）。0 ならどのスロットも使っていない（ファイルに書き込まない）
+    /// </summary>
+    public static int CurrentSlot { get; private set; }
+
+    /// <summary>
+    /// スロットを使っているか（false の間は、仮置き・確定はできるが、ファイルには書き込まない）
+    /// </summary>
+    public static bool HasSlot => CurrentSlot >= 1 && CurrentSlot <= SlotCount;
+
+    /// <summary>
+    /// 確定する直前に呼ばれる（プレイ時間や保存日時など、毎回記録したいものを仮置きするため）
+    /// </summary>
+    public static event Action BeforeCommit;
+
     // メインスレッドでしか取得できないので、別スレッドから呼ばないようにする
     private static string FilePath
     {
-        // Application.persistentDataPathは、Unityが提供する、アプリケーションのデータを保存するためのディレクトリのパスです。
-        // Path.Combineは、複数のパスを結合するための関数です。
+        get { return SlotPath(CurrentSlot); }
+    }
+
+    /// <summary>
+    /// スロットのファイルのパス
+    /// </summary>
+    // Application.persistentDataPathは、Unityが提供する、アプリケーションのデータを保存するためのディレクトリのパスです。
+    // Path.Combineは、複数のパスを結合するための関数です。
+    public static string SlotPath(int slot)
+    {
+        return Path.Combine(Application.persistentDataPath, $"save_{slot}.json");
+    }
+
+    // スロット導入前のファイル（初回にスロット1へ引き継ぐ）
+    private static string LegacyPath
+    {
         get { return Path.Combine(Application.persistentDataPath, "save.json"); }
     }
 
@@ -68,6 +106,112 @@ public static class  Save
         data.Clear();
         pending.Clear();
         dirty = false;
+        CurrentSlot = 0;
+        BeforeCommit = null;
+    }
+
+    /// <summary>
+    /// スロットにデータがあるか
+    /// </summary>
+    public static bool SlotExists(int slot)
+    {
+        return File.Exists(SlotPath(slot));
+    }
+
+    /// <summary>
+    /// スロットを読み込んで、以後そのスロットに保存する（つづきから）
+    /// </summary>
+    public static void LoadSlot(int slot)
+    {
+        CurrentSlot = slot;
+        Read();
+    }
+
+    /// <summary>
+    /// 空の状態でスロットを使い始める（はじめから）。次に書き込むときにスロットのデータは上書きされる
+    /// </summary>
+    public static void StartNewSlot(int slot)
+    {
+        CurrentSlot = slot;
+        Discard();
+        dirty = true;
+    }
+
+    /// <summary>
+    /// 今の内容（仮置きも確定して）を、指定したスロットにすぐ書き込む（セーブポイント）
+    /// 以後はそのスロットを使う
+    /// </summary>
+    public static void SaveToSlot(int slot)
+    {
+        CurrentSlot = slot;
+        Commit();
+        dirty = true;   // 別のスロットにも全部書き込むため
+        Write();
+    }
+
+    /// <summary>
+    /// スロットを使うのをやめる（タイトルに戻ったときなど）。読み込んだデータも消す
+    /// </summary>
+    public static void CloseSlot()
+    {
+        CurrentSlot = 0;
+        Discard();
+        dirty = false;
+    }
+
+    /// <summary>
+    /// スロットのファイルを削除する
+    /// </summary>
+    public static void DeleteSlot(int slot)
+    {
+        string path = SlotPath(slot);
+        if(File.Exists(path)) { File.Delete(path); }
+    }
+
+    /// <summary>
+    /// スロット導入前の save.json があれば、スロット1に引き継ぐ（スロット1が空のときだけ）
+    /// </summary>
+    public static void MigrateLegacy()
+    {
+        try
+        {
+            if(File.Exists(LegacyPath) && !SlotExists(1))
+            {
+                File.Move(LegacyPath, SlotPath(1));
+                Debug.Log("[セーブ] 以前のセーブデータ（save.json）をスロット1に引き継ぎました");
+            }
+        }
+        catch(Exception e)
+        {
+            Debug.LogWarning("[セーブ] 以前のセーブデータを引き継げませんでした: " + e.Message);
+        }
+    }
+
+    /// <summary>
+    /// スロットの中身を、読み込まずにのぞく（ロード画面の表示用）
+    /// </summary>
+    /// <returns> キーと値の一覧。ファイルがない・読めないときは null </returns>
+    public static Dictionary<string, string> PeekSlot(int slot)
+    {
+        string path = SlotPath(slot);
+        if(!File.Exists(path)) { return null; }
+
+        try
+        {
+            FileData file = JsonUtility.FromJson<FileData>(File.ReadAllText(path));
+            if(file == null || file.list == null) { return null; }
+
+            var result = new Dictionary<string, string>();
+            foreach(Entry entry in file.list)
+            {
+                if(entry != null && !string.IsNullOrEmpty(entry.key)) { result[entry.key] = entry.value; }
+            }
+            return result;
+        }
+        catch(Exception)
+        {
+            return null;
+        }
     }
 
     // 仮置きで保存する
@@ -113,6 +257,9 @@ public static class  Save
     // 仮置きを確定する
     public static void Commit()
     {
+        // プレイ時間など、確定のたびに記録したいものを仮置きしてもらう
+        BeforeCommit?.Invoke();
+
         if(pending.Count == 0)
         {
             return;
@@ -155,6 +302,9 @@ public static class  Save
     {
         Discard();
         dirty = false;
+
+        // スロットを使っていなければ読むものはない
+        if(!HasSlot) { return; }
 
         string path = FilePath;
         // ファイルが存在しない場合は何もしない
@@ -199,6 +349,9 @@ public static class  Save
             return;
         }
 
+        // スロットを使っていない（エディタでステージから直接再生したときなど）はファイルに書かない
+        if(!HasSlot) { return; }
+
         dirty = false;
 
         WriteFile(FilePath, BuildJson());// 同期的に書き込む
@@ -211,6 +364,8 @@ public static class  Save
         {
             return;
         }
+
+        if(!HasSlot) { return; }
 
         dirty = false;
 

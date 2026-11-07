@@ -146,7 +146,7 @@ public class TimingGaugeUI : MonoBehaviour
         if(!isRunning || isFinished) { return; }
 
         // アイテム画面・会話・シーン遷移・イベント演出の間はゲージを止め、判定キーも受け付けない
-        if(ItemMenuUI.IsBusy || DialogueManager.IsBusy || SceneFader.IsBusy || EventSequence.IsBusy) { return; }
+        if(InputBlock.IsBlocked) { return; }
 
         elapsedTime += Time.deltaTime;
 

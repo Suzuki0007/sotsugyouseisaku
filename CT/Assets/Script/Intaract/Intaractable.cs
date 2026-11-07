@@ -34,17 +34,9 @@ public abstract class Intaractable : MonoBehaviour
         if(player == null) { return; }
         if(Keyboard.current == null) { return; }
 
-        // 会話中・会話を閉じた直後は調べられない（同じキーで会話が開き直すのを防ぐ）
-        if(DialogueManager.IsBusy) { return; }
-
-        // シーン遷移中は調べられない
-        if(SceneFader.IsBusy) { return; }
-
-        // プレイヤーを止めるイベント演出の実行中は調べられない
-        if(EventSequence.IsBusy) { return; }
-
-        // アイテム画面を開いている間は調べられない
-        if(ItemMenuUI.IsBusy) { return; }
+        // 会話中（閉じた直後も含む。同じキーで会話が開き直すのを防ぐ）・シーン遷移中・イベント演出中・
+        // アイテム画面・メニュー画面の間は調べられない
+        if(InputBlock.IsBlocked) { return; }
 
         // インタラクトキーが押されたときに処理を呼び出す
         if(Keyboard.current[interactKeyInput].wasPressedThisFrame)

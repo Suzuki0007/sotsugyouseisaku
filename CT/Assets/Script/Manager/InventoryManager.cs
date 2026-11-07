@@ -262,6 +262,16 @@ public class InventoryManager : Singleton<InventoryManager>
     }
 
     /// <summary>
+    /// セーブの内容で所持アイテムを入れ替える（はじめから・つづきからのとき。GameSession から呼ぶ）
+    /// </summary>
+    public void ReloadFromSave()
+    {
+        NoahData.hasKey = false;
+        LoadItems();
+        OnChanged?.Invoke();
+    }
+
+    /// <summary>
     /// セーブから所持アイテムを復元する
     /// </summary>
     private void LoadItems()

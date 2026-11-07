@@ -28,6 +28,28 @@ public class PlayerSpawnPoint : MonoBehaviour
     /// </summary>
     public static string PendingSpawnPointId { get; set; }
 
+    /// <summary>
+    /// 次のシーンで使う出現位置（座標。チェックポイントから再開するとき）。設定されていれば ID より優先する
+    /// </summary>
+    public static Vector2? PendingPosition { get; set; }
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetOnPlay()
+    {
+        PendingSpawnPointId = null;
+        PendingPosition = null;
+    }
+
+    /// <summary>
+    /// 保持している出現位置（座標）を取り出してクリアする
+    /// </summary>
+    public static Vector2? ConsumePendingPosition()
+    {
+        Vector2? position = PendingPosition;
+        PendingPosition = null;
+        return position;
+    }
+
     //=====================================================================
     // プロパティ
     //=====================================================================

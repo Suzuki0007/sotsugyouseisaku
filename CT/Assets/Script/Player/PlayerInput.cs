@@ -61,8 +61,8 @@ public class PlayerInput : CharaBase
         currentPlayer = playerSwitchManager.CurrentPlayer;
         if(currentPlayer == null) { Debug.LogError($"{name}: CurrentPlayerがnullです"); return; }
 
-        // 会話中・シーン遷移中・イベント演出中は移動と弾削除エリアを止める
-        if(DialogueManager.IsBusy || SceneFader.IsBusy || ItemMenuUI.IsBusy || EventSequence.IsBusy)
+        // 会話中・シーン遷移中・イベント演出中・メニュー画面などでは移動と弾削除エリアを止める
+        if(InputBlock.IsBlocked)
         {
             StopPlayerActions(currentPlayer);
             return;
@@ -136,7 +136,7 @@ public class PlayerInput : CharaBase
         if(!context.performed) { return; }
 
         // 会話中・シーン遷移中は撃たない
-        if(DialogueManager.IsBusy || SceneFader.IsBusy || ItemMenuUI.IsBusy || EventSequence.IsBusy) { return; }
+        if(InputBlock.IsBlocked) { return; }
 
         if(targetCamera == null) { return; }
 
