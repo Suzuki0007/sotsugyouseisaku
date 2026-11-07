@@ -13,7 +13,7 @@ using UnityEngine;
 /// アイテムの所持状況で結果が変わるオブジェクト
 /// </summary>
 ///
-/// ・「きっかけ」（調べた／エリアに入った）で、上から順にルールの条件を調べる
+/// ・「きっかけ」（調べた／エリアに入った）で、上から順にルールの条件（アイテム・フラグ）を調べる
 /// ・条件を満たした最初のルールの EventSequence を実行する。どれも満たさなければ「それ以外」を実行する
 /// ・ルールに「完了にする」を付けると、以後は「完了後」の EventSequence だけを実行する
 ///   完了したことは Save に記録し、シーンを読み込み直すと見た目だけを完了後の状態にする
@@ -53,6 +53,9 @@ public class ItemInteraction : Intaractable
 
         [Tooltip("すべて満たしたときにこのルールを実行する（空なら常に満たす）")]
         public List<ItemCondition> conditions = new List<ItemCondition>();
+
+        [Tooltip("フラグの条件。アイテムの条件と合わせて、すべて満たしたときにこのルールを実行する（空なら常に満たす）")]
+        public List<FlagCondition> flagConditions = new List<FlagCondition>();
 
         [Tooltip("実行するときに、条件のアイテムを消費する（「持っていないとき」の条件は消費しない）")]
         public bool consumeItems;
@@ -194,6 +197,7 @@ public class ItemInteraction : Intaractable
             Rule rule = rules[i];
             if(rule == null) { continue; }
             if(!ItemCondition.AllMet(rule.conditions)) { continue; }
+            if(!FlagCondition.AllMet(rule.flagConditions)) { continue; }
 
             if(rule.consumeItems) { ItemCondition.ConsumeAll(rule.conditions); }
 

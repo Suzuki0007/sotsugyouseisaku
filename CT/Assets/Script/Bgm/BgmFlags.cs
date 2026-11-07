@@ -5,39 +5,27 @@
 // * \author
 /*********************************************************************/
 
-using System.Collections.Generic;
-
 /// <summary>
 /// BGMを切り替えるための名前付きフラグ
 /// どこからでも BgmFlags.Set("Boss", true) のように設定できる
 /// </summary>
+///
+/// 中身は GameFlags の「セーブしないフラグ」と同じ。
+/// 「セーブしない」GameFlag の ID を同じ名前にすると、アセットからも同じフラグとして使える
 public static class BgmFlags
 {
-    private static readonly HashSet<string> flags = new HashSet<string>();
-
     public static void Set(string name, bool value)
     {
-        if(string.IsNullOrEmpty(name)) { return; }
-
-        if(value) { flags.Add(name); }
-        else      { flags.Remove(name); }
+        GameFlags.SetTemporary(name, value);
     }
 
     public static bool Get(string name)
     {
-        return !string.IsNullOrEmpty(name) && flags.Contains(name);
+        return GameFlags.GetTemporary(name);
     }
 
     public static void ClearAll()
     {
-        flags.Clear();
-    }
-
-    // 再生開始時にフラグを空にする
-    // エディタでドメインリロードを無効にしていると、前回の再生のフラグが残るため
-    [UnityEngine.RuntimeInitializeOnLoadMethod(UnityEngine.RuntimeInitializeLoadType.SubsystemRegistration)]
-    private static void ResetOnPlay()
-    {
-        flags.Clear();
+        GameFlags.ClearTemporary();
     }
 }
