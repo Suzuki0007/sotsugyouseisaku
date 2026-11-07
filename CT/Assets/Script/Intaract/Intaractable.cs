@@ -40,6 +40,9 @@ public abstract class Intaractable : MonoBehaviour
         // シーン遷移中は調べられない
         if(SceneFader.IsBusy) { return; }
 
+        // プレイヤーを止めるイベント演出の実行中は調べられない
+        if(EventSequence.IsBusy) { return; }
+
         // アイテム画面を開いている間は調べられない
         if(ItemMenuUI.IsBusy) { return; }
 

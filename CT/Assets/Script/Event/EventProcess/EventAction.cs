@@ -5,6 +5,7 @@
 // * \author 成田悠真
 /*********************************************************************/
 
+using System.Collections;
 using UnityEngine;
 
 /// <summary>
@@ -17,6 +18,19 @@ public abstract class EventAction : MonoBehaviour
     /// </summary>
     /// <param name="gameObject"></param>
     public abstract void Execute(GameObject gameObject);
+
+    /// <summary>
+    /// 順番に実行するときに呼ばれる仮想関数
+    /// </summary>
+    /// <param name="gameObject"></param>
+    ///
+    /// 終わるまで次のアクションを待たせたいもの（会話・待機・アニメなど）がオーバーライドする
+    /// 何もしなければ Execute を呼んですぐに次へ進む
+    public virtual IEnumerator Run(GameObject gameObject)
+    {
+        Execute(gameObject);
+        yield break;
+    }
 
     /// <summary>
     /// アクションが終了したときに呼ばれる仮想関数

@@ -281,7 +281,7 @@ public class ItemMenuUI : MonoBehaviour
         // プレイヤーがいるシーン（ゲーム中）だけ開ける
         if(PlayerSwitchManager.Instance == null || PlayerSwitchManager.Instance.CurrentPlayer == null) { return false; }
 
-        if(DialogueManager.IsBusy || SceneFader.IsBusy) { return false; }
+        if(DialogueManager.IsBusy || SceneFader.IsBusy || EventSequence.IsBusy) { return false; }
 
         return true;
     }

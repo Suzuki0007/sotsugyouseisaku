@@ -33,7 +33,7 @@ public class AttackController : CharaBase
         if(Keyboard.current == null) { return; }
 
         // 会話中・シーン遷移中は攻撃しない
-        if(DialogueManager.IsBusy || SceneFader.IsBusy || ItemMenuUI.IsBusy) { return; }
+        if(DialogueManager.IsBusy || SceneFader.IsBusy || ItemMenuUI.IsBusy || EventSequence.IsBusy) { return; }
 
         // 指定されたキーが押されたら攻撃を開始する
         if(Keyboard.current[attackKey].wasPressedThisFrame)

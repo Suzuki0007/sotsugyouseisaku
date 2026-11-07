@@ -5,6 +5,7 @@
 // * \author 成田悠真
 /*********************************************************************/
 
+using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -38,6 +39,10 @@ public class DialogueEventAction : EventAction
 
     [SerializeField]
     private DialogueCloseMode closeMode = DialogueCloseMode.ExitArea;
+
+    [Tooltip("順番に実行するとき、会話を閉じるまで次の部品を待たせる")]
+    [SerializeField]
+    private bool waitUntilClosed = true;
 
     [Tooltip("旧方式（DialogueManagerがないシーン）で閉じるキー")]
     [SerializeField]
@@ -84,6 +89,31 @@ public class DialogueEventAction : EventAction
             isShowingLegacy = true;
             shownFrame = Time.frameCount;
         }
+    }
+
+    /// <summary>
+    /// 順番に実行するとき：会話を閉じるまで待つ
+    /// </summary>
+    public override IEnumerator Run(GameObject player)
+    {
+        // 待たない設定・旧方式（閉じたことが分からない）なら、表示だけしてすぐ次へ
+        if(!waitUntilClosed || dialogue == null || dialogue.IsLegacy)
+        {
+            Execute(player);
+            yield break;
+        }
+
+        // 別の会話が表示中なら、閉じるまで待ってから始める
+        while(DialogueManager.Instance != null && DialogueManager.Instance.IsTalking) { yield return null; }
+        if(DialogueManager.Instance == null) { yield break; }
+
+        bool closed = false;
+        dialogue.Talk(() => closed = true);
+
+        // 会話データが空などで始まらなかったときは待たない
+        if(!DialogueManager.Instance.IsTalking) { yield break; }
+
+        while(!closed) { yield return null; }
     }
 
     /// <summary>
