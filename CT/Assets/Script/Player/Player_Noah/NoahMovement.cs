@@ -20,6 +20,7 @@ public class NoahMovement : CharaBase
 
     private PlayerMovement playerMovement;
 
+    // 古い向き切り替え (SpriteAnimator + CharacterAnimLink を使う場合は付いていなくてよい)
     private NoahAnimation noahAnimation;
 
     //=====================================================================
@@ -31,9 +32,9 @@ public class NoahMovement : CharaBase
         playerMovement = GetComponent<PlayerMovement>();
         noahAnimation = GetComponent<NoahAnimation>();
 
-        if(playerMovement == null || noahAnimation == null)
+        if(playerMovement == null)
         {
-            Debug.LogError($"{name}: PlayerMovementまたはNoahAnimationがアタッチされていません。", this); 
+            Debug.LogError($"{name}: PlayerMovementがアタッチされていません。", this);
         }
     }
 

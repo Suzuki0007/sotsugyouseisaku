@@ -97,7 +97,8 @@ public abstract class BulletPoolBase<TBullet> : MonoBehaviour where TBullet : Co
     {
         if(bullet != null)
         {
-            Destroy(bullet);
+            // Destroy(bullet) だとコンポーネントだけが消えて GameObject が残るので、GameObject ごと消す
+            Destroy(bullet.gameObject);
         }
     }
 

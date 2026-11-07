@@ -173,3 +173,7 @@ MonoBehaviour:
   bulletSpeed: 12
   bulletDamage: 1
   bulletLifeTime: 3
+  hitEffect: {fileID: 11400000, guid: 227ad72a71e3d2946ab18d0478447895, type: 2}
+  obstacleHitEffect: {fileID: 11400000, guid: c32254432e6912944816e2465955182b, type: 2}
+  vanishEffect: {fileID: 11400000, guid: a91cee4becfc7c44fbcc49a9ffbfbdc7, type: 2}
+  rotateEffectToDirection: 1

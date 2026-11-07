@@ -61,6 +61,13 @@ public class PlayerInput : CharaBase
         currentPlayer = playerSwitchManager.CurrentPlayer;
         if(currentPlayer == null) { Debug.LogError($"{name}: CurrentPlayerがnullです"); return; }
 
+        // 会話中・シーン遷移中・イベント演出中は移動と弾削除エリアを止める
+        if(DialogueManager.IsBusy || SceneFader.IsBusy || ItemMenuUI.IsBusy || EventSequence.IsBusy)
+        {
+            StopPlayerActions(currentPlayer);
+            return;
+        }
+
         // 移動入力を更新
         UpdateMoveInput(currentPlayer);
 
@@ -106,6 +113,20 @@ public class PlayerInput : CharaBase
     }
 
     /// <summary>
+    /// 会話中などに、プレイヤーの移動と弾削除エリアを止める
+    /// </summary>
+    /// <param name="currentPlayer"></param>
+    private void StopPlayerActions(GameObject currentPlayer)
+    {
+        PlayerMovement movement = currentPlayer.GetComponent<PlayerMovement>();
+        if(movement != null) { movement.Stop(); }
+
+        NoahBulletDeleteAreaController areaController =
+            currentPlayer.GetComponent<NoahBulletDeleteAreaController>();
+        if(areaController != null) { areaController.SetBulletDeleteAreaActive(false); }
+    }
+
+    /// <summary>
     /// 弾の発射入力が行われたときに呼ばれる関数
     /// </summary>
     /// <param name="context"></param>
@@ -113,6 +134,9 @@ public class PlayerInput : CharaBase
     {
         // 入力が開始されていないなら処理を行わない
         if(!context.performed) { return; }
+
+        // 会話中・シーン遷移中は撃たない
+        if(DialogueManager.IsBusy || SceneFader.IsBusy || ItemMenuUI.IsBusy || EventSequence.IsBusy) { return; }
 
         if(targetCamera == null) { return; }
 

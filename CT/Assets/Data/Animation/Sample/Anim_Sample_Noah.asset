@@ -1,0 +1,58 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2f897e4d9b01b8743bd19387665be973, type: 3}
+  m_Name: Anim_Sample_Noah
+  m_EditorClassIdentifier: Assembly-CSharp::SpriteAnimData
+  defaultClip: Idle
+  clips:
+  - name: Idle
+    directionMode: 1
+    down:
+    - {fileID: -2397078625104975803, guid: 931d819f830aa104f8b3f28b7185050b, type: 3}
+    up:
+    - {fileID: -5715957288639430718, guid: 170f24635ce422e4abb63a938263c669, type: 3}
+    left:
+    - {fileID: 5893658483924868506, guid: ca3917da6eeb37e45932cfda98d769c1, type: 3}
+    right:
+    - {fileID: 7059661818181411105, guid: 58959b83057c1624586e227ac77935a6, type: 3}
+    fps: 8
+    playMode: 0
+    nextClip: 
+    frameLengths: []
+    events: []
+  - name: Walk
+    directionMode: 1
+    down:
+    - {fileID: -2397078625104975803, guid: 931d819f830aa104f8b3f28b7185050b, type: 3}
+    - {fileID: 2820836115076220717, guid: 931d819f830aa104f8b3f28b7185050b, type: 3}
+    - {fileID: -8017661660549324400, guid: 931d819f830aa104f8b3f28b7185050b, type: 3}
+    - {fileID: -1580982750196643582, guid: 931d819f830aa104f8b3f28b7185050b, type: 3}
+    up:
+    - {fileID: -5715957288639430718, guid: 170f24635ce422e4abb63a938263c669, type: 3}
+    - {fileID: 1166987043153133649, guid: 170f24635ce422e4abb63a938263c669, type: 3}
+    - {fileID: -5858222899166922924, guid: 170f24635ce422e4abb63a938263c669, type: 3}
+    - {fileID: -8365224433906196130, guid: 170f24635ce422e4abb63a938263c669, type: 3}
+    left:
+    - {fileID: 5893658483924868506, guid: ca3917da6eeb37e45932cfda98d769c1, type: 3}
+    - {fileID: -1672355047683435745, guid: ca3917da6eeb37e45932cfda98d769c1, type: 3}
+    - {fileID: -7842738716331407938, guid: ca3917da6eeb37e45932cfda98d769c1, type: 3}
+    - {fileID: 5782052544405791778, guid: ca3917da6eeb37e45932cfda98d769c1, type: 3}
+    right:
+    - {fileID: 7059661818181411105, guid: 58959b83057c1624586e227ac77935a6, type: 3}
+    - {fileID: -2615788197921333367, guid: 58959b83057c1624586e227ac77935a6, type: 3}
+    - {fileID: -3669245758401503425, guid: 58959b83057c1624586e227ac77935a6, type: 3}
+    - {fileID: 524242947044975657, guid: 58959b83057c1624586e227ac77935a6, type: 3}
+    fps: 4
+    playMode: 0
+    nextClip: 
+    frameLengths: []
+    events: []

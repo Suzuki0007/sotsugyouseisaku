@@ -13,13 +13,14 @@ GameObject:
   - component: {fileID: 1147237342843129097}
   - component: {fileID: 1176485107255373802}
   - component: {fileID: 1456457646117958921}
-  - component: {fileID: 4479570829526272255}
   - component: {fileID: 3425219543722180738}
   - component: {fileID: 7964541301095500610}
   - component: {fileID: 7187852730256482387}
   - component: {fileID: 9184606015198540213}
   - component: {fileID: 6484146483934491467}
   - component: {fileID: 2114953636450028307}
+  - component: {fileID: 2678763537733708394}
+  - component: {fileID: 5893461590104330874}
   m_Layer: 0
   m_Name: Player_Sigle
   m_TagString: Player
@@ -177,22 +178,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b093a980bfcd0d948a2d34a05967eedf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SigleMovement
---- !u!114 &4479570829526272255
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3848283961383208032}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6f537d5aada8f55419895dc0b12c7519, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::SigleAnimation
-  upSprite: {fileID: -4393052980798941836, guid: d83dc95dc8ba7f14482f1837b2634890, type: 3}
-  downSprite: {fileID: -3461645432649646316, guid: 0187be5b69041e7428d374823948265c, type: 3}
-  leftSprite: {fileID: -3288251791033627579, guid: 3a73576d4851cc949bed2c35074a7571, type: 3}
-  rightSprite: {fileID: -687699022845138034, guid: ce5934609da456846b376fb3b3468f2c, type: 3}
 --- !u!114 &3425219543722180738
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -232,7 +217,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9e98e724499085d4580aeac3fafd9a55, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerFollower
-  targetPlayer: {fileID: 0}
   followDistance: 10
 --- !u!114 &9184606015198540213
 MonoBehaviour:
@@ -270,3 +254,38 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ad3c55fa86a5aa64bbcbbf4cae49360f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerRuntimeInitializer
+--- !u!114 &2678763537733708394
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3848283961383208032}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7a619f8808802544ca47d78e5e4ef68a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SpriteAnimator
+  data: {fileID: 11400000, guid: aa92cf3b72e0a4d4fa7a6690c3991085, type: 2}
+  playOnEnable: 1
+  startClip: 
+  startFacing: 0
+  speed: 1
+  ignoreTimeScale: 0
+--- !u!114 &5893461590104330874
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3848283961383208032}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5feb6c6c7d99f974882d89cff7a1949e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CharacterAnimLink
+  idleClip: Idle
+  walkClip: Walk
+  damageClip: Damage
+  moveThreshold: 0.1
+  stopDelay: 0.1

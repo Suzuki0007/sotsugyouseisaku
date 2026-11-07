@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2f897e4d9b01b8743bd19387665be973, type: 3}
+  m_Name: Anim_Sample_Sigle
+  m_EditorClassIdentifier: Assembly-CSharp::SpriteAnimData
+  defaultClip: Idle
+  clips:
+  - name: Idle
+    directionMode: 1
+    down:
+    - {fileID: -3461645432649646316, guid: 0187be5b69041e7428d374823948265c, type: 3}
+    up:
+    - {fileID: -4393052980798941836, guid: d83dc95dc8ba7f14482f1837b2634890, type: 3}
+    left:
+    - {fileID: -3288251791033627579, guid: 3a73576d4851cc949bed2c35074a7571, type: 3}
+    right:
+    - {fileID: -687699022845138034, guid: ce5934609da456846b376fb3b3468f2c, type: 3}
+    fps: 8
+    playMode: 0
+    nextClip: 
+    frameLengths: []
+    events: []

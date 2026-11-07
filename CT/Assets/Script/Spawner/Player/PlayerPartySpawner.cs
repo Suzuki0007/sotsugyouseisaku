@@ -5,7 +5,6 @@
 // * \author 成田悠真
 /*********************************************************************/
 
-using Unity.AppUI.Core;
 using UnityEngine;
 
 /// <summary>
@@ -63,17 +62,30 @@ public class PlayerPartySpawner : MonoBehaviour
 
     private void Start()
     {
+        // 出現位置を決める
+        // 遷移元で出現位置IDが指定されていればその地点、なければデフォルトの地点
+
+        Transform noahPoint = noahSpawnPoint;
+        Transform siglePoint = sigleSpawnPoint;
+
+        PlayerSpawnPoint spawnPoint = PlayerSpawnPoint.ConsumePending();
+        if(spawnPoint != null)
+        {
+            noahPoint = spawnPoint.NoahPoint;
+            siglePoint = spawnPoint.SiglePoint;
+        }
+
         // NoahとSigleを生成する
 
         GameObject noah = Instantiate(
             noahPrefab,
-            noahSpawnPoint.position,
-            noahSpawnPoint.rotation);
+            noahPoint.position,
+            noahPoint.rotation);
 
         GameObject sigle = Instantiate(
             siglePrefab,
-            sigleSpawnPoint.position,
-            sigleSpawnPoint.rotation);
+            siglePoint.position,
+            siglePoint.rotation);
 
         // プレイヤーの初期化
 
@@ -107,7 +119,22 @@ public class PlayerPartySpawner : MonoBehaviour
 
         sigle.GetComponent<CharacterSorting>().SetPlayer(noah);
 
-        sigle.GetComponent<SigleMovement>().SetStartPos(noah.transform);
+        // Sigle の出現位置
+        // ・出現位置に Sigle 用の位置が設定されていれば、そこに出して、ノアが動き出したらそこから歩いて付いてくる
+        // ・なければ今まで通りノアの位置に出す（このスポナーの Sigle Spawn Point は、ノアと重ねる前提で使わない）
+        if(spawnPoint != null && spawnPoint.HasSiglePoint)
+        {
+            PlayerHistory noahHistory = noah.GetComponent<PlayerHistory>();
+            PlayerFollower sigleFollower = sigle.GetComponent<PlayerFollower>();
+            if(noahHistory != null && sigleFollower != null)
+            {
+                noahHistory.SeedPath(siglePoint.position, noahPoint.position, sigleFollower.FollowFrames);
+            }
+        }
+        else
+        {
+            sigle.GetComponent<SigleMovement>().SetStartPos(noah.transform);
+        }
 
         playerSwitchManager.InitializePlayers(noah, sigle);
     }

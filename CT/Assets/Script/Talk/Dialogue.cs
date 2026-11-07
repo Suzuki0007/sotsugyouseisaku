@@ -5,17 +5,31 @@
 // * \author 成田悠真
 /*********************************************************************/
 
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 
 /// <summary>
 /// ダイアログクラス
 /// </summary>
+///
+/// 調べたとき（またはDialogueEventActionから呼ばれたとき）に会話を表示する。
+/// ・シーンにDialogueManagerがある場合：DialogueManagerで複数の文を表示する
+///   （dialogueDataが未設定なら、dialogueTextを1文の会話として表示する）
+/// ・シーンにDialogueManagerがない場合：旧方式（dialoguePanel + Text）で表示する
 public class Dialogue : Intaractable
 {
     //=====================================================================
     // 変数
     //=====================================================================
+
+    [Header("会話データ")]
+
+    [Tooltip("表示する会話。未設定なら下のDialogue Textを1文として表示する")]
+    [SerializeField]
+    private DialogueData dialogueData;
+
+    [Header("旧方式（DialogueManagerがないシーン用）")]
 
     [SerializeField]
     private string dialogueText;
@@ -27,13 +41,22 @@ public class Dialogue : Intaractable
     private Text dialogueTextUI;
 
     //=====================================================================
+    // プロパティ
+    //=====================================================================
+
+    /// <summary>
+    /// 旧方式で表示するかどうか（シーンにDialogueManagerがない）
+    /// </summary>
+    public bool IsLegacy => DialogueManager.Instance == null;
+
+    //=====================================================================
     // 初期化
     //=====================================================================
 
     private void Start()
     {
-        // ダイアログを非表示にする
-        HideDialogue();
+        // 旧方式のパネルは非表示にしておく
+        if(dialoguePanel != null) { dialoguePanel.SetActive(false); }
     }
 
     //=====================================================================
@@ -42,12 +65,53 @@ public class Dialogue : Intaractable
 
     protected override void Interact()
     {
-        // ダイアログを表示する
-        ShowDialogue();
+        Talk();
     }
 
     /// <summary>
-    /// ダイアログを表示する
+    /// 会話を開始する
+    /// </summary>
+    /// <param name="finished"> 会話終了時に呼ばれる処理（DialogueManager使用時のみ） </param>
+    public void Talk(Action finished = null)
+    {
+        if(IsLegacy)
+        {
+            ShowDialogue();
+            return;
+        }
+
+        if(dialogueData != null)
+        {
+            DialogueManager.Instance.StartDialogue(dialogueData, finished);
+        }
+        else if(!string.IsNullOrEmpty(dialogueText))
+        {
+            // 会話データ未設定なら、旧方式のテキストを1文の会話として表示する
+            DialogueData.Line[] lines = { new DialogueData.Line("", dialogueText) };
+            DialogueManager.Instance.StartDialogue(lines, finished);
+        }
+    }
+
+    /// <summary>
+    /// 会話を閉じる
+    /// </summary>
+    public void Close()
+    {
+        if(IsLegacy)
+        {
+            HideDialogue();
+            return;
+        }
+
+        DialogueManager.Instance.ForceClose();
+    }
+
+    //=====================================================================
+    // 旧方式の表示関数
+    //=====================================================================
+
+    /// <summary>
+    /// ダイアログを表示する（旧方式）
     /// </summary>
     public void ShowDialogue()
     {
@@ -56,19 +120,15 @@ public class Dialogue : Intaractable
 
         dialogueTextUI.text = dialogueText;
         dialoguePanel.SetActive(true);
-
-        Debug.Log("ダイアログが有効");
     }
 
     /// <summary>
-    /// ダイアログを非表示にする
+    /// ダイアログを非表示にする（旧方式）
     /// </summary>
     public void HideDialogue()
     {
         if(dialoguePanel == null) { return; }
 
         dialoguePanel.SetActive(false);
-
-        Debug.Log("ダイアログが無効");
     }
 }

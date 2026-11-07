@@ -71,6 +71,23 @@ public class PlayerHistory : CharaBase
     // 履歴リセット関数
     //=====================================================================
 
+    /// <summary>
+    /// 「from から to まで歩いてきた」履歴にする
+    /// </summary>
+    /// <param name="from"> 歩き始めの位置（追従するキャラがここに出る） </param>
+    /// <param name="to"> 今の位置 </param>
+    /// <param name="steps"> from から to までの記録の数（追従するキャラの遅れのフレーム数に合わせる） </param>
+    ///
+    /// 追従するキャラを別の位置に出したいときに使う（ワープせず、そこから歩いて付いてくる）
+    public void SeedPath(Vector3 from, Vector3 to, int steps)
+    {
+        steps = Mathf.Clamp(steps, 1, maxHistoryCount - 1);
+
+        posHistory.Clear();
+        for(int i = 0; i < maxHistoryCount - steps; i++) { posHistory.Add(from); }
+        for(int i = 1; i <= steps; i++) { posHistory.Add(Vector3.Lerp(from, to, (float)i / steps)); }
+    }
+
     public void ResetHistory(Vector3 position)
     {
         //posHistory.Clear();

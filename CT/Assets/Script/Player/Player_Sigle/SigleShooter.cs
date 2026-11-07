@@ -17,6 +17,16 @@ public class SigleShooter : CharaBase
     // 変数
     //=====================================================================
 
+    [Header("SE")]
+
+    [SerializeField, Tooltip("弾を撃ったとき")]
+    private SeData shotSe;
+
+    [Header("エフェクト")]
+
+    [SerializeField, Tooltip("弾を撃ったとき (右向きの絵なら撃った方向に回転して出る)")]
+    private EffectData shotEffect;
+
     private PlayerBulletPool bulletPool;
 
     //=====================================================================
@@ -55,5 +65,8 @@ public class SigleShooter : CharaBase
         // 弾に必要な情報を設定する
         bullet.SetShooter(gameObject);
         bullet.SetDirection(direction);
+
+        SeManager.PlaySe(shotSe, transform.position);
+        EffectManager.Play(shotEffect, transform.position, Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg);
     }
 }

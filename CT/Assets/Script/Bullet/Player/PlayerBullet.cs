@@ -28,7 +28,14 @@ public class PlayerBullet : BulletBase
 
         if(collision.gameObject == shooter) return;
 
-        if(collision.CompareTag("Enemies"))
+        // 味方（ノア・シグル）には当たらない
+        if(collision.CompareTag("Player")) return;
+
+        bool isTarget = collision.CompareTag("Enemies");
+
+        // イベントの範囲・調べる範囲・シーン遷移などのトリガーは通り抜ける（弾どうしは今まで通りぶつかる）
+        if(!isTarget && IgnoresTrigger(collision)) return;
+        if(isTarget)
         {
             Health health = collision.GetComponent<Health>();
 
@@ -38,6 +45,7 @@ public class PlayerBullet : BulletBase
             }
         }
 
+        PlayHitEffect(collision, isTarget);
         ReturnToPool();
     }
 

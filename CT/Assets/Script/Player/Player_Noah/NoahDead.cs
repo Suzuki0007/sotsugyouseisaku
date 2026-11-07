@@ -7,6 +7,7 @@
 
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 /// <summary>
 /// ノアの死亡クラス
@@ -20,6 +21,21 @@ public class NoahDead : CharaBase
     private Health health;
 
     private SceneChange sceneChange;
+
+    [Header("SE")]
+
+    [SerializeField, Tooltip("ゲームオーバー画面へ遷移し始めたとき")]
+    private SeData gameOverLeaveSe;
+
+    [SerializeField, Tooltip("ゲームオーバー画面に着いたとき")]
+    private SeData gameOverArriveSe;
+
+    [Header("アニメーション")]
+
+    [SerializeField, Tooltip("死亡アニメの名前。SpriteAnimator にこの名前の動きがあれば、流し終わってからゲームオーバー画面へ移る (無ければすぐ移る)")]
+    private string deathAnimation = "Dead";
+
+    private bool dying;
 
     //=====================================================================
     // 関数
@@ -51,9 +67,41 @@ public class NoahDead : CharaBase
 
     private void OnPlayerDied()
     {
+        if(dying) { return; }
+        dying = true;
+
         Debug.Log("プレイヤーが死亡しました！");
 
-        sceneChange.ChangeScene("SceneGameOver");
+        // 死亡アニメがあれば、操作を止めて流し終わるのを待つ
+        SpriteAnimator anim = GetComponent<SpriteAnimator>();
+        if(anim != null && anim.Play(deathAnimation, true))
+        {
+            PlayerMovement movement = GetComponent<PlayerMovement>();
+            if(movement != null)
+            {
+                movement.Stop();
+                movement.SetControlEnabled(false);
+            }
+            StartCoroutine(GameOverAfterAnimation(anim));
+            return;
+        }
+
+        GoToGameOver();
+    }
+
+    private System.Collections.IEnumerator GameOverAfterAnimation(SpriteAnimator anim)
+    {
+        yield return anim.WaitForCycle();
+        GoToGameOver();
+    }
+
+    private void GoToGameOver()
+    {
+        // リトライで今のステージに戻れるように記録しておく
+        SceneChange.LastStageScene = SceneManager.GetActiveScene().name;
+
+        // 借りている SceneChange (ドアなど) のSEではなく、ゲームオーバー用のSEを鳴らす
+        sceneChange.ChangeScene("SceneGameOver", null, gameOverLeaveSe, gameOverArriveSe);
     }
 
     //=====================================================================

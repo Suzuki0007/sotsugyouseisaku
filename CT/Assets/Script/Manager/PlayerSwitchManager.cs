@@ -35,6 +35,11 @@ public class PlayerSwitchManager : Singleton<PlayerSwitchManager>
     [SerializeField]
     private Key switchKey = Key.C;
 
+    [Header("SE")]
+
+    [SerializeField, Tooltip("キャラクターを切り替えたとき")]
+    private SeData switchSe;
+
     private PlayerMovement noahMovement;
     private PlayerMovement sigleMovement;
 
@@ -54,6 +59,35 @@ public class PlayerSwitchManager : Singleton<PlayerSwitchManager>
     public GameObject CurrentPlayer => currentPlayer;
 
     public GameObject Noah => noah;
+
+    public GameObject Sigle => sigle;
+
+    //=====================================================================
+    // ワープ（デバッグ用）
+    //=====================================================================
+
+    /// <summary>
+    /// 2人を指定した位置に移動させる（デバッグウィンドウから使う）
+    /// </summary>
+    public void Warp(Vector3 noahPosition, Vector3 siglePosition)
+    {
+        if(noah == null || sigle == null) { return; }
+
+        MoveTo(noah, noahPosition);
+        MoveTo(sigle, siglePosition);
+
+        if(noahHistory != null)  { noahHistory.ResetHistory(noah.transform.position); }
+        if(sigleHistory != null) { sigleHistory.ResetHistory(sigle.transform.position); }
+    }
+
+    private static void MoveTo(GameObject target, Vector3 position)
+    {
+        position.z = target.transform.position.z;
+        target.transform.position = position;
+
+        Rigidbody2D body = target.GetComponent<Rigidbody2D>();
+        if(body != null) { body.position = position; body.linearVelocity = Vector2.zero; }
+    }
 
     //=====================================================================
     // 初期化
@@ -122,6 +156,9 @@ public class PlayerSwitchManager : Singleton<PlayerSwitchManager>
     {
         if(Keyboard.current == null) { return; }
 
+        // 会話中・シーン遷移中はキャラクターを切り替えない
+        if(DialogueManager.IsBusy || SceneFader.IsBusy || ItemMenuUI.IsBusy || EventSequence.IsBusy) { return; }
+
         if(Keyboard.current[switchKey].wasPressedThisFrame)
         {
             SwitchPlayer();
@@ -179,5 +216,7 @@ public class PlayerSwitchManager : Singleton<PlayerSwitchManager>
 
         // カメラの追従先を変更
         focusCamera.SetTarget(currentPlayer.transform);
+
+        SeManager.PlaySe(switchSe, currentPlayer.transform.position);
     }
 }

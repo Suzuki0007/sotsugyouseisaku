@@ -18,6 +18,11 @@ public class AttackController : CharaBase
     [SerializeField]
     private Key attackKey;
 
+    [Header("SE")]
+
+    [SerializeField, Tooltip("攻撃を開始したとき")]
+    private SeData attackSe;
+
     void Awake()
     {
         if(attackKey == Key.None) { Debug.LogError("攻撃開始の入力設定が設定されていません"); }
@@ -25,6 +30,11 @@ public class AttackController : CharaBase
 
     private void Update()
     {
+        if(Keyboard.current == null) { return; }
+
+        // 会話中・シーン遷移中は攻撃しない
+        if(DialogueManager.IsBusy || SceneFader.IsBusy || ItemMenuUI.IsBusy || EventSequence.IsBusy) { return; }
+
         // 指定されたキーが押されたら攻撃を開始する
         if(Keyboard.current[attackKey].wasPressedThisFrame)
         {
@@ -36,4 +46,12 @@ public class AttackController : CharaBase
     /// 攻撃開始時の処理を行う仮想関数
     /// </summary>
     virtual protected void StartAttack() { }
+
+    /// <summary>
+    /// 攻撃開始のSEを鳴らす (攻撃が実際に始まったときに派生クラスから呼ぶ)
+    /// </summary>
+    protected void PlayAttackSe()
+    {
+        SeManager.PlaySe(attackSe, transform.position);
+    }
 }

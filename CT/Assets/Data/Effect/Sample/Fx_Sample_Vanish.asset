@@ -1,0 +1,40 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 69d1624924cbc724fbffc6cd65f9e5c1, type: 3}
+  m_Name: Fx_Sample_Vanish
+  m_EditorClassIdentifier: Assembly-CSharp::EffectData
+  displayMode: 0
+  frames:
+  - {fileID: 21300000, guid: 2b260b614013c744aa024eb73e3b3f6a, type: 3}
+  - {fileID: 21300000, guid: 530c8f19296bffb4d8aa776b4a709508, type: 3}
+  - {fileID: 21300000, guid: f8ad1cf9b4d2b174ea3288d33dab90aa, type: 3}
+  - {fileID: 21300000, guid: 9c5a139da5862df46b00a520b6d8031c, type: 3}
+  - {fileID: 21300000, guid: 6c1ebb49affaaa34387f1133d09a141d, type: 3}
+  fps: 20
+  color: {r: 1, g: 1, b: 1, a: 1}
+  material: {fileID: 0}
+  prefab: {fileID: 0}
+  lifetime: 0
+  duration: 1
+  offset: {x: 0, y: 0}
+  scale: 0.7
+  scaleRandom: 0
+  randomRotation: 0
+  randomFlipX: 0
+  overrideSorting: 1
+  sortingLayerID: 0
+  sortingOrder: 200
+  se: {fileID: 0}
+  ignoreTimeScale: 0
+  minInterval: 0
+  maxConcurrent: 0
+  preloadCount: 4
