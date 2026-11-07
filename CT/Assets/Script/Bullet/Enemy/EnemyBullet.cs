@@ -28,7 +28,15 @@ public class EnemyBullet : BulletBase
 
         if(collision.gameObject == shooter) return;
 
-        if(collision.CompareTag("Player"))
+        // 弾消しエリアに入った場合は「消えたとき」のエフェクトにする
+        if(collision.GetComponent<BulletDeleteArea>() != null)
+        {
+            Vanish();
+            return;
+        }
+
+        bool isTarget = collision.CompareTag("Player");
+        if(isTarget)
         {
             Health health = collision.GetComponent<Health>();
 
@@ -38,6 +46,7 @@ public class EnemyBullet : BulletBase
             }
         }
 
+        PlayHitEffect(collision, isTarget);
         ReturnToPool();
     }
 

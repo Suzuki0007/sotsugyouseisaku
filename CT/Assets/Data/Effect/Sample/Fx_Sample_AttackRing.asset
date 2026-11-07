@@ -1,0 +1,41 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 69d1624924cbc724fbffc6cd65f9e5c1, type: 3}
+  m_Name: Fx_Sample_AttackRing
+  m_EditorClassIdentifier: Assembly-CSharp::EffectData
+  displayMode: 0
+  frames:
+  - {fileID: 21300000, guid: cb72abcf42999784d8b3ce0978d34fa9, type: 3}
+  - {fileID: 21300000, guid: c229d06e362a45744b4f9f161e8620ed, type: 3}
+  - {fileID: 21300000, guid: 6384d0390e5c6c144b0c034f3ffe9677, type: 3}
+  - {fileID: 21300000, guid: 814bae80791dcbd4c81550cd43649980, type: 3}
+  - {fileID: 21300000, guid: 627923a602caca34b9949496db9bb4aa, type: 3}
+  - {fileID: 21300000, guid: 59f38a1bd32a05f4d85964761637d76b, type: 3}
+  fps: 24
+  color: {r: 1, g: 1, b: 1, a: 1}
+  material: {fileID: 0}
+  prefab: {fileID: 0}
+  lifetime: 0
+  duration: 1
+  offset: {x: 0, y: 0}
+  scale: 2.5
+  scaleRandom: 0
+  randomRotation: 0
+  randomFlipX: 0
+  overrideSorting: 1
+  sortingLayerID: 0
+  sortingOrder: 200
+  se: {fileID: 0}
+  ignoreTimeScale: 0
+  minInterval: 0
+  maxConcurrent: 0
+  preloadCount: 4

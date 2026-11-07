@@ -34859,6 +34859,8 @@ MonoBehaviour:
   targetLayer:
     serializedVersion: 2
     m_Bits: 512
+  attackEffect: {fileID: 11400000, guid: 72ed6a75d9afa7244abd3462f96b37ac, type: 2}
+  hitEffect: {fileID: 11400000, guid: 227ad72a71e3d2946ab18d0478447895, type: 2}
 --- !u!58 &1420506457
 CircleCollider2D:
   m_ObjectHideFlags: 0
@@ -35578,6 +35580,7 @@ MonoBehaviour:
   interactKeyInput: 19
   id: 
   needKey: 1
+  consumeKey: 1
   getKey: 0
   beforeRenderer: {fileID: 1525000495}
   afterSprite: {fileID: 1315817458, guid: 8b0c508b056873a46b1820fe8083f2dc, type: 3}
@@ -37297,6 +37300,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::KeyItem
   interactKeyInput: 19
   noahInventory: {fileID: 8908782603096249720, guid: dd9779ac97fbb06489888bc76e2e392a, type: 3}
+  keyItemData: {fileID: 0}
+  pickupId: 
   pickupSe: {fileID: 0}
 --- !u!1 &2011798005
 GameObject:

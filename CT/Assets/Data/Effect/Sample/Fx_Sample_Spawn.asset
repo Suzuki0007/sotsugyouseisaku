@@ -1,0 +1,42 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 69d1624924cbc724fbffc6cd65f9e5c1, type: 3}
+  m_Name: Fx_Sample_Spawn
+  m_EditorClassIdentifier: Assembly-CSharp::EffectData
+  displayMode: 0
+  frames:
+  - {fileID: 21300000, guid: dee0facb2ca3c38479671f4438100560, type: 3}
+  - {fileID: 21300000, guid: ba933e6378629074d8ef3abefa5353a9, type: 3}
+  - {fileID: 21300000, guid: 4d04e929948000749bbffa40ce022f45, type: 3}
+  - {fileID: 21300000, guid: b65d5ef0c2d2d124fb8c891d6fb3ca1e, type: 3}
+  - {fileID: 21300000, guid: 83f5a37b21059f14fb89faa3dd1e6647, type: 3}
+  - {fileID: 21300000, guid: 805c1062838cfea4b9733f714c8ab1e5, type: 3}
+  - {fileID: 21300000, guid: f7444576c6b25a548bb531e5e33ee4b2, type: 3}
+  fps: 16
+  color: {r: 1, g: 1, b: 1, a: 1}
+  material: {fileID: 0}
+  prefab: {fileID: 0}
+  lifetime: 0
+  duration: 1
+  offset: {x: 0, y: 0}
+  scale: 1.2
+  scaleRandom: 0
+  randomRotation: 0
+  randomFlipX: 0
+  overrideSorting: 1
+  sortingLayerID: 0
+  sortingOrder: 200
+  se: {fileID: 0}
+  ignoreTimeScale: 0
+  minInterval: 0
+  maxConcurrent: 0
+  preloadCount: 4

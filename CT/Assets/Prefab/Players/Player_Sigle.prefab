@@ -232,7 +232,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9e98e724499085d4580aeac3fafd9a55, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerFollower
-  targetPlayer: {fileID: 0}
   followDistance: 10
 --- !u!114 &9184606015198540213
 MonoBehaviour:

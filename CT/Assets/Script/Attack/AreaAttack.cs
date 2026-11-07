@@ -33,6 +33,16 @@ public class AreaAttack : MonoBehaviour
     [SerializeField]
     private LayerMask targetLayer;
 
+    [Header("エフェクト")]
+
+    [Tooltip("攻撃したとき (攻撃する人の位置に出る)")]
+    [SerializeField]
+    private EffectData attackEffect;
+
+    [Tooltip("攻撃が当たったとき (当たった相手の位置に出る)")]
+    [SerializeField]
+    private EffectData hitEffect;
+
     private Transform attackerPos;
 
     // 現在の攻撃ですでにダメージを与えた対象
@@ -67,6 +77,8 @@ public class AreaAttack : MonoBehaviour
         if(isAttacking) { return; }
 
         attackDamage = (int)(defaultDamage * damageMultiplier);
+
+        EffectManager.Play(attackEffect, attackerPos.position);
 
         // 攻撃コルーチンを開始
         StartCoroutine(AttackCoroutine());
@@ -142,6 +154,8 @@ public class AreaAttack : MonoBehaviour
             //Debug.Log($"{targetObject.name} に攻撃がヒットしました");
 
             targetHealth.Damage(attackDamage);
+
+            EffectManager.Play(hitEffect, target.ClosestPoint(attackerPos.position));
 
             Debug.Log(" 残り体力: " + targetHealth.CurrentHealth);
         }

@@ -28,7 +28,8 @@ public class PlayerBullet : BulletBase
 
         if(collision.gameObject == shooter) return;
 
-        if(collision.CompareTag("Enemies"))
+        bool isTarget = collision.CompareTag("Enemies");
+        if(isTarget)
         {
             Health health = collision.GetComponent<Health>();
 
@@ -38,6 +39,7 @@ public class PlayerBullet : BulletBase
             }
         }
 
+        PlayHitEffect(collision, isTarget);
         ReturnToPool();
     }
 

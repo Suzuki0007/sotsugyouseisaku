@@ -28,6 +28,20 @@ public abstract class BulletBase : MonoBehaviour
     [SerializeField]
     private float bulletLifeTime = 0f;
 
+    [Header("エフェクト (任意。右向きの絵なら弾の進行方向に回転して出る)")]
+
+    [SerializeField, Tooltip("狙った相手 (敵の弾ならプレイヤー、プレイヤーの弾なら敵) に当たったとき")]
+    private EffectData hitEffect;
+
+    [SerializeField, Tooltip("壁など、相手以外に当たったとき")]
+    private EffectData obstacleHitEffect;
+
+    [SerializeField, Tooltip("寿命が切れたとき・弾消しで消されたとき")]
+    private EffectData vanishEffect;
+
+    [SerializeField, Tooltip("エフェクトを弾の進行方向に回転させる")]
+    private bool rotateEffectToDirection = true;
+
     private float initialLifeTime;
 
     protected Rigidbody2D rb;
@@ -93,8 +107,46 @@ public abstract class BulletBase : MonoBehaviour
 
         if(bulletLifeTime <= 0f)
         {
-            ReturnToPool();
+            Vanish();
         }
+    }
+
+    /// <summary>
+    /// 消えるエフェクトを出してプールに返却する (寿命切れ・弾消しなど)
+    /// </summary>
+    public void Vanish()
+    {
+        if(isReturned) return;
+
+        EffectManager.Play(vanishEffect, transform.position, GetEffectAngle());
+        ReturnToPool();
+    }
+
+    /// <summary>
+    /// 当たったときのエフェクトを出す (返却する前に呼ぶ)
+    /// </summary>
+    /// <param name="other"> 当たった相手 </param>
+    /// <param name="isTarget"> 狙った相手に当たったか </param>
+    protected void PlayHitEffect(Collider2D other, bool isTarget)
+    {
+        EffectData effect = isTarget ? hitEffect : obstacleHitEffect;
+        if(effect == null) return;
+
+        // 当たった相手の表面に出す
+        Vector3 point = other != null ? (Vector3)other.ClosestPoint(transform.position) : transform.position;
+        EffectManager.Play(effect, point, GetEffectAngle());
+    }
+
+    /// <summary>
+    /// エフェクトの向き (進行方向の角度)
+    /// </summary>
+    private float GetEffectAngle()
+    {
+        if(!rotateEffectToDirection || rb == null) return 0f;
+
+        Vector2 v = rb.linearVelocity;
+        if(v.sqrMagnitude <= 0.0001f) return 0f;
+        return Mathf.Atan2(v.y, v.x) * Mathf.Rad2Deg;
     }
 
     /// <summary>

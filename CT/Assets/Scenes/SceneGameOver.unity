@@ -581,7 +581,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1654027132}
         m_TargetAssemblyTypeName: SceneChange, Assembly-CSharp
-        m_MethodName: ChangeScene
+        m_MethodName: RetryLastStage
         m_Mode: 5
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

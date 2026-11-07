@@ -7,6 +7,7 @@
 
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 /// <summary>
 /// ノアの死亡クラス
@@ -60,6 +61,9 @@ public class NoahDead : CharaBase
     private void OnPlayerDied()
     {
         Debug.Log("プレイヤーが死亡しました！");
+
+        // リトライで今のステージに戻れるように記録しておく
+        SceneChange.LastStageScene = SceneManager.GetActiveScene().name;
 
         // 借りている SceneChange (ドアなど) のSEではなく、ゲームオーバー用のSEを鳴らす
         sceneChange.ChangeScene("SceneGameOver", null, gameOverLeaveSe, gameOverArriveSe);

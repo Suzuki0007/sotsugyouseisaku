@@ -19,6 +19,11 @@ public class EnemyShooter : CharaBase
     [SerializeField]
     private float shootInterval = 0f;
 
+    [Header("エフェクト")]
+
+    [SerializeField, Tooltip("弾を撃ったとき (右向きの絵なら撃った方向に回転して出る)")]
+    private EffectData shotEffect;
+
     private GameObject player;
 
     private EnemyBulletPool enemyBulletPool;
@@ -51,6 +56,8 @@ public class EnemyShooter : CharaBase
         // 弾に必要な情報を設定する
         bullet.SetDirection(direction);
         bullet.SetShooter(gameObject);
+
+        EffectManager.Play(shotEffect, transform.position, Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg);
     }
 
     /// <summary>

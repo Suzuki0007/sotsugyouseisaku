@@ -29,6 +29,20 @@ public class SceneChange : MonoBehaviour
     [SerializeField, Tooltip("遷移先に着いたとき (明転の開始) に鳴らす。例: ドアを閉める音")]
     private SeData arriveSe;
 
+    /// <summary>
+    /// 最後に死亡したステージのシーン名 (ゲームオーバー画面の「リトライ」で戻る先)
+    /// </summary>
+    public static string LastStageScene { get; set; }
+
+    /// <summary>
+    /// Playモード開始時にリセットする (ドメインリロード無効のため、前回のPlayの値が残らないように)
+    /// </summary>
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetStatics()
+    {
+        LastStageScene = null;
+    }
+
     private void OnCollisionEnter2D(Collision2D collision)
     {
         if(collision.gameObject.CompareTag("Player"))
@@ -55,6 +69,17 @@ public class SceneChange : MonoBehaviour
     public void ChangeScene(string sceneName, string spawnPointId)
     {
         ChangeScene(sceneName, spawnPointId, leaveSe, arriveSe);
+    }
+
+    /// <summary>
+    /// 最後に死亡したステージに戻る (ゲームオーバー画面のリトライボタン用)
+    /// 記録がなければ (ゲームオーバー画面から直接Playした場合など) fallbackSceneName に移動する
+    /// </summary>
+    /// <param name="fallbackSceneName"> 記録がないときの移動先 </param>
+    public void RetryLastStage(string fallbackSceneName)
+    {
+        string target = string.IsNullOrEmpty(LastStageScene) ? fallbackSceneName : LastStageScene;
+        ChangeScene(target, null);
     }
 
     /// <summary>

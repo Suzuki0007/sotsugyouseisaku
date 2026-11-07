@@ -458,6 +458,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SceneChange
   sceneName: Stage1_2
+  spawnPointId: 
+  leaveSe: {fileID: 0}
+  arriveSe: {fileID: 0}
 --- !u!61 &43570063
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -32751,6 +32754,7 @@ MonoBehaviour:
   sigle: {fileID: 3848283961383208032, guid: 96b593b4c0a0ac64d9ab2afdcc1dacea, type: 3}
   focusCamera: {fileID: 519420033}
   switchKey: 17
+  switchSe: {fileID: 0}
 --- !u!1 &823229329
 GameObject:
   m_ObjectHideFlags: 0
@@ -33784,6 +33788,8 @@ MonoBehaviour:
   targetLayer:
     serializedVersion: 2
     m_Bits: 512
+  attackEffect: {fileID: 11400000, guid: 72ed6a75d9afa7244abd3462f96b37ac, type: 2}
+  hitEffect: {fileID: 11400000, guid: 227ad72a71e3d2946ab18d0478447895, type: 2}
 --- !u!58 &1420506457
 CircleCollider2D:
   m_ObjectHideFlags: 0
@@ -33865,6 +33871,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SceneChange
   sceneName: 
+  spawnPointId: 
+  leaveSe: {fileID: 0}
+  arriveSe: {fileID: 0}
 --- !u!1 &1448037748
 GameObject:
   m_ObjectHideFlags: 0
@@ -34500,9 +34509,12 @@ MonoBehaviour:
   interactKeyInput: 19
   id: 
   needKey: 1
+  consumeKey: 1
   getKey: 0
   beforeRenderer: {fileID: 1525000495}
   afterSprite: {fileID: 1315817458, guid: 8b0c508b056873a46b1820fe8083f2dc, type: 3}
+  openSe: {fileID: 0}
+  lockedSe: {fileID: 0}
 --- !u!61 &1525000501
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -35287,7 +35299,7 @@ SpriteRenderer:
   m_Size: {x: 14.4, y: 21.605274}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
+  m_WasSpriteAssigned: 0
   m_SpriteSortPoint: 0
   m_BlendShapeWeights: []
 --- !u!4 &1723591031
@@ -35922,6 +35934,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::KeyItem
   interactKeyInput: 19
   noahInventory: {fileID: 8908782603096249720, guid: dd9779ac97fbb06489888bc76e2e392a, type: 3}
+  keyItemData: {fileID: 0}
+  pickupId: 
+  pickupSe: {fileID: 0}
 --- !u!1 &2011798005
 GameObject:
   m_ObjectHideFlags: 0
@@ -36030,6 +36045,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Dialogue
   interactKeyInput: 19
+  dialogueData: {fileID: 0}
   dialogueText: "\u30AB\u30E0\u30B5\u30CF\u30E0\u30CB\u30C0"
   dialoguePanel: {fileID: 52031747}
   dialogueTextUI: {fileID: 781712001}
