@@ -53,4 +53,26 @@ public class EventSequence : MonoBehaviour
             action.OnExit(gameObject);
         }
     }
+
+    /// <summary>
+    /// セーブから復元するときに呼ばれる関数（見た目だけを実行後の状態にする）
+    /// </summary>
+    /// <param name="gameObject"></param>
+    public void Restore(GameObject gameObject)
+    {
+        foreach(EventAction action in actions)
+        {
+            if(action == null) { continue; }
+            action.Restore(gameObject);
+        }
+    }
+
+    /// <summary>
+    /// アクションを追加する（エディタのひな形作成用）
+    /// </summary>
+    public void AddAction(EventAction action)
+    {
+        if(action == null || actions.Contains(action)) { return; }
+        actions.Add(action);
+    }
 }

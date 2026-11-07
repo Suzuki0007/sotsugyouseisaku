@@ -23,6 +23,10 @@ public class Treasure : Intaractable
     [SerializeField]
     private bool needKey;
 
+    [Tooltip("開けたときに鍵を消費する（アイテム欄から鍵が消える）")]
+    [SerializeField]
+    private bool consumeKey = true;
+
     [SerializeField] 
     private bool getKey;
 
@@ -75,6 +79,9 @@ public class Treasure : Intaractable
             else
             {
                 Debug.Log("宝箱を開けました");
+
+                // 鍵を消費する（アイテム欄から消える）
+                if(consumeKey) { InventoryManager.Instance.ConsumeKey(); }
 
                 // 宝箱のスプライト変更、鍵を取得したことを示すフラグを立てる
                 SetBeforeRenderer();

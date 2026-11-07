@@ -23,4 +23,13 @@ public abstract class EventAction : MonoBehaviour
     /// </summary>
     /// <param name="gameObject"></param>
     public virtual void OnExit(GameObject gameObject) { }
+
+    /// <summary>
+    /// セーブから復元するときに呼ばれる仮想関数
+    /// </summary>
+    /// <param name="gameObject"></param>
+    ///
+    /// 会話やSEは鳴らさず、見た目（表示・非表示、スプライトなど）だけを
+    /// 実行後の状態にしたいアクションがオーバーライドする
+    public virtual void Restore(GameObject gameObject) { }
 }

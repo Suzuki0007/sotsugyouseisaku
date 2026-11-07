@@ -32,4 +32,12 @@ public static class BgmFlags
     {
         flags.Clear();
     }
+
+    // 再生開始時にフラグを空にする
+    // エディタでドメインリロードを無効にしていると、前回の再生のフラグが残るため
+    [UnityEngine.RuntimeInitializeOnLoadMethod(UnityEngine.RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetOnPlay()
+    {
+        flags.Clear();
+    }
 }

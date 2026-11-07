@@ -58,6 +58,18 @@ public static class  Save
         get { return Path.Combine(Application.persistentDataPath, "save.json"); }
     }
 
+    // 再生開始時に中身を空にする
+    // エディタでドメインリロードを無効にしていると、static の中身が前回の再生から残るため
+    // （ビルドしたゲームは起動のたびに空から始まるので、動作は変わらない）
+    // SubsystemRegistration は他のどの初期化よりも先に呼ばれる
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetOnPlay()
+    {
+        data.Clear();
+        pending.Clear();
+        dirty = false;
+    }
+
     // 仮置きで保存する
     public static void SetPending<T>(string key, T value)
     {

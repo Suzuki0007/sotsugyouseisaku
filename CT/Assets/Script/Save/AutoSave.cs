@@ -14,6 +14,11 @@ public static class  AutoSave
     [RuntimeInitializeOnLoadMethod]
     private static void Init()
     {
+        // ドメインリロード無効のエディタでは、前回の再生の登録が残っているので先に外す
+        // （外さないと、再生するたびに同じ処理が二重・三重に呼ばれる）
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+        Application.quitting -= OnQuitting;
+
         SceneManager.sceneLoaded += OnSceneLoaded;
 
         Application.quitting += OnQuitting;// Application.quittingはアプリケーションが終了する時に呼ばれるイベント

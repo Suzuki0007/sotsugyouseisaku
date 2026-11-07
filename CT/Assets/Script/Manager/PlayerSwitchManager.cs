@@ -128,7 +128,7 @@ public class PlayerSwitchManager : Singleton<PlayerSwitchManager>
         if(Keyboard.current == null) { return; }
 
         // 会話中・シーン遷移中はキャラクターを切り替えない
-        if(DialogueManager.IsBusy || SceneFader.IsBusy) { return; }
+        if(DialogueManager.IsBusy || SceneFader.IsBusy || ItemMenuUI.IsBusy) { return; }
 
         if(Keyboard.current[switchKey].wasPressedThisFrame)
         {

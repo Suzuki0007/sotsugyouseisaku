@@ -128,6 +128,9 @@ public class TimingGaugeUI : MonoBehaviour
     {
         if(!isRunning || isFinished) { return; }
 
+        // アイテム画面を開いている間はゲージを止め、判定キーも受け付けない
+        if(ItemMenuUI.IsBusy) { return; }
+
         elapsedTime += Time.deltaTime;
 
         // ゲージの進行度を計算（0.0から1.0の間）して、左右のゲージUIのfillAmountに反映

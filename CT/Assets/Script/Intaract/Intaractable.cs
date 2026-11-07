@@ -40,6 +40,9 @@ public abstract class Intaractable : MonoBehaviour
         // シーン遷移中は調べられない
         if(SceneFader.IsBusy) { return; }
 
+        // アイテム画面を開いている間は調べられない
+        if(ItemMenuUI.IsBusy) { return; }
+
         // インタラクトキーが押されたときに処理を呼び出す
         if(Keyboard.current[interactKeyInput].wasPressedThisFrame)
         {
@@ -58,6 +61,8 @@ public abstract class Intaractable : MonoBehaviour
         player = collision.gameObject;
 
         Debug.Log($"{gameObject.name}を調べられるまする");
+
+        OnPlayerEnter(player);
     }
 
     /// <summary>
@@ -69,7 +74,19 @@ public abstract class Intaractable : MonoBehaviour
         if(!IsPlayerTag(other)) { return; }
 
         player = null;
+
+        OnPlayerExit(other.gameObject);
     }
+
+    /// <summary>
+    /// プレイヤーが範囲に入ったときに呼ばれる仮想関数（継承先で必要なら使う）
+    /// </summary>
+    protected virtual void OnPlayerEnter(GameObject enteredPlayer) { }
+
+    /// <summary>
+    /// プレイヤーが範囲から出たときに呼ばれる仮想関数（継承先で必要なら使う）
+    /// </summary>
+    protected virtual void OnPlayerExit(GameObject exitedPlayer) { }
 
     /// <summary>
     /// プレイヤーのタグを判定するメソッド
