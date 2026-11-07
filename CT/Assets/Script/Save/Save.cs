@@ -165,13 +165,31 @@ public static class  Save
 
         // JsonUtility.FromJsonは、JSON形式の文字列を指定した型のオブジェクトに変換するための関数です。
         // File.ReadAllTextは、指定したファイルの内容をすべて文字列として読み込むための関数です。
-        FileData file = JsonUtility.FromJson<FileData>(File.ReadAllText(path));
+        // ファイルが壊れていても止まらないように、読めなかったら空から始める
+        FileData file;
+        try
+        {
+            file = JsonUtility.FromJson<FileData>(File.ReadAllText(path));
+        }
+        catch(Exception e)
+        {
+            Debug.LogWarning("セーブデータを読み込めませんでした。最初から始めます: " + e.Message);
+            return;
+        }
+        if(file == null || file.list == null) { return; }
+
         // データを復元する
         for(int i = 0; i < file.list.Count; i++)
         {
+            if(file.list[i] == null || string.IsNullOrEmpty(file.list[i].key)) { continue; }
             data[file.list[i].key] = file.list[i].value;
         }
     }
+
+    /// <summary>
+    /// 確定済みのデータの件数（デバッグ表示用）
+    /// </summary>
+    public static int Count => data.Count;
 
     // データを保存する
     public static void Write()

@@ -75,4 +75,16 @@ public class DialogueData : ScriptableObject
     //=====================================================================
 
     public Line[] Lines => lines;
+
+    //=====================================================================
+    // エディタ用
+    //=====================================================================
+
+    /// <summary>
+    /// 文を丸ごと入れ替える（CSV の取り込み用）
+    /// </summary>
+    public void SetLinesForEditor(Line[] newLines)
+    {
+        lines = newLines ?? new Line[0];
+    }
 }

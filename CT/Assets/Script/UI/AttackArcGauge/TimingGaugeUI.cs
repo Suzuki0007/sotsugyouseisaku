@@ -102,6 +102,23 @@ public class TimingGaugeUI : MonoBehaviour
     [SerializeField]
     private AreaAttack areaAttack;
 
+    /// <summary>
+    /// ゲージが動いていて、判定キーを待っているか
+    /// （通常の範囲攻撃と判定キーが同じなので、その間は通常攻撃を出さないために使う）
+    /// </summary>
+    public static bool IsJudging { get; private set; }
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetOnPlay()
+    {
+        IsJudging = false;
+    }
+
+    private void OnDisable()
+    {
+        IsJudging = false;
+    }
+
     //=====================================================================
     // 関数
     //=====================================================================
@@ -113,23 +130,23 @@ public class TimingGaugeUI : MonoBehaviour
         if(resultText == null) { Debug.LogError("Result Textが設定されていません"); }
 
         // 初期状態では非表示
-        if(timingGauge != null) { timingGauge.SetActive(false); }
-        if(lightEffect != null) { lightEffect.SetActive(false); }
+        // ただし、StartGauge で初めて表示されたとき（ここで初めて Awake が呼ばれる）は消さない
+        // （消すと、最初の1回目の攻撃でゲージが出ない）
+        if(!isRunning)
+        {
+            if(timingGauge != null) { timingGauge.SetActive(false); }
+            if(lightEffect != null) { lightEffect.SetActive(false); }
+        }
 
         if(areaAttack == null) { Debug.LogWarning("AreaAttackが設定されていません"); }
-    }
-
-    private void Start()
-    {
-        StartGauge();
     }
 
     private void Update()
     {
         if(!isRunning || isFinished) { return; }
 
-        // アイテム画面を開いている間はゲージを止め、判定キーも受け付けない
-        if(ItemMenuUI.IsBusy) { return; }
+        // アイテム画面・会話・シーン遷移・イベント演出の間はゲージを止め、判定キーも受け付けない
+        if(ItemMenuUI.IsBusy || DialogueManager.IsBusy || SceneFader.IsBusy || EventSequence.IsBusy) { return; }
 
         elapsedTime += Time.deltaTime;
 
@@ -160,8 +177,9 @@ public class TimingGaugeUI : MonoBehaviour
     public void StartGauge()
     {
         elapsedTime = 0f;
-        isRunning = true; 
+        isRunning = true;
         isFinished = false;
+        IsJudging = true;
 
         leftFill.fillAmount = 0f; 
         rightFill.fillAmount = 0f;
@@ -206,6 +224,7 @@ public class TimingGaugeUI : MonoBehaviour
 
         isFinished = true;
         isRunning = false;
+        IsJudging = false;
         if(resultText != null) { resultText.text = result.ToString(); }
 
         // 判定結果がPerfectの場合、ライトエフェクトを表示する

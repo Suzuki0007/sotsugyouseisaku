@@ -27,6 +27,7 @@ public class TimingGaugeAttackController : AttackController
     /// </summary>
     protected override void StartAttack()
     {
+        if(timingGauge == null) { return; }
         if(timingGauge.gameObject.activeSelf) { return; }
 
         timingGauge.StartGauge();

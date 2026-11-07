@@ -13,12 +13,13 @@ using UnityEngine;
 public class SceneChange : MonoBehaviour
 {
     // 遷移先のシーン名をInspectorで設定できるようにする
-    [SerializeField] 
+    // Build Settings に入っているシーンから選ぶ
+    [SerializeField, SceneName, Tooltip("遷移先のシーン（Build Settings に入っているものから選ぶ）")]
     private string sceneName;
 
     // 遷移先での出現位置ID (遷移先シーンの PlayerSpawnPoint のIDと合わせる)
     // 空欄なら遷移先のデフォルト位置に出現する
-    [SerializeField]
+    [SerializeField, SpawnPointId(nameof(sceneName)), Tooltip("遷移先での出現位置（遷移先シーンの PlayerSpawnPoint から選ぶ）")]
     private string spawnPointId;
 
     [Header("SE")]

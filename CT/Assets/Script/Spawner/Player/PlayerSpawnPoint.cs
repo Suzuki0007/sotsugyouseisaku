@@ -20,7 +20,7 @@ public class PlayerSpawnPoint : MonoBehaviour
     [SerializeField, Tooltip("出現位置ID (遷移元の SceneChange の出現位置IDと合わせる)")]
     private string spawnPointId;
 
-    [SerializeField, Tooltip("Sigleの出現位置 (未設定ならこのオブジェクトの位置)")]
+    [SerializeField, Tooltip("Sigleの出現位置 (未設定ならノアと同じ位置)。設定すると、Sigle はここに出て、ノアが動き出すとここからノアの後ろへ歩いて付いていく")]
     private Transform sigleSpawnPoint;
 
     /// <summary>
@@ -44,6 +44,11 @@ public class PlayerSpawnPoint : MonoBehaviour
     /// </summary>
     public Transform SiglePoint => sigleSpawnPoint != null ? sigleSpawnPoint : transform;
 
+    /// <summary>
+    /// Sigle の出現位置が別に設定されているか（未設定なら Sigle はノアの位置に出る）
+    /// </summary>
+    public bool HasSiglePoint => sigleSpawnPoint != null;
+
     //=====================================================================
     // 検索
     //=====================================================================
@@ -59,7 +64,7 @@ public class PlayerSpawnPoint : MonoBehaviour
 
         if(string.IsNullOrEmpty(id)) { return null; }
 
-        foreach(PlayerSpawnPoint point in FindObjectsByType<PlayerSpawnPoint>(FindObjectsSortMode.None))
+        foreach(PlayerSpawnPoint point in FindObjectsByType<PlayerSpawnPoint>())
         {
             if(point.spawnPointId == id) { return point; }
         }

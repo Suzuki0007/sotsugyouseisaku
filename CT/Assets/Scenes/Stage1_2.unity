@@ -219,6 +219,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe0651f72825a6f4db6549b725b3043f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EventSequence
+  playMode: 0
+  lockPlayer: 0
   actions: []
 --- !u!1 &35119845
 GameObject:
@@ -30978,6 +30980,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DialogueEventAction
   dialogue: {fileID: 262987124}
   closeMode: 1
+  waitUntilClosed: 1
   closeKey: 19
 --- !u!114 &262987124
 MonoBehaviour:
@@ -31008,6 +31011,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe0651f72825a6f4db6549b725b3043f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EventSequence
+  playMode: 0
+  lockPlayer: 0
   actions:
   - {fileID: 262987123}
 --- !u!1 &348674307
@@ -32553,6 +32558,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DialogueEventAction
   dialogue: {fileID: 364490159}
   closeMode: 1
+  waitUntilClosed: 1
   closeKey: 19
 --- !u!114 &364490159
 MonoBehaviour:
@@ -32583,6 +32589,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe0651f72825a6f4db6549b725b3043f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EventSequence
+  playMode: 0
+  lockPlayer: 0
   actions:
   - {fileID: 364490158}
 --- !u!1 &415572549
@@ -34446,6 +34454,7 @@ MonoBehaviour:
     - item: {fileID: 11400000, guid: e0fdc9f2cba007f4793ff39cd6725412, type: 2}
       count: 1
       notHave: 0
+    flagConditions: []
     consumeItems: 1
     sequence: {fileID: 2029074850}
     markCompleted: 1
@@ -34916,6 +34925,7 @@ MonoBehaviour:
     - item: {fileID: 11400000, guid: 334a070ce9970134d82b23f3c6392091, type: 2}
       count: 1
       notHave: 0
+    flagConditions: []
     consumeItems: 1
     sequence: {fileID: 1318130577}
     markCompleted: 1
@@ -35122,6 +35132,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DialogueEventAction
   dialogue: {fileID: 1318130574}
   closeMode: 1
+  waitUntilClosed: 1
   closeKey: 19
 --- !u!114 &1318130574
 MonoBehaviour:
@@ -35183,6 +35194,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe0651f72825a6f4db6549b725b3043f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EventSequence
+  playMode: 0
+  lockPlayer: 0
   actions:
   - {fileID: 1318130576}
   - {fileID: 1318130575}
@@ -35920,6 +35933,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe0651f72825a6f4db6549b725b3043f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EventSequence
+  playMode: 0
+  lockPlayer: 0
   actions:
   - {fileID: 1510645091}
 --- !u!114 &1510645090
@@ -35950,6 +35965,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DialogueEventAction
   dialogue: {fileID: 2011798008}
   closeMode: 0
+  waitUntilClosed: 1
   closeKey: 19
 --- !u!61 &1510645092
 BoxCollider2D:
@@ -38602,6 +38618,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DialogueEventAction
   dialogue: {fileID: 2029074848}
   closeMode: 1
+  waitUntilClosed: 1
   closeKey: 19
 --- !u!114 &2029074848
 MonoBehaviour:
@@ -38648,6 +38665,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe0651f72825a6f4db6549b725b3043f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EventSequence
+  playMode: 0
+  lockPlayer: 0
   actions:
   - {fileID: 2029074849}
   - {fileID: 2029074847}
@@ -38957,6 +38976,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DialogueEventAction
   dialogue: {fileID: 2146947389}
   closeMode: 1
+  waitUntilClosed: 1
   closeKey: 19
 --- !u!114 &2146947389
 MonoBehaviour:
@@ -38987,6 +39007,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe0651f72825a6f4db6549b725b3043f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EventSequence
+  playMode: 0
+  lockPlayer: 0
   actions:
   - {fileID: 2146947388}
 --- !u!1001 &3109789225101286588

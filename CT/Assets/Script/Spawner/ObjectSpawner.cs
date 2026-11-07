@@ -109,6 +109,10 @@ public class ObjectSpawner : MonoBehaviour
     /// </summary>
     private void OnObjectDestroyed()
     {
+        // シーンの切り替えなどで、スポナー自身が先に消えている（または無効）なら何もしない
+        // （消えたスポナーで StartCoroutine を呼ぶと MissingReferenceException になる）
+        if(this == null || !isActiveAndEnabled) { return; }
+
         // 再生成処理の重複を防ぐ
         if(isRespawning) { return; }
         isRespawning = true;

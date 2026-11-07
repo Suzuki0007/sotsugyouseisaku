@@ -35,7 +35,13 @@ public class EnemyBullet : BulletBase
             return;
         }
 
+        // 味方（ほかの敵）には当たらない
+        if(collision.CompareTag("Enemies")) return;
+
         bool isTarget = collision.CompareTag("Player");
+
+        // イベントの範囲・調べる範囲・シーン遷移などのトリガーは通り抜ける（弾どうしは今まで通りぶつかる）
+        if(!isTarget && IgnoresTrigger(collision)) return;
         if(isTarget)
         {
             Health health = collision.GetComponent<Health>();

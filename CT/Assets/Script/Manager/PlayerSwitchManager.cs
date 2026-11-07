@@ -60,6 +60,35 @@ public class PlayerSwitchManager : Singleton<PlayerSwitchManager>
 
     public GameObject Noah => noah;
 
+    public GameObject Sigle => sigle;
+
+    //=====================================================================
+    // ワープ（デバッグ用）
+    //=====================================================================
+
+    /// <summary>
+    /// 2人を指定した位置に移動させる（デバッグウィンドウから使う）
+    /// </summary>
+    public void Warp(Vector3 noahPosition, Vector3 siglePosition)
+    {
+        if(noah == null || sigle == null) { return; }
+
+        MoveTo(noah, noahPosition);
+        MoveTo(sigle, siglePosition);
+
+        if(noahHistory != null)  { noahHistory.ResetHistory(noah.transform.position); }
+        if(sigleHistory != null) { sigleHistory.ResetHistory(sigle.transform.position); }
+    }
+
+    private static void MoveTo(GameObject target, Vector3 position)
+    {
+        position.z = target.transform.position.z;
+        target.transform.position = position;
+
+        Rigidbody2D body = target.GetComponent<Rigidbody2D>();
+        if(body != null) { body.position = position; body.linearVelocity = Vector2.zero; }
+    }
+
     //=====================================================================
     // 初期化
     //=====================================================================

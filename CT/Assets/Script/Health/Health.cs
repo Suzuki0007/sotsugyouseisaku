@@ -41,6 +41,23 @@ public class Health : MonoBehaviour
 
     public bool IsDead => CurrentHealth <= 0;
 
+    /// <summary>
+    /// 無敵（ダメージを受けない）。このオブジェクトだけに効く
+    /// </summary>
+    public bool Invincible { get; set; }
+
+    /// <summary>
+    /// プレイヤー（Player タグ）全員を無敵にする（デバッグウィンドウ用）
+    /// シーンが変わってプレイヤーが作り直されても続く。再生を止めると元に戻る
+    /// </summary>
+    public static bool PlayerInvincible { get; set; }
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetOnPlay()
+    {
+        PlayerInvincible = false;
+    }
+
     //=====================================================================
     // 関数
     //=====================================================================
@@ -53,6 +70,8 @@ public class Health : MonoBehaviour
     public void Damage(int damage)
     {
         if(IsDead) { return; }
+        if(Invincible) { return; }
+        if(PlayerInvincible && CompareTag("Player")) { return; }
 
         CurrentHealth -= damage;
         if(CurrentHealth < 0) { CurrentHealth = 0; }

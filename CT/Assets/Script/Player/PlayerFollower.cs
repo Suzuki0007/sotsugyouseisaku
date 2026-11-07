@@ -26,6 +26,11 @@ public class PlayerFollower : CharaBase
 
     private PlayerHistory targetHistory;
 
+    /// <summary>
+    /// 追従対象の何フレーム前（何件前の記録）の位置に付いていくか
+    /// </summary>
+    public int FollowFrames => Mathf.Max(1, (int)followDistance);
+
     //=====================================================================
     // 関数
     //=====================================================================

@@ -31,6 +31,10 @@ public class AreaAttackController : AttackController
     {
         if(areaAttack == null) { return; }
 
+        // タイミングゲージの判定待ちの間は、同じキー（Space）が判定に使われるので通常攻撃は出さない
+        // （同時に出すと、ゲージの倍率つきの攻撃が「攻撃中」で弾かれてしまう）
+        if(TimingGaugeUI.IsJudging) { return; }
+
         areaAttack.StartAttack(damageMultiplier);
         PlayAttackSe();
     }

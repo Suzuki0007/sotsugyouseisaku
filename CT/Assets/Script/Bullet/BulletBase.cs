@@ -138,6 +138,22 @@ public abstract class BulletBase : MonoBehaviour
     }
 
     /// <summary>
+    /// 当たっても無視するトリガーか
+    /// </summary>
+    /// <param name="other"> 当たった相手 </param>
+    /// <returns> イベントの範囲・調べる範囲などのトリガーなら true（弾・弾消しエリアは false） </returns>
+    protected static bool IgnoresTrigger(Collider2D other)
+    {
+        if(other == null || !other.isTrigger) { return false; }
+
+        // 弾どうし・弾消しエリアは今まで通り当たる
+        if(other.GetComponent<BulletBase>() != null) { return false; }
+        if(other.GetComponent<BulletDeleteArea>() != null) { return false; }
+
+        return true;
+    }
+
+    /// <summary>
     /// エフェクトの向き (進行方向の角度)
     /// </summary>
     private float GetEffectAngle()

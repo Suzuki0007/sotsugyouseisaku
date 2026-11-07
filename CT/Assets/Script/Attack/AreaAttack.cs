@@ -76,7 +76,9 @@ public class AreaAttack : MonoBehaviour
 
         if(isAttacking) { return; }
 
-        attackDamage = (int)(defaultDamage * damageMultiplier);
+        // 体力は整数なので四捨五入する（切り捨てだと 1 × 1.5 も 1 になり、倍率が効かない）
+        // 最低でも 1 ダメージは与える
+        attackDamage = Mathf.Max(1, Mathf.FloorToInt(defaultDamage * damageMultiplier + 0.5f));
 
         EffectManager.Play(attackEffect, attackerPos.position);
 
