@@ -21,5 +21,6 @@ public static class InputBlock
         SceneFader.IsBusy ||
         ItemMenuUI.IsBusy ||
         EventSequence.IsBusy ||
-        GameMenu.IsBusy;
+        GameMenu.IsBusy ||
+        PuzzleUI.IsBusy;
 }

@@ -45,6 +45,9 @@ public class GameMenu : MonoBehaviour
     [SerializeField]
     private Button itemButton;
 
+    [SerializeField, Tooltip("持っているメモを読み返す（謎解き・2人の仕掛け 段階5）")]
+    private Button noteButton;
+
     [SerializeField]
     private Button loadButton;
 
@@ -152,6 +155,7 @@ public class GameMenu : MonoBehaviour
         DontDestroyOnLoad(gameObject);
 
         if(itemButton != null)  { itemButton.onClick.AddListener(OnItem); }
+        if(noteButton != null)  { noteButton.onClick.AddListener(OnNote); }
         if(loadButton != null)  { loadButton.onClick.AddListener(OnLoad); }
         if(titleButton != null) { titleButton.onClick.AddListener(OnTitle); }
         if(closeButton != null) { closeButton.onClick.AddListener(() => CloseAll(true)); }
@@ -206,6 +210,7 @@ public class GameMenu : MonoBehaviour
 
         // アイテム画面・セーブデータ選択・確認の間は、それぞれの画面が操作を受け持つ
         if(ItemMenuUI.IsOpen) { return; }
+        if(PuzzleUI.IsBusy) { return; }
         if(slotPanel != null && slotPanel.IsOpenOrJustClosed) { return; }
         if(confirm != null && confirm.IsOpenOrJustClosed) { return; }
         if(menuPanel == null || !menuPanel.activeSelf) { return; }
@@ -272,6 +277,22 @@ public class GameMenu : MonoBehaviour
         });
 
         if(!opened) { ShowMenu(itemButton); }
+    }
+
+    private void OnNote()
+    {
+        if(!isOpen) { return; }
+
+        UISound.Play(decideSe, UISoundType.Decide);
+        SetActive(menuPanel, false);
+
+        // メモの一覧（選ぶと読む）。もどったらメニューに戻る
+        NoteBook.OpenList(() =>
+        {
+            if(!isOpen || SceneFader.IsBusy) { return; }
+            lastToggleFrame = Time.frameCount;
+            ShowMenu(noteButton);
+        });
     }
 
     private void OnLoad()

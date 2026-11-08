@@ -494,6 +494,145 @@ public class ChaseAction : EnemyAction
 }
 
 //=====================================================================
+// 見ていない間に近づく（謎解き・2人の仕掛け 段階5）
+//=====================================================================
+
+/// <summary>
+/// 「見られている」の判定
+/// </summary>
+public enum WatchCheck
+{
+    [InspectorName("プレイヤーがこちらを向いている")]
+    Facing = 0,
+
+    [InspectorName("画面に映っている")]
+    OnScreen = 1,
+
+    [InspectorName("向いている、または画面に映っている")]
+    Either = 2,
+
+    [InspectorName("向いていて、画面にも映っている")]
+    Both = 3,
+}
+
+[Serializable, EnemyActionMenu("移動/見ていない間に近づく（像・人形）", 15)]
+public class UnseenApproachAction : EnemyAction
+{
+    [Label("見られている判定")]
+    [Tooltip("見られている間は止まり、見られていない間だけ近づく（Ib の像・だるまさんが転んだ）")]
+    public WatchCheck watch = WatchCheck.Facing;
+
+    [Label("プレイヤーの視野（度）", 1.0f, 360.0f)]
+    [Tooltip("プレイヤーの向いている方の、この角度の中にいると「見られている」")]
+    public float viewAngle = 140.0f;
+
+    [Label("プレイヤーから見える距離", 0.0f)]
+    [Tooltip("これより遠いと、向いていても見られていない")]
+    public float viewDistance = 10.0f;
+
+    [Label("壁の向こうは見えない")]
+    [Tooltip("オン：間に壁があると、向いていても見られていない")]
+    public bool wallBlocks = true;
+
+    [Label("近づく速さの倍率", 0.1f)]
+    public float speedMultiplier = 1.0f;
+
+    [Label("止まる距離", 0.0f)]
+    [Tooltip("プレイヤーにここまで近づいたら、この行動を終える（0 ならずっと近づく。体当たりのダメージで当てる）")]
+    public float stopDistance = 0.0f;
+
+    [Label("最長の時間（秒）", 0.0f)]
+    [Tooltip("この秒数で行動を終える（0 ならずっと）")]
+    public float maxSeconds = 0.0f;
+
+    [Label("見られたときの SE")]
+    [Tooltip("見られて止まった瞬間に鳴らす（ゴトッ）")]
+    public SeData frozenSe;
+
+    public override string Summary => "見ていない間に近づく";
+
+    protected override bool CanRunExtra(PatternRunner brain) => brain.Enemy != null;
+
+    public override IEnumerator Run(PatternRunner brain)
+    {
+        Enemy enemy = brain.Enemy;
+        float elapsed = 0.0f;
+        bool wasSeen = true;
+
+        while(maxSeconds <= 0.0f || elapsed < maxSeconds)
+        {
+            yield return null;
+            if(!brain.CanAct) { continue; }
+            elapsed += Time.deltaTime;
+
+            GameObject target = brain.Target;
+            if(target == null) { break; }
+            if(stopDistance > 0.0f && brain.DistanceToTarget <= stopDistance) { break; }
+
+            bool seen = IsWatched(brain, target);
+            if(seen)
+            {
+                if(!wasSeen) { SeManager.PlaySe(frozenSe, enemy.transform.position); }
+                enemy.Stop();
+            }
+            else
+            {
+                enemy.SpeedMultiplier = speedMultiplier;
+                enemy.MoveTo(target.transform.position, 0.1f);
+            }
+            wasSeen = seen;
+        }
+
+        enemy.SpeedMultiplier = 1.0f;
+        enemy.Stop();
+    }
+
+    /// <summary>
+    /// プレイヤーに見られているか
+    /// </summary>
+    public bool IsWatched(PatternRunner brain, GameObject target)
+    {
+        Vector2 me = brain.Position;
+        Vector2 player = target.transform.position;
+
+        bool facing = false;
+        if(watch != WatchCheck.OnScreen)
+        {
+            CharacterMovement movement = target.GetComponent<CharacterMovement>();
+            Vector2 look = movement != null ? movement.LastDirection : Vector2.down;
+            float distance = Vector2.Distance(me, player);
+            facing = distance <= viewDistance
+                && Vector2.Angle(look, me - player) <= viewAngle * 0.5f
+                && (!wallBlocks || brain.CanSeeTarget(viewDistance));
+        }
+
+        bool onScreen = false;
+        if(watch != WatchCheck.Facing)
+        {
+            Camera cam = Camera.main;
+            if(cam != null)
+            {
+                Vector3 vp = cam.WorldToViewportPoint(me);
+                onScreen = vp.x >= 0.0f && vp.x <= 1.0f && vp.y >= 0.0f && vp.y <= 1.0f;
+            }
+        }
+
+        switch(watch)
+        {
+            case WatchCheck.Facing:   return facing;
+            case WatchCheck.OnScreen: return onScreen;
+            case WatchCheck.Either:   return facing || onScreen;
+            default:                  return facing && onScreen;
+        }
+    }
+
+    public override void Cleanup(PatternRunner brain)
+    {
+        if(brain.Enemy != null) { brain.Enemy.SpeedMultiplier = 1.0f; }
+    }
+}
+
+//=====================================================================
 // 仲間を呼ぶ
 //=====================================================================
 

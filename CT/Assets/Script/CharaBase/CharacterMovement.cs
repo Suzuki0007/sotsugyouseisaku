@@ -30,6 +30,12 @@ public class CharacterMovement : CharaBase
 
     public Vector2 MoveDirection => moveDirection;
 
+    /// <summary>
+    /// 最後に動いた向き（止まっていても、最後に向いていた方。最初は下）
+    /// 「見ていない間に動く物」が、プレイヤーがどちらを向いているかを見るのに使う
+    /// </summary>
+    public Vector2 LastDirection { get; private set; } = Vector2.down;
+
     //=====================================================================
     // 初期化
     //=====================================================================
@@ -62,6 +68,7 @@ public class CharacterMovement : CharaBase
     {
         // 移動方向を正規化して設定する
         moveDirection = Vector2.ClampMagnitude(direction, 1f);
+        if(moveDirection.sqrMagnitude > 0.01f) { LastDirection = moveDirection.normalized; }
     }
 
     /// <summary>

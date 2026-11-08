@@ -53,13 +53,14 @@ public static class GameMenuBuilder
         var menuPanel = CreateImage("MenuPanel", root, new Color(0, 0, 0, 0.55f));
         Stretch(menuPanel.rectTransform);
         var box = CreateImage("Box", menuPanel.transform, new Color(0.08f, 0.08f, 0.12f, 0.96f));
-        SetRect(box.rectTransform, new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(560, 560));
+        SetRect(box.rectTransform, new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(560, 650));
         var title = CreateText("Title", box.transform, "メニュー", 44, TextAlignmentOptions.Center);
         SetRect(title.rectTransform, new Vector2(0.5f, 1f), new Vector2(0, -60), new Vector2(500, 70));
         var list = CreateRect("Buttons", box.transform);
-        SetRect(list, new Vector2(0.5f, 0.5f), new Vector2(0, -35), new Vector2(440, 380));
+        SetRect(list, new Vector2(0.5f, 0.5f), new Vector2(0, -35), new Vector2(440, 470));
         AddVerticalLayout(list, 16);
         Button item = CreateButton("ItemButton", list, "アイテム", 38);
+        Button note = CreateButton("NoteButton", list, "メモ", 38);
         Button load = CreateButton("LoadButton", list, "ロード", 38);
         Button titleBtn = CreateButton("TitleButton", list, "タイトルに戻る", 38);
         Button close = CreateButton("CloseButton", list, "とじる（Tab / Esc）", 32);
@@ -81,6 +82,7 @@ public static class GameMenuBuilder
         var so = new SerializedObject(menu);
         so.FindProperty("menuPanel").objectReferenceValue = menuPanel.gameObject;
         so.FindProperty("itemButton").objectReferenceValue = item;
+        so.FindProperty("noteButton").objectReferenceValue = note;
         so.FindProperty("loadButton").objectReferenceValue = load;
         so.FindProperty("titleButton").objectReferenceValue = titleBtn;
         so.FindProperty("closeButton").objectReferenceValue = close;

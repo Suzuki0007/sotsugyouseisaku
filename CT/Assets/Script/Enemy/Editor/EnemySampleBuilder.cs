@@ -192,6 +192,7 @@ public static class EnemySampleBuilder
         BuildStage4(swing);
         BuildStage5(swing);
         BuildStage6();
+        BuildWatcherSample();
 
         AssetDatabase.SaveAssets();
         AssetDatabase.Refresh();
@@ -622,6 +623,29 @@ public static class EnemySampleBuilder
                 Object.DestroyImmediate(root);
             }
         }
+    }
+
+    //=====================================================================
+    // 謎解き 段階5：見ていない間に動く像
+    //=====================================================================
+
+    private static void BuildWatcherSample()
+    {
+        EnemyPattern watcher = Pattern("Pattern_Sample_見ていない間に近づく（像）", p =>
+        {
+            p.phases[0].actions.Add(new UnseenApproachAction { watch = WatchCheck.Facing, viewAngle = 140.0f, viewDistance = 12.0f });
+            p.memo = "プレイヤーが向いている間は止まり、背を向けている間だけ近づく（Ib の像）。触れるとダメージ";
+        });
+
+        EnemyData($"{Folder}/EnemyData_Sample_像.asset", "像（見ていない間に動く）", 99, 3.0f, EnemySize.Medium, watcher, so =>
+        {
+            // どの攻撃も効かない
+            SerializedProperty rules = so.FindProperty("damageRules");
+            rules.arraySize = 1;
+            SetRule(rules.GetArrayElementAtIndex(0), DamageKindFilter.Any, CharacterFilter.Any, GaugeJudge.None, 0.0f);
+            so.FindProperty("contactDamage").intValue = 1;
+            so.FindProperty("memo").stringValue = "見ていない間に近づく像。攻撃は効かない（逃げるか、仕掛けで止める）。「敵に命令」で止める・消すこともできる";
+        });
     }
 
     private static EnemyPart MakePart(GameObject root, string name, Vector2 offset, float radius, Sprite sprite, Color color, int order, EnemyPartType type, System.Action<SerializedObject> setup)

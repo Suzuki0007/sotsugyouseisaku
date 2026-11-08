@@ -52,7 +52,7 @@
 | ファイル | 役割 | 状態 |
 |---|---|---|
 | `ObjectBase/ObjectBase.cs` → `CharaBase/CharaBase.cs` | 共通の基底（中身は空の Start / Update） | ○ |
-| `CharaBase/CharacterMovement.cs` | Rigidbody2D.MovePosition で移動 | ◎ |
+| `CharaBase/CharacterMovement.cs` | Rigidbody2D.MovePosition で移動。`LastDirection`（最後に動いた向き。見ていない間に動く像が使う） | ◎ |
 | `Player/PlayerMovement.cs` | 操作できるかのフラグを追加 | ◎ |
 | `Player/PlayerInput.cs` | キー入力 → 操作中キャラの移動、Q で弾消し、**マウスの左クリックで射撃**（操作中のキャラに SigleShooter があれば。Update で直接読む。Target Camera が空ならメインカメラ。`OnShot` は Input System のイベント用に残しているが未使用） | ◎ |
 | `Manager/PlayerSwitchManager.cs` | Noah / Sigle の切り替え（位置の入れ替え、追従、カメラ）、`Warp`。**2人の状態** `PartyMode`（一緒／待機／別行動。`SetMode`、`ModeChanged`・`Switched` イベント）：一緒のときだけ位置を入れ替え・相棒がついてくる（待機・別行動は `PlayerFollower.Hold`、カメラだけ移る）。一緒に戻ると相棒が合流（道があれば歩く）。**待て／ついてこい**（F キー、`ToggleWait`・`TrySetMode(..., requireRoute)`・`CanPartnerReach`・`WaitCommandLocked`）。体の当たり判定（`ApplyBodyCollision`：ついてきている間だけプレハブのまま＝シグルは無効）。体力の共有（一緒＝ノア → シグル、離れる＝別々）、`PartyHealth`（一緒＝シグル、離れる＝操作中のキャラ）、`HealthOf` | ◎ |
@@ -115,10 +115,10 @@
 | `Talk/` | `DialogueManager.cs`、`Dialogue.cs`、`DialogueData.cs`、`DialogueEventAction.cs`、`CharacterProfile.cs`、`Expression.cs`、🛠`Editor/DialogueCsv.cs` |
 | `Save/` | `Save.cs`（スロット・仮置き・確定・書き込み）、`AutoSave.cs`（旧ファイルの引き継ぎ・エディタでの直接再生・シーン読み込み時と終了時の書き込み）、`GameSession.cs`（はじめから・つづきから・タイトルへ・プレイ時間・再開場所の記録）、`SaveSlotInfo.cs`（Meta キーとスロットの概要）、`PlayTimeCounter.cs` |
 | `Title/` | `TitleMenu.cs`（タイトル画面）、`SaveSlotButton.cs`（スロット1つ分の表示）、`ReturnToTitleButton.cs`（ボタンからタイトルへ）、🛠`Editor/TitleSceneBuilder.cs`（Title.unity を作る） |
-| `UI/GameMenu/` | `GameMenu.cs`（Tab のメニュー：アイテム・ロード・タイトルへ、セーブポイントからのセーブの流れ、メッセージ）、🛠`Editor/GameMenuBuilder.cs`（`Resources/UI/GameMenu.prefab` を作る） |
+| `UI/GameMenu/`（メニューに「メモ」：`noteButton`、`NoteBook.OpenList`）  | `GameMenu.cs`（Tab のメニュー：アイテム・ロード・タイトルへ、セーブポイントからのセーブの流れ、メッセージ）、🛠`Editor/GameMenuBuilder.cs`（`Resources/UI/GameMenu.prefab` を作る） |
 | `UI/Common/` | `SaveSlotPanel.cs`（セーブデータ選択画面。NewGame / Continue / Load / Save）、`ConfirmDialog.cs`（はい／いいえ。左右移動は2つの間だけ）、`UISubmitKeys.cs`（UI の決定に Space を足す・キー操作で選択が動いたら選択の SE。起動時に自動生成）、`UISound.cs` / `UISoundSettings.cs`（UI の効果音。`Resources/UISounds.asset`）、`UIButtonSound.cs`（ボタンに付けると押したときに鳴る）、🛠`Editor/UISoundGenerator.cs`（仮の電子音を `Assets/SE/UI/` に作る）、`PlaceNameTable.cs`（場所の表示名、`Resources/PlaceNames.asset`）、🛠`Editor/MenuUIBuilder.cs`（メニュー系 UI を作る共通処理） |
 | `SavePoint/` | `SavePoint.cs`（調べるとセーブ。Intaractable。戦闘エリアの戦闘中はセーブできない）、🛠`Editor/SavePointCreator.cs`（Hierarchy 右クリック > セーブポイント） |
-| `Common/InputBlock.cs` | プレイヤーの操作を止める判定（会話・暗転・アイテム画面・イベント・メニュー） |
+| `Common/InputBlock.cs` | プレイヤーの操作を止める判定（会話・暗転・アイテム画面・イベント・メニュー・謎解きの画面） |
 | `Intaract/Intaractable.cs` | 「調べる」の基底（範囲に入って E）。範囲の中のプレイヤーを覚え、**操作中のキャラだけ**を player にする（ついてくる相棒・待たせている相棒には反応しない。キャラを切り替えると入れ直す）。`OnPlayerEnter` / `OnPlayerExit` も操作中のキャラだけ（謎解き段階3） |
 | `Manager/InventoryManager.cs` | 所持品（シングルトン、シーンをまたぐ、セーブ） |
 | `Key/KeyItem.cs`、`Treasure/Treasure.cs` | 古い鍵・宝箱（NoahData.hasKey を使う）。ItemInteraction で同じことができる | △（シーンで使用中） |
@@ -161,8 +161,14 @@
 | `Party/LiftPoint.cs` | 持ち上げる場所（GimmickInteractable。移るキャラ・行き先・相棒の手伝いが要るか。弧を描いて移り、手伝った相棒は待機、移ったキャラを操作） |
 | `Party/PartyHint.cs`、`PartyHintView.cs`、`PartyHintSettings.cs` | 相棒の目印（使えないキャラで近づくと「シグル」「ノア」の札。仕掛けが毎フレーム `Request`、`PartyHintView` が札を出し消し。設定は `Resources/PartyHints.asset`） |
 | 🛠`Party/Editor/PartyMenu.cs` | Hierarchy 右クリック > 仕掛け > 2人 > 狭い通路／壊せる壁／条件で見える物／持ち上げる場所、Tools > 仕掛け > 相棒の目印の設定を作る |
+| `Gimmick/UI/PuzzleUI.cs`、`PuzzleUISettings.cs` | **謎解きの画面**（段階5。必要なときに作る uGUI〔DontDestroyOnLoad、並び順 550〕）。`OpenCode`（番号錠：←→ 桁・↑↓ 変える）、`OpenChoice`（リストから選ぶ。絵つき）、`OpenText`（文章。TMP のページ）。`IsOpen` / `IsBusy`（InputBlock）。見た目は `Resources/PuzzleUI.asset` |
+| `Gimmick/CodeLock.cs` | **番号錠**（使える文字・答え・前の入力を覚える。正解で GimmickState を ON・固定） |
+| `Gimmick/Note/`（`NoteData`・`NoteBook`・`NotePickup`・`NoteEventAction`） | **メモ**。NoteData は `Resources/Notes/`。持っているかは `Note/<ID>`。`NoteBook.OpenList`（メニューの「メモ」：一覧 → 読む → 一覧へ戻る） |
+| `Gimmick/ExamineSequence.cs` | **調べるたびに変わる**（N 回目のイベント・最後まで行ったら・回数を GimmickState に出す・`Examine/<シーン>/<ID>`） |
+| `Gimmick/Death/`（`InstantDeath`・`DeathTrap`・`DeathEventAction`・`RetryPoint`） | **即死とやり直し**。RetryPoint：入ると Save.Commit・やり直す位置・一時フラグの写し（static。シーンをまたがない）。InstantDeath：演出を待って、やり直す＝仮置きを捨てる・フラグと所持品を戻す・同じシーンを読み直してやり直す位置から（記録がなければセーブの再開位置）／ゲームオーバー＝今の体力を 0 に |
 | `Gimmick/GimmickInteractable.cs` | 調べる仕掛けの共通の土台（Intaractable を継承。範囲の中の操作中のキャラだけ、相棒が出たときに操作中のキャラを入れ直す、断るときの反応）。GimmickSwitch・ItemSocket が継承 |
 | `Gimmick/GimmickEventAction.cs` | イベントの部品「仕掛けを操作」（ON・OFF・切り替え・次へ・値・戻す・固定・固定を外す・答え合わせ・入力を戻す。固定されていても変える） |
+| 🛠`Gimmick/Editor/PuzzleMenu.cs` | Hierarchy 右クリック > 仕掛け > 謎解き > 番号錠／メモ／調べるたびに変わる／即死の罠／やり直す位置、Tools > 仕掛け > 謎解きの画面の設定を作る、Tools > メニュー画面 > メニューに「メモ」を足す（プレハブを作り直さずにボタンを足す） |
 | 🛠`Gimmick/Editor/GimmickWiring.cs`、`GimmickMenu.cs` | 配線の表示（シーンの全 MonoBehaviour の GimmickState への参照を矢印で。選んだ物につながる線だけ／Tools > 仕掛け > 配線をいつも全部表示）。Hierarchy 右クリック > 仕掛け > …（選んだスイッチを条件・入力に入れる。`FirstCallThisClick` で複数選択でも 1 回） |
 | 🛠`Flag/Editor/`、`Item/Interaction/Editor/`、`UI/ItemMenu/Editor/`、`Event/EventProcess/Editor/` | ひな形・一覧・Inspector |
 | `Singleton/Singleton.cs` | `Singleton<T>`（`persistAcrossScenes` でシーンをまたぐ） |

@@ -47,6 +47,9 @@ MonoBehaviour:
       partyHealth: 0
       partyHealthRatio: 0
       area: {fileID: 0}
+      gimmicks: []
+      party: 0
+      partnerWithin: 0
     animation: {fileID: 0}
     useTint: 1
     tint: {r: 1, g: 0.55, b: 0.55, a: 1}
@@ -68,6 +71,9 @@ MonoBehaviour:
       partyHealth: 0
       partyHealthRatio: 0
       area: {fileID: 0}
+      gimmicks: []
+      party: 0
+      partnerWithin: 0
     animation: {fileID: 0}
     useTint: 1
     tint: {r: 0.5, g: 0.9, b: 1, a: 1}
@@ -89,6 +95,9 @@ MonoBehaviour:
       partyHealth: 0
       partyHealthRatio: 0
       area: {fileID: 0}
+      gimmicks: []
+      party: 0
+      partnerWithin: 0
     animation: {fileID: 0}
     useTint: 1
     tint: {r: 1, g: 1, b: 0.4, a: 1}

@@ -232,6 +232,48 @@ public static class SceneChecker
             if(!hasTrigger) { ctx.Add(Level.Error, lift, "持ち上げる場所に Is Trigger の Collider2D（調べる範囲）がありません"); }
         }
 
+        // 謎解き（段階5）
+        foreach(CodeLock code in ctx.Find<CodeLock>())
+        {
+            if(string.IsNullOrEmpty(code.Answer)) { ctx.Add(Level.Error, code, "番号錠の「答え」が空です"); }
+            else
+            {
+                foreach(char ch in code.Answer)
+                {
+                    if(code.Symbols.IndexOf(ch) < 0) { ctx.Add(Level.Error, code, $"番号錠の答えの「{ch}」が、使える文字（{code.Symbols}）にありません（正解できません）"); break; }
+                }
+            }
+        }
+
+        foreach(NotePickup note in ctx.Find<NotePickup>())
+        {
+            if(note.Note == null) { ctx.Add(Level.Error, note, "メモ（NotePickup）に NoteData が入っていません"); }
+            else if(!AssetDatabase.GetAssetPath(note.Note).StartsWith("Assets/Resources/Notes/")) { ctx.Add(Level.Warning, note, $"メモ「{note.Note.name}」が Assets/Resources/Notes/ の外にあります（メニューの「メモ」に出ません）"); }
+        }
+        foreach(NoteEventAction action in ctx.Find<NoteEventAction>())
+        {
+            if(action.Note == null) { ctx.Add(Level.Error, action, "「メモを渡す」に NoteData が入っていません"); }
+        }
+
+        foreach(ExamineSequence exam in ctx.Find<ExamineSequence>())
+        {
+            if(exam.Sequences.Count == 0) { ctx.Add(Level.Warning, exam, "調べるたびに変わる に、イベントが入っていません"); }
+        }
+
+        bool hasRetryPoint = ctx.Find<RetryPoint>().Count > 0;
+        foreach(DeathTrap trap in ctx.Find<DeathTrap>())
+        {
+            Collider2D c = trap.GetComponent<Collider2D>();
+            if(c != null && !c.isTrigger) { ctx.Add(Level.Error, trap, "即死の罠の Collider2D の Is Trigger がオフです（壁になって入れません）"); }
+            if(trap.Result == DeathResult.Retry && !hasRetryPoint) { ctx.Add(Level.Info, trap, "このシーンに「やり直す位置」がないので、即死したらセーブの再開する位置（シーンの入口・セーブポイント）からやり直します"); }
+        }
+
+        foreach(RetryPoint retry in ctx.Find<RetryPoint>())
+        {
+            Collider2D c = retry.GetComponent<Collider2D>();
+            if(c != null && !c.isTrigger) { ctx.Add(Level.Error, retry, "やり直す位置の Collider2D の Is Trigger がオフです"); }
+        }
+
         foreach(PartyRejoinArea rejoin in ctx.Find<PartyRejoinArea>())
         {
             Collider2D c = rejoin.GetComponent<Collider2D>();
