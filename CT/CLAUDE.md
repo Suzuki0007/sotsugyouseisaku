@@ -4,7 +4,9 @@
 主人公は **ノア（Noah）** と **シグル（Sigle）** の2人で、C キーで操作を切り替える。
 目標は「**プランナーがコードを書かずに Inspector だけで制作を進められる**」こと。
 
-最終更新：2026-11-08（①〜⑥の実装、既存の問題の修正、タイトル画面とセーブスロット、メニュー画面とセーブポイントまで）
+最終更新：2026-11-08（①〜⑥の実装、既存の問題の修正、タイトル画面とセーブスロット、メニュー画面とセーブポイント、敵の仕組みの段階0〔シグルの射撃・体力の共有〕まで）
+
+**進行中：敵の仕組み**（プランナーが敵・攻撃・行動パターン・ギミック連動・追跡などを Inspector だけで作れるように）。段階 0 前提の修正 → 1 土台（DamageInfo・攻撃を受ける部品・GameCondition・EnemyData・2D ナビメッシュ〔標準の NavMesh API + 2D コライダーから自作の収集。NavMeshAgent は使わず経路だけ計算し Rigidbody2D で動かす〕）→ 2 行動パターンと攻撃の基本 → 3 ギミック連動・攻撃の発生源 → 4 追跡 → 5 部位・ひるみ・見た目 → 6 倒した後・グループ → 7 ツールと資料。**1段階ずつ終わったら報告とコミットメッセージを渡す**。今は段階0まで完了。
 
 ---
 
@@ -68,7 +70,7 @@
 - `EventAction`：`Execute` / `Run`（コルーチン。待つ部品がオーバーライド）/ `OnExit` / `Restore`（セーブからの復元。見た目だけ）。
 - 部品：Dialogue / Se / SetActive / SpriteChange / Anim（終わるまで待てる）/ Effect / Bgm系 / ItemGive / ItemTake / SetFlag / **Wait**。
 - 注意：順番に実行中に、自分（か親）を非表示にすると途中で止まる（シーンチェックで検出）。
-- 入力停止の判定は `DialogueManager.IsBusy || SceneFader.IsBusy || ItemMenuUI.IsBusy || EventSequence.IsBusy` を各所（PlayerInput / AttackController / PlayerSwitchManager / Intaractable / ItemMenuUI）で見ている。
+- 入力停止の判定は `InputBlock.IsBlocked`（`Common/InputBlock.cs`）に一本化済み。PlayerInput / AttackController / PlayerSwitchManager / Intaractable / TimingGaugeUI がこれを見ている。
 
 ### アイテム連動（`Assets/Script/Item/`）
 - `ItemData`（`Assets/Resources/Items/` に置く必要あり）、`InventoryManager`（シングルトン、シーンをまたぐ）、`ItemPickup`。
@@ -111,14 +113,23 @@
 
 ## ファイル構成・全スクリプトの役割・問題点の一覧
 
+プログラマー向けの引き継ぎ資料（アイテム画面以降の変更の流れ・守る約束・よくある作業の手順・**各設計の理由**）は `Docs/引き継ぎ_アイテム画面以降の変更.md`。仕組みの変更が大きいときはそちらも更新し、新しい設計判断には「理由」「なぜこの形か」を書き足す。
+プランナー向けの通しの作業手順書（Unity の基本操作からイベントの組み立て・SE・BGM・明かり・マップ遷移・確認まで、練習問題つき）は `Docs/プランナー向け作業手順書.md`。11-06 に Artifact で作った個別の手順書（SE・暗闇・マップ遷移・BGM）の内容はここに取り込み済みで、食い違うときはこちらが新しい。
+共有用（Claude Docs）にも同じ内容を置いている：プランナー向け作業手順書 https://claude.ai/artifact/HawxoKhE7Pz73WdbUbxwt4 、引き継ぎ資料 https://claude.ai/artifact/MZz5A9WgmQNB8owyj3yxeW 。**Markdown と自動で同期はしない**ので、Markdown を大きく直したら共有用にも反映する（頼まれたとき）。**プランナー向けの機能を足したり、メニュー名・Inspector の項目名を変えたりしたら、個別の手順書に加えてこちらも更新する**（付録の早見表を含む）。
+
 詳しくは下の文書（自動で読み込まれる）。**コードやシーンを変えたら、この文書の表と問題点も更新する。**
 問題を直したら「4. 問題点」から消し、新しく見つけたら追加する。
 
 @Docs/code-map.md
 
 ### 問題点の要約（優先度の高いもの）
-- **会話フォント（NotoSansJP-Regular SDF）に文字が足りない**（「ジ」「停」「止」などが空白になる）。
+（2026-11-08 に全項目を再確認。全体は code-map.md の「4. 問題点」と、引き継ぎ資料の「8. 既知の問題（すべて）」）
+- **ノア・シグルのプレハブに FootstepSe がない**（足音が鳴らない。FootstepSe は Stage1_2 の動かない `Player` オブジェクトに付いている）。
+- `BgmProgress`（BGM の進行度）が再生ごとにリセットされず、セーブもされない。
 - `StageDarkness` の明かりが操作キャラに付いていかないことがある。
+- **敵**：移動が壁をすり抜ける（Behavior Graph の SetPositionToTarget）、会話・イベント中も撃ち続ける、スポナー経由でないと動かない（1スポナー1体）、倒しても何も起きない・セーブされない。プランナー向けの敵の仕組みは提案済み・未着手（11-08）。
+- シグル操作中も Space / R でノアの攻撃が出る（`AttackController` が操作中かを見ていない。意図か未確認）。
+- タイトルの SceneBgm に曲が入っていない（タイトルで BGM が鳴らない）。
 - `CheckPoint` がどのシーンにもない（再開はシーンの入口から）。
 - **`Behavior/Enemy/AbcdefuckAction.cs` に不適切な語**（未使用。提出前に削除推奨）。
 
@@ -135,4 +146,6 @@
 - 出現位置の Sigle 用の位置が効かない → 効くように（そこから歩いて付いてくる）。
 - 「続きから」がない・セーブが1つ・再開位置を記録しない → タイトル画面とスロット3つ（再開位置・プレイ時間・保存日時つき）。
 - 会話フォントの文字が足りない（アトラスが満杯）→ NotoSansJP-Regular SDF の Multi Atlas Textures をオン。
+- シグルが撃てない（SigleShooter なし・OnShot 未接続・Target Camera が空）→ プレハブに SigleShooter、`PlayerInput.Update` で左クリックを直接読む、カメラが空ならメインカメラ。
+- シグルに Health がない（ダメージなし・BGM の HP 条件が効かない）→ **2人で体力を共有**（`Health.ShareWith`。シグルが受けた攻撃はノアの体力から減る）。
 - `Stage1` / `Stage2` / `SampleScene` が Build Settings に入っていた → 外した。ゲームオーバー画面のリトライ先・SceneChange の SampleScene 参照も修正。

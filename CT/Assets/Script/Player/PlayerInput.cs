@@ -73,6 +73,9 @@ public class PlayerInput : CharaBase
 
         // 弾削除エリアの有効化を更新
         UpdateBulletDeleteAreaInput(currentPlayer);
+
+        // 射撃（マウスの左クリック）
+        UpdateShotInput(currentPlayer);
     }
 
     //=====================================================================
@@ -127,7 +130,20 @@ public class PlayerInput : CharaBase
     }
 
     /// <summary>
-    /// 弾の発射入力が行われたときに呼ばれる関数
+    /// マウスの左クリックで、操作中のキャラが SigleShooter を持っていれば撃つ
+    /// </summary>
+    /// 以前は Input System の PlayerInput コンポーネントのイベント（OnShot）から呼ぶ想定だったが、
+    /// そのコンポーネントがどこにもなく、一度も呼ばれていなかった。移動・Q と同じく、ここで直接読む
+    private void UpdateShotInput(GameObject currentPlayer)
+    {
+        if(Mouse.current == null) { return; }
+        if(!Mouse.current.leftButton.wasPressedThisFrame) { return; }
+
+        ShootAtMouse(currentPlayer);
+    }
+
+    /// <summary>
+    /// 弾の発射入力が行われたときに呼ばれる関数（Input System の PlayerInput コンポーネントを使う場合用。今は使っていない）
     /// </summary>
     /// <param name="context"></param>
     public void OnShot(InputAction.CallbackContext context)
@@ -138,24 +154,32 @@ public class PlayerInput : CharaBase
         // 会話中・シーン遷移中は撃たない
         if(InputBlock.IsBlocked) { return; }
 
-        if(targetCamera == null) { return; }
+        ShootAtMouse(playerSwitchManager.CurrentPlayer);
+    }
 
-        GameObject currentPlayer = playerSwitchManager.CurrentPlayer;
-        if(currentPlayer == null){ return; }
+    /// <summary>
+    /// マウスの位置へ撃つ
+    /// </summary>
+    private void ShootAtMouse(GameObject currentPlayer)
+    {
+        if(currentPlayer == null) { return; }
+        if(Mouse.current == null) { return; }
 
         SigleShooter shooter = currentPlayer.GetComponent<SigleShooter>();
         if(shooter == null) { return; }
 
+        // Target Camera が空なら、メインカメラを使う（シーンで設定し忘れても撃てるように）
+        Camera cam = targetCamera != null ? targetCamera : Camera.main;
+        if(cam == null) { return; }
+
         // マウスのスクリーン座標を取得
-        // ReadValue()を使用して、現在のマウス位置を取得
         Vector2 screenPosition = Mouse.current.position.ReadValue();
 
-        // カメラの位置を考慮してスク座をワル座に変換するために、カメラのZ座標を使用
-        Vector3 screenPoint = 
-            new Vector3(screenPosition.x, screenPosition.y, -targetCamera.transform.position.z);
+        // カメラの位置を考慮してスクリーン座標をワールド座標に変換するために、カメラのZ座標を使用
+        Vector3 screenPoint = new Vector3(screenPosition.x, screenPosition.y, -cam.transform.position.z);
 
         // スクリーン座標をワールド座標に変換
-        Vector3 worldPoint = targetCamera.ScreenToWorldPoint(screenPoint);
+        Vector3 worldPoint = cam.ScreenToWorldPoint(screenPoint);
 
         shooter.Shoot(worldPoint);
     }

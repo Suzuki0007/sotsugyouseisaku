@@ -1,6 +1,6 @@
 # コード構成と問題点（開発者・Claude 向け）
 
-最終更新：2026-11-07。CLAUDE.md から読み込まれる。コードを変えたら、この表も更新すること。
+最終更新：2026-11-08。CLAUDE.md から読み込まれる。コードを変えたら、この表も更新すること。
 ファイルの参照は `Assets/Script/` からの相対パス。行番号は目安。
 
 ---
@@ -17,7 +17,7 @@
 | `Assets/Images/`、`Assets/BGM/`、`Assets/SE/`、`Assets/Fonts/` | 素材 |
 | `Assets/res_kari/` | 仮素材（マップタイル約2000枚、仮プレイヤー画像など） |
 | `Assets/_Recovery/0.unity` | Unity のクラッシュ復旧で作られたシーン（不要なら削除してよい） |
-| `Docs/` | プランナー向け手順書と、この文書 |
+| `Docs/` | プランナー向け手順書（通しの手順書は `プランナー向け作業手順書.md`）、この文書、プログラマー向けの引き継ぎ資料（`引き継ぎ_アイテム画面以降の変更.md`） |
 
 ---
 
@@ -54,7 +54,7 @@
 | `ObjectBase/ObjectBase.cs` → `CharaBase/CharaBase.cs` | 共通の基底（中身は空の Start / Update） | ○ |
 | `CharaBase/CharacterMovement.cs` | Rigidbody2D.MovePosition で移動 | ◎ |
 | `Player/PlayerMovement.cs` | 操作できるかのフラグを追加 | ◎ |
-| `Player/PlayerInput.cs` | キー入力 → 操作中キャラの移動、Q で弾消し、マウスで射撃（OnShot は PlayerInput コンポーネントのイベントから呼ぶ） | ◎ |
+| `Player/PlayerInput.cs` | キー入力 → 操作中キャラの移動、Q で弾消し、**マウスの左クリックで射撃**（操作中のキャラに SigleShooter があれば。Update で直接読む。Target Camera が空ならメインカメラ。`OnShot` は Input System のイベント用に残しているが未使用） | ◎ |
 | `Manager/PlayerSwitchManager.cs` | Noah / Sigle の切り替え（位置の入れ替え、追従、カメラ）、`Warp` | ◎ |
 | `Player/PlayerHistory.cs`、`Player/PlayerFollower.cs` | 位置の履歴と、操作していない側の追従（何フレーム前の位置か） | ◎ |
 | `Player/PlayerMapLimit.cs` | Tilemap の範囲内に収める | ◎ |
@@ -82,7 +82,7 @@
 | `Behavior/Enemy/AbcdefuckAction.cs`、`SampleAction.cs` | 練習用ノード（どのグラフからも使われていない） | △ **削除推奨**（下記） |
 | `Spawner/ObjectSpawner.cs`、`Spawner/SpawnedObject.cs`、`Spawner/Enemy/EnemySpawner.cs` | 一定間隔で再出現 | ◎ |
 | `Spawner/Player/PlayerPartySpawner.cs`、`PlayerSpawnPoint.cs` | プレイヤーの生成と出現位置。出現位置に Sigle 用の位置があれば、Sigle はそこに出てノアの後ろへ歩いて付いていく（`PlayerHistory.SeedPath`） | ◎ |
-| `Health/Health.cs` | 体力、`OnDied` / `OnDamaged` / `OnHealed`、`Invincible` / `PlayerInvincible` | ◎ |
+| `Health/Health.cs` | 体力、`OnDied` / `OnDamaged` / `OnHealed`、`Invincible` / `PlayerInvincible`、**体力の共有**（`ShareWith`：受けたダメージ・回復を共有先へ回し、自分のイベントも出す。シグル → ノアは `PlayerPartySpawner` が設定） | ◎ |
 
 ### イベント・アイテム・フラグ・会話・セーブ（プランナー向けの中心）
 詳しくは CLAUDE.md の「主な仕組み」と各 Docs。
@@ -133,10 +133,22 @@
 
 優先度：**高** = 遊ぶと気づく不具合 ／ **中** = 条件次第で不具合・提出前に直したい ／ **低** = 整理・品質
 
+**2026-11-08 に全項目を再確認済み**（コードの検索、エディタでのシーンチェック〔Build Settings の4シーン〕・参照の空き・Missing Script・プレハブの構成の確認、再コンパイル）。再生しての確認はしていない。🆕 = この再確認で新しく見つけたもの。
+- 再コンパイル：エラー・警告なし。Missing Script：4シーン・全プレハブともなし。
+
 ### 不具合・不具合の可能性
 | 優先度 | 場所 | 内容 |
 |---|---|---|
+| **高** | `Prefab/Players/Player_Noah.prefab`、`Player_Sigle.prefab` | **FootstepSe が付いていない**ため足音が鳴らない。FootstepSe は Stage1_2 のルートの `Player`（Transform と FootstepSe だけの動かないオブジェクト）に付いている。11-06 の SE 手順書は「プレハブの FootstepSe に設定」と書いていた |
+| 中 | `Bgm/Effects/BgmProgress.cs` | 進行度（static）が `SubsystemRegistration` でリセットされない（ドメインリロード無効のエディタで前回の値が残る）。セーブもされず、はじめから・つづきからでも戻らない |
 | 中 | `StageDarkness/StageDarkness.cs` FindTarget | 明かりの追従先を `FindWithTag("Player")` の最初の1人で決めるため、キャラ切り替えで操作キャラに付いていかないことがある |
+| 中 | 🆕 敵の移動（`Behavior/Enemy/Behavior Graph.asset` の SetPositionToTarget、`Prefab/Enemies/Enemy.prefab`） | 「6秒撃つ → 3秒かけてプレイヤーの位置へ移動」の繰り返し。移動は transform を直接動かし、Rigidbody2D は Static なので**壁をすり抜け、プレイヤーと重なる**（接触ダメージはないので害は少ない） |
+| 中 | 🆕 敵の行動全般（`EnemyShotAction`、Behavior Graph） | 会話・イベント中も敵が動いて撃ち続ける（`InputBlock` を見ていない。メニュー・アイテム画面は timeScale = 0 なので止まる） |
+| 中 | 🆕 敵の配置（`Spawner/Enemy/EnemySpawner.cs`） | 敵はスポナー経由でないと動かない（狙う相手と弾のプールをスポナーが渡すため。シーンに直接置いた敵は撃たない）。1つのスポナーで同時に出せるのは1体だけ。Stage1_1 のスポナーは非アクティブ（敵が出ない） |
+| 低 | 🆕 `Attack/AttackController.cs` | 操作中のキャラかを見ていないため、シグル操作中も Space / R でノアの位置から攻撃が出る（Q の弾消しは操作中だけ）。意図した作りかは未確認 |
+| 低 | 🆕 Physics 2D の衝突設定 | Bullet と Bullet の衝突が無効になっているので、弾どうしはぶつからない（`BulletBase` などのコメント「弾どうしは今まで通り当たる」と食い違う） |
+| 低 | 🆕 敵を倒したとき（`Enemy/EnemyDead.cs`） | 消えるだけで、イベント・フラグ・アイテムのドロップにつなげられない。倒した記録もセーブされない（シーンに戻ると再出現） |
+| 低 | 🆕 `Prefab/Enemies/Enemy.prefab` | 見た目が仮（シグルの画像 `Sigle-front_0`）。SpriteAnimator がないので死亡アニメ（Dead）は流れない。`Behavior Graph.asset` の EnemyShot ノードに、コードから消えた `shootInterval` の値が残っている（害はない） |
 | 低 | `CheckPoint/CheckPoint.cs` | どのシーンにも置かれていない（自動セーブ用。手動セーブはセーブポイント） |
 | 低 | Stage1_1 / Stage1_2 の `SavePoint` | 位置と見た目は仮（入口の右・青い丸）。Stage1_1 は入口がマップ下端にあり、再開位置を下にずらすとマップ外になるので左にずらしている |
 | 低 | `UI/GameMenu/GameMenu.cs` | ゲームオーバー画面・タイトルでは開かない（プレイヤーがいるシーンだけ）。ゲームパッド操作は未対応（キーボード・マウスのみ） |
@@ -147,34 +159,38 @@
 | 低 | `Spawner/Player/PlayerPartySpawner.cs` Awake | 参照が足りなくてもエラーを出すだけで、Start に進んで NullReferenceException |
 | 低 | `Behavior/Enemy/EnemyShotAction.cs` | `EnemyShooter` がないと Log のあと OnUpdate で NullReferenceException |
 | 低 | `Spawner/Player/PlayerPartySpawner.cs` の `Sigle Spawn Point`（既定の出現位置） | 使われていない（Sigle は既定ではノアと同じ位置に出る）。Stage1_2 では Noah の既定位置から 5.8 離れた場所が入っている。出現位置ごとの Sigle の位置は `PlayerSpawnPoint` で設定できる |
-| 低 | `Player/PlayerInput.cs` Update | プレイヤー生成前（最初の数フレーム）に「CurrentPlayerがnullです」を毎フレーム LogError。OnShot は `Mouse.current` の null を見ていない |
+| 低 | `Player/PlayerInput.cs` Update | プレイヤー生成前（最初の数フレーム）に「CurrentPlayerがnullです」を毎フレーム LogError |
+| 低 | `Prefab/Players/Player_Sigle.prefab` の SigleShooter | Shot Se が空（射撃の音が鳴らない。撃ったときのエフェクトは仮で Fx_Sample_Muzzle）。音が決まったら入れる |
 | 低 | `CharaBase/CharacterSorting.cs` | `SetPlayer` が Start より後に呼ばれると `spriteRenderer` が null のまま |
 | 低 | `Player/PlayerFollower.cs`、`PlayerHistory.cs` | 追従の距離が「フレーム数」なので、fps が変わると距離が変わる。`RemoveAt(0)` を毎フレーム（1000件のリスト） |
 | 低 | `Player/PlayerMapLimit.cs`、`PlayerFollower.cs` | Rigidbody2D を使っているのに transform.position を直接書き換えている（物理と位置がずれることがある） |
 | 低 | `StateMachine/StateMachine.cs` Update | 状態が変わったフレームしか `Current.Update` を呼ばない（括弧の位置の誤り）。今は未使用 |
 | 低 | `Data/NoahData.cs` / `NoahInventory.GetKey(null)` | `hasKey` はセーブされない。ItemData なしで鍵を拾うと、シーン遷移後に鍵が消える |
+| 低 | 🆕 `Title.unity` の `System`（SceneBgm） | Default Clip が空なので、タイトルで BGM が鳴らない（ステージの曲はタイトルで止まる）。曲が決まったら入れる |
 
 ### 提出前に整理したいもの
 | 場所 | 内容 |
 |---|---|
 | `Behavior/Enemy/AbcdefuckAction.cs` | **クラス名とノードの文言に不適切な語が含まれている**（卒業制作として提出・公開する前に削除推奨。どのグラフでも未使用） |
 | `Behavior/Enemy/SampleAction.cs` | 練習用ノード（未使用。ブラックボードの値を書き換えて戻さない） |
-| `Intaract/Intaractable.cs:63` | Debug.Log「調べられるまする」（誤字、範囲に入るたびに出る） |
+| `Intaract/Intaractable.cs:58` | Debug.Log「調べられるまする」（誤字、範囲に入るたびに出る） |
 | 不要な using | `PlayerFollower`（Unity.AppUI.Redux）、`PlayerInput` / `NoahDead`（Unity.VisualScripting）、`AbcdefuckAction`（RuleTile） |
 | 使われていないクラス | `StateMachine/*`、`ComponentBase`、`FocusPlayer`、`SpriteAnimation`（Animator 版）、`kari/player/*`、`BgmProgressDebug`、`SePlayer`、`HealthSe`（シーン・プレハブに未配置） |
 | `Player_Noah/NoahBulletDeleteAreaController.cs` | ヘッダーの説明が「ノアのアニメーションクラス」になっている |
 | `Attack/AreaAttack.cs` | 命中のたびに Debug.Log。Health がない相手（壁など）に当たるたびにも Log |
 | `Bullet/BulletDeleteArea.cs` | `deleteRadius` は Gizmo の表示にしか使っておらず、実際の範囲は Collider の大きさ |
-| `Debug.Log` 全般 | 本番ビルド向けに整理が必要（約60か所） |
+| `Debug.Log` 全般 | 本番ビルド向けに整理が必要（エディタ拡張を除いて約40か所。LogWarning / LogError は別） |
 | `Assets/_Recovery/0.unity` | 復旧シーンの残り |
-| Visual Scripting | 「90 node options failed to load」（Regenerate Nodes） |
+| Visual Scripting | 以前「90 node options failed to load」（Regenerate Nodes）が出ていた。11-08 のエディタのログには出ていない（未確認） |
 
 ### シーンの設定
 | 場所 | 内容 |
 |---|---|
-| Stage1_1 / Stage1_2 / SampleScene の `MapEntity/OB_TRbox` | 宝箱の Id が空 |
-| 同じ3シーンの `Event`（ルート） | 中身が空の EventZone / EventSequence（害なし） |
+| Stage1_1 / Stage1_2 / SampleScene の `MapEntity/OB_TRbox` | 宝箱の Id が空（シーンチェックでエラー。ほかの宝箱と開いた記録が混ざる） |
+| 同じ3シーンの `Event`（ルート） | 中身が空の EventZone / EventSequence。Is Trigger の Collider2D もない（シーンチェックでエラー・注意が出るが、動作上の害はない。不要なら消す） |
 | Stage1_2 | 会話 UI がシーンの Canvas に直接組まれている（他のシーンは DialogueSystem.prefab）。揃えるなら置き換え |
+| 🆕 Stage1_2 のルートの `Player` | Transform と FootstepSe だけの動かないオブジェクト（上の「FootstepSe が付いていない」を参照）。プレハブに移したら消す |
+| Stage1_1 / Stage1_2 の `OtherSystem/SceneChange`、SceneGameOver の SceneChange | 遷移先が空（シーンチェックで「参考」）。死亡時・リトライでコードから `ChangeScene` を呼ぶためのもので、問題なし |
 
 ### 設計上の注意（不具合ではない）
 - ItemPickup / ItemInteraction / KeyItem は、ID が空だと階層パスでセーブする → 名前や親を変えると記録がリセットされる。
