@@ -157,6 +157,30 @@ public class SceneFader : MonoBehaviour
     }
 
     /// <summary>
+    /// シーンを変えずに、暗転 → atBlack を実行 → 明転 する（離れ離れのキャラの切り替えなど）
+    /// </summary>
+    /// <param name="atBlack"> 暗転しきったときに実行する処理 </param>
+    public void FadeThrough(System.Action atBlack, float outDuration = 0.2f, float inDuration = 0.25f)
+    {
+        if(IsFading) { atBlack?.Invoke(); return; }
+        StartCoroutine(FadeThroughRoutine(atBlack, outDuration, inDuration));
+    }
+
+    private IEnumerator FadeThroughRoutine(System.Action atBlack, float outDuration, float inDuration)
+    {
+        IsFading = true;
+        fadeImage.raycastTarget = true;
+
+        yield return Fade(0.0f, 1.0f, outDuration);
+        atBlack?.Invoke();
+        yield return null;
+        yield return Fade(1.0f, 0.0f, inDuration);
+
+        fadeImage.raycastTarget = false;
+        IsFading = false;
+    }
+
+    /// <summary>
     /// アルファ値を補間する (Time.timeScaleの影響を受けない)
     /// </summary>
     private IEnumerator Fade(float from, float to, float duration)

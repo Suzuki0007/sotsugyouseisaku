@@ -67,7 +67,9 @@
 | `Player/Player_Sigle/SigleShooter.cs` | Sigle の射撃（プール・SE・エフェクト） | ◎ |
 | `Player/FocusPlayer.cs`、`Player_Noah/NoahMapLimit.cs`、`Player_Noah/NoahHistory.cs` | 古い仕組み（Stage1 / Stage2 で使われている） | △ |
 | `CharaBase/CharacterSorting.cs` | Sigle の描画順を Noah との上下で切り替え | ○ |
-| `Camera/FocusCamera.cs` | プレイヤーを追い、Tilemap の範囲で止める | ◎ |
+| `Camera/FocusCamera.cs` | プレイヤーを追い、Tilemap の範囲で止める。**カメラの範囲**（`CameraArea`）の中ならその範囲で止める。`BeginBlend`（なめらかに移る。範囲が変わったとき・`SetTarget(t, true)`）、`LookAt`（決めた場所を映す）（謎解き段階4） | ◎ |
+| `Camera/CameraArea.cs` | カメラの範囲（Is Trigger の BoxCollider2D。`Find` で位置を含む範囲〔優先度〕） | ◎ |
+| `Camera/CameraLookEventAction.cs` | イベントの部品「カメラを向ける」（見せる場所・動く時間・見せる時間・戻す） | ◎ |
 
 ### 攻撃・弾・敵
 | ファイル | 役割 | 状態 |
@@ -121,7 +123,7 @@
 | `Manager/InventoryManager.cs` | 所持品（シングルトン、シーンをまたぐ、セーブ） |
 | `Key/KeyItem.cs`、`Treasure/Treasure.cs` | 古い鍵・宝箱（NoahData.hasKey を使う）。ItemInteraction で同じことができる | △（シーンで使用中） |
 | `CheckPoint/CheckPoint.cs` | 触れると再開する位置を記録して Commit + Write | ○（**どのシーンにも置かれていない**） |
-| `Scene/SceneChange.cs`、`Scene/SceneFader.cs` | 暗転つきシーン遷移（SceneFader は自動生成・シーンをまたぐ） | ◎ |
+| `Scene/SceneChange.cs`、`Scene/SceneFader.cs` | 暗転つきシーン遷移（SceneFader は自動生成・シーンをまたぐ。`FadeThrough`：シーンを変えずに暗転→処理→明転） | ◎ |
 | `UI/ItemMenu/ItemMenuUI.cs`、`ItemSlotUI.cs` | アイテム画面（Resources から自動生成）。メニュー画面から `OpenFromMenu` で開く（GameMenu がないときだけ Tab で直接開く） | ◎ |
 | `UI/Life/LifeUIController.cs` | ハートの表示。`PlayerCharacters.PartyHealth`（一緒＝シグルの体力、離れる＝操作中のキャラ）を見る。最大の体力の数だけハートを出す（足りなければ複製）。色で区別（一緒・ノア・シグル） | ◎ |
 
@@ -149,6 +151,9 @@
 | `Gimmick/PushBlock.cs`、`GimmickHole.cs`、`PushBlockResetEventAction.cs` | **押せる箱と穴**。箱：Kinematic、操作中のキャラが上下左右に「押し始めるまで」歩き続けると 1 マス（行き先を OverlapBox で確かめ、壁・箱・キャラ・敵があれば動かない。埋まっていない穴なら落ちて埋める）。押せるキャラ、位置と落ちたかをセーブ（`Block/<シーン>/<ID>`）、`ResetToHome`・`All`。穴：当たり判定で通れない、埋まると消える（GimmickState の ON）。イベントの部品「押せる箱を元に戻す」 |
 | `Gimmick/ItemSocket.cs` | **置き台**。アイテムをはめる（消費する／見せるだけ）、取り外せる、はめた物の絵（大きさを合わせる）、使えるキャラ |
 | `Gimmick/GimmickVisual.cs` | **状態で見た目を変える**。状態の値ごとに絵・色・表示する物・有効にする部品（燭台の火と LightSource など） |
+| `Party/PartyRejoinArea.cs` | 合流の範囲（2人がそろうと一緒に戻す・イベント・待て／ついてこいを使えるように・1回だけ `Rejoin/<シーン>/<ID>`） |
+| `Party/PartyWarpEventAction.cs` | イベントの部品「キャラを移す」（ノア・シグル・操作中・相棒を移す場所へ。暗転つき） |
+| `Party/PartyPersistence.cs` | 2人の状態のセーブ（`Save.BeforeCommit` で `Party/Mode`・`Current`・`Scene`・`PartnerX/Y`・`WaitLocked`）と復元（`PlayerPartySpawner` から。同じシーンのときだけ） |
 | `Party/PartyRoute.cs` | 相棒が合流する道（まっすぐ CircleCast で行けるか。通り抜けられる壁は無視 → ナビメッシュの回り道 → なければ来られない） |
 | `Party/CharacterBarrier.cs` | キャラによって通れる壁（通れるキャラの当たり判定と IgnoreCollision。0.5 秒ごとにかけ直す）。一緒のときに通れるキャラが入ると相棒を待機に。通れないキャラが触れると目印 |
 | `Party/BreakableWall.cs` | 壊せる壁（DamageReceiver。攻撃したキャラ・種類・ゲージ判定・回数。壊れると当たり判定を切り、絵を消す／差し替える。GimmickState の ON でセーブ） |

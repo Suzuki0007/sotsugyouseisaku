@@ -65,6 +65,55 @@ public class PlayerSwitchManager : Singleton<PlayerSwitchManager>
     [Tooltip("イベントで「一緒」に戻したとき、道があってこの距離より近ければ歩いて追いつく。遠い・道がなければ、操作しているキャラの位置へ移る")]
     private float rejoinWalkDistance = 10.0f;
 
+    [Header("離れているとき")]
+
+    [SerializeField, Label("切り替えの演出")]
+    [Tooltip("待機・別行動のときに C で切り替えたときのカメラ：すぐ／スライド（なめらかに移る）／暗転（別のエリアにいるとき向き）")]
+    private ApartSwitchStyle apartSwitchStyle = ApartSwitchStyle.Slide;
+
+    [SerializeField, Label("敵が狙う相手")]
+    [Tooltip("待機・別行動のときに敵が狙う相手：操作しているキャラだけ（待っている相棒は狙われない）／近い方（待っている相棒も狙われる）")]
+    private ApartEnemyTarget apartEnemyTarget = ApartEnemyTarget.Current;
+
+    public enum ApartSwitchStyle
+    {
+        [InspectorName("すぐ")]
+        Instant = 0,
+
+        [InspectorName("スライド（なめらかに移る）")]
+        Slide = 1,
+
+        [InspectorName("暗転")]
+        Fade = 2,
+    }
+
+    public enum ApartEnemyTarget
+    {
+        [InspectorName("操作しているキャラだけ")]
+        Current = 0,
+
+        [InspectorName("近い方（待っている相棒も狙われる）")]
+        Nearest = 1,
+    }
+
+    /// <summary>
+    /// 敵が狙う相手（敵の位置から）
+    /// ・一緒のとき・「操作しているキャラだけ」のときは操作しているキャラ
+    /// ・離れていて「近い方」のときは、ノアとシグルの近い方
+    /// </summary>
+    public GameObject EnemyTargetFrom(Vector2 position)
+    {
+        if(currentPlayer == null) { return null; }
+        if(mode == PartyMode.Together || apartEnemyTarget == ApartEnemyTarget.Current) { return currentPlayer; }
+
+        GameObject partner = Partner;
+        if(partner == null) { return currentPlayer; }
+
+        float toCurrent = Vector2.Distance(position, currentPlayer.transform.position);
+        float toPartner = Vector2.Distance(position, partner.transform.position);
+        return toPartner < toCurrent ? partner : currentPlayer;
+    }
+
     [Header("待て／ついてこい")]
 
     [SerializeField, Label("待て／ついてこいのキー")]
@@ -279,14 +328,17 @@ public class PlayerSwitchManager : Singleton<PlayerSwitchManager>
     /// </summary>
     public void SwitchPlayer()
     {
-        if(currentPlayer == noah)
+        GameObject next = currentPlayer == noah ? sigle : noah;
+        GameObject prev = currentPlayer == noah ? noah : sigle;
+
+        // 離れているときに「暗転」なら、暗転している間に切り替える
+        if(mode != PartyMode.Together && apartSwitchStyle == ApartSwitchStyle.Fade && !SceneFader.IsBusy)
         {
-            SwitchTo(sigle, noah);
+            SceneFader.Instance.FadeThrough(() => SwitchTo(next, prev));
+            return;
         }
-        else
-        {
-            SwitchTo(noah, sigle);
-        }
+
+        SwitchTo(next, prev);
     }
 
     /// <summary>
@@ -294,7 +346,17 @@ public class PlayerSwitchManager : Singleton<PlayerSwitchManager>
     /// </summary>
     /// <param name="newPlayer"> 切り替え後のプレイヤー </param>
     /// <param name="oldPlayer"> 切り替え前のプレイヤー </param>
-    private void SwitchTo(GameObject newPlayer, GameObject oldPlayer)
+    /// <summary>
+    /// 演出・SE なしで、操作するキャラを決める（セーブからの復元。離れているときに使う）
+    /// </summary>
+    public void SelectImmediate(GameObject target)
+    {
+        if(target == null || target == currentPlayer) { return; }
+        SwitchTo(target, currentPlayer, false);
+        focusCamera.SetTarget(currentPlayer.transform, false);
+    }
+
+    private void SwitchTo(GameObject newPlayer, GameObject oldPlayer, bool playSe = true)
     {
         // 一緒のときだけ位置を入れ替える（待機・別行動のときは、それぞれの場所のまま。カメラが相手へ移る）
         if(mode == PartyMode.Together)
@@ -323,12 +385,12 @@ public class PlayerSwitchManager : Singleton<PlayerSwitchManager>
         noahFollower.SetTarget(sigle);
         sigleFollower.SetTarget(noah);
 
-        // カメラの追従先を変更
-        focusCamera.SetTarget(currentPlayer.transform);
+        // カメラの追従先を変更（離れているときに「スライド」なら、なめらかに移る）
+        focusCamera.SetTarget(currentPlayer.transform, mode != PartyMode.Together && apartSwitchStyle == ApartSwitchStyle.Slide);
 
         ApplyFollow();
 
-        SeManager.PlaySe(switchSe, currentPlayer.transform.position);
+        if(playSe) { SeManager.PlaySe(switchSe, currentPlayer.transform.position); }
         Switched?.Invoke(currentPlayer);
     }
 

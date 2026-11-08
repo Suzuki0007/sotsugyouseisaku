@@ -1,4 +1,4 @@
-/*********************************************************************/
+﻿/*********************************************************************/
 // * \file   PatternRunner.cs
 // * \brief  行動パターンを実行する共通部分（敵の EnemyBrain と、見えない敵の AttackEmitter が使う）
 // *
@@ -92,7 +92,7 @@ public abstract class PatternRunner : MonoBehaviour
         get
         {
             PlayerSwitchManager manager = PlayerSwitchManager.Instance;
-            return manager != null ? manager.CurrentPlayer : null;
+            return manager != null ? manager.EnemyTargetFrom(transform.position) : null;
         }
     }
 

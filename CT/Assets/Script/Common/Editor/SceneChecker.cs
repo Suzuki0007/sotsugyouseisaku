@@ -232,6 +232,29 @@ public static class SceneChecker
             if(!hasTrigger) { ctx.Add(Level.Error, lift, "持ち上げる場所に Is Trigger の Collider2D（調べる範囲）がありません"); }
         }
 
+        foreach(PartyRejoinArea rejoin in ctx.Find<PartyRejoinArea>())
+        {
+            Collider2D c = rejoin.GetComponent<Collider2D>();
+            if(c != null && !c.isTrigger) { ctx.Add(Level.Error, rejoin, "合流の範囲の Collider2D の Is Trigger がオフです（キャラが入れません）"); }
+        }
+
+        var cameraAreas = ctx.Find<CameraArea>();
+        foreach(CameraArea area in cameraAreas)
+        {
+            BoxCollider2D box = area.GetComponent<BoxCollider2D>();
+            if(box != null && !box.isTrigger) { ctx.Add(Level.Warning, area, "カメラの範囲の BoxCollider2D の Is Trigger がオフです（再生すると自動でオンにしますが、編集中は壁になって見えます）"); }
+
+            // 小さすぎる範囲（カメラに映る広さより小さいと、真ん中に固定される）
+            Camera cam = Camera.main;
+            if(cam != null && box != null && cam.orthographic)
+            {
+                float h = cam.orthographicSize * 2.0f;
+                float w = h * cam.aspect;
+                Vector2 size = Vector2.Scale(box.size, area.transform.lossyScale);
+                if(size.x < w - 0.01f || size.y < h - 0.01f) { ctx.Add(Level.Info, area, $"カメラの範囲（{size.x:0.#}×{size.y:0.#}）が画面の広さ（{w:0.#}×{h:0.#}）より小さいので、中ではカメラが動きません（真ん中に固定）"); }
+            }
+        }
+
         foreach(ConditionalVisible visible in ctx.Find<ConditionalVisible>())
         {
             if(visible.Condition == null || visible.Condition.IsEmpty) { ctx.Add(Level.Warning, visible, "条件で見える物の「見える条件」が空です（いつも見えます）"); }

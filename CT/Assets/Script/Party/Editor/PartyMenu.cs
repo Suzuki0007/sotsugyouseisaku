@@ -115,6 +115,41 @@ public static class PartyMenu
     }
 
     //=====================================================================
+    // 離れ離れ：カメラの範囲・合流の範囲
+    //=====================================================================
+
+    [MenuItem("GameObject/仕掛け/2人/カメラの範囲（エリアごと）", false, 50)]
+    private static void PlaceCameraArea(MenuCommand command)
+    {
+        var go = new GameObject("カメラの範囲");
+        var box = go.AddComponent<BoxCollider2D>();
+        box.isTrigger = true;
+        box.size = new Vector2(20.0f, 12.0f);
+        go.AddComponent<CameraArea>();
+        GimmickMenu.Place(go, command, "カメラの範囲");
+    }
+
+    [MenuItem("GameObject/仕掛け/2人/合流の範囲", false, 51)]
+    private static void PlaceRejoin(MenuCommand command)
+    {
+        var go = new GameObject("合流の範囲");
+        var box = go.AddComponent<BoxCollider2D>();
+        box.isTrigger = true;
+        box.size = new Vector2(4.0f, 3.0f);
+
+        var child = new GameObject("合流したとき");
+        child.transform.SetParent(go.transform, false);
+        var sequence = child.AddComponent<EventSequence>();
+
+        var rejoin = go.AddComponent<PartyRejoinArea>();
+        var so = new SerializedObject(rejoin);
+        so.FindProperty("onRejoined").objectReferenceValue = sequence;
+        so.ApplyModifiedPropertiesWithoutUndo();
+
+        GimmickMenu.Place(go, command, "合流の範囲");
+    }
+
+    //=====================================================================
     // 目印の設定
     //=====================================================================
 

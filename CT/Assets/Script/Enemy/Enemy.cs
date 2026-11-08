@@ -1,4 +1,4 @@
-/*********************************************************************/
+﻿/*********************************************************************/
 // * \file   Enemy.cs
 // * \brief  敵の本体（データの反映・移動・経路・体当たり・倒されたとき）
 // *
@@ -181,7 +181,7 @@ public class Enemy : MonoBehaviour
         get
         {
             PlayerSwitchManager manager = PlayerSwitchManager.Instance;
-            return manager != null ? manager.CurrentPlayer : null;
+            return manager != null ? manager.EnemyTargetFrom(transform.position) : null;
         }
     }
 

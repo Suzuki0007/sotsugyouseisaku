@@ -163,5 +163,8 @@ public class PlayerPartySpawner : MonoBehaviour
         }
 
         playerSwitchManager.InitializePlayers(noah, sigle);
+
+        // 2人の状態（離れ離れ）を、同じシーンのセーブから戻す（つづきから・やり直しなど）
+        PartyPersistence.Restore(playerSwitchManager, sceneName);
     }
 }

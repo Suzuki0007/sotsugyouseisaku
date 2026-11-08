@@ -52,9 +52,9 @@ public class EnemyShooter : CharaBase
         if(EnemyBlock.IsBlocked) { return; }
 
         // スポナーから渡されていなくても（シーンに直接置いた敵でも）撃てるように、自分で探す
-        // 狙うのは今操作しているキャラ
+        // 狙うのは今操作しているキャラ（離れていて「近い方」の設定なら、近い方）
         PlayerSwitchManager manager = PlayerSwitchManager.Instance;
-        if(manager != null && manager.CurrentPlayer != null) { player = manager.CurrentPlayer; }
+        if(manager != null && manager.CurrentPlayer != null) { player = manager.EnemyTargetFrom(transform.position); }
         if(enemyBulletPool == null) { enemyBulletPool = FindAnyObjectByType<EnemyBulletPool>(); }
 
         if(player == null || enemyBulletPool == null) { return; }
