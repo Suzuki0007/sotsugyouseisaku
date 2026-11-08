@@ -5,8 +5,30 @@
 // * \author
 /*********************************************************************/
 
+using System;
 using System.Collections.Generic;
 using UnityEngine;
+
+/// <summary>
+/// 条件で動かす物 1 つ（扉が横にずれる・橋が伸びる・床が上がる）
+/// </summary>
+[Serializable]
+public class ReactionMove
+{
+    [Label("動かす物")]
+    public Transform target;
+
+    [Label("動かす距離")]
+    [Tooltip("満たしたときに、置いた位置からどれだけずらすか（マス）。満たさなくなったら戻る")]
+    public Vector2 offset = new Vector2(0.0f, 2.0f);
+
+    [Label("動く時間（秒）", 0.0f)]
+    [Tooltip("0 なら一瞬で動く")]
+    public float seconds = 0.6f;
+
+    [NonSerialized] public Vector3 home;
+    [NonSerialized] public bool ready;
+}
 
 /// <summary>
 /// 条件で動く物
@@ -40,6 +62,13 @@ public class GimmickReaction : MonoBehaviour
     [Tooltip("満たしているときに隠す物（満たしていないときは表示する）。例：閉じた扉")]
     private List<GameObject> hideWhenMet = new List<GameObject>();
 
+    [SerializeField]
+    [Tooltip("満たしているときに動かす物（扉が横にずれて開く・橋が伸びる）。満たさなくなったら戻る。当たり判定ごと動くので、敵の通り道も自動で変わる")]
+    private List<ReactionMove> moves = new List<ReactionMove>();
+
+    [SerializeField, Label("動き始めの SE")]
+    private SeData moveSe;
+
     [SerializeField, Label("満たしたときのイベント")]
     [Tooltip("満たした瞬間に実行する（扉が開く音・会話など）。セーブから戻ったときは、見た目だけ実行後の状態にする")]
     private EventSequence onMet;
@@ -69,6 +98,7 @@ public class GimmickReaction : MonoBehaviour
     public IReadOnlyList<GameObject> ShowWhenMet => showWhenMet;
     public IReadOnlyList<GameObject> HideWhenMet => hideWhenMet;
     public EventSequence OnMetSequence => onMet;
+    public IReadOnlyList<ReactionMove> Moves => moves;
 
     //=====================================================================
     // 更新
@@ -82,6 +112,16 @@ public class GimmickReaction : MonoBehaviour
         bool saved = latch && Save.Get(saveKey, false);
         met = saved || Evaluate();
         if(latch && met && !saved) { Save.SetPending(saveKey, true); }
+
+        // 動かす物：置いた位置を覚え、今の状態の位置へ一瞬で
+        foreach(ReactionMove m in moves)
+        {
+            if(m == null || m.target == null) { continue; }
+            m.home = m.target.position;
+            m.ready = true;
+            SetMovePosition(m, met ? m.home + (Vector3)m.offset : m.home);
+        }
+
         Apply();
         if(met && onMet != null) { onMet.Restore(gameObject); }
         initialized = true;
@@ -90,6 +130,7 @@ public class GimmickReaction : MonoBehaviour
     private void Update()
     {
         if(!initialized) { return; }
+        UpdateMoves();
         if(latch && met) { return; }
 
         bool now = Evaluate();
@@ -97,6 +138,7 @@ public class GimmickReaction : MonoBehaviour
 
         met = now;
         Apply();
+        if(moves.Count > 0) { SeManager.PlaySe(moveSe, transform.position); }
 
         if(met)
         {
@@ -107,6 +149,31 @@ public class GimmickReaction : MonoBehaviour
         {
             if(onUnmet != null) { onUnmet.Play(gameObject); }
         }
+    }
+
+    /// <summary>
+    /// 動かす物を、今の状態の位置へ少しずつ動かす
+    /// </summary>
+    private void UpdateMoves()
+    {
+        foreach(ReactionMove m in moves)
+        {
+            if(m == null || m.target == null || !m.ready) { continue; }
+
+            Vector3 goal = met ? m.home + (Vector3)m.offset : m.home;
+            Vector3 now = m.target.position;
+            if((now - goal).sqrMagnitude < 0.000001f) { continue; }
+
+            float speed = m.seconds > 0.0f ? m.offset.magnitude / m.seconds : float.MaxValue;
+            SetMovePosition(m, Vector3.MoveTowards(now, goal, speed * Time.deltaTime));
+        }
+    }
+
+    private static void SetMovePosition(ReactionMove m, Vector3 position)
+    {
+        m.target.position = position;
+        Rigidbody2D body = m.target.GetComponent<Rigidbody2D>();
+        if(body != null) { body.position = position; }
     }
 
     private bool Evaluate()

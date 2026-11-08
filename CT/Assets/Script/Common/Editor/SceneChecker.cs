@@ -116,7 +116,7 @@ public static class SceneChecker
                 ctx.Add(Level.Error, reaction, "条件で動く物の「仕掛け」の条件に、仕掛けが入っていない行があります（満たさないので動きません）");
             }
 
-            bool nothing = reaction.ShowWhenMet.Count == 0 && reaction.HideWhenMet.Count == 0 && reaction.OnMetSequence == null;
+            bool nothing = reaction.ShowWhenMet.Count == 0 && reaction.HideWhenMet.Count == 0 && reaction.OnMetSequence == null && reaction.Moves.Count == 0;
             if(nothing) { ctx.Add(Level.Warning, reaction, "条件で動く物に、表示を切り替える物もイベントも入っていません（満たしても何も起きません）"); }
 
             foreach(GameObject go in reaction.HideWhenMet)
@@ -154,6 +154,63 @@ public static class SceneChecker
         foreach(GimmickEventAction action in ctx.Find<GimmickEventAction>())
         {
             if(action.Target == null) { ctx.Add(Level.Error, action, "「仕掛けを操作」の仕掛けが空です"); }
+        }
+
+        foreach(FloorSwitch floor in ctx.Find<FloorSwitch>())
+        {
+            bool hasTrigger = false;
+            foreach(Collider2D c in floor.GetComponents<Collider2D>()) { if(c.isTrigger) { hasTrigger = true; } }
+            if(!hasTrigger) { ctx.Add(Level.Error, floor, "床スイッチに Is Trigger の Collider2D（乗る範囲）がありません"); }
+        }
+
+        foreach(ItemSocket socket in ctx.Find<ItemSocket>())
+        {
+            if(socket.Item == null) { ctx.Add(Level.Error, socket, "置き台に「はめるアイテム」が入っていません"); }
+            bool hasTrigger = false;
+            foreach(Collider2D c in socket.GetComponents<Collider2D>()) { if(c.isTrigger) { hasTrigger = true; } }
+            if(!hasTrigger) { ctx.Add(Level.Error, socket, "置き台に Is Trigger の Collider2D（調べる範囲）がありません"); }
+        }
+
+        foreach(GimmickHole hole in ctx.Find<GimmickHole>())
+        {
+            bool solid = false;
+            foreach(Collider2D c in hole.GetComponents<Collider2D>()) { if(!c.isTrigger) { solid = true; } }
+            if(!solid && new SerializedObject(hole).FindProperty("blocker").objectReferenceValue == null)
+            {
+                ctx.Add(Level.Warning, hole, "穴に当たり判定（Is Trigger オフの Collider2D）がありません（通れてしまい、箱も落ちません）");
+            }
+        }
+
+        var blockKeys = new Dictionary<string, PushBlock>();
+        foreach(PushBlock block in ctx.Find<PushBlock>())
+        {
+            BoxCollider2D col = block.GetComponent<BoxCollider2D>();
+            if(col != null && col.isTrigger) { ctx.Add(Level.Error, block, "押せる箱の BoxCollider2D の Is Trigger がオンです（押せません）"); }
+
+            Vector2 size = col != null ? Vector2.Scale(col.size, block.transform.lossyScale) : Vector2.zero;
+            if(size.x > block.CellSize + 0.01f || size.y > block.CellSize + 0.01f)
+            {
+                ctx.Add(Level.Warning, block, "押せる箱の当たり判定が「マスの大きさ」より大きいです（1 マス先がいつもふさがって押せないことがあります）");
+            }
+
+            var so = new SerializedObject(block);
+            if(so.FindProperty("save").boolValue)
+            {
+                string id = so.FindProperty("saveId").stringValue;
+                string path = block.name;
+                for(Transform p = block.transform.parent; p != null; p = p.parent) { path = p.name + "/" + path; }
+                string key = block.gameObject.scene.name + "/" + (string.IsNullOrEmpty(id) ? path : id);
+                if(blockKeys.TryGetValue(key, out PushBlock other)) { ctx.Add(Level.Error, block, $"押せる箱のセーブの名前が「{other.name}」と重なっています（同じ名前の箱が同じ親の下にある）。セーブ用の ID を付けてください"); }
+                else { blockKeys[key] = block; }
+            }
+        }
+
+        foreach(GimmickVisual visual in ctx.Find<GimmickVisual>())
+        {
+            if(visual.State == null && visual.GetComponentInParent<GimmickState>() == null)
+            {
+                ctx.Add(Level.Error, visual, "状態で見た目を変える部品に、仕掛けの状態がありません（同じオブジェクトか親に GimmickState、または欄に入れる）");
+            }
         }
     }
 

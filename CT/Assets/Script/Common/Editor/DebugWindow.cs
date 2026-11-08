@@ -411,6 +411,18 @@ public class DebugWindow : EditorWindow
             IReadOnlyList<GimmickState> states = GimmickState.All;
             if(states.Count == 0) { EditorGUILayout.LabelField("（このシーンに仕掛けはありません）", EditorStyles.miniLabel); }
 
+            if(PushBlock.All.Count > 0)
+            {
+                using(new EditorGUILayout.HorizontalScope())
+                {
+                    EditorGUILayout.LabelField("押せる箱", $"{PushBlock.All.Count} 個");
+                    if(GUILayout.Button(new GUIContent("全部元に戻す", "置いた位置に戻す（穴に落ちた箱はそのまま）"), EditorStyles.miniButton, GUILayout.Width(90)))
+                    {
+                        foreach(PushBlock block in new List<PushBlock>(PushBlock.All)) { if(block != null) { block.ResetToHome(); } }
+                    }
+                }
+            }
+
             foreach(GimmickState state in new List<GimmickState>(states))
             {
                 if(state == null) { continue; }
@@ -420,7 +432,8 @@ public class DebugWindow : EditorWindow
                 {
                     string label = (puzzle != null ? "答え合わせ：" : "") + state.DisplayName;
                     if(GUILayout.Button(label, EditorStyles.label, GUILayout.MinWidth(120))) { Selection.activeGameObject = state.gameObject; }
-                    EditorGUILayout.LabelField(state.ValueText + (state.Locked ? "（固定）" : ""), GUILayout.Width(80));
+                    string extra = state.Locked ? "（固定）" : (state.RemainingTime > 0.0f ? $"（あと {state.RemainingTime:0.0} 秒）" : "");
+                    EditorGUILayout.LabelField(state.ValueText + extra, GUILayout.Width(110));
 
                     if(puzzle != null)
                     {

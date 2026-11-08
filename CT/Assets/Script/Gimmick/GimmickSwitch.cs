@@ -34,7 +34,7 @@ public enum GimmickSwitchAction
 /// ・使えないキャラ・条件を満たさないときは、それぞれのイベント（会話など）を実行する（空なら「できない」音だけ）
 /// ・調べられるのは、範囲の中にいる「操作しているキャラ」だけ（ついてくる相棒・待たせている相棒では反応しない）
 [RequireComponent(typeof(GimmickState))]
-public class GimmickSwitch : Intaractable
+public class GimmickSwitch : GimmickInteractable
 {
     //=====================================================================
     // 変数
@@ -69,7 +69,6 @@ public class GimmickSwitch : Intaractable
     private EventSequence lockedSequence;
 
     private GimmickState state;
-    private Collider2D[] areas;
 
     //=====================================================================
     // プロパティ
@@ -83,25 +82,14 @@ public class GimmickSwitch : Intaractable
     // 関数
     //=====================================================================
 
-    private void Awake()
+    protected override void Awake()
     {
+        base.Awake();
         state = GetComponent<GimmickState>();
-        areas = GetComponents<Collider2D>();
     }
 
-    protected override void OnPlayerExit(GameObject exitedPlayer)
+    protected override void OnInteract(GameObject current)
     {
-        // ついてくる相棒が出ただけなら、操作しているキャラはまだ中にいる
-        GameObject current = CurrentPlayer;
-        if(current != null && current != exitedPlayer && IsInside(current)) { player = current; }
-    }
-
-    protected override void Interact()
-    {
-        // 調べられるのは、範囲の中にいる「操作しているキャラ」だけ
-        GameObject current = CurrentPlayer;
-        if(current == null || !IsInside(current)) { return; }
-
         if(!user.Allows(current))
         {
             Refuse(wrongCharacter);
@@ -128,27 +116,5 @@ public class GimmickSwitch : Intaractable
         }
 
         if(changed) { SeManager.PlaySe(useSe, transform.position); }
-    }
-
-    private void Refuse(EventSequence sequence)
-    {
-        if(sequence != null) { sequence.Play(gameObject); }
-        else                 { UISound.Play(UISoundType.Cannot); }
-    }
-
-    private static GameObject CurrentPlayer => PlayerSwitchManager.Instance != null ? PlayerSwitchManager.Instance.CurrentPlayer : null;
-
-    private bool IsInside(GameObject target)
-    {
-        if(areas == null || areas.Length == 0) { return true; }
-
-        Collider2D targetCollider = target.GetComponent<Collider2D>();
-        foreach(Collider2D area in areas)
-        {
-            if(area == null || !area.enabled || !area.isTrigger) { continue; }
-            if(area.OverlapPoint(target.transform.position)) { return true; }
-            if(targetCollider != null && area.IsTouching(targetCollider)) { return true; }
-        }
-        return false;
     }
 }

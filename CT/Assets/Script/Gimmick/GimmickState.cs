@@ -43,6 +43,19 @@ public class GimmickState : MonoBehaviour
     [Tooltip("状態が変わるたびに実行する（音・見た目の切り替えなど）。空でもよい")]
     private EventSequence onChanged;
 
+    [Header("時間で戻る")]
+
+    [SerializeField, Label("戻るまでの秒数", 0.0f)]
+    [Tooltip("最初の状態から変わったら、この秒数で最初の状態に戻る（時間制限のあるスイッチ）。0 なら戻らない。\n会話中などは時間が進まない。時間で戻る仕掛けは、シーンに入り直すと最初の状態から")]
+    private float resetAfter = 0.0f;
+
+    [SerializeField, Label("残り時間の音")]
+    [Tooltip("戻るまでの間、1 秒ごとに鳴らす（カチカチ）。空なら鳴らさない")]
+    private SeData tickSe;
+
+    [SerializeField, Label("戻ったときの音")]
+    private SeData resetSe;
+
     [Header("セーブ")]
 
     [SerializeField, Label("セーブする")]
@@ -56,6 +69,8 @@ public class GimmickState : MonoBehaviour
     private int value;
     private bool locked;
     private string saveKey;
+    private float resetTimer;
+    private int lastTick;
 
     private static readonly List<GimmickState> all = new List<GimmickState>();
 
@@ -87,6 +102,9 @@ public class GimmickState : MonoBehaviour
     /// <summary> 状態の表示（ON / OFF か 数字） </summary>
     public string ValueText => StateCount == 2 ? (IsOn ? "ON" : "OFF") : value.ToString();
 
+    /// <summary> 時間で戻るまでの残り秒数（戻らない・最初の状態なら 0） </summary>
+    public float RemainingTime => resetAfter > 0.0f && value != InitialValue && !locked ? Mathf.Max(0.0f, resetAfter - resetTimer) : 0.0f;
+
     /// <summary> シーンにある仕掛けの状態（デバッグ用） </summary>
     public static IReadOnlyList<GimmickState> All => all;
 
@@ -103,6 +121,26 @@ public class GimmickState : MonoBehaviour
         value = InitialValue;
         if(save) { value = Mathf.Clamp(Save.Get(saveKey, value), 0, StateCount - 1); }
         locked = save && Save.Get(saveKey + "/Locked", false);
+
+        // 時間で戻る仕掛けは、入り直したら最初の状態から（固定されたもの＝答え合わせが済んだものはそのまま）
+        if(resetAfter > 0.0f && !locked) { value = InitialValue; }
+    }
+
+    private void Update()
+    {
+        if(resetAfter <= 0.0f || locked || value == InitialValue) { return; }
+        if(InputBlock.IsBlocked) { return; }
+
+        resetTimer += Time.deltaTime;
+
+        int tick = Mathf.FloorToInt(resetTimer);
+        if(tick != lastTick) { lastTick = tick; SeManager.PlaySe(tickSe, transform.position); }
+
+        if(resetTimer >= resetAfter)
+        {
+            Set(InitialValue);
+            SeManager.PlaySe(resetSe, transform.position);
+        }
     }
 
     private void OnEnable()  { if(!all.Contains(this)) { all.Add(this); } }
@@ -134,6 +172,8 @@ public class GimmickState : MonoBehaviour
 
         value = newValue;
         if(save) { Save.SetPending(saveKey, value); }
+        resetTimer = 0.0f;
+        lastTick = 0;
 
         if(playEvent && onChanged != null) { onChanged.Play(gameObject); }
         Changed?.Invoke(this, value);
