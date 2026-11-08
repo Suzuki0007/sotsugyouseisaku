@@ -29,6 +29,7 @@ public class DebugWindow : EditorWindow
     private bool foldPlayer = true;
     private bool foldSave = true;
     private bool foldStart = true;
+    private bool foldEnemies = true;
 
     private string warpScene = "";
     private string warpSpawn = "";
@@ -85,6 +86,7 @@ public class DebugWindow : EditorWindow
             DrawFlags();
             DrawWarp();
             DrawPlayer();
+            DrawEnemies();
         }
 
         DrawStartState();
@@ -236,6 +238,50 @@ public class DebugWindow : EditorWindow
                     if(GUILayout.Button("1 ダメージ")) { health.Damage(1); }
                 }
                 Health.PlayerInvincible = EditorGUILayout.ToggleLeft("無敵（ダメージを受けない。シーンが変わっても続く）", Health.PlayerInvincible);
+            }
+        }
+        EditorGUILayout.EndFoldoutHeaderGroup();
+    }
+
+    //=====================================================================
+    // 敵
+    //=====================================================================
+
+    private void DrawEnemies()
+    {
+        foldEnemies = EditorGUILayout.BeginFoldoutHeaderGroup(foldEnemies, "敵");
+        if(foldEnemies)
+        {
+            EnemyBlock.StopAll = EditorGUILayout.ToggleLeft("敵を止める（動き・攻撃・体当たり）", EnemyBlock.StopAll);
+            NavMesh2D.ShowDebug = EditorGUILayout.ToggleLeft("歩ける範囲（水色）と敵の経路（黄色）を表示", NavMesh2D.ShowDebug);
+            if(NavMesh2D.ShowDebug && !NavMesh2D.Exists)
+            {
+                EditorGUILayout.HelpBox("このシーンでは、まだナビメッシュが作られていません（敵が経路を探すと作られます）", MessageType.None);
+            }
+
+            IReadOnlyList<Enemy> enemies = Enemy.All;
+            EditorGUILayout.LabelField("今いる敵（新しい作り）", $"{enemies.Count} 体");
+
+            foreach(Enemy enemy in enemies)
+            {
+                if(enemy == null) { continue; }
+
+                using(new EditorGUILayout.HorizontalScope())
+                {
+                    string label = enemy.Data != null ? enemy.Data.DisplayName : enemy.name;
+                    string hp = enemy.Health != null ? $"{enemy.Health.CurrentHealth}/{enemy.Health.MaxHealth}" : "-";
+                    if(GUILayout.Button(label, EditorStyles.label)) { Selection.activeGameObject = enemy.gameObject; }
+                    EditorGUILayout.LabelField(hp, GUILayout.Width(50));
+                    if(GUILayout.Button("倒す", GUILayout.Width(50)) && enemy.Health != null) { enemy.Health.Damage(enemy.Health.CurrentHealth); }
+                }
+            }
+
+            if(enemies.Count > 0 && GUILayout.Button("全部倒す"))
+            {
+                foreach(Enemy enemy in new List<Enemy>(enemies))
+                {
+                    if(enemy != null && enemy.Health != null) { enemy.Health.Damage(enemy.Health.CurrentHealth); }
+                }
             }
         }
         EditorGUILayout.EndFoldoutHeaderGroup();

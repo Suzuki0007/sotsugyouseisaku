@@ -232,7 +232,7 @@ public class TimingGaugeUI : MonoBehaviour
 
         // 判定結果に応じたダメージ倍率を計算し、範囲攻撃を開始
         float damageMultiplier = DamageMultiplierFromJudge(result);
-        if(areaAttack != null) { areaAttack.StartAttack(damageMultiplier); }
+        if(areaAttack != null) { areaAttack.StartAttack(damageMultiplier, DamageKind.GaugeAttack, ToGaugeJudge(result)); }
 
         // 一定時間後にゲージを非表示にする
         if(resultDisplayDuration > 0f)
@@ -242,6 +242,19 @@ public class TimingGaugeUI : MonoBehaviour
         }
 
         Debug.Log($"判定結果: {result} / ダメージ倍率: {damageMultiplier}");
+    }
+
+    /// <summary>
+    /// 判定結果を、攻撃の情報（DamageInfo）で使う形にする
+    /// </summary>
+    private static GaugeJudge ToGaugeJudge(JudgeResult result)
+    {
+        switch(result)
+        {
+            case JudgeResult.PERFECT: return GaugeJudge.Perfect;
+            case JudgeResult.GOOD:    return GaugeJudge.Good;
+            default:                  return GaugeJudge.Miss;
+        }
     }
 
     /// <summary>

@@ -37,12 +37,8 @@ public class PlayerBullet : BulletBase
         if(!isTarget && IgnoresTrigger(collision)) return;
         if(isTarget)
         {
-            Health health = collision.GetComponent<Health>();
-
-            if(health != null)
-            {
-                health.Damage(BulletDamage);
-            }
+            // DamageReceiver（部位など）があればそれ、なければ Health に当てる
+            DamageUtility.Apply(collision, DamageInfo.Create(BulletDamage, DamageKind.PlayerBullet, shooter, transform.position));
         }
 
         PlayHitEffect(collision, isTarget);

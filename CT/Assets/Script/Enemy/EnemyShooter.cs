@@ -45,10 +45,19 @@ public class EnemyShooter : CharaBase
 
     public void Shoot()
     {
-        if(player == null || enemyBulletPool == null) { return; }
-
         // 死亡アニメ中など、コンポーネントが止められているときは撃たない
         if(!enabled) { return; }
+
+        // 会話・イベント中などは撃たない
+        if(EnemyBlock.IsBlocked) { return; }
+
+        // スポナーから渡されていなくても（シーンに直接置いた敵でも）撃てるように、自分で探す
+        // 狙うのは今操作しているキャラ
+        PlayerSwitchManager manager = PlayerSwitchManager.Instance;
+        if(manager != null && manager.CurrentPlayer != null) { player = manager.CurrentPlayer; }
+        if(enemyBulletPool == null) { enemyBulletPool = FindAnyObjectByType<EnemyBulletPool>(); }
+
+        if(player == null || enemyBulletPool == null) { return; }
 
         // プールから弾を取得する
         EnemyBullet bullet = enemyBulletPool.GetBullet(transform.position, Quaternion.identity);

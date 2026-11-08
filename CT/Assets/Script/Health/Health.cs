@@ -19,7 +19,7 @@ public class Health : MonoBehaviour
     [SerializeField]
     private int maxHealth;
 
-    [SerializeField, InspectorName("体力を共有する相手")]
+    [SerializeField, Label("体力を共有する相手")]
     [Tooltip("ここに指定した Health と体力を共有する（受けたダメージ・回復はそちらに回る）。空なら自分の体力を使う。\nシグル → ノア は、プレイヤーを出すときに自動で設定される")]
     private Health shareWith;
 
@@ -36,6 +36,12 @@ public class Health : MonoBehaviour
 
     /// <summary> 回復したとき (引数: 実際に回復した量) </summary>
     public event System.Action<int> OnHealed;
+
+    /// <summary> ダメージを受けたとき (引数: 攻撃の情報。OnDamaged の直前に呼ばれる) </summary>
+    public event System.Action<DamageInfo> OnDamagedInfo;
+
+    /// <summary> 最後に受けた攻撃の情報（倒されたときに、何で倒されたかを見るのに使う） </summary>
+    public DamageInfo LastDamage { get; private set; }
 
     //=====================================================================
     // プロパティ
@@ -89,6 +95,17 @@ public class Health : MonoBehaviour
     }
 
     /// <summary>
+    /// 最大の体力を変える（敵のデータから設定するときなどに使う）
+    /// </summary>
+    /// <param name="value"> 新しい最大値（1 以上） </param>
+    /// <param name="refill"> 体力を最大まで戻すか </param>
+    public void SetMaxHealth(int value, bool refill = true)
+    {
+        maxHealth = Mathf.Max(1, value);
+        if(refill || currentHealth > maxHealth) { currentHealth = maxHealth; }
+    }
+
+    /// <summary>
     /// 体力を共有する相手を設定する（null で共有をやめる）
     /// </summary>
     /// 例：シグルの Health → ノアの Health。シグルが受けた攻撃はノアの体力から減る
@@ -114,8 +131,21 @@ public class Health : MonoBehaviour
         return true;
     }
 
+    /// <summary>
+    /// ダメージを受ける（攻撃の種類は「その他」）
+    /// </summary>
     public void Damage(int damage)
     {
+        Damage(DamageInfo.Simple(damage));
+    }
+
+    /// <summary>
+    /// 攻撃の情報つきでダメージを受ける
+    /// </summary>
+    public void Damage(DamageInfo info)
+    {
+        int damage = info.amount;
+
         if(IsDead) { return; }
         if(Invincible) { return; }
         if(PlayerInvincible && CompareTag("Player")) { return; }
@@ -125,9 +155,11 @@ public class Health : MonoBehaviour
         if(shareWith != null)
         {
             int before = shareWith.CurrentHealth;
-            shareWith.Damage(damage);
+            shareWith.Damage(info);
             if(shareWith.CurrentHealth >= before) { return; }    // 共有先が無敵などで減らなかった
 
+            LastDamage = info;
+            OnDamagedInfo?.Invoke(info);
             OnDamaged?.Invoke(damage);
             if(IsDead) { OnDied?.Invoke(); }
             return;
@@ -137,6 +169,8 @@ public class Health : MonoBehaviour
         if(CurrentHealth < 0) { CurrentHealth = 0; }
 
         // 被ダメージイベントをだす
+        LastDamage = info;
+        OnDamagedInfo?.Invoke(info);
         OnDamaged?.Invoke(damage);
 
         if(CurrentHealth <= 0)

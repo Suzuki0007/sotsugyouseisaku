@@ -81,17 +81,26 @@ public class EnemySpawner : ObjectSpawner
     {
         if(spawnedEnemy == null || player == null) { return; }
 
-        EnemyShooter enemyShooter = spawnedEnemy.GetComponent<EnemyShooter>();
-        if(enemyShooter == null) { Debug.LogError("生成した敵にEnemyShooterがアタッチされていません", spawnedEnemy); return; }
-
+        // 新しい作りの敵（Enemy）は、狙う相手を自分で探すので何もしなくてよい
+        // 古い作りの敵（Behavior Graph + EnemyShooter）には、今までどおり渡す。どちらも付いていなくてもエラーにしない
         BehaviorGraphAgent behaviorAgent = spawnedEnemy.GetComponent<BehaviorGraphAgent>();
-        if(behaviorAgent == null) { Debug.LogError("生成した敵にBehaviorGraphAgentがアタッチされていません", spawnedEnemy); return; }
+        if(behaviorAgent != null)
+        {
+            bool success = behaviorAgent.SetVariableValue("TargetPlayer", player);
+            if(!success) { Debug.LogError("BehaviorGraphAgentのTargetPlayer変数の設定に失敗しました", spawnedEnemy); }
+        }
 
-        bool success = behaviorAgent.SetVariableValue("TargetPlayer", player);
-        if(!success) { Debug.LogError("BehaviorGraphAgentのTargetPlayer変数の設定に失敗しました", spawnedEnemy); return; }
+        EnemyShooter enemyShooter = spawnedEnemy.GetComponent<EnemyShooter>();
+        if(enemyShooter != null)
+        {
+            enemyShooter.SetTargetPlayer(player);
+            enemyShooter.InitializeReference(player, bulletPool);
+        }
 
-        enemyShooter.SetTargetPlayer(player);
-        enemyShooter.InitializeReference(player, bulletPool);
+        if(behaviorAgent == null && enemyShooter == null && spawnedEnemy.GetComponent<Enemy>() == null)
+        {
+            Debug.LogWarning("生成したオブジェクトに Enemy（新しい敵）も BehaviorGraphAgent / EnemyShooter（古い敵）も付いていません", spawnedEnemy);
+        }
     }
 
     //====================================================================================

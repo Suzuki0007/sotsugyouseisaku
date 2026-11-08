@@ -71,6 +71,40 @@ public static class SceneChecker
         CheckActions(ctx);
         CheckSwitches(ctx);
         CheckDialogues(ctx);
+        CheckEnemies(ctx);
+    }
+
+    private static void CheckEnemies(Context ctx)
+    {
+        int enemiesLayer = LayerMask.NameToLayer("Enemies");
+
+        foreach(Enemy enemy in ctx.Find<Enemy>())
+        {
+            var so = new SerializedObject(enemy);
+            if(so.FindProperty("data").objectReferenceValue == null)
+            {
+                ctx.Add(Level.Error, enemy, "敵のデータ（EnemyData）が入っていません");
+            }
+
+            if(!enemy.CompareTag("Enemies") || enemy.gameObject.layer != enemiesLayer)
+            {
+                ctx.Add(Level.Warning, enemy, "タグかレイヤーが「Enemies」になっていません（ノアの範囲攻撃・シグルの弾が当たりません）");
+            }
+
+            if(enemy.GetComponentInChildren<Collider2D>(true) == null)
+            {
+                ctx.Add(Level.Error, enemy, "Collider2D がありません（攻撃が当たらず、壁もすり抜けます）");
+            }
+        }
+
+        foreach(EnemyNavArea area in ctx.Find<EnemyNavArea>())
+        {
+            Collider2D col = area.GetComponent<Collider2D>();
+            if(col != null && !col.isTrigger)
+            {
+                ctx.Add(Level.Warning, area, "敵の通行設定エリアの Collider2D の Is Trigger がオフです（プレイヤーも通れなくなります）");
+            }
+        }
     }
 
     private static void CheckSceneChanges(Context ctx)

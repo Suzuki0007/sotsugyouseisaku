@@ -44,12 +44,7 @@ public class EnemyBullet : BulletBase
         if(!isTarget && IgnoresTrigger(collision)) return;
         if(isTarget)
         {
-            Health health = collision.GetComponent<Health>();
-
-            if(health != null)
-            {
-                health.Damage(BulletDamage);
-            }
+            DamageUtility.Apply(collision, DamageInfo.Create(BulletDamage, DamageKind.EnemyBullet, shooter, transform.position));
         }
 
         PlayHitEffect(collision, isTarget);
