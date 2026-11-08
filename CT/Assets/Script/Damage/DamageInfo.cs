@@ -199,12 +199,18 @@ public static class PlayerCharacters
     }
 
     /// <summary>
-    /// パーティーの体力（2人で共有しているのでノアの Health）
+    /// 今の体力（ライフ表示・条件・戦闘エリアのダメージで使う）
+    /// 一緒：シグルの体力（2人で共有）／ 待機・別行動：操作しているキャラの体力
     /// </summary>
     public static Health PartyHealth
     {
         get
         {
+            PlayerSwitchManager manager = PlayerSwitchManager.Instance;
+            if(manager == null) { return null; }
+            if(manager.PartyHealth != null) { return manager.PartyHealth; }
+
+            // 初期化前
             GameObject noah = Get(PlayerCharacter.Noah);
             return noah != null ? noah.GetComponent<Health>() : null;
         }

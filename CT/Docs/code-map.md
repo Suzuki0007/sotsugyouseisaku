@@ -55,12 +55,13 @@
 | `CharaBase/CharacterMovement.cs` | Rigidbody2D.MovePosition で移動 | ◎ |
 | `Player/PlayerMovement.cs` | 操作できるかのフラグを追加 | ◎ |
 | `Player/PlayerInput.cs` | キー入力 → 操作中キャラの移動、Q で弾消し、**マウスの左クリックで射撃**（操作中のキャラに SigleShooter があれば。Update で直接読む。Target Camera が空ならメインカメラ。`OnShot` は Input System のイベント用に残しているが未使用） | ◎ |
-| `Manager/PlayerSwitchManager.cs` | Noah / Sigle の切り替え（位置の入れ替え、追従、カメラ）、`Warp` | ◎ |
+| `Manager/PlayerSwitchManager.cs` | Noah / Sigle の切り替え（位置の入れ替え、追従、カメラ）、`Warp`。**2人の状態** `PartyMode`（一緒／待機／別行動。`SetMode`、`ModeChanged`・`Switched` イベント）：一緒のときだけ位置を入れ替え・相棒がついてくる（待機・別行動は `PlayerFollower.Hold`、カメラだけ移る）。一緒に戻ると相棒が合流（近ければ歩く）。体力の共有（一緒＝ノア → シグル、離れる＝別々）、`PartyHealth`（一緒＝シグル、離れる＝操作中のキャラ）、`HealthOf` | ◎ |
+| `Party/PartyModeEventAction.cs` | イベントの部品「2人の状態を変える」（状態・操作するキャラ）。まだセーブしない | ◎ |
 | `Player/PlayerHistory.cs`、`Player/PlayerFollower.cs` | 位置の履歴と、操作していない側の追従（何フレーム前の位置か） | ◎ |
 | `Player/PlayerMapLimit.cs` | Tilemap の範囲内に収める | ◎ |
 | `Player/PlayerRuntimeInitializer.cs`、`Player/PlayerSceneContext.cs` | 生成したプレイヤーにシーンの参照を渡す | ◎ |
 | `Player/Player_Noah/NoahMovement.cs`、`NoahAnimation.cs` / `Player_Sigle/SigleMovement.cs`、`SigleAnimation.cs` | 古い向き切り替え（SpriteAnimator があれば何もしない） | △ |
-| `Player/Player_Noah/NoahDead.cs` | 死亡 → 死亡アニメ → `SceneGameOver` へ | ◎ |
+| `Player/Player_Noah/NoahDead.cs` | 死亡 → 死亡アニメ → `SceneGameOver` へ。相棒（シグル）の体力も見て、どちらが倒れてもゲームオーバー（倒れたキャラの死亡アニメ。`SetPartner`） | ◎ |
 | `Player/Player_Noah/NoahBulletDeleteAreaController.cs` | Q を押している間、弾消しエリアを出す（SE 付き） | ◎ |
 | `Player/Player_Noah/NoahInventory.cs`、`Data/NoahData.cs` | 鍵フラグ（`hasKey`）の古い仕組み | △（KeyItem・Treasure が使う） |
 | `Player/Player_Sigle/SigleShooter.cs` | Sigle の射撃（プール・SE・エフェクト） | ◎ |
@@ -71,7 +72,7 @@
 ### 攻撃・弾・敵
 | ファイル | 役割 | 状態 |
 |---|---|---|
-| `Attack/AttackController.cs` | キーで攻撃を始める基底 | ◎ |
+| `Attack/AttackController.cs` | キーで攻撃を始める基底。操作しているキャラの攻撃だけを出す | ◎ |
 | `Attack/Player/AreaAttackController.cs`、`Attack/AreaAttack.cs` | Space：Noah の周りに範囲攻撃（数フレーム判定）。攻撃の種類（範囲／ゲージ＋判定）つきで `DamageUtility.Apply`。同じ攻撃で同じ Health には1回だけ（本体と部位の二重ヒットを防ぐ）。ターゲットレイヤー（敵）に加え、レイヤーに関係なく `DamageReceiver` の付いた物（スイッチ・爆弾など）にも当たる | ◎ |
 | `Attack/Player/TimingGaugeAttackController.cs`、`UI/AttackArcGauge/TimingGaugeUI.cs` | R：ゲージ → Space で判定 → 倍率つきで範囲攻撃（判定待ちの間は `TimingGaugeUI.IsJudging` が true で、通常の Space 攻撃は出ない。会話・イベント中はゲージが止まる） | ◎ |
 | `Bullet/BulletBase.cs`、`Bullet/Player/PlayerBullet.cs`、`Bullet/Enemy/EnemyBullet.cs` | 弾（寿命・命中・エフェクト）。味方（敵の弾→Enemies、プレイヤーの弾→Player）と、イベントなどのトリガー範囲は通り抜ける。壁・相手・弾どうし・弾消しエリア・`DamageReceiver` の付いた物には当たる。`BulletBase.Configure`（1発だけ速さ・ダメージを変える）、`EnemyBullet.SetRules`（すり抜けるキャラ・弾消しで消せるか。取り出すたびに戻す） | ◎ |
@@ -99,7 +100,7 @@
 | `Spawner/ObjectSpawner.cs`、`Spawner/SpawnedObject.cs`、`Spawner/Enemy/EnemySpawner.cs` | 一定間隔で再出現（プレハブを出す古い作り。今もそのまま使える） | ◎ |
 | `Spawner/Enemy/EnemyDataSpawner.cs` | **敵のスポナー（新しい作り）**（段階7）。敵のデータを何種類でも（順番／重みつきランダム）、同時にいる数・合計・1回に出す数・最初と次までの秒数・出る場所（複数・ばらつき・プレイヤーから離す距離）・条件（GameCondition）・条件を外れたら消す・予告の丸・全部倒したらイベントとフラグ。`Enemy.Spawn` で出す。EnemyBlock の間は時間が進まない。Hierarchy 右クリック > 敵 > スポナー | ◎ |
 | `Spawner/Player/PlayerPartySpawner.cs`、`PlayerSpawnPoint.cs` | プレイヤーの生成と出現位置。出現位置に Sigle 用の位置があれば、Sigle はそこに出てノアの後ろへ歩いて付いていく（`PlayerHistory.SeedPath`） | ◎ |
-| `Health/Health.cs` | 体力、`SetDeadSilently`（イベントを出さずに 0 にする。倒した記録から戻すとき）、`OnDied` / `OnDamaged` / `OnHealed` / **`OnDamagedInfo`**（攻撃の情報つき）/ **`OnBlocked`**（効かなかった）、`DamageFilter`（受ける前に量を変える。0 以下なら OnBlocked だけ出して終わり）、`LastDamage`、`Damage(int)` と `Damage(DamageInfo)`、`SetMaxHealth`、`Invincible` / `PlayerInvincible`、**体力の共有**（`ShareWith`：受けたダメージ・回復を共有先へ回し、自分のイベントも出す。シグル → ノアは `PlayerPartySpawner` が設定） | ◎ |
+| `Health/Health.cs` | 体力、`SetDeadSilently`（イベントを出さずに 0 にする。倒した記録から戻すとき）、`OnDied` / `OnDamaged` / `OnHealed` / **`OnDamagedInfo`**（攻撃の情報つき）/ **`OnBlocked`**（効かなかった）、`DamageFilter`（受ける前に量を変える。0 以下なら OnBlocked だけ出して終わり）、`LastDamage`、`Damage(int)` と `Damage(DamageInfo)`、`SetMaxHealth`、`Invincible` / `PlayerInvincible`、**体力の共有**（`ShareWith`：受けたダメージ・回復を共有先へ回し、自分のイベントも出す。2人の状態が「一緒」のときノア → シグルを `PlayerSwitchManager` が設定、離れたら共有しない） | ◎ |
 
 ### イベント・アイテム・フラグ・会話・セーブ（プランナー向けの中心）
 詳しくは CLAUDE.md の「主な仕組み」と各 Docs。
@@ -122,7 +123,7 @@
 | `CheckPoint/CheckPoint.cs` | 触れると再開する位置を記録して Commit + Write | ○（**どのシーンにも置かれていない**） |
 | `Scene/SceneChange.cs`、`Scene/SceneFader.cs` | 暗転つきシーン遷移（SceneFader は自動生成・シーンをまたぐ） | ◎ |
 | `UI/ItemMenu/ItemMenuUI.cs`、`ItemSlotUI.cs` | アイテム画面（Resources から自動生成）。メニュー画面から `OpenFromMenu` で開く（GameMenu がないときだけ Tab で直接開く） | ◎ |
-| `UI/Life/LifeUIController.cs` | ハートの表示 | ◎ |
+| `UI/Life/LifeUIController.cs` | ハートの表示。`PlayerCharacters.PartyHealth`（一緒＝シグルの体力、離れる＝操作中のキャラ）を見る。最大の体力の数だけハートを出す（足りなければ複製）。色で区別（一緒・ノア・シグル） | ◎ |
 
 ### 演出（音・エフェクト・アニメ・明るさ）
 | フォルダ | 内容 | 手順書 |
@@ -168,7 +169,7 @@
 | 低 | 置いた爆弾（`PlacedBomb`） | 「触れたら爆発」はシグル（操作していない側）が触れても爆発する。ついてくるシグルが踏んで、すぐ爆発することがある（確認中に起きた） |
 | 低 | 敵のスポナー（`Spawner/Enemy/EnemySpawner.cs`） | 1つのスポナーで同時に出せるのは1体だけ。Stage1_1 のスポナーは非アクティブ（敵が出ない）。（スポナーなしでも敵は動くようになった） |
 | 低 | 🆕 `Enemy/Enemy.cs` の体当たり | プレイヤーに無敵時間がないため、体当たりのダメージは敵ごとの間隔（既定 1 秒）だけで決まる。敵が多いと連続で受ける。プレイヤー側の無敵時間を足すかは未定 |
-| 低 | 🆕 `Attack/AttackController.cs` | 操作中のキャラかを見ていないため、シグル操作中も Space / R でノアの位置から攻撃が出る（Q の弾消しは操作中だけ）。意図した作りかは未確認 |
+
 | 低 | 🆕 Physics 2D の衝突設定 | Bullet と Bullet の衝突が無効になっているので、弾どうしはぶつからない（`BulletBase` などのコメント「弾どうしは今まで通り当たる」と食い違う） |
 | 低 | **古い作りの敵**を倒したとき（`Enemy/EnemyDead.cs`） | 消えるだけで、イベント・フラグ・ドロップ・セーブにつなげられない（新しい作りの敵は段階6で対応済み） |
 | 低 | 🆕 落ちたアイテム（`Enemy/Defeat/DroppedItem.cs`） | セーブしないので、拾わずにシーンを出ると消える（手順書に「大事な物はすぐ持ち物に入れる／イベントで渡す」と書いた） |

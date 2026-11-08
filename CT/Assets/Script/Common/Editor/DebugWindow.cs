@@ -226,19 +226,37 @@ public class DebugWindow : EditorWindow
         if(foldPlayer)
         {
             PlayerSwitchManager manager = PlayerSwitchManager.Instance;
-            Health health = manager != null && manager.Noah != null ? manager.Noah.GetComponent<Health>() : null;
+            Health health = PlayerCharacters.PartyHealth;
 
-            if(health == null)
+            if(health == null || manager == null)
             {
                 EditorGUILayout.LabelField("（プレイヤーの Health が見つかりません）");
             }
             else
             {
-                EditorGUILayout.LabelField("体力", $"{health.CurrentHealth} / {health.MaxHealth}");
+                // 2人の状態
+                PartyMode mode = (PartyMode)EditorGUILayout.EnumPopup(new GUIContent("2人の状態", "一緒：相棒がついてくる・体力は共有（シグルの体力）／待機・別行動：相棒はその場・体力は別々"), manager.Mode);
+                if(mode != manager.Mode) { manager.SetMode(mode); }
+
+                Health noahHealth = manager.HealthOf(manager.Noah);
+                Health sigleHealth = manager.HealthOf(manager.Sigle);
+                string owner = manager.IsTogether ? "2人で共有（シグルの体力）" : (manager.CurrentPlayer == manager.Noah ? "ノア" : "シグル");
+                EditorGUILayout.LabelField("今の体力", $"{health.CurrentHealth} / {health.MaxHealth}　{owner}");
+                if(noahHealth != null && sigleHealth != null)
+                {
+                    // 一緒のときのノアの体力は共有先を見るので、自分の値は離れたときに使う値
+                    string noahOwn = manager.IsTogether ? "（離れたときに使う）" : "";
+                    EditorGUILayout.LabelField("　ノア／シグル", $"{(manager.IsTogether ? "-" : noahHealth.CurrentHealth.ToString())} / {noahHealth.MaxHealth}{noahOwn}　　{sigleHealth.CurrentHealth} / {sigleHealth.MaxHealth}", EditorStyles.miniLabel);
+                }
+
                 using(new EditorGUILayout.HorizontalScope())
                 {
-                    if(GUILayout.Button("全回復")) { health.Heal(health.MaxHealth); }
-                    if(GUILayout.Button("1 ダメージ")) { health.Damage(1); }
+                    if(GUILayout.Button("全回復（2人とも）"))
+                    {
+                        if(sigleHealth != null) { sigleHealth.Heal(sigleHealth.MaxHealth); }
+                        if(noahHealth != null && !manager.IsTogether) { noahHealth.Heal(noahHealth.MaxHealth); }
+                    }
+                    if(GUILayout.Button("1 ダメージ（今の体力）")) { health.Damage(1); }
                 }
                 Health.PlayerInvincible = EditorGUILayout.ToggleLeft("無敵（ダメージを受けない。シーンが変わっても続く）", Health.PlayerInvincible);
             }

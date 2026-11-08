@@ -139,11 +139,11 @@ public class PlayerPartySpawner : MonoBehaviour
 
         sigle.GetComponent<CharacterSorting>().SetPlayer(noah);
 
-        // 2人で体力を共有する（シグルが受けた攻撃はノアの体力から減る。ライフ表示・ゲームオーバーはノアの体力を見ている）
-        Health noahHealth = noah.GetComponent<Health>();
+        // 体力：一緒のときはシグルの体力を2人で共有（シグルがノアを守っている）、離れたら別々
+        // 共有の設定は PlayerSwitchManager が2人の状態に合わせて行う。ゲームオーバーは、どちらが倒れても起きるようにする
         Health sigleHealth = sigle.GetComponent<Health>();
         if(sigleHealth == null) { sigleHealth = sigle.AddComponent<Health>(); }
-        if(noahHealth != null) { sigleHealth.ShareWith(noahHealth); }
+        noah.GetComponent<NoahDead>().SetPartner(sigle);
 
         // Sigle の出現位置
         // ・出現位置に Sigle 用の位置が設定されていれば、そこに出して、ノアが動き出したらそこから歩いて付いてくる

@@ -31,6 +31,11 @@ public class PlayerFollower : CharaBase
     /// </summary>
     public int FollowFrames => Mathf.Max(1, (int)followDistance);
 
+    /// <summary>
+    /// その場で待つ（2人の状態が「待機」「別行動」のとき。PlayerSwitchManager が設定する）
+    /// </summary>
+    public bool Hold { get; set; }
+
     //=====================================================================
     // 関数
     //=====================================================================
@@ -56,7 +61,7 @@ public class PlayerFollower : CharaBase
     private void LateUpdate()
     {
         // 操作できるキャラクターは追従しない
-        if(playerMovement == null || targetHistory == null || playerMovement.CanControl)
+        if(playerMovement == null || targetHistory == null || playerMovement.CanControl || Hold)
         {
             return;
         }

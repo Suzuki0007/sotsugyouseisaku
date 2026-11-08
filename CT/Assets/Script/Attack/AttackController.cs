@@ -35,6 +35,10 @@ public class AttackController : CharaBase
         // 会話中・シーン遷移中は攻撃しない
         if(InputBlock.IsBlocked) { return; }
 
+        // 操作しているキャラの攻撃だけを出す（シグル操作中に、ノアの攻撃が出ないように）
+        PlayerSwitchManager manager = PlayerSwitchManager.Instance;
+        if(manager != null && manager.CurrentPlayer != null && manager.CurrentPlayer != gameObject) { return; }
+
         // 指定されたキーが押されたら攻撃を開始する
         if(Keyboard.current[attackKey].wasPressedThisFrame)
         {
