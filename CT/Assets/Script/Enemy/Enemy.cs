@@ -149,8 +149,104 @@ public class Enemy : MonoBehaviour
     // 初期化
     //=====================================================================
 
+    // Spawn で出すときに使うデータ（Awake より前に決める必要があるため）
+    private static EnemyData pendingSpawnData;
+
+    /// <summary>
+    /// 共通プレハブから敵を出す（仲間を呼ぶ・卵など）。プレハブは Resources/Enemies/Enemy_Base
+    /// </summary>
+    public static Enemy Spawn(EnemyData data, Vector2 position)
+    {
+        GameObject prefab = Resources.Load<GameObject>("Enemies/Enemy_Base");
+        if(prefab == null) { Debug.LogError("Resources/Enemies/Enemy_Base.prefab がないので、敵を出せません"); return null; }
+
+        pendingSpawnData = data;
+        GameObject go = Instantiate(prefab, new Vector3(position.x, position.y, 0.0f), Quaternion.identity);
+        pendingSpawnData = null;
+        return go.GetComponent<Enemy>();
+    }
+
+    //=====================================================================
+    // ギミックからの命令
+    //=====================================================================
+
+    private Coroutine pauseRoutine;
+    private Color? colorBeforePause;
+
+    /// <summary>
+    /// 止める・動かす（止めている間は色を変えられる。tint が null なら色はそのまま）
+    /// </summary>
+    public void SetPaused(bool paused, Color? tint = null)
+    {
+        if(pauseRoutine != null) { StopCoroutine(pauseRoutine); pauseRoutine = null; }
+        ApplyPaused(paused, tint);
+    }
+
+    /// <summary>
+    /// 秒数だけ止める（止められている間は数える。会話中などは数えない）
+    /// </summary>
+    public void PauseFor(float seconds, Color? tint = null)
+    {
+        if(pauseRoutine != null) { StopCoroutine(pauseRoutine); }
+        ApplyPaused(true, tint);
+        pauseRoutine = StartCoroutine(PauseRoutine(seconds));
+    }
+
+    private System.Collections.IEnumerator PauseRoutine(float seconds)
+    {
+        float elapsed = 0.0f;
+        while(elapsed < seconds)
+        {
+            if(!EnemyBlock.IsBlocked) { elapsed += Time.deltaTime; }
+            yield return null;
+        }
+        pauseRoutine = null;
+        ApplyPaused(false, null);
+    }
+
+    private void ApplyPaused(bool paused, Color? tint)
+    {
+        Paused = paused;
+        if(paused && brain != null) { brain.Interrupt(); }
+
+        SpriteRenderer sr = GetComponent<SpriteRenderer>();
+        if(sr == null) { return; }
+
+        if(paused && tint.HasValue)
+        {
+            if(!colorBeforePause.HasValue) { colorBeforePause = sr.color; }
+            sr.color = tint.Value;
+        }
+        else if(!paused && colorBeforePause.HasValue)
+        {
+            sr.color = colorBeforePause.Value;
+            colorBeforePause = null;
+        }
+    }
+
+    /// <summary>
+    /// 倒された演出なしで消す
+    /// </summary>
+    public void Remove()
+    {
+        Destroy(gameObject);
+    }
+
+    /// <summary>
+    /// 倒す（効き方の設定に関係なく。倒されたときの演出あり）
+    /// </summary>
+    public void Kill()
+    {
+        if(IsDead || health == null) { return; }
+        var filter = health.DamageFilter;
+        health.DamageFilter = null;
+        health.Damage(DamageInfo.Create(health.CurrentHealth, DamageKind.Other, null, transform.position));
+        health.DamageFilter = filter;
+    }
+
     private void Awake()
     {
+        if(pendingSpawnData != null) { data = pendingSpawnData; }
         rb = GetComponent<Rigidbody2D>();
         health = GetComponent<Health>();
         anim = GetComponent<SpriteAnimator>();

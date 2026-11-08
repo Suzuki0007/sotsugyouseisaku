@@ -116,6 +116,64 @@ public static class SceneChecker
             }
         }
 
+        foreach(AttackEmitter emitter in ctx.Find<AttackEmitter>())
+        {
+            var so = new SerializedObject(emitter);
+            if(so.FindProperty("emitterPattern").objectReferenceValue == null)
+            {
+                ctx.Add(Level.Warning, emitter, "攻撃の発生源に行動パターンが入っていません（何もしません）");
+            }
+            var area = so.FindProperty("condition").FindPropertyRelative("area").objectReferenceValue as Collider2D;
+            if(area != null && !area.isTrigger)
+            {
+                ctx.Add(Level.Warning, emitter, "攻撃の発生源の「プレイヤーがいる範囲」の Collider2D の Is Trigger がオフです（プレイヤーが通れません）");
+            }
+        }
+
+        var switchKeys = new Dictionary<string, AttackSwitch>();
+        foreach(AttackSwitch sw in ctx.Find<AttackSwitch>())
+        {
+            var so = new SerializedObject(sw);
+            if(so.FindProperty("sequence").objectReferenceValue == null)
+            {
+                ctx.Add(Level.Warning, sw, "攻撃で作動するスイッチに「実行するイベント」が入っていません（当たっても何も起きません）");
+            }
+            string key = AttackSwitch.MakeSaveKey(sw.gameObject, so.FindProperty("saveId").stringValue);
+            if(switchKeys.ContainsKey(key)) { ctx.Add(Level.Error, sw, $"攻撃で作動するスイッチのセーブ用の名前「{key}」が重なっています（ID を付けてください）"); }
+            else                            { switchKeys.Add(key, sw); }
+        }
+
+        foreach(EnemyCommandEventAction action in ctx.Find<EnemyCommandEventAction>())
+        {
+            var so = new SerializedObject(action);
+            if(so.FindProperty("enemies").arraySize == 0 && so.FindProperty("emitters").arraySize == 0)
+            {
+                ctx.Add(Level.Warning, action, "「敵に命令」の相手（敵・攻撃の発生源）が空です");
+            }
+            else if(HasNullElement(so.FindProperty("enemies")) || HasNullElement(so.FindProperty("emitters")))
+            {
+                ctx.Add(Level.Warning, action, "「敵に命令」の相手に空の欄があります");
+            }
+        }
+
+        foreach(EnemyDamageEventAction action in ctx.Find<EnemyDamageEventAction>())
+        {
+            var so = new SerializedObject(action);
+            if(so.FindProperty("enemies").arraySize == 0 && so.FindProperty("parts").arraySize == 0)
+            {
+                ctx.Add(Level.Warning, action, "「敵にダメージ」の相手（敵・部分）が空です");
+            }
+        }
+
+        foreach(DamageAreaEventAction action in ctx.Find<DamageAreaEventAction>())
+        {
+            var so = new SerializedObject(action);
+            if(so.FindProperty("attack").objectReferenceValue == null)
+            {
+                ctx.Add(Level.Error, action, "「ダメージエリアを出す」に攻撃が入っていません");
+            }
+        }
+
         foreach(EnemyNavArea area in ctx.Find<EnemyNavArea>())
         {
             Collider2D col = area.GetComponent<Collider2D>();
@@ -468,6 +526,14 @@ public static class SceneChecker
                     {
                         issues.Add(new Issue { level = Level.Error, target = pattern, message = $"行動パターン「{pattern.name}」の段階 {i + 1} の「攻撃する」に、攻撃が入っていません" });
                     }
+                    else if(action is SummonAction summon && summon.enemy == null)
+                    {
+                        issues.Add(new Issue { level = Level.Error, target = pattern, message = $"行動パターン「{pattern.name}」の段階 {i + 1} の「仲間を呼ぶ」に、呼ぶ敵が入っていません" });
+                    }
+                    else if(action is SummonAction summon2 && summon2.enemy != null && summon2.enemy.Pattern == pattern)
+                    {
+                        issues.Add(new Issue { level = Level.Warning, target = pattern, message = $"行動パターン「{pattern.name}」は、同じ行動パターンの敵を呼びます（呼ばれた敵もまた呼ぶので、「同時にいられる数」に気をつけてください）" });
+                    }
                 }
             }
         }
@@ -481,7 +547,7 @@ public static class SceneChecker
             {
                 issues.Add(new Issue { level = Level.Warning, target = attack, message = $"攻撃「{attack.name}」は突進ですが、形が長方形ではありません（長方形の長さが走る距離になります）" });
             }
-            if(attack.activation != AttackActivation.Bullet && attack.damage <= 0)
+            if(attack.damage <= 0)
             {
                 issues.Add(new Issue { level = Level.Info, target = attack, message = $"攻撃「{attack.name}」のダメージが 0 です（当たっても何も起きません）" });
             }
@@ -614,6 +680,15 @@ public static class SceneChecker
         {
             SerializedProperty p = array.GetArrayElementAtIndex(i).FindPropertyRelative(relative);
             if(p != null && p.objectReferenceValue == null) { return true; }
+        }
+        return false;
+    }
+
+    private static bool HasNullElement(SerializedProperty array)
+    {
+        for(int i = 0; i < array.arraySize; i++)
+        {
+            if(array.GetArrayElementAtIndex(i).objectReferenceValue == null) { return true; }
         }
         return false;
     }

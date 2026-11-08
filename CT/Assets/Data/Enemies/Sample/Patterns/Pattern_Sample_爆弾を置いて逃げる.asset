@@ -1,0 +1,76 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d9b29a5f1e02d3c47acbbafad2c0517a, type: 3}
+  m_Name: "Pattern_Sample_\u7206\u5F3E\u3092\u7F6E\u3044\u3066\u9003\u3052\u308B"
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyPattern
+  phases:
+  - name: "\u901A\u5E38"
+    order: 0
+    actions:
+    - rid: 1708568687347761322
+    - rid: 1708568687347761323
+    - rid: 1708568687347761324
+    - rid: 1708568687347761325
+    exit: 0
+    healthRatio: 0.5
+    seconds: 10
+    condition:
+      flags: []
+      items: []
+      character: 0
+      partyHealth: 0
+      partyHealthRatio: 0.5
+      area: {fileID: 0}
+    interrupt: 1
+    enterEffect: {fileID: 0}
+    enterSe: {fileID: 0}
+    enterAnimation: 
+    enterPause: 0
+  memo: "\u8FD1\u3065\u3044\u3066\u7206\u5F3E\u3092\u7F6E\u304D\u3001\u96E2\u308C\u308B"
+  references:
+    version: 2
+    RefIds:
+    - rid: 1708568687347761322
+      type: {class: ApproachAction, ns: , asm: Assembly-CSharp}
+      data:
+        distanceCheck: 0
+        distance: 4
+        weight: 1
+        stopDistance: 3
+        maxSeconds: 2.5
+        speedMultiplier: 1
+    - rid: 1708568687347761323
+      type: {class: AttackAction, ns: , asm: Assembly-CSharp}
+      data:
+        distanceCheck: 0
+        distance: 4
+        weight: 1
+        attack: {fileID: 11400000, guid: 9d41838adbff5bf4a9f59a1f974b633d, type: 2}
+        repeat: 1
+        interval: 0
+    - rid: 1708568687347761324
+      type: {class: RetreatAction, ns: , asm: Assembly-CSharp}
+      data:
+        distanceCheck: 0
+        distance: 4
+        weight: 1
+        keepDistance: 5
+        maxSeconds: 2
+        speedMultiplier: 1
+    - rid: 1708568687347761325
+      type: {class: WaitAction, ns: , asm: Assembly-CSharp}
+      data:
+        distanceCheck: 0
+        distance: 4
+        weight: 1
+        minSeconds: 1
+        maxSeconds: 1.5

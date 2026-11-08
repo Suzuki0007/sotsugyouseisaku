@@ -72,20 +72,20 @@ public abstract class EnemyAction
     /// <summary>
     /// 今この行動をしてよいか
     /// </summary>
-    public bool CanRun(EnemyBrain brain)
+    public bool CanRun(PatternRunner brain)
     {
         if(distanceCheck == DistanceCheck.Closer  && brain.DistanceToTarget > distance)  { return false; }
         if(distanceCheck == DistanceCheck.Farther && brain.DistanceToTarget <= distance) { return false; }
         return CanRunExtra(brain);
     }
 
-    protected virtual bool CanRunExtra(EnemyBrain brain) => true;
+    protected virtual bool CanRunExtra(PatternRunner brain) => true;
 
     /// <summary> 行動する（コルーチン） </summary>
-    public abstract IEnumerator Run(EnemyBrain brain);
+    public abstract IEnumerator Run(PatternRunner brain);
 
     /// <summary> 途中でやめられたときの片づけ </summary>
-    public virtual void Cleanup(EnemyBrain brain) { }
+    public virtual void Cleanup(PatternRunner brain) { }
 }
 
 //=====================================================================
@@ -104,9 +104,9 @@ public class WaitAction : EnemyAction
 
     public override string Summary => Mathf.Approximately(minSeconds, maxSeconds) ? $"待つ（{minSeconds} 秒）" : $"待つ（{minSeconds}〜{maxSeconds} 秒）";
 
-    public override IEnumerator Run(EnemyBrain brain)
+    public override IEnumerator Run(PatternRunner brain)
     {
-        brain.Enemy.Stop();
+        if(brain.Enemy != null) { brain.Enemy.Stop(); }
         float seconds = UnityEngine.Random.Range(Mathf.Min(minSeconds, maxSeconds), Mathf.Max(minSeconds, maxSeconds));
         yield return brain.Wait(seconds);
     }
@@ -132,7 +132,7 @@ public class ApproachAction : EnemyAction
 
     public override string Summary => $"近づく（{stopDistance} まで、最長 {maxSeconds} 秒）";
 
-    public override IEnumerator Run(EnemyBrain brain)
+    public override IEnumerator Run(PatternRunner brain)
     {
         brain.Enemy.SpeedMultiplier = speedMultiplier;
         yield return brain.MoveUntil(() =>
@@ -147,10 +147,13 @@ public class ApproachAction : EnemyAction
         brain.Enemy.Stop();
     }
 
-    public override void Cleanup(EnemyBrain brain)
+    public override void Cleanup(PatternRunner brain)
     {
-        brain.Enemy.SpeedMultiplier = 1.0f;
+        if(brain.Enemy != null) { brain.Enemy.SpeedMultiplier = 1.0f; }
     }
+
+    // 移動は、敵の体があるときだけ（見えない敵では飛ばす）
+    protected override bool CanRunExtra(PatternRunner brain) => brain.Enemy != null;
 }
 
 //=====================================================================
@@ -172,7 +175,7 @@ public class RetreatAction : EnemyAction
 
     public override string Summary => $"離れる（{keepDistance} まで、最長 {maxSeconds} 秒）";
 
-    public override IEnumerator Run(EnemyBrain brain)
+    public override IEnumerator Run(PatternRunner brain)
     {
         brain.Enemy.SpeedMultiplier = speedMultiplier;
 
@@ -192,10 +195,13 @@ public class RetreatAction : EnemyAction
         brain.Enemy.Stop();
     }
 
-    public override void Cleanup(EnemyBrain brain)
+    public override void Cleanup(PatternRunner brain)
     {
-        brain.Enemy.SpeedMultiplier = 1.0f;
+        if(brain.Enemy != null) { brain.Enemy.SpeedMultiplier = 1.0f; }
     }
+
+    // 移動は、敵の体があるときだけ（見えない敵では飛ばす）
+    protected override bool CanRunExtra(PatternRunner brain) => brain.Enemy != null;
 }
 
 //=====================================================================
@@ -217,7 +223,7 @@ public class PatrolAction : EnemyAction
 
     public override string Summary => allPoints ? "巡回する（全部のポイント）" : "巡回する（次のポイントへ）";
 
-    public override IEnumerator Run(EnemyBrain brain)
+    public override IEnumerator Run(PatternRunner brain)
     {
         int count = brain.PatrolPointCount;
         if(count == 0)
@@ -242,10 +248,13 @@ public class PatrolAction : EnemyAction
         brain.Enemy.SpeedMultiplier = 1.0f;
     }
 
-    public override void Cleanup(EnemyBrain brain)
+    public override void Cleanup(PatternRunner brain)
     {
-        brain.Enemy.SpeedMultiplier = 1.0f;
+        if(brain.Enemy != null) { brain.Enemy.SpeedMultiplier = 1.0f; }
     }
+
+    // 移動は、敵の体があるときだけ（見えない敵では飛ばす）
+    protected override bool CanRunExtra(PatternRunner brain) => brain.Enemy != null;
 }
 
 //=====================================================================
@@ -270,7 +279,7 @@ public class WanderAction : EnemyAction
 
     public override string Summary => $"ランダムに歩く（半径 {radius}、{count} 回）";
 
-    public override IEnumerator Run(EnemyBrain brain)
+    public override IEnumerator Run(PatternRunner brain)
     {
         brain.Enemy.SpeedMultiplier = speedMultiplier;
 
@@ -289,10 +298,13 @@ public class WanderAction : EnemyAction
         brain.Enemy.SpeedMultiplier = 1.0f;
     }
 
-    public override void Cleanup(EnemyBrain brain)
+    public override void Cleanup(PatternRunner brain)
     {
-        brain.Enemy.SpeedMultiplier = 1.0f;
+        if(brain.Enemy != null) { brain.Enemy.SpeedMultiplier = 1.0f; }
     }
+
+    // 移動は、敵の体があるときだけ（見えない敵では飛ばす）
+    protected override bool CanRunExtra(PatternRunner brain) => brain.Enemy != null;
 }
 
 //=====================================================================
@@ -316,9 +328,9 @@ public class AttackAction : EnemyAction
 
     public override string Summary => attack != null ? $"攻撃する（{attack.name}{(repeat > 1 ? $" ×{repeat}" : "")}）" : "攻撃する（攻撃が空）";
 
-    protected override bool CanRunExtra(EnemyBrain brain) => attack != null;
+    protected override bool CanRunExtra(PatternRunner brain) => attack != null;
 
-    public override IEnumerator Run(EnemyBrain brain)
+    public override IEnumerator Run(PatternRunner brain)
     {
         if(attack == null) { yield break; }
 
@@ -333,9 +345,137 @@ public class AttackAction : EnemyAction
         }
     }
 
-    public override void Cleanup(EnemyBrain brain)
+    public override void Cleanup(PatternRunner brain)
     {
         if(brain.CurrentAttack != null) { brain.CurrentAttack.Cleanup(); }
         brain.CurrentAttack = null;
+    }
+}
+
+//=====================================================================
+// 仲間を呼ぶ
+//=====================================================================
+
+/// <summary>
+/// 仲間を呼ぶときの出る場所
+/// </summary>
+public enum SummonPlace
+{
+    [InspectorName("自分のまわり")]
+    AroundSelf = 0,
+
+    [InspectorName("プレイヤーのまわり")]
+    AroundPlayer = 1,
+
+    [InspectorName("自分のまわりに卵を置く（時間でかえる。壊せる）")]
+    Egg = 2,
+}
+
+[Serializable, EnemyActionMenu("仲間を呼ぶ", 30)]
+public class SummonAction : EnemyAction
+{
+    [Label("呼ぶ敵")]
+    [Tooltip("出てくる敵のデータ（EnemyData）")]
+    public EnemyData enemy;
+
+    [Label("1回に呼ぶ数", 1)]
+    public int count = 2;
+
+    [Label("同時にいられる数", 1)]
+    [Tooltip("呼び出した仲間がこの数以上いるときは、この行動を飛ばす")]
+    public int maxAlive = 4;
+
+    [Label("出る場所")]
+    public SummonPlace place = SummonPlace.AroundSelf;
+
+    [Label("距離", 0.0f)]
+    [Tooltip("出る場所の中心からの距離（マス）")]
+    public float radius = 2.5f;
+
+    [Label("予告の時間（秒）", 0.0f)]
+    [Tooltip("出る場所に丸を見せてから出す。0 ならすぐ出る")]
+    public float telegraphTime = 0.8f;
+
+    [Label("予告の色")]
+    public Color telegraphColor = new Color(0.6f, 0.3f, 1.0f, 0.35f);
+
+    [Label("卵がかえるまで（秒）", 0.1f)]
+    public float hatchTime = 3.0f;
+
+    [Label("卵の体力", 1)]
+    [Tooltip("この回数分攻撃すると、かえる前に壊せる")]
+    public int eggHealth = 2;
+
+    [Label("卵の絵")]
+    [Tooltip("空なら丸で表示")]
+    public Sprite eggSprite;
+
+    [Label("出たときのエフェクト")]
+    public EffectData spawnEffect;
+
+    [Label("出たときの SE")]
+    public SeData spawnSe;
+
+    [Label("呼ぶときの敵のアニメ")]
+    public string animation = "Summon";
+
+    public override string Summary => enemy != null ? $"仲間を呼ぶ（{enemy.DisplayName}×{count}）" : "仲間を呼ぶ（敵が空）";
+
+    protected override bool CanRunExtra(PatternRunner brain) => enemy != null && brain.SummonedCount < maxAlive;
+
+    public override IEnumerator Run(PatternRunner brain)
+    {
+        if(enemy == null) { yield break; }
+        if(brain.Enemy != null) { brain.Enemy.Stop(); }
+        brain.PlayAction(animation);
+
+        // 出る場所を決める（歩ける場所だけ）
+        Vector2 center = brain.Position;
+        if(place == SummonPlace.AroundPlayer && brain.Target != null) { center = brain.Target.transform.position; }
+
+        int n = Mathf.Min(Mathf.Max(1, count), Mathf.Max(0, maxAlive - brain.SummonedCount));
+        var points = new System.Collections.Generic.List<Vector2>();
+        NavMesh2D nav = NavMesh2D.Instance;
+        for(int i = 0; i < n; i++)
+        {
+            float angle = 360.0f * i / n + UnityEngine.Random.Range(-20.0f, 20.0f);
+            Vector2 p = center + (Vector2)(Quaternion.Euler(0.0f, 0.0f, angle) * Vector2.right) * radius;
+            if(nav != null && !nav.SamplePosition(p, 1.5f, enemy.Size, out p)) { continue; }
+            points.Add(p);
+        }
+
+        // 予告
+        var views = new System.Collections.Generic.List<TelegraphView>();
+        if(telegraphTime > 0.0f)
+        {
+            foreach(Vector2 p in points) { views.Add(TelegraphView.ShowCircle(p, 0.6f, telegraphColor)); }
+            float elapsed = 0.0f;
+            while(elapsed < telegraphTime)
+            {
+                if(brain.CanAct) { elapsed += Time.deltaTime; }
+                foreach(TelegraphView v in views) { if(v != null) { v.SetProgress(elapsed / telegraphTime); } }
+                yield return null;
+            }
+            foreach(TelegraphView v in views) { if(v != null) { v.Hide(); } }
+        }
+
+        // 出す
+        foreach(Vector2 p in points)
+        {
+            EffectManager.Play(spawnEffect, p);
+            SeManager.PlaySe(spawnSe, p);
+
+            if(place == SummonPlace.Egg)
+            {
+                EnemyEgg.Create(enemy, p, hatchTime, eggHealth, eggSprite, brain, spawnEffect, spawnSe);
+            }
+            else
+            {
+                Enemy spawned = Enemy.Spawn(enemy, p);
+                brain.AddSummoned(spawned);
+            }
+        }
+
+        yield return brain.Wait(0.3f);
     }
 }

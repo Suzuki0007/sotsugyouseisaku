@@ -13,12 +13,13 @@ using UnityEngine;
 /// Tools > 敵 > 共通プレハブとサンプルを作る
 /// </summary>
 ///
-/// ・Assets/Prefab/Enemies/Enemy_Base.prefab：新しい作りの敵の共通プレハブ（見た目と当たり判定は古い Enemy.prefab から写す）
+/// ・Assets/Resources/Enemies/Enemy_Base.prefab：新しい作りの敵の共通プレハブ（見た目と当たり判定は古い Enemy.prefab から写す）
 /// ・Assets/Data/Enemies/Sample/EnemyData_Sample.asset：サンプルの敵のデータ
 /// すでにあるものは作り直さない（プレハブは「作り直す」を選んだときだけ上書き）
 public static class EnemyBaseBuilder
 {
-    public const string PrefabPath = "Assets/Prefab/Enemies/Enemy_Base.prefab";
+    // 「仲間を呼ぶ」で実行中に読み込む（Enemy.Spawn）ので Resources に置く
+    public const string PrefabPath = "Assets/Resources/Enemies/Enemy_Base.prefab";
     public const string SampleDataPath = "Assets/Data/Enemies/Sample/EnemyData_Sample.asset";
     private const string OldPrefabPath = "Assets/Prefab/Enemies/Enemy.prefab";
 
@@ -185,6 +186,54 @@ public static class EnemyBaseBuilder
         }
 
         Undo.RegisterCreatedObjectUndo(go, "敵の通行設定エリア");
+        Selection.activeGameObject = go;
+    }
+
+    [MenuItem("GameObject/敵/攻撃の発生源（見えない敵）", false, 22)]
+    private static void PlaceEmitter(MenuCommand command)
+    {
+        var go = new GameObject("攻撃の発生源");
+        var emitter = go.AddComponent<AttackEmitter>();
+
+        // 動く範囲（この中にプレイヤーがいる間だけ攻撃してくる）
+        var area = new GameObject("動く範囲");
+        area.transform.SetParent(go.transform, false);
+        var box = area.AddComponent<BoxCollider2D>();
+        box.isTrigger = true;
+        box.size = new Vector2(8.0f, 6.0f);
+
+        var so = new SerializedObject(emitter);
+        so.FindProperty("condition").FindPropertyRelative("area").objectReferenceValue = box;
+        so.ApplyModifiedPropertiesWithoutUndo();
+
+        PlaceAtView(go, command, "攻撃の発生源");
+    }
+
+    [MenuItem("GameObject/敵/攻撃で作動するスイッチ", false, 23)]
+    private static void PlaceAttackSwitch(MenuCommand command)
+    {
+        var go = new GameObject("攻撃で作動するスイッチ");
+        var box = go.AddComponent<BoxCollider2D>();
+        box.size = new Vector2(1.0f, 1.0f);
+        var sw = go.AddComponent<AttackSwitch>();
+        var sequence = go.AddComponent<EventSequence>();
+
+        var so = new SerializedObject(sw);
+        so.FindProperty("sequence").objectReferenceValue = sequence;
+        so.ApplyModifiedPropertiesWithoutUndo();
+
+        PlaceAtView(go, command, "攻撃で作動するスイッチ");
+    }
+
+    private static void PlaceAtView(GameObject go, MenuCommand command, string undoName)
+    {
+        GameObjectUtility.SetParentAndAlign(go, command.context as GameObject);
+        if(command.context == null && SceneView.lastActiveSceneView != null)
+        {
+            Vector3 pivot = SceneView.lastActiveSceneView.pivot;
+            go.transform.position = new Vector3(pivot.x, pivot.y, 0.0f);
+        }
+        Undo.RegisterCreatedObjectUndo(go, undoName);
         Selection.activeGameObject = go;
     }
 }

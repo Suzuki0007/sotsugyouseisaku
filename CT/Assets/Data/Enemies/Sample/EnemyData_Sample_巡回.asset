@@ -18,6 +18,7 @@ MonoBehaviour:
   size: 1
   heavy: 1
   pattern: {fileID: 11400000, guid: 91875f4b4091a4e47ae8b831681561ff, type: 2}
+  removeSummonedOnDeath: 1
   damageRules: []
   contactDamage: 1
   contactInterval: 1

@@ -281,6 +281,22 @@ public class DebugWindow : EditorWindow
                 }
             }
 
+            // 攻撃の発生源（見えない敵）
+            AttackEmitter[] emitters = FindObjectsByType<AttackEmitter>();
+            if(emitters.Length > 0)
+            {
+                EditorGUILayout.LabelField("攻撃の発生源（見えない敵）", $"{emitters.Length} 個");
+                foreach(AttackEmitter emitter in emitters)
+                {
+                    using(new EditorGUILayout.HorizontalScope())
+                    {
+                        if(GUILayout.Button(emitter.name, EditorStyles.label)) { Selection.activeGameObject = emitter.gameObject; }
+                        if(GUILayout.Button(emitter.Stopped ? "動かす" : "止める", GUILayout.Width(50))) { emitter.SetStopped(!emitter.Stopped); }
+                    }
+                    using(new EditorGUI.IndentLevelScope()) { EditorGUILayout.LabelField(emitter.StatusText, EditorStyles.miniLabel); }
+                }
+            }
+
             if(enemies.Count > 0 && GUILayout.Button("全部倒す"))
             {
                 foreach(Enemy enemy in new List<Enemy>(enemies)) { Kill(enemy); }
@@ -294,13 +310,7 @@ public class DebugWindow : EditorWindow
     /// </summary>
     private static void Kill(Enemy enemy)
     {
-        if(enemy == null || enemy.Health == null) { return; }
-
-        Health health = enemy.Health;
-        var filter = health.DamageFilter;
-        health.DamageFilter = null;
-        health.Damage(DamageInfo.Create(health.CurrentHealth, DamageKind.Other, null, enemy.transform.position));
-        health.DamageFilter = filter;
+        if(enemy != null) { enemy.Kill(); }
     }
 
     //=====================================================================

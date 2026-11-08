@@ -50,6 +50,33 @@ public enum AttackActivation
 
     [InspectorName("弾を撃つ")]
     Bullet = 2,
+
+    [InspectorName("上から落ちる（予告が影になる）")]
+    Drop = 3,
+
+    [InspectorName("下から突き出る")]
+    Rise = 4,
+
+    [InspectorName("設置して起爆（爆弾・罠）")]
+    Place = 5,
+}
+
+/// <summary>
+/// 弾の撃ち方
+/// </summary>
+public enum BulletPattern
+{
+    [InspectorName("狙い撃ち（扇状に広げられる）")]
+    Aimed = 0,
+
+    [InspectorName("全方位（ぐるっと一周）")]
+    Circle = 1,
+
+    [InspectorName("うず巻き（撃つたびに回る）")]
+    Spiral = 2,
+
+    [InspectorName("ばらまき（ランダムな方向）")]
+    Random = 3,
 }
 
 /// <summary>
@@ -102,7 +129,8 @@ public enum TelegraphStyle
 /// ・同じ攻撃を、いろいろな敵の行動パターンで使い回せる
 /// ・組み合わせの例：ビーム＝敵の位置×長方形×出し続ける、突進＝敵の位置×長方形×一瞬×突進、
 ///   足元の爆発＝プレイヤーの位置（予告時）×円×一瞬、なぎ払い＝敵の位置×扇形×一瞬
-/// 落下・突き出る・設置などの発動のしかたは次の段階で足す
+/// ・上から落ちる＝予告が影になり、最後に物が落ちてくる ／ 下から突き出る＝発動で地面から物が出る（残せる）
+///   ／ 設置して起爆＝その場に物を置き、時間・触れる・攻撃されるで爆発（置いたあと、敵は次の行動に移る）
 [CreateAssetMenu(menuName = "敵/攻撃", fileName = "Attack_")]
 public class AttackData : ScriptableObject
 {
@@ -221,13 +249,20 @@ public class AttackData : ScriptableObject
     [Tooltip("「出し続ける」の間、範囲を回転させる（ビームのなぎ払い）。0 なら回らない。マイナスで逆回り")]
     public float rotateSpeed = 0.0f;
 
+    [Label("弾の撃ち方")]
+    public BulletPattern bulletPattern = BulletPattern.Aimed;
+
     [Label("撃つ弾の数", 1)]
-    [Tooltip("「弾を撃つ」のとき。同時に扇状に撃つ数（1 なら1発）")]
+    [Tooltip("1回に同時に撃つ数（狙い撃ち：扇状 ／ 全方位・うず巻き：一周に並べる ／ ばらまき：ランダム）")]
     public int bulletCount = 1;
 
     [Label("弾の広がり（度）", 0.0f, 360.0f)]
-    [Tooltip("複数の弾を撃つときの、端から端までの角度")]
+    [Tooltip("狙い撃ち・ばらまきのときの、端から端までの角度")]
     public float bulletSpread = 30.0f;
+
+    [Label("撃つたびに回す角度（度）")]
+    [Tooltip("うず巻きのとき、1回撃つごとに向きを回す角度")]
+    public float bulletSpiralStep = 15.0f;
 
     [Label("連射の回数", 1)]
     [Tooltip("上の弾を何回撃つか")]
@@ -235,6 +270,57 @@ public class AttackData : ScriptableObject
 
     [Label("連射の間隔（秒）", 0.0f)]
     public float bulletVolleyInterval = 0.3f;
+
+    [Label("弾の速さ", 0.0f)]
+    [Tooltip("1秒に進む距離。0 なら弾のプレハブのまま")]
+    public float bulletSpeed = 0.0f;
+
+    [Label("弾消しで消せる")]
+    [Tooltip("オフにすると、ノアの弾消し（Q）で消えない弾になる")]
+    public bool bulletDeletable = true;
+
+    [Label("落ちてくる物（プレハブ）")]
+    [Tooltip("「上から落ちる」のとき、上から降ってくる見た目（岩など）。空なら予告（影）と着地のエフェクトだけ")]
+    public GameObject dropObject;
+
+    [Label("落ちる高さ", 0.0f)]
+    [Tooltip("どれだけ上から落ちてくるか（マス）")]
+    public float dropHeight = 6.0f;
+
+    [Label("落ちる時間（秒）", 0.05f)]
+    [Tooltip("予告の最後のこの時間で落ちてくる")]
+    public float dropTime = 0.35f;
+
+    [Label("突き出る物（プレハブ）")]
+    [Tooltip("「下から突き出る」のとき、地面から出てくる見た目（とげ・腕など）。当たり判定（Collider2D）が付いていれば、残っている間は壁になる")]
+    public GameObject riseObject;
+
+    [Label("残る時間（秒）", 0.0f)]
+    [Tooltip("突き出た物が残る時間。0 ならすぐ引っ込む")]
+    public float riseLinger = 1.0f;
+
+    [Label("残っている間も当たる")]
+    [Tooltip("オン：残っている間、範囲に入ると「当たる間隔」ごとに当たる")]
+    public bool riseHitWhileLingering = false;
+
+    [Label("置く物（プレハブ）")]
+    [Tooltip("「設置して起爆」のとき、置かれる見た目（爆弾など）。空なら小さな丸")]
+    public GameObject placeObject;
+
+    [Label("起爆までの時間（秒）", 0.0f)]
+    [Tooltip("置いてから爆発するまで。0 なら時間では爆発しない（触れる・攻撃されるで爆発）")]
+    public float fuseTime = 3.0f;
+
+    [Label("プレイヤーが触れたら爆発")]
+    public bool detonateOnTouch = true;
+
+    [Label("攻撃されたら爆発")]
+    [Tooltip("ノアやシグルの攻撃が当たったら爆発する（敵を巻き込む使い方も）")]
+    public bool detonateOnAttacked = false;
+
+    [Label("起爆まで範囲を見せる")]
+    [Tooltip("置いてから爆発するまで、爆発の範囲を表示する")]
+    public bool showFuseRange = true;
 
     [Label("敵自身の動き")]
     public AttackMotion motion = AttackMotion.Stay;

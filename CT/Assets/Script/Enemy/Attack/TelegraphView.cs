@@ -43,10 +43,38 @@ public class TelegraphView : MonoBehaviour
         if(view == null) { view = Create(); }
 
         view.gameObject.SetActive(true);
-        view.Setup(data, lengthOverride);
+        view.data = data;
+        view.Setup(data.shape, data.telegraphColor, data.telegraphStyle, data.telegraphFill && data.telegraphTime > 0.0f, data.telegraphUnlit, data.telegraphSortingOrder, lengthOverride);
         view.SetPose(origin, direction);
         view.SetProgress(0.0f);
         return view;
+    }
+
+    /// <summary>
+    /// 形と色を直接指定して出す（仲間を呼ぶ場所・置いた爆弾など、AttackData がないもの）
+    /// </summary>
+    public static TelegraphView ShowShape(AttackShape shape, Vector2 origin, Vector2 direction, Color color, bool fill, int sortingOrder = 3, bool blink = false)
+    {
+        TelegraphView view = null;
+        while(pool.Count > 0 && view == null) { view = pool.Pop(); }
+        if(view == null) { view = Create(); }
+
+        view.gameObject.SetActive(true);
+        view.data = null;
+        view.blinkOverride = blink;
+        view.Setup(shape, color, TelegraphStyle.FillAndOutline, fill, true, sortingOrder, -1.0f);
+        view.SetPose(origin, direction);
+        view.SetProgress(0.0f);
+        return view;
+    }
+
+    /// <summary>
+    /// 円の予告を出す（ShowShape の簡単版）
+    /// </summary>
+    public static TelegraphView ShowCircle(Vector2 center, float radius, Color color, bool fill = true, int sortingOrder = 3)
+    {
+        var shape = new AttackShape { type = AttackShapeType.Circle, radius = radius };
+        return ShowShape(shape, center, Vector2.right, color, fill, sortingOrder);
     }
 
     /// <summary>
@@ -137,24 +165,26 @@ public class TelegraphView : MonoBehaviour
     // 関数
     //=====================================================================
 
-    private void Setup(AttackData attack, float lengthOverride)
+    private bool blinkOverride;
+
+    private void Setup(AttackShape shape, Color color, TelegraphStyle style, bool fillProgress, bool unlit, int sortingOrder, float lengthOverride)
     {
-        data = attack;
-        baseColor = attack.telegraphColor;
-        rectangle = attack.shape.type == AttackShapeType.Rectangle;
+        if(data != null) { blinkOverride = false; }
+        baseColor = color;
+        rectangle = shape.type == AttackShapeType.Rectangle;
 
-        bool drawFill = attack.telegraphStyle != TelegraphStyle.Outline;
-        bool drawOutline = attack.telegraphStyle != TelegraphStyle.Fill;
-        showProgress = attack.telegraphFill && attack.telegraphTime > 0.0f;
+        bool drawFill = style != TelegraphStyle.Outline;
+        bool drawOutline = style != TelegraphStyle.Fill;
+        showProgress = fillProgress;
 
-        Material material = GetMaterial(attack.telegraphUnlit);
+        Material material = GetMaterial(unlit);
 
-        attack.shape.BuildFill(vertices, triangles, lengthOverride);
-        Apply(fill, drawFill, material, attack.telegraphSortingOrder, baseColor);
-        Apply(progress, showProgress, material, attack.telegraphSortingOrder, new Color(baseColor.r, baseColor.g, baseColor.b, Mathf.Clamp01(baseColor.a * 1.6f)));
+        shape.BuildFill(vertices, triangles, lengthOverride);
+        Apply(fill, drawFill, material, sortingOrder, baseColor);
+        Apply(progress, showProgress, material, sortingOrder, new Color(baseColor.r, baseColor.g, baseColor.b, Mathf.Clamp01(baseColor.a * 1.6f)));
 
-        attack.shape.BuildOutline(vertices, triangles, OutlineThickness, lengthOverride);
-        Apply(outline, drawOutline, material, attack.telegraphSortingOrder + 1, new Color(baseColor.r, baseColor.g, baseColor.b, Mathf.Clamp01(baseColor.a * 2.5f)));
+        shape.BuildOutline(vertices, triangles, OutlineThickness, lengthOverride);
+        Apply(outline, drawOutline, material, sortingOrder + 1, new Color(baseColor.r, baseColor.g, baseColor.b, Mathf.Clamp01(baseColor.a * 2.5f)));
     }
 
     private static void Apply(Part part, bool visible, Material material, int order, Color color)
@@ -198,7 +228,8 @@ public class TelegraphView : MonoBehaviour
         }
 
         bool visible = true;
-        if(data != null && data.telegraphBlink && t > 0.7f)
+        bool blink = data != null ? data.telegraphBlink : blinkOverride;
+        if(blink && t > 0.7f)
         {
             visible = Mathf.Repeat(Time.time * 12.0f, 1.0f) < 0.5f;
         }

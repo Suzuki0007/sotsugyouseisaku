@@ -188,8 +188,188 @@ public static class EnemySampleBuilder
         });
         EnemyData($"{Folder}/EnemyData_Sample_巡回.asset", "巡回する敵", 3, 2.0f, EnemySize.Medium, patrol, null);
 
+        BuildStage3(swing);
+
         AssetDatabase.SaveAssets();
         AssetDatabase.Refresh();
+    }
+
+    //=====================================================================
+    // 段階3のサンプル（落下・突き出る・設置・弾幕・仲間を呼ぶ・見えない敵・ギミック用）
+    //=====================================================================
+
+    private static void BuildStage3(AttackData swing)
+    {
+        EffectData explosion = AssetDatabase.LoadAssetAtPath<EffectData>("Assets/Data/Effect/Sample/Fx_Sample_Explosion.asset");
+        EffectData hit = AssetDatabase.LoadAssetAtPath<EffectData>("Assets/Data/Effect/Sample/Fx_Sample_Hit.asset");
+
+        AttackData rock = Attack("Attack_Sample_落石", a =>
+        {
+            a.origin = AttackOrigin.PlayerAtStart;
+            a.telegraphTime = 1.2f;
+            a.telegraphColor = new Color(0.0f, 0.0f, 0.0f, 0.35f);
+            a.telegraphFill = true;
+            a.shape.type = AttackShapeType.Circle;
+            a.shape.radius = 1.2f;
+            a.activation = AttackActivation.Drop;
+            a.activeEffect = explosion;
+            a.recoveryTime = 0.2f;
+            a.memo = "プレイヤーの足元に影（予告）→ 上から落ちる。落ちてくる物（プレハブ）を入れると、最後の 0.35 秒で降ってくる";
+        });
+
+        AttackData spike = Attack("Attack_Sample_とげ（下から）", a =>
+        {
+            a.origin = AttackOrigin.PlayerAtStart;
+            a.telegraphTime = 0.9f;
+            a.shape.type = AttackShapeType.Circle;
+            a.shape.radius = 1.0f;
+            a.activation = AttackActivation.Rise;
+            a.riseLinger = 1.0f;
+            a.activeEffect = hit;
+            a.recoveryTime = 0.3f;
+            a.memo = "プレイヤーの足元から突き出る。突き出る物（プレハブ）に当たり判定を付けると、残っている 1 秒は壁になる";
+        });
+
+        AttackData arm = Attack("Attack_Sample_腕（下から伸びる）", a =>
+        {
+            a.origin = AttackOrigin.PlayerAtStart;
+            a.aim = AttackAim.Fixed;
+            a.fixedAngle = 90.0f;
+            a.forwardOffset = -1.5f;
+            a.telegraphTime = 1.0f;
+            a.telegraphColor = new Color(0.6f, 0.1f, 0.9f, 0.35f);
+            a.shape.type = AttackShapeType.Rectangle;
+            a.shape.length = 3.0f;
+            a.shape.width = 0.9f;
+            a.stopAtWall = false;
+            a.activation = AttackActivation.Rise;
+            a.riseLinger = 0.6f;
+            a.riseHitWhileLingering = true;
+            a.hitInterval = 0.5f;
+            a.activeEffect = hit;
+            a.recoveryTime = 0.4f;
+            a.memo = "見えない敵用：プレイヤーの位置を縦に貫く腕。突き出る物に腕の絵のプレハブを入れる";
+        });
+
+        AttackData bomb = Attack("Attack_Sample_爆弾", a =>
+        {
+            a.telegraphTime = 0.4f;
+            a.shape.type = AttackShapeType.Circle;
+            a.shape.radius = 2.0f;
+            a.activation = AttackActivation.Place;
+            a.fuseTime = 3.0f;
+            a.detonateOnTouch = true;
+            a.detonateOnAttacked = true;
+            a.targets = AttackTargets.Both;
+            a.damageKind = DamageKind.Explosion;
+            a.damage = 2;
+            a.activeEffect = explosion;
+            a.recoveryTime = 0.3f;
+            a.memo = "その場に置く。3 秒・触れる・攻撃されるで爆発。敵も巻き込む（爆発で敵を倒す遊びに）";
+        });
+
+        AttackData radial = Attack("Attack_Sample_全方位弾", a =>
+        {
+            a.telegraphTime = 0.5f;
+            a.showTelegraph = false;
+            a.activation = AttackActivation.Bullet;
+            a.bulletPattern = BulletPattern.Circle;
+            a.bulletCount = 12;
+            a.bulletVolleys = 3;
+            a.bulletVolleyInterval = 0.5f;
+            a.bulletSpeed = 4.0f;
+            a.recoveryTime = 0.5f;
+            a.memo = "まわり 12 方向に 3 回";
+        });
+
+        AttackData spiral = Attack("Attack_Sample_うず巻き弾", a =>
+        {
+            a.telegraphTime = 0.0f;
+            a.showTelegraph = false;
+            a.aim = AttackAim.Fixed;
+            a.activation = AttackActivation.Bullet;
+            a.bulletPattern = BulletPattern.Spiral;
+            a.bulletCount = 4;
+            a.bulletVolleys = 24;
+            a.bulletVolleyInterval = 0.12f;
+            a.bulletSpiralStep = 11.0f;
+            a.bulletSpeed = 3.5f;
+            a.bulletDeletable = false;
+            a.recoveryTime = 0.8f;
+            a.memo = "4 方向の弾を回しながら連射。弾消しでは消せない";
+        });
+
+        Attack("Attack_Sample_電気の床（敵に当たる）", a =>
+        {
+            a.telegraphTime = 0.5f;
+            a.telegraphColor = new Color(1.0f, 0.9f, 0.1f, 0.35f);
+            a.shape.type = AttackShapeType.Circle;
+            a.shape.radius = 2.5f;
+            a.activation = AttackActivation.Sustained;
+            a.sustainTime = 3.0f;
+            a.hitInterval = 0.5f;
+            a.targets = AttackTargets.Enemies;
+            a.damageKind = DamageKind.Gimmick;
+            a.recoveryTime = 0.0f;
+            a.memo = "ギミック用：イベントの部品「ダメージエリアを出す」で使う。敵だけに当たる電気の床（3 秒）";
+        });
+
+        // ---- 行動パターン ----
+        EnemyPattern hidden = Pattern("Pattern_Sample_見えない敵（足元から腕）", p =>
+        {
+            EnemyPhase strong = p.phases[0];
+            strong.name = "強い";
+            strong.actions.Add(new AttackAction { attack = arm });
+            strong.actions.Add(new WaitAction { minSeconds = 0.6f, maxSeconds = 0.6f });
+            strong.actions.Add(new AttackAction { attack = spike });
+
+            var weak = new EnemyPhase { name = "弱い" };
+            weak.actions.Add(new AttackAction { attack = spike });
+            weak.actions.Add(new WaitAction { minSeconds = 2.0f, maxSeconds = 2.0f });
+            p.phases.Add(weak);
+            p.memo = "攻撃の発生源（見えない敵）用。ギミックの「敵に命令：段階を変える（2）」で弱くなる。「止める」で止まる";
+        });
+
+        EnemyPattern bomber = Pattern("Pattern_Sample_爆弾を置いて逃げる", p =>
+        {
+            EnemyPhase phase = p.phases[0];
+            phase.actions.Add(new ApproachAction { stopDistance = 3.0f, maxSeconds = 2.5f });
+            phase.actions.Add(new AttackAction { attack = bomb });
+            phase.actions.Add(new RetreatAction { keepDistance = 5.0f, maxSeconds = 2.0f });
+            phase.actions.Add(new WaitAction { minSeconds = 1.0f, maxSeconds = 1.5f });
+            p.memo = "近づいて爆弾を置き、離れる";
+        });
+
+        EnemyPattern barrage = Pattern("Pattern_Sample_弾幕", p =>
+        {
+            EnemyPhase phase = p.phases[0];
+            phase.actions.Add(new AttackAction { attack = radial });
+            phase.actions.Add(new WaitAction { minSeconds = 1.0f, maxSeconds = 1.0f });
+            phase.actions.Add(new AttackAction { attack = spiral });
+            phase.actions.Add(new WaitAction { minSeconds = 1.0f, maxSeconds = 1.0f });
+            p.memo = "全方位弾 → うず巻き弾";
+        });
+
+        global::EnemyData minion = AssetDatabase.LoadAssetAtPath<global::EnemyData>(EnemyBaseBuilder.SampleDataPath);
+        EnemyPattern summoner = Pattern("Pattern_Sample_仲間を呼ぶ", p =>
+        {
+            EnemyPhase phase = p.phases[0];
+            phase.order = ActionOrder.Sequential;
+            phase.actions.Add(new SummonAction { enemy = minion, count = 2, maxAlive = 3, place = SummonPlace.AroundSelf });
+            phase.actions.Add(new WaitAction { minSeconds = 3.0f, maxSeconds = 3.0f });
+            phase.actions.Add(new SummonAction { enemy = minion, count = 1, maxAlive = 3, place = SummonPlace.Egg, hatchTime = 3.0f, eggHealth = 2 });
+            phase.actions.Add(new WaitAction { minSeconds = 3.0f, maxSeconds = 3.0f });
+            p.memo = "まわりに仲間を2体 → 卵を1つ（3 秒でかえる。2 回叩くと壊れる）。同時に 3 体まで";
+        });
+
+        // ---- 敵のデータ ----
+        EnemyData($"{Folder}/EnemyData_Sample_爆弾魔.asset", "爆弾を置く敵", 3, 2.5f, EnemySize.Small, bomber, null);
+        EnemyData($"{Folder}/EnemyData_Sample_弾幕.asset", "弾幕の敵", 6, 0.0f, EnemySize.Medium, barrage, null);
+        EnemyData($"{Folder}/EnemyData_Sample_呼ぶ.asset", "仲間を呼ぶ敵", 6, 1.0f, EnemySize.Medium, summoner, null);
+
+        // 見えない敵の行動パターンは、敵のデータではなく攻撃の発生源（AttackEmitter）に入れて使う
+        _ = hidden;
+        _ = swing;
     }
 
     //=====================================================================

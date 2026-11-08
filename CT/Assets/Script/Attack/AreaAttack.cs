@@ -138,11 +138,8 @@ public class AreaAttack : MonoBehaviour
     private void CheckAttackTargets()
     {
         // 指定した半径内のすべてのコライダーを取得
-        Collider2D[] targets = Physics2D.OverlapCircleAll(
-            attackerPos.position, 
-            attackRadius,
-            targetLayer
-        );
+        // ターゲットレイヤー（敵）に加えて、攻撃を受ける部品（攻撃で作動するスイッチなど）はレイヤーに関係なく当てる
+        Collider2D[] targets = Physics2D.OverlapCircleAll(attackerPos.position, attackRadius);
 
         //Debug.Log($"攻撃範囲内のCollider数: {targets.Length}");
 
@@ -151,6 +148,9 @@ public class AreaAttack : MonoBehaviour
         // inは、C++でいうconst参照
         foreach(var target in targets)
         {
+            bool inTargetLayer = (targetLayer.value & (1 << target.gameObject.layer)) != 0;
+            if(!inTargetLayer && target.GetComponent<DamageReceiver>() == null) { continue; }
+
             // 攻撃を受ける相手（DamageReceiver の渡す先か、同じオブジェクトの Health）
             Object key = DamageUtility.HitKey(target);
             if(key == null)

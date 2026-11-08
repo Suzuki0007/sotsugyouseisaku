@@ -51,6 +51,10 @@ public class EnemyData : ScriptableObject
     [Tooltip("EnemyPattern（いつ・どこへ動き、いつ攻撃するか）。空ならその場に立っているだけ")]
     private EnemyPattern pattern;
 
+    [SerializeField, Label("倒されたら呼んだ仲間も消す")]
+    [Tooltip("「仲間を呼ぶ」で出した敵を、この敵が倒されたときに一緒に倒す")]
+    private bool removeSummonedOnDeath = true;
+
     [Header("受けるダメージの効き方")]
 
     [SerializeField]
@@ -114,6 +118,7 @@ public class EnemyData : ScriptableObject
     public SeData DeathSe => deathSe;
     public string DeathAnimation => deathAnimation;
     public EnemyPattern Pattern => pattern;
+    public bool RemoveSummonedOnDeath => removeSummonedOnDeath;
     public IReadOnlyList<DamageRule> DamageRules => damageRules;
 
     /// <summary>

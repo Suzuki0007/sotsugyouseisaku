@@ -87,6 +87,9 @@ public class BulletDeleteArea : MonoBehaviour
         EnemyBullet bullet = collision.GetComponent<EnemyBullet>();
         if(bullet == null) { Debug.Log("敵の弾クラスがないです"); return; }
 
+        // 弾消しで消せない弾（攻撃のデータで決める）
+        if(!bullet.Deletable) { return; }
+
         // 消えるエフェクトを出して、弾をプールに返却する
         bullet.Vanish();
     }

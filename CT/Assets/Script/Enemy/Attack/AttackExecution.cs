@@ -1,6 +1,6 @@
 /*********************************************************************/
 // * \file   AttackExecution.cs
-// * \brief  敵の攻撃を1回実行する（予告 → 発動 → 後隙）
+// * \brief  攻撃を1回実行する（予告 → 発動 → 後隙）
 // *
 // * \author
 /*********************************************************************/
@@ -13,20 +13,22 @@ using UnityEngine;
 /// 攻撃を1回実行する
 /// </summary>
 ///
-/// ・EnemyBrain の「攻撃する」行動から使う。Run をコルーチンとして回し、途中でやめるときは Cleanup を呼ぶ
-/// ・敵が止められている間（会話中・Paused など）は、時間を進めない・当てない
+/// ・PatternRunner（敵の EnemyBrain・見えない敵の AttackEmitter）から使う。Run をコルーチンとして回し、途中でやめるときは Cleanup を呼ぶ
+/// ・止められている間（会話中・命令で停止など）は、時間を進めない・当てない
+/// ・敵の体がない（runner.Enemy が null）ときは、突進・アニメはしない
 public class AttackExecution
 {
     //=====================================================================
     // 変数
     //=====================================================================
 
-    private readonly EnemyBrain brain;
+    private readonly PatternRunner runner;
     private readonly Enemy enemy;
     private readonly AttackData data;
 
     private TelegraphView view;
     private bool charging;
+    private GameObject spawnedVisual;
 
     private Vector2 origin;
     private Vector2 direction;
@@ -35,14 +37,17 @@ public class AttackExecution
     // 出し続ける攻撃で、相手ごとに最後に当てた時刻
     private readonly Dictionary<Object, float> lastHitTime = new Dictionary<Object, float>();
 
-    private static readonly List<Collider2D> found = new List<Collider2D>();
+    // うず巻きで、撃つたびに回す角度
+    private float spiralAngle;
 
-    public AttackExecution(EnemyBrain brain, AttackData data)
+    public AttackExecution(PatternRunner runner, AttackData data)
     {
-        this.brain = brain;
+        this.runner = runner;
         this.data = data;
-        enemy = brain.Enemy;
+        enemy = runner != null ? runner.Enemy : null;
     }
+
+    private GameObject Attacker => runner != null ? runner.Attacker : null;
 
     //=====================================================================
     // 実行
@@ -50,46 +55,53 @@ public class AttackExecution
 
     public IEnumerator Run()
     {
-        if(data == null || enemy == null) { yield break; }
+        if(data == null || runner == null) { yield break; }
 
-        enemy.Stop();
+        if(enemy != null) { enemy.Stop(); }
 
         // ---- 予告 ----
         UpdatePose(true);
 
-        enemy.PlayAction(data.telegraphAnimation);
-        SeManager.PlaySe(data.telegraphSe, enemy.transform.position);
+        runner.PlayAction(data.telegraphAnimation);
+        SeManager.PlaySe(data.telegraphSe, runner.Position);
 
-        if(data.telegraphTime > 0.0f && data.showTelegraph)
+        if(data.telegraphTime > 0.0f && data.showTelegraph && data.activation != AttackActivation.Place)
         {
-            view = TelegraphView.Show(data, origin, direction, length);
+            view = TelegraphView.Show(data, PlacedOrigin, direction, length);
         }
 
         float elapsed = 0.0f;
         while(elapsed < data.telegraphTime)
         {
-            if(brain.CanAct)
+            if(runner.CanAct)
             {
                 elapsed += Time.deltaTime;
                 if(IsTracking) { UpdatePose(false); }
             }
             if(view != null) { view.SetProgress(elapsed / data.telegraphTime); }
+
+            // 上から落ちる：予告の最後に物が落ちてくる
+            if(data.activation == AttackActivation.Drop) { UpdateDrop(data.telegraphTime - elapsed); }
+
             yield return null;
         }
 
         // ---- 発動 ----
-        enemy.PlayAction(data.activeAnimation);
-        SeManager.PlaySe(data.activeSe, enemy.transform.position);
+        runner.PlayAction(data.activeAnimation);
+        SeManager.PlaySe(data.activeSe, runner.Position);
 
-        Vector2 center = data.shape.CenterOf(origin, direction, length);
-        EffectManager.Play(data.activeEffect, center, Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg);
+        Vector2 center = data.shape.CenterOf(PlacedOrigin, direction, length);
+        if(data.activation != AttackActivation.Place && data.activation != AttackActivation.Bullet)
+        {
+            EffectManager.Play(data.activeEffect, center, Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg);
+        }
 
         switch(data.activation)
         {
             case AttackActivation.Instant:
                 HideView();
-                if(data.motion == AttackMotion.Charge) { yield return Charge(); }
-                else                                   { HitTargets(false); }
+                if(data.motion == AttackMotion.Charge && enemy != null) { yield return Charge(); }
+                else                                                    { HitNow(); }
                 break;
 
             case AttackActivation.Sustained:
@@ -99,20 +111,38 @@ public class AttackExecution
 
             case AttackActivation.Bullet:
                 HideView();
+                EffectManager.Play(data.activeEffect, runner.Position, Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg);
                 yield return FireBullets();
+                break;
+
+            case AttackActivation.Drop:
+                HideView();
+                DestroyVisual();
+                HitNow();
+                break;
+
+            case AttackActivation.Rise:
+                HideView();
+                yield return Rise();
+                break;
+
+            case AttackActivation.Place:
+                HideView();
+                PlacedBomb.Place(data, PlacedOrigin, direction, length, Attacker);
                 break;
         }
 
         // ---- 後隙 ----
-        yield return brain.Wait(data.recoveryTime);
+        yield return runner.Wait(data.recoveryTime);
     }
 
     /// <summary>
-    /// 途中でやめたときの片づけ（予告を消す・突進をやめる）
+    /// 途中でやめたときの片づけ（予告・出した物を消す・突進をやめる）
     /// </summary>
     public void Cleanup()
     {
         HideView();
+        DestroyVisual();
         if(charging && enemy != null)
         {
             enemy.ClearOverrideVelocity();
@@ -127,35 +157,48 @@ public class AttackExecution
         view = null;
     }
 
+    private void DestroyVisual()
+    {
+        if(spawnedVisual != null) { Object.Destroy(spawnedVisual); }
+        spawnedVisual = null;
+    }
+
+    private void HitNow()
+    {
+        AttackHits.Hit(data, PlacedOrigin, direction, length, Attacker, null);
+    }
+
     //=====================================================================
     // 位置と向き
     //=====================================================================
 
     private bool IsTracking => data.origin == AttackOrigin.PlayerTracking || (data.trackDuringTelegraph && data.aim == AttackAim.Player);
 
+    private Vector2 PlacedOrigin => origin + direction * data.forwardOffset;
+
     /// <summary>
     /// 起点・向き・長さを決める（first：予告を出す最初）
     /// </summary>
     private void UpdatePose(bool first)
     {
-        GameObject target = enemy.Target;
-        Vector2 enemyPos = enemy.transform.position;
-        Vector2 targetPos = target != null ? (Vector2)target.transform.position : enemyPos + enemy.Facing;
+        GameObject target = runner.Target;
+        Vector2 selfPos = runner.Position;
+        Vector2 targetPos = target != null ? (Vector2)target.transform.position : selfPos + runner.Facing;
 
         // 起点
         if(first || data.origin == AttackOrigin.PlayerTracking)
         {
-            origin = data.origin == AttackOrigin.Enemy ? enemyPos : targetPos;
+            origin = data.origin == AttackOrigin.Enemy ? selfPos : targetPos;
         }
         else if(data.origin == AttackOrigin.Enemy)
         {
-            origin = enemyPos;
+            origin = selfPos;
         }
 
         // 向き
         if(first || (data.trackDuringTelegraph && data.aim == AttackAim.Player))
         {
-            direction = ComputeDirection(enemyPos, targetPos);
+            direction = ComputeDirection(selfPos, targetPos);
         }
 
         float oldLength = length;
@@ -175,24 +218,22 @@ public class AttackExecution
         }
     }
 
-    private Vector2 ComputeDirection(Vector2 enemyPos, Vector2 targetPos)
+    private Vector2 ComputeDirection(Vector2 selfPos, Vector2 targetPos)
     {
         switch(data.aim)
         {
             case AttackAim.Facing:
-                return enemy.Facing;
+                return runner.Facing.sqrMagnitude > 0.0001f ? runner.Facing.normalized : Vector2.right;
 
             case AttackAim.Fixed:
                 float rad = data.fixedAngle * Mathf.Deg2Rad;
                 return new Vector2(Mathf.Cos(rad), Mathf.Sin(rad));
 
             default:
-                Vector2 toTarget = targetPos - enemyPos;
-                return toTarget.sqrMagnitude > 0.0001f ? toTarget.normalized : enemy.Facing;
+                Vector2 toTarget = targetPos - selfPos;
+                return toTarget.sqrMagnitude > 0.0001f ? toTarget.normalized : (runner.Facing.sqrMagnitude > 0.0001f ? runner.Facing.normalized : Vector2.right);
         }
     }
-
-    private Vector2 PlacedOrigin => origin + direction * data.forwardOffset;
 
     /// <summary>
     /// 長方形の長さ（壁で止める設定なら、壁までの距離）
@@ -205,7 +246,7 @@ public class AttackExecution
         float wall = DistanceToWall(from, dir, max);
 
         // 突進は体の大きさの分、手前で止まる
-        if(data.motion == AttackMotion.Charge && wall < max) { wall = Mathf.Max(0.0f, wall - enemy.BodyRadius); }
+        if(data.motion == AttackMotion.Charge && enemy != null && wall < max) { wall = Mathf.Max(0.0f, wall - enemy.BodyRadius); }
         return Mathf.Min(max, wall);
     }
 
@@ -225,71 +266,6 @@ public class AttackExecution
     }
 
     //=====================================================================
-    // 当てる
-    //=====================================================================
-
-    /// <summary>
-    /// 範囲に入っている相手に当てる
-    /// </summary>
-    /// <param name="repeating"> 出し続ける攻撃か（当たる間隔を守る） </param>
-    private void HitTargets(bool repeating)
-    {
-        Vector2 placed = PlacedOrigin;
-        Vector2 center = data.shape.CenterOf(placed, direction, length);
-        float searchRadius = data.shape.OuterRadius(length) + 1.0f;
-
-        found.Clear();
-        found.AddRange(Physics2D.OverlapCircleAll(center, searchRadius));
-
-        var hitThisCheck = new HashSet<Object>();
-        foreach(Collider2D col in found)
-        {
-            if(!IsTarget(col)) { continue; }
-            if(!data.shape.Overlaps(col, placed, direction, length)) { continue; }
-
-            Object key = DamageUtility.HitKey(col);
-            if(key == null) { key = col; }
-            if(!hitThisCheck.Add(key)) { continue; }
-
-            if(repeating)
-            {
-                if(lastHitTime.TryGetValue(key, out float last) && Time.time - last < data.hitInterval) { continue; }
-                lastHitTime[key] = Time.time;
-            }
-
-            Vector2 point = col.ClosestPoint(center);
-            DamageUtility.Apply(col, DamageInfo.Create(data.damage, data.damageKind, enemy.gameObject, point));
-        }
-    }
-
-    /// <summary>
-    /// 当てる相手か（当たる相手・効かないキャラ・自分自身）
-    /// </summary>
-    private bool IsTarget(Collider2D col)
-    {
-        if(col == null) { return false; }
-
-        // トリガーは、攻撃を受ける部品（DamageReceiver）が付いているものだけ
-        if(col.isTrigger && col.GetComponent<DamageReceiver>() == null) { return false; }
-
-        if(col.CompareTag("Player"))
-        {
-            if(!data.HitsPlayer) { return false; }
-            return !data.Ignores(PlayerCharacters.Of(col.gameObject));
-        }
-
-        if(col.CompareTag("Enemies"))
-        {
-            if(!data.HitsEnemies) { return false; }
-            Enemy other = col.GetComponentInParent<Enemy>();
-            return other != enemy;
-        }
-
-        // タグがなくても、攻撃を受ける部品があればギミックとして当てる（敵に当たる攻撃のとき）
-        return data.HitsEnemies && col.GetComponent<DamageReceiver>() != null;
-    }
-
-    //=====================================================================
     // 出し続ける（ビーム）
     //=====================================================================
 
@@ -304,7 +280,7 @@ public class AttackExecution
         float elapsed = 0.0f;
         while(elapsed < data.sustainTime)
         {
-            if(brain.CanAct)
+            if(runner.CanAct)
             {
                 float dt = Time.deltaTime;
                 elapsed += dt;
@@ -314,7 +290,7 @@ public class AttackExecution
                 {
                     direction = Quaternion.Euler(0.0f, 0.0f, data.rotateSpeed * dt) * direction;
                 }
-                if(data.origin == AttackOrigin.Enemy) { origin = enemy.transform.position; }
+                if(data.origin == AttackOrigin.Enemy) { origin = runner.Position; }
 
                 float oldLength = length;
                 length = ComputeLength(PlacedOrigin, direction);
@@ -333,10 +309,71 @@ public class AttackExecution
                     }
                 }
 
-                HitTargets(true);
+                AttackHits.Hit(data, PlacedOrigin, direction, length, Attacker, lastHitTime);
             }
             yield return null;
         }
+    }
+
+    //=====================================================================
+    // 上から落ちる
+    //=====================================================================
+
+    /// <summary>
+    /// 予告の最後（残り dropTime 秒）に、上から物を落とす見た目
+    /// </summary>
+    private void UpdateDrop(float remaining)
+    {
+        if(data.dropObject == null) { return; }
+
+        float fall = Mathf.Max(0.05f, data.dropTime);
+        if(remaining > fall) { return; }
+
+        Vector2 landing = data.shape.CenterOf(PlacedOrigin, direction, length);
+        if(spawnedVisual == null)
+        {
+            spawnedVisual = Object.Instantiate(data.dropObject, landing + Vector2.up * data.dropHeight, Quaternion.identity);
+            DisableColliders(spawnedVisual);
+        }
+
+        float t = 1.0f - Mathf.Clamp01(remaining / fall);
+        spawnedVisual.transform.position = Vector2.Lerp(landing + Vector2.up * data.dropHeight, landing, t * t);
+    }
+
+    //=====================================================================
+    // 下から突き出る
+    //=====================================================================
+
+    private IEnumerator Rise()
+    {
+        Vector2 center = data.shape.CenterOf(PlacedOrigin, direction, length);
+        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+
+        if(data.riseObject != null)
+        {
+            spawnedVisual = Object.Instantiate(data.riseObject, center, Quaternion.Euler(0.0f, 0.0f, data.shape.type == AttackShapeType.Rectangle ? angle : 0.0f));
+        }
+
+        HitNow();
+
+        // 残っている間（当たり判定が付いていれば壁になる。ナビメッシュも自動で作り直される）
+        float elapsed = 0.0f;
+        while(elapsed < data.riseLinger)
+        {
+            if(runner.CanAct)
+            {
+                elapsed += Time.deltaTime;
+                if(data.riseHitWhileLingering) { AttackHits.Hit(data, PlacedOrigin, direction, length, Attacker, lastHitTime); }
+            }
+            yield return null;
+        }
+
+        DestroyVisual();
+    }
+
+    private static void DisableColliders(GameObject go)
+    {
+        foreach(Collider2D col in go.GetComponentsInChildren<Collider2D>()) { col.enabled = false; }
     }
 
     //=====================================================================
@@ -360,7 +397,7 @@ public class AttackExecution
         while(traveled < distance - 0.05f)
         {
             yield return new WaitForFixedUpdate();
-            if(!brain.CanAct) { last = enemy.transform.position; continue; }
+            if(!runner.CanAct) { last = enemy.transform.position; continue; }
 
             Vector2 now = enemy.transform.position;
             float step = Vector2.Distance(now, last);
@@ -373,7 +410,7 @@ public class AttackExecution
             if(stuckTime > 0.1f) { hitWall = true; break; }
 
             // 体のまわり（突進の幅）に当たった相手
-            HitAround(now, hitOnce);
+            AttackHits.HitCircle(data, now, Mathf.Max(enemy.BodyRadius, data.shape.width * 0.5f), Attacker, hitOnce);
         }
 
         enemy.ClearOverrideVelocity();
@@ -394,7 +431,7 @@ public class AttackExecution
         if(hitWall && data.chargeStunTime > 0.0f)
         {
             enemy.PlayAction("Stun");
-            yield return brain.Wait(data.chargeStunTime);
+            yield return runner.Wait(data.chargeStunTime);
         }
     }
 
@@ -435,58 +472,67 @@ public class AttackExecution
         return false;
     }
 
-    private void HitAround(Vector2 position, HashSet<Object> hitOnce)
-    {
-        float radius = Mathf.Max(enemy.BodyRadius, data.shape.width * 0.5f);
-        foreach(Collider2D col in Physics2D.OverlapCircleAll(position, radius))
-        {
-            if(!IsTarget(col)) { continue; }
-
-            Object key = DamageUtility.HitKey(col);
-            if(key == null) { key = col; }
-            if(!hitOnce.Add(key)) { continue; }
-
-            DamageUtility.Apply(col, DamageInfo.Create(data.damage, data.damageKind, enemy.gameObject, col.ClosestPoint(position)));
-        }
-    }
-
     //=====================================================================
     // 弾
     //=====================================================================
 
     private IEnumerator FireBullets()
     {
-        EnemyBulletPool pool = brain.BulletPool;
+        EnemyBulletPool pool = runner.BulletPool;
         if(pool == null)
         {
-            Debug.LogWarning($"{enemy.name}: 敵の弾のプール（EnemyBulletPool）がシーンにないので、弾を撃てません", enemy);
+            Debug.LogWarning($"{runner.name}: 敵の弾のプール（EnemyBulletPool）がシーンにないので、弾を撃てません", runner);
             yield break;
         }
 
         int volleys = Mathf.Max(1, data.bulletVolleys);
         for(int v = 0; v < volleys; v++)
         {
-            while(!brain.CanAct) { yield return null; }
+            while(!runner.CanAct) { yield return null; }
 
             // 向きは撃つたびに決め直す（プレイヤーを狙う場合）
-            Vector2 enemyPos = enemy.transform.position;
-            GameObject target = enemy.Target;
-            Vector2 baseDir = ComputeDirection(enemyPos, target != null ? (Vector2)target.transform.position : enemyPos + enemy.Facing);
+            Vector2 selfPos = runner.Position;
+            GameObject target = runner.Target;
+            Vector2 baseDir = ComputeDirection(selfPos, target != null ? (Vector2)target.transform.position : selfPos + runner.Facing);
 
             int count = Mathf.Max(1, data.bulletCount);
             for(int i = 0; i < count; i++)
             {
-                float angle = count == 1 ? 0.0f : Mathf.Lerp(-data.bulletSpread * 0.5f, data.bulletSpread * 0.5f, (float)i / (count - 1));
-                Vector2 dir = Quaternion.Euler(0.0f, 0.0f, angle) * baseDir;
+                Vector2 dir = Quaternion.Euler(0.0f, 0.0f, BulletAngle(i, count)) * baseDir;
 
-                EnemyBullet bullet = pool.GetBullet(enemyPos + dir * data.forwardOffset, Quaternion.identity);
+                EnemyBullet bullet = pool.GetBullet(selfPos + dir * data.forwardOffset, Quaternion.identity);
                 if(bullet == null) { continue; }
+                bullet.Configure(data.bulletSpeed, data.damage);
+                bullet.SetRules(data.ignoreNoah, data.ignoreSigle, data.bulletDeletable);
                 bullet.SetDirection(dir);
-                bullet.SetShooter(enemy.gameObject);
+                bullet.SetShooter(Attacker);
             }
 
-            if(v > 0) { SeManager.PlaySe(data.activeSe, enemyPos); }
-            if(v < volleys - 1) { yield return brain.Wait(data.bulletVolleyInterval); }
+            spiralAngle += data.bulletSpiralStep;
+
+            if(v > 0) { SeManager.PlaySe(data.activeSe, selfPos); }
+            if(v < volleys - 1) { yield return runner.Wait(data.bulletVolleyInterval); }
+        }
+    }
+
+    /// <summary>
+    /// i 発目の弾の、基準の向きからの角度
+    /// </summary>
+    private float BulletAngle(int i, int count)
+    {
+        switch(data.bulletPattern)
+        {
+            case BulletPattern.Circle:
+                return 360.0f * i / count;
+
+            case BulletPattern.Spiral:
+                return spiralAngle + 360.0f * i / count;
+
+            case BulletPattern.Random:
+                return UnityEngine.Random.Range(-data.bulletSpread * 0.5f, data.bulletSpread * 0.5f);
+
+            default:
+                return count == 1 ? 0.0f : Mathf.Lerp(-data.bulletSpread * 0.5f, data.bulletSpread * 0.5f, (float)i / (count - 1));
         }
     }
 }
