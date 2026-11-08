@@ -122,6 +122,19 @@ public class Health : MonoBehaviour
     }
 
     /// <summary>
+    /// 自分の体力（共有していても、共有先ではなく自分の値）。セーブ用
+    /// </summary>
+    public int OwnHealth => currentHealth;
+
+    /// <summary>
+    /// イベントを出さずに自分の体力を決める（セーブから戻すとき。1〜最大に収める）
+    /// </summary>
+    public void SetHealthSilently(int value)
+    {
+        currentHealth = Mathf.Clamp(value, 1, Mathf.Max(1, maxHealth));
+    }
+
+    /// <summary>
     /// 体力を共有する相手を設定する（null で共有をやめる）
     /// </summary>
     /// 例：シグルの Health → ノアの Health。シグルが受けた攻撃はノアの体力から減る

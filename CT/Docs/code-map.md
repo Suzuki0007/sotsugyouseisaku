@@ -102,7 +102,7 @@
 | `Spawner/ObjectSpawner.cs`、`Spawner/SpawnedObject.cs`、`Spawner/Enemy/EnemySpawner.cs` | 一定間隔で再出現（プレハブを出す古い作り。今もそのまま使える） | ◎ |
 | `Spawner/Enemy/EnemyDataSpawner.cs` | **敵のスポナー（新しい作り）**（段階7）。敵のデータを何種類でも（順番／重みつきランダム）、同時にいる数・合計・1回に出す数・最初と次までの秒数・出る場所（複数・ばらつき・プレイヤーから離す距離）・条件（GameCondition）・条件を外れたら消す・予告の丸・全部倒したらイベントとフラグ。`Enemy.Spawn` で出す。EnemyBlock の間は時間が進まない。Hierarchy 右クリック > 敵 > スポナー | ◎ |
 | `Spawner/Player/PlayerPartySpawner.cs`、`PlayerSpawnPoint.cs` | プレイヤーの生成と出現位置。出現位置に Sigle 用の位置があれば、Sigle はそこに出てノアの後ろへ歩いて付いていく（`PlayerHistory.SeedPath`） | ◎ |
-| `Health/Health.cs` | 体力、`SetDeadSilently`（イベントを出さずに 0 にする。倒した記録から戻すとき）、`OnDied` / `OnDamaged` / `OnHealed` / **`OnDamagedInfo`**（攻撃の情報つき）/ **`OnBlocked`**（効かなかった）、`DamageFilter`（受ける前に量を変える。0 以下なら OnBlocked だけ出して終わり）、`LastDamage`、`Damage(int)` と `Damage(DamageInfo)`、`SetMaxHealth`、`Invincible` / `PlayerInvincible`、**体力の共有**（`ShareWith`：受けたダメージ・回復を共有先へ回し、自分のイベントも出す。2人の状態が「一緒」のときノア → シグルを `PlayerSwitchManager` が設定、離れたら共有しない） | ◎ |
+| `Health/Health.cs` | 体力、`SetDeadSilently`（イベントを出さずに 0 にする。倒した記録から戻すとき）、`OnDied` / `OnDamaged` / `OnHealed` / **`OnDamagedInfo`**（攻撃の情報つき）/ **`OnBlocked`**（効かなかった）、`DamageFilter`（受ける前に量を変える。0 以下なら OnBlocked だけ出して終わり）、`LastDamage`、`Damage(int)` と `Damage(DamageInfo)`、`SetMaxHealth`、`OwnHealth` / `SetHealthSilently`（体力のセーブ用）、`Invincible` / `PlayerInvincible`、**体力の共有**（`ShareWith`：受けたダメージ・回復を共有先へ回し、自分のイベントも出す。2人の状態が「一緒」のときノア → シグルを `PlayerSwitchManager` が設定、離れたら共有しない） | ◎ |
 
 ### イベント・アイテム・フラグ・会話・セーブ（プランナー向けの中心）
 詳しくは CLAUDE.md の「主な仕組み」と各 Docs。
@@ -153,7 +153,7 @@
 | `Gimmick/GimmickVisual.cs` | **状態で見た目を変える**。状態の値ごとに絵・色・表示する物・有効にする部品（燭台の火と LightSource など） |
 | `Party/PartyRejoinArea.cs` | 合流の範囲（2人がそろうと一緒に戻す・イベント・待て／ついてこいを使えるように・1回だけ `Rejoin/<シーン>/<ID>`） |
 | `Party/PartyWarpEventAction.cs` | イベントの部品「キャラを移す」（ノア・シグル・操作中・相棒を移す場所へ。暗転つき） |
-| `Party/PartyPersistence.cs` | 2人の状態のセーブ（`Save.BeforeCommit` で `Party/Mode`・`Current`・`Scene`・`PartnerX/Y`・`WaitLocked`）と復元（`PlayerPartySpawner` から。同じシーンのときだけ） |
+| `Party/PartyPersistence.cs` | 2人の状態のセーブ（`Save.BeforeCommit` で `Party/Mode`・`Current`・`Scene`・`PartnerX/Y`・`WaitLocked`・**`NoahHP`・`SigleHP`**）と復元（`PlayerPartySpawner` から。状態は同じシーンのときだけ、体力はどのシーンでも。体力の記録が 0 以下・なしなら満タン） |
 | `Party/PartyRoute.cs` | 相棒が合流する道（まっすぐ CircleCast で行けるか。通り抜けられる壁は無視 → ナビメッシュの回り道 → なければ来られない） |
 | `Party/CharacterBarrier.cs` | キャラによって通れる壁（通れるキャラの当たり判定と IgnoreCollision。0.5 秒ごとにかけ直す）。一緒のときに通れるキャラが入ると相棒を待機に。通れないキャラが触れると目印 |
 | `Party/BreakableWall.cs` | 壊せる壁（DamageReceiver。攻撃したキャラ・種類・ゲージ判定・回数。壊れると当たり判定を切り、絵を消す／差し替える。GimmickState の ON でセーブ） |
