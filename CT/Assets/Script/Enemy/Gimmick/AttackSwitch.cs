@@ -45,6 +45,13 @@ public class AttackSwitch : MonoBehaviour
     [SerializeField, Label("実行するイベント")]
     private EventSequence sequence;
 
+    [SerializeField, Label("仕掛けの状態")]
+    [Tooltip("作動したときに変える仕掛けの状態（GimmickState）。扉などの「条件」に入れて使う。空なら使わない")]
+    private GimmickState gimmick;
+
+    [SerializeField, Label("仕掛けの状態をどうするか")]
+    private GimmickSwitchAction gimmickAction = GimmickSwitchAction.TurnOn;
+
     [SerializeField, Label("1回だけ")]
     [Tooltip("オン：1回作動したら、もう反応しない（セーブもする）／オフ：何度でも作動する")]
     private bool once = true;
@@ -74,6 +81,8 @@ public class AttackSwitch : MonoBehaviour
     //=====================================================================
 
     public bool Done => done;
+
+    public GimmickState Gimmick => gimmick;
 
     //=====================================================================
     // 関数
@@ -122,6 +131,16 @@ public class AttackSwitch : MonoBehaviour
         {
             done = true;
             Save.SetPending(saveKey, true);
+        }
+        if(gimmick != null)
+        {
+            switch(gimmickAction)
+            {
+                case GimmickSwitchAction.TurnOff: gimmick.TurnOff(); break;
+                case GimmickSwitchAction.Toggle:  gimmick.Toggle(); break;
+                case GimmickSwitchAction.Advance: gimmick.Advance(); break;
+                default:                          gimmick.TurnOn(); break;
+            }
         }
         if(sequence != null) { sequence.Play(gameObject); }
     }

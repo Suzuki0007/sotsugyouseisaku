@@ -30,6 +30,7 @@ public class DebugWindow : EditorWindow
     private bool foldSave = true;
     private bool foldStart = true;
     private bool foldEnemies = true;
+    private bool foldGimmicks = true;
 
     private AttackData debugAttack;
     private readonly Dictionary<int, int> attackChoice = new Dictionary<int, int>();
@@ -90,6 +91,7 @@ public class DebugWindow : EditorWindow
             DrawWarp();
             DrawPlayer();
             DrawEnemies();
+            DrawGimmicks();
         }
 
         DrawStartState();
@@ -392,6 +394,49 @@ public class DebugWindow : EditorWindow
             if(enemies.Count > 0 && GUILayout.Button("全部倒す"))
             {
                 foreach(Enemy enemy in new List<Enemy>(enemies)) { Kill(enemy); }
+            }
+        }
+        EditorGUILayout.EndFoldoutHeaderGroup();
+    }
+
+    //=====================================================================
+    // 仕掛け（謎解き）
+    //=====================================================================
+
+    private void DrawGimmicks()
+    {
+        foldGimmicks = EditorGUILayout.BeginFoldoutHeaderGroup(foldGimmicks, "仕掛け");
+        if(foldGimmicks)
+        {
+            IReadOnlyList<GimmickState> states = GimmickState.All;
+            if(states.Count == 0) { EditorGUILayout.LabelField("（このシーンに仕掛けはありません）", EditorStyles.miniLabel); }
+
+            foreach(GimmickState state in new List<GimmickState>(states))
+            {
+                if(state == null) { continue; }
+                PuzzleCheck puzzle = state.GetComponent<PuzzleCheck>();
+
+                using(new EditorGUILayout.HorizontalScope())
+                {
+                    string label = (puzzle != null ? "答え合わせ：" : "") + state.DisplayName;
+                    if(GUILayout.Button(label, EditorStyles.label, GUILayout.MinWidth(120))) { Selection.activeGameObject = state.gameObject; }
+                    EditorGUILayout.LabelField(state.ValueText + (state.Locked ? "（固定）" : ""), GUILayout.Width(80));
+
+                    if(puzzle != null)
+                    {
+                        if(GUILayout.Button("答え合わせ", EditorStyles.miniButton, GUILayout.Width(70))) { puzzle.Judge(); }
+                        if(GUILayout.Button("入力を戻す", EditorStyles.miniButton, GUILayout.Width(70))) { puzzle.ResetInputs(); }
+                    }
+                    else
+                    {
+                        if(GUILayout.Button(state.StateCount == 2 ? "切り替え" : "次へ", EditorStyles.miniButton, GUILayout.Width(60))) { state.Toggle(true); }
+                    }
+                    if(GUILayout.Button("戻す", EditorStyles.miniButton, GUILayout.Width(40))) { state.SetLocked(false); state.ResetValue(true); }
+                }
+                if(puzzle != null)
+                {
+                    using(new EditorGUI.IndentLevelScope()) { EditorGUILayout.LabelField(puzzle.StatusText, EditorStyles.miniLabel); }
+                }
             }
         }
         EditorGUILayout.EndFoldoutHeaderGroup();

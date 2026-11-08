@@ -72,6 +72,89 @@ public static class SceneChecker
         CheckSwitches(ctx);
         CheckDialogues(ctx);
         CheckEnemies(ctx);
+        CheckGimmicks(ctx);
+    }
+
+    //=====================================================================
+    // 仕掛け（謎解き）
+    //=====================================================================
+
+    private static void CheckGimmicks(Context ctx)
+    {
+        // 仕掛けの状態：セーブの名前が重なっていないか・どこからも見られていないか
+        List<GimmickWiring.Edge> edges = null;
+        var keys = new Dictionary<string, GimmickState>();
+        foreach(GimmickState state in ctx.Find<GimmickState>())
+        {
+            var so = new SerializedObject(state);
+            if(so.FindProperty("save").boolValue)
+            {
+                string key = GimmickState.MakeSaveKey(state.gameObject, so.FindProperty("saveId").stringValue);
+                if(keys.TryGetValue(key, out GimmickState other)) { ctx.Add(Level.Error, state, $"仕掛けのセーブの名前が「{other.name}」と重なっています（同じ名前の物が同じ親の下にある）。セーブ用の ID を付けてください"); }
+                else { keys[key] = state; }
+            }
+
+            if(so.FindProperty("initialValue").intValue >= Mathf.Max(2, so.FindProperty("stateCount").intValue))
+            {
+                ctx.Add(Level.Warning, state, "仕掛けの「最初の状態」が段階の数より大きいです（最後の段階になります）");
+            }
+
+            if(edges == null) { edges = GimmickWiring.Collect(); }
+            bool used = false;
+            foreach(GimmickWiring.Edge e in edges) { if(e.from == state) { used = true; break; } }
+            if(!used) { ctx.Add(Level.Info, state, "この仕掛けの状態は、どの条件・答え合わせからも使われていません（扉などの「条件」に入れると動きます）"); }
+        }
+
+        foreach(GimmickReaction reaction in ctx.Find<GimmickReaction>())
+        {
+            if(reaction.Condition == null || reaction.Condition.IsEmpty)
+            {
+                ctx.Add(Level.Warning, reaction, "条件で動く物の「条件」が空です（ずっと満たさないので動きません）");
+            }
+            else if(reaction.Condition.gimmicks != null && reaction.Condition.gimmicks.Exists(g => g == null || g.target == null))
+            {
+                ctx.Add(Level.Error, reaction, "条件で動く物の「仕掛け」の条件に、仕掛けが入っていない行があります（満たさないので動きません）");
+            }
+
+            bool nothing = reaction.ShowWhenMet.Count == 0 && reaction.HideWhenMet.Count == 0 && reaction.OnMetSequence == null;
+            if(nothing) { ctx.Add(Level.Warning, reaction, "条件で動く物に、表示を切り替える物もイベントも入っていません（満たしても何も起きません）"); }
+
+            foreach(GameObject go in reaction.HideWhenMet)
+            {
+                if(go != null && reaction.transform.IsChildOf(go.transform))
+                {
+                    ctx.Add(Level.Error, reaction, $"条件で動く物が、自分（か親）の「{go.name}」を隠します。隠れると条件を見られなくなります（隠す物は子にしてください）");
+                }
+            }
+        }
+
+        foreach(PuzzleCheck puzzle in ctx.Find<PuzzleCheck>())
+        {
+            if(puzzle.Inputs.Count == 0 || ((List<GimmickState>)puzzle.Inputs).Exists(g => g == null))
+            {
+                ctx.Add(Level.Error, puzzle, "答え合わせの入力が空か、空の行があります");
+            }
+            if(puzzle.Mode == PuzzleMode.Pattern && puzzle.Answer.Count != puzzle.Inputs.Count)
+            {
+                ctx.Add(Level.Error, puzzle, $"答え合わせの「答え」の数（{puzzle.Answer.Count}）が、入力の数（{puzzle.Inputs.Count}）と合っていません");
+            }
+            if(puzzle.Mode == PuzzleMode.Order && puzzle.Inputs.Count < 2)
+            {
+                ctx.Add(Level.Warning, puzzle, "「決めた順番」の答え合わせに、入力が 1 つしかありません");
+            }
+        }
+
+        foreach(GimmickSwitch sw in ctx.Find<GimmickSwitch>())
+        {
+            bool hasTrigger = false;
+            foreach(Collider2D c in sw.GetComponents<Collider2D>()) { if(c.isTrigger) { hasTrigger = true; } }
+            if(!hasTrigger) { ctx.Add(Level.Error, sw, "調べるスイッチに Is Trigger の Collider2D（調べる範囲）がありません"); }
+        }
+
+        foreach(GimmickEventAction action in ctx.Find<GimmickEventAction>())
+        {
+            if(action.Target == null) { ctx.Add(Level.Error, action, "「仕掛けを操作」の仕掛けが空です"); }
+        }
     }
 
     private static void CheckEnemies(Context ctx)

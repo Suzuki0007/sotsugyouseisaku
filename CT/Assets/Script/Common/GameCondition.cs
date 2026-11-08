@@ -36,6 +36,18 @@ public class GameCondition
         Sigle,
     }
 
+    public enum PartyCheck
+    {
+        [InspectorName("問わない")]
+        Any,
+
+        [InspectorName("2人が一緒のとき")]
+        Together,
+
+        [InspectorName("2人が離れているとき（待機・別行動）")]
+        Apart,
+    }
+
     public enum HealthCheck
     {
         [InspectorName("問わない")]
@@ -74,6 +86,13 @@ public class GameCondition
     [Tooltip("操作中のキャラがこの Collider2D の範囲の中にいるとき（空なら判定しない。シーンに置いた物だけ指定できる）")]
     public Collider2D area;
 
+    [Tooltip("仕掛けの状態の条件。すべて満たすとき（空なら判定しない。シーンに置いた物だけ指定できる）。\n例：「スイッチA が ON」「ダイヤルが 3」")]
+    public List<GimmickCondition> gimmicks = new List<GimmickCondition>();
+
+    [Label("2人の状態")]
+    [Tooltip("ノアとシグルが一緒にいるか、離れているかで判定する")]
+    public PartyCheck party = PartyCheck.Any;
+
     //=====================================================================
     // 判定
     //=====================================================================
@@ -110,6 +129,22 @@ public class GameCondition
             if(player == null || !area.OverlapPoint(player.transform.position)) { return false; }
         }
 
+        if(gimmicks != null)
+        {
+            foreach(GimmickCondition g in gimmicks)
+            {
+                if(g != null && !g.IsMet()) { return false; }
+            }
+        }
+
+        if(party != PartyCheck.Any)
+        {
+            PlayerSwitchManager manager = PlayerSwitchManager.Instance;
+            bool together = manager == null || manager.IsTogether;
+            if(party == PartyCheck.Together && !together) { return false; }
+            if(party == PartyCheck.Apart && together)     { return false; }
+        }
+
         return true;
     }
 
@@ -121,7 +156,9 @@ public class GameCondition
         (items == null || items.Count == 0) &&
         character == CharacterCheck.Any &&
         partyHealth == HealthCheck.Any &&
-        area == null;
+        area == null &&
+        (gimmicks == null || gimmicks.Count == 0) &&
+        party == PartyCheck.Any;
 
     /// <summary>
     /// すべての条件を満たしているか（空なら常に満たす）

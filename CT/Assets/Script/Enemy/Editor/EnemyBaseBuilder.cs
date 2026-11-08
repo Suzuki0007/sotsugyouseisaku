@@ -228,6 +228,8 @@ public static class EnemyBaseBuilder
     [MenuItem("GameObject/敵/グループ（全滅・撃破の順番）", false, 26)]
     private static void PlaceGroup(MenuCommand command)
     {
+        // 複数の敵を選んで右クリックから実行すると、選んだ数だけ呼ばれるので 1 回にまとめる
+        if(!GimmickMenu.FirstCallThisClick()) { return; }
         var go = new GameObject("敵のグループ");
         var group = go.AddComponent<EnemyGroup>();
 
