@@ -138,5 +138,63 @@ public class EnemyBrain : PatternRunner
             Gizmos.color = new Color(1.0f, 1.0f, 0.3f, 0.5f);
             Gizmos.DrawWireSphere(transform.position, wakeDistance);
         }
+
+        DrawActionRanges();
     }
+
+    /// <summary>
+    /// 行動の「この行動をする距離」（オレンジ）と「見える距離」（水色）を、最初の段階（再生中は今の段階）の分だけ円で出す
+    /// </summary>
+    private void DrawActionRanges()
+    {
+#if UNITY_EDITOR
+        Enemy self = enemy != null ? enemy : GetComponent<Enemy>();
+        EnemyPattern usePattern = Pattern != null ? Pattern : (overridePattern != null ? overridePattern : (self != null && self.Data != null ? self.Data.Pattern : null));
+        if(usePattern == null || usePattern.phases.Count == 0) { return; }
+
+        int index = Mathf.Clamp(Application.isPlaying ? PhaseIndex : 0, 0, usePattern.phases.Count - 1);
+        EnemyPhase phase = usePattern.phases[index];
+        if(phase == null || phase.actions == null) { return; }
+
+        var drawn = new List<float>();
+        Vector3 center = transform.position;
+        foreach(EnemyAction action in phase.actions)
+        {
+            if(action == null) { continue; }
+            string name = action.Summary;
+
+            if(action.distanceCheck != DistanceCheck.Any)
+            {
+                DrawRange(center, action.distance, new Color(1.0f, 0.6f, 0.2f, 0.8f), $"{name}：{(action.distanceCheck == DistanceCheck.Closer ? "この内側で" : "この外側で")}", drawn);
+            }
+            if(action.sightCheck != SightCheck.Any)
+            {
+                DrawRange(center, action.sightRange, new Color(0.3f, 0.85f, 1.0f, 0.7f), $"{name}：見える距離", drawn);
+            }
+            if(action is ChaseAction chase)
+            {
+                DrawRange(center, chase.chaseSightRange, new Color(0.3f, 0.85f, 1.0f, 0.4f), "追いかけ中に見える距離", drawn);
+            }
+        }
+#endif
+    }
+
+#if UNITY_EDITOR
+    private static void DrawRange(Vector3 center, float radius, Color color, string label, List<float> drawn)
+    {
+        if(radius <= 0.0f) { return; }
+
+        UnityEditor.Handles.color = color;
+        UnityEditor.Handles.DrawWireDisc(center, Vector3.forward, radius);
+
+        // 同じ半径の文字が重ならないよう、少しずつ下へずらす
+        int same = 0;
+        foreach(float r in drawn) { if(Mathf.Abs(r - radius) < 0.05f) { same++; } }
+        drawn.Add(radius);
+
+        var style = new GUIStyle(UnityEditor.EditorStyles.miniLabel);
+        style.normal.textColor = color;
+        UnityEditor.Handles.Label(center + new Vector3(radius * 0.71f, radius * 0.71f - same * 0.35f), label, style);
+    }
+#endif
 }

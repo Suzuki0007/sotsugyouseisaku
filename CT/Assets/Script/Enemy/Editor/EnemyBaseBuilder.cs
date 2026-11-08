@@ -253,6 +253,47 @@ public static class EnemyBaseBuilder
         PlaceAtView(go, new MenuCommand(null), "敵のグループ");
     }
 
+    [MenuItem("GameObject/敵/スポナー（敵のデータから出す）", false, 27)]
+    private static void PlaceSpawner(MenuCommand command)
+    {
+        var go = new GameObject("敵のスポナー");
+        var spawner = go.AddComponent<EnemyDataSpawner>();
+
+        // 出し始める範囲（この中にプレイヤーがいる間だけ出す）
+        var area = new GameObject("出し始める範囲");
+        area.transform.SetParent(go.transform, false);
+        var box = area.AddComponent<BoxCollider2D>();
+        box.isTrigger = true;
+        box.size = new Vector2(10.0f, 8.0f);
+
+        // 出る場所
+        var point = new GameObject("出る場所");
+        point.transform.SetParent(go.transform, false);
+        point.transform.localPosition = new Vector3(2.0f, 0.0f, 0.0f);
+
+        var so = new SerializedObject(spawner);
+        so.FindProperty("condition").FindPropertyRelative("area").objectReferenceValue = box;
+        SerializedProperty points = so.FindProperty("points");
+        points.arraySize = 1;
+        points.GetArrayElementAtIndex(0).objectReferenceValue = point.transform;
+
+        // 選んでいる敵のデータがあれば入れる（Project で EnemyData を選んでから作ると楽）
+        SerializedProperty enemies = so.FindProperty("enemies");
+        foreach(UnityEngine.Object obj in Selection.objects)
+        {
+            if(obj is EnemyData data)
+            {
+                enemies.arraySize++;
+                SerializedProperty entry = enemies.GetArrayElementAtIndex(enemies.arraySize - 1);
+                entry.FindPropertyRelative("enemy").objectReferenceValue = data;
+                entry.FindPropertyRelative("weight").floatValue = 1.0f;
+            }
+        }
+        so.ApplyModifiedPropertiesWithoutUndo();
+
+        PlaceAtView(go, command, "敵のスポナー");
+    }
+
     [MenuItem("GameObject/敵/部位を追加（選んでいる敵の子に）", false, 25)]
     private static void AddPart(MenuCommand command)
     {

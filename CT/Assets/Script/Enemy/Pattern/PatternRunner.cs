@@ -35,6 +35,7 @@ public abstract class PatternRunner : MonoBehaviour
     private Coroutine loop;
     private Coroutine actionRoutine;
     private EnemyAction currentAction;
+    private EnemyAction forcedAction;
 
     private EnemyBulletPool bulletPool;
 
@@ -123,7 +124,7 @@ public abstract class PatternRunner : MonoBehaviour
     {
         get
         {
-            if(pattern == null) { return "行動パターンなし"; }
+            if(pattern == null) { return currentAction != null ? $"行動パターンなし：{currentAction.Summary}" : "行動パターンなし"; }
             if(!started) { return "待機中"; }
             if(!CanActSelf) { return "止まっている"; }
 
@@ -255,7 +256,9 @@ public abstract class PatternRunner : MonoBehaviour
             }
 
             EnemyPhase phase = pattern.phases[phaseIndex];
-            EnemyAction action = PickAction(phase);
+            // デバッグなどで「次はこれ」と指定された行動があれば、条件に関係なくそれをする
+            EnemyAction action = forcedAction != null ? forcedAction : PickAction(phase);
+            forcedAction = null;
             if(action == null)
             {
                 yield return Wait(0.5f);
@@ -412,6 +415,35 @@ public abstract class PatternRunner : MonoBehaviour
     {
         yield return execution.Run();
         if(CurrentAttack == execution) { CurrentAttack = null; }
+    }
+
+    /// <summary>
+    /// 今の行動をやめて、すぐにこの攻撃を出させる（デバッグウィンドウの「この攻撃を出させる」）
+    /// </summary>
+    /// ・行動パターンが動いていれば、次の行動として割り込む（終わったらいつもの行動に戻る）
+    /// ・行動パターンがない（動いていない）ときは、その場で1回だけ出す
+    public void ForceAttack(AttackData attack)
+    {
+        if(attack == null || !IsAlive) { return; }
+
+        var action = new AttackAction { attack = attack };
+        if(loop != null && started)
+        {
+            forcedAction = action;
+            Interrupt();
+            return;
+        }
+
+        StopCurrentAction();
+        currentAction = action;
+        actionRoutine = StartCoroutine(RunForcedAction(action));
+    }
+
+    private IEnumerator RunForcedAction(EnemyAction action)
+    {
+        yield return action.Run(this);
+        if(currentAction == action) { currentAction = null; }
+        actionRoutine = null;
     }
 
     //=====================================================================

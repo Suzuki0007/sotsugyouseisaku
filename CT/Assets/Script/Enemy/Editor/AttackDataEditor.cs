@@ -52,6 +52,187 @@ public class AttackDataEditor : Editor
         }
 
         serializedObject.ApplyModifiedProperties();
+
+        DrawPreview(data);
+    }
+
+    //=====================================================================
+    // 形のプレビュー（Inspector と Scene ビュー）
+    //=====================================================================
+
+    private const string ScenePreviewKey = "CT.AttackPreview.Scene";
+
+    private static bool ScenePreview
+    {
+        get => EditorPrefs.GetBool(ScenePreviewKey, true);
+        set => EditorPrefs.SetBool(ScenePreviewKey, value);
+    }
+
+    private void OnEnable()
+    {
+        SceneView.duringSceneGui += OnSceneGUI;
+        SceneView.RepaintAll();
+    }
+
+    private void OnDisable()
+    {
+        SceneView.duringSceneGui -= OnSceneGUI;
+        SceneView.RepaintAll();
+    }
+
+    /// <summary>
+    /// Inspector の下に、形の小さな図を出す（1 マスごとの目盛り・白い点＝起点・矢印＝前）
+    /// </summary>
+    private static void DrawPreview(AttackData data)
+    {
+        EditorGUILayout.Space(6);
+        EditorGUILayout.LabelField("形のプレビュー", EditorStyles.boldLabel);
+
+        bool scene = EditorGUILayout.ToggleLeft("Scene ビューにも表示する（最後に選んだ敵の位置。いなければ Scene ビューの真ん中）", ScenePreview);
+        if(scene != ScenePreview) { ScenePreview = scene; SceneView.RepaintAll(); }
+
+        Rect rect = GUILayoutUtility.GetRect(10, 180, GUILayout.ExpandWidth(true));
+        if(Event.current.type != EventType.Repaint) { return; }
+
+        EditorGUI.DrawRect(rect, new Color(0.13f, 0.13f, 0.13f));
+
+        // 形が収まる大きさにする
+        float extent = Mathf.Max(1.0f, data.shape.OuterRadius() + Mathf.Abs(data.forwardOffset)) * 1.15f;
+        float scale = Mathf.Min(rect.width, rect.height) * 0.5f / extent;
+        Vector2 center = rect.center;
+        if(data.shape.type == AttackShapeType.Rectangle || data.shape.type == AttackShapeType.Sector)
+        {
+            // 前に伸びる形は、起点を左に寄せる
+            center.x = rect.x + rect.width * 0.5f - Mathf.Min(rect.width * 0.35f, data.shape.OuterRadius() * 0.5f * scale);
+        }
+
+        Vector2 forward = PreviewForward(data);
+        System.Func<Vector2, Vector3> map = p => new Vector3(center.x + p.x * scale, center.y - p.y * scale, 0.0f);
+
+        GUI.BeginClip(rect);
+        Vector2 offset = rect.position;
+        System.Func<Vector2, Vector3> local = p => map(p) - (Vector3)offset;
+
+        // 1 マスごとの目盛り
+        Handles.color = new Color(1, 1, 1, 0.06f);
+        int lines = Mathf.CeilToInt(Mathf.Max(rect.width, rect.height) / Mathf.Max(4.0f, scale)) + 2;
+        for(int i = -lines; i <= lines; i++)
+        {
+            Handles.DrawLine(local(new Vector2(i, -lines)), local(new Vector2(i, lines)));
+            Handles.DrawLine(local(new Vector2(-lines, i)), local(new Vector2(lines, i)));
+        }
+
+        Vector2 origin = forward * data.forwardOffset;
+        DrawShape(data, origin, forward, local);
+
+        // 起点と向き
+        Handles.color = Color.white;
+        Handles.DrawSolidDisc(local(Vector2.zero), Vector3.forward, 3.0f);
+        Handles.DrawLine(local(Vector2.zero), local(forward * 0.8f));
+        GUI.EndClip();
+
+        GUI.Label(new Rect(rect.x + 4, rect.y + 2, rect.width - 8, 18), $"1 目盛り = 1 マス　{PreviewNote(data)}", EditorStyles.miniLabel);
+    }
+
+    private static Vector2 PreviewForward(AttackData data)
+    {
+        if(data.aim == AttackAim.Fixed)
+        {
+            float a = data.fixedAngle * Mathf.Deg2Rad;
+            return new Vector2(Mathf.Cos(a), Mathf.Sin(a));
+        }
+        return Vector2.right;
+    }
+
+    private static string PreviewNote(AttackData data)
+    {
+        string where = data.origin == AttackOrigin.Enemy ? "白い点＝敵" : "白い点＝プレイヤー";
+        string dir = data.aim == AttackAim.Fixed ? "向きは固定" : (data.aim == AttackAim.Player ? "右＝プレイヤーの方向" : "右＝敵の向いている方向");
+        return $"{where}　{dir}";
+    }
+
+    /// <summary>
+    /// 形（塗り・枠）と、弾なら撃つ方向の線を描く
+    /// </summary>
+    private static void DrawShape(AttackData data, Vector2 origin, Vector2 forward, System.Func<Vector2, Vector3> map)
+    {
+        var verts = new System.Collections.Generic.List<Vector3>();
+        var tris = new System.Collections.Generic.List<int>();
+        Vector2 left = new Vector2(-forward.y, forward.x);
+        System.Func<Vector3, Vector3> toWorld = v => map(origin + forward * v.x + left * v.y);
+
+        Color fill = data.telegraphColor;
+        fill.a = Mathf.Clamp(fill.a, 0.25f, 0.6f);
+        Color line = data.telegraphColor;
+        line.a = 1.0f;
+
+        data.shape.BuildFill(verts, tris);
+        Handles.color = fill;
+        DrawTriangles(verts, tris, toWorld);
+
+        data.shape.BuildOutline(verts, tris, 0.06f);
+        Handles.color = line;
+        DrawTriangles(verts, tris, toWorld);
+
+        if(data.activation != AttackActivation.Bullet) { return; }
+
+        // 弾の方向
+        Handles.color = new Color(1.0f, 0.9f, 0.4f, 0.9f);
+        float reach = Mathf.Max(2.0f, data.shape.OuterRadius());
+        foreach(float deg in BulletAngles(data))
+        {
+            float a = deg * Mathf.Deg2Rad;
+            Vector2 dir = forward * Mathf.Cos(a) + left * Mathf.Sin(a);
+            Handles.DrawLine(map(origin), map(origin + dir * reach));
+        }
+    }
+
+    private static System.Collections.Generic.IEnumerable<float> BulletAngles(AttackData data)
+    {
+        int count = Mathf.Max(1, data.bulletCount);
+        switch(data.bulletPattern)
+        {
+            case BulletPattern.Circle:
+            case BulletPattern.Spiral:
+                for(int i = 0; i < count; i++) { yield return 360.0f * i / count; }
+                break;
+            default:
+                if(count == 1) { yield return 0.0f; break; }
+                for(int i = 0; i < count; i++) { yield return Mathf.Lerp(-data.bulletSpread * 0.5f, data.bulletSpread * 0.5f, (float)i / (count - 1)); }
+                break;
+        }
+    }
+
+    private static void DrawTriangles(System.Collections.Generic.List<Vector3> verts, System.Collections.Generic.List<int> tris, System.Func<Vector3, Vector3> toWorld)
+    {
+        var tri = new Vector3[3];
+        for(int i = 0; i + 2 < tris.Count; i += 3)
+        {
+            tri[0] = toWorld(verts[tris[i]]);
+            tri[1] = toWorld(verts[tris[i + 1]]);
+            tri[2] = toWorld(verts[tris[i + 2]]);
+            Handles.DrawAAConvexPolygon(tri);
+        }
+    }
+
+    /// <summary>
+    /// Scene ビューに、最後に選んだ敵（なければ Scene ビューの真ん中）を起点に形を出す
+    /// </summary>
+    private void OnSceneGUI(SceneView view)
+    {
+        if(!ScenePreview || Event.current.type != EventType.Repaint) { return; }
+        var data = target as AttackData;
+        if(data == null) { return; }
+
+        Vector2 anchor = AttackPreviewAnchor.Position(view);
+        Vector2 forward = PreviewForward(data);
+        Vector2 origin = anchor + forward * data.forwardOffset;
+
+        DrawShape(data, origin, forward, p => new Vector3(p.x, p.y, 0.0f));
+
+        Handles.color = Color.white;
+        Handles.DrawWireDisc(anchor, Vector3.forward, 0.15f);
+        Handles.Label(anchor + new Vector2(0.2f, -0.2f), $"{data.name}（{PreviewNote(data)}）", EditorStyles.whiteMiniLabel);
     }
 
     private static string ActivationHelp(AttackActivation activation)

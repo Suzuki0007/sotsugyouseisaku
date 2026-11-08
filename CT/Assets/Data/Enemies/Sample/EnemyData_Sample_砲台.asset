@@ -43,4 +43,7 @@ MonoBehaviour:
   deathEffect: {fileID: 11400000, guid: db953535983d3f047a3398fdc6e212b4, type: 2}
   deathSe: {fileID: 0}
   deathAnimation: Dead
+  defeatStyle: 0
+  remainTint: {r: 0.6, g: 0.6, b: 0.6, a: 1}
+  drops: []
   memo: "\u30B7\u30B0\u30EB\u306E\u5F3E\u306F\u534A\u5206\u3001\u30B2\u30FC\u30B8\u653B\u6483\u306E\u30D1\u30FC\u30D5\u30A7\u30AF\u30C8\u306F2\u500D\u3002\u4F53\u529B\u304C\u534A\u5206\u3067\u6012\u308B"

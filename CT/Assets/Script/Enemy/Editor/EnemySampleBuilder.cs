@@ -191,6 +191,7 @@ public static class EnemySampleBuilder
         BuildStage3(swing);
         BuildStage4(swing);
         BuildStage5(swing);
+        BuildStage6();
 
         AssetDatabase.SaveAssets();
         AssetDatabase.Refresh();
@@ -502,6 +503,124 @@ public static class EnemySampleBuilder
         finally
         {
             Object.DestroyImmediate(root);
+        }
+    }
+
+    //=====================================================================
+    // 段階6・7のサンプル（倒したあと・落とすアイテム・順番に倒すグループ・スポナー）
+    //=====================================================================
+
+    public const string OrderGroupPrefabPath = "Assets/Prefab/Enemies/Sample_順番に倒すグループ.prefab";
+    public const string SpawnerPrefabPath = "Assets/Prefab/Enemies/Sample_スポナー.prefab";
+
+    private static void BuildStage6()
+    {
+        EnemyPattern melee = AssetDatabase.LoadAssetAtPath<EnemyPattern>($"{PatternFolder}/Pattern_Sample_近づいてなぎ払う.asset");
+        ItemData gem = AssetDatabase.LoadAssetAtPath<ItemData>("Assets/Resources/Items/Sample/Item_SampleGem.asset");
+
+        EnemyData($"{Folder}/EnemyData_Sample_倒れて残る.asset", "倒れて残る敵", 3, 2.0f, EnemySize.Medium, melee, so =>
+        {
+            so.FindProperty("defeatStyle").enumValueIndex = (int)DefeatStyle.Remain;
+            if(gem != null)
+            {
+                SerializedProperty drops = so.FindProperty("drops");
+                drops.arraySize = 1;
+                SerializedProperty d = drops.GetArrayElementAtIndex(0);
+                d.FindPropertyRelative("item").objectReferenceValue = gem;
+                d.FindPropertyRelative("count").intValue = 1;
+                d.FindPropertyRelative("chance").floatValue = 1.0f;
+                d.FindPropertyRelative("direct").boolValue = false;
+            }
+            so.FindProperty("memo").stringValue = "倒すと灰色の倒れた姿で残り、宝石を 1 つ落とす（触れると拾える）。シーンに置いた敵の「倒した後に調べたとき」に会話を入れると、調べられる";
+        });
+
+        EnemyData($"{Folder}/EnemyData_Sample_おとなしくなる.asset", "倒すとおとなしくなる敵", 3, 2.0f, EnemySize.Medium, melee, so =>
+        {
+            so.FindProperty("defeatStyle").enumValueIndex = (int)DefeatStyle.Pacify;
+            so.FindProperty("memo").stringValue = "倒すと攻撃しなくなり、その場に立つ（NPC になる）。シーンに置いた敵の「倒した後に調べたとき」に会話を入れて使う。「倒したことをセーブする」もオンにするとよい";
+        });
+
+        global::EnemyData minion = AssetDatabase.LoadAssetAtPath<global::EnemyData>(EnemyBaseBuilder.SampleDataPath);
+        GameObject basePrefab = AssetDatabase.LoadAssetAtPath<GameObject>(EnemyBaseBuilder.PrefabPath);
+
+        // 順番に倒すグループ：3 体を左から順に倒さないと倒せない（順番でない敵はバリア）
+        if(!File.Exists(OrderGroupPrefabPath))
+        {
+            var root = new GameObject("Sample_順番に倒すグループ");
+            try
+            {
+                var group = root.AddComponent<EnemyGroup>();
+                var done = new GameObject("倒したとき");
+                done.transform.SetParent(root.transform, false);
+                var sequence = done.AddComponent<EventSequence>();
+
+                var so = new SerializedObject(group);
+                so.FindProperty("onDefeated").objectReferenceValue = sequence;
+                so.FindProperty("useOrder").boolValue = true;
+                so.FindProperty("wrongMode").enumValueIndex = (int)WrongOrderMode.Barrier;
+                so.FindProperty("once").boolValue = false;
+                SerializedProperty members = so.FindProperty("members");
+                members.arraySize = 3;
+                for(int i = 0; i < 3; i++)
+                {
+                    var enemyGo = (GameObject)PrefabUtility.InstantiatePrefab(basePrefab);
+                    enemyGo.name = $"{i + 1}番目";
+                    enemyGo.transform.SetParent(root.transform, false);
+                    enemyGo.transform.localPosition = new Vector3((i - 1) * 2.5f, 0.0f, 0.0f);
+                    var eso = new SerializedObject(enemyGo.GetComponent<Enemy>());
+                    eso.FindProperty("data").objectReferenceValue = minion;
+                    eso.ApplyModifiedPropertiesWithoutUndo();
+                    members.GetArrayElementAtIndex(i).objectReferenceValue = enemyGo.GetComponent<Enemy>();
+                }
+                so.ApplyModifiedPropertiesWithoutUndo();
+
+                PrefabUtility.SaveAsPrefabAsset(root, OrderGroupPrefabPath);
+            }
+            finally
+            {
+                Object.DestroyImmediate(root);
+            }
+        }
+
+        // スポナー：範囲に入ると、サンプルの敵を 2 体ずつ、合計 6 体出す
+        if(!File.Exists(SpawnerPrefabPath))
+        {
+            var root = new GameObject("Sample_スポナー");
+            try
+            {
+                var spawner = root.AddComponent<EnemyDataSpawner>();
+
+                var area = new GameObject("出し始める範囲");
+                area.transform.SetParent(root.transform, false);
+                var box = area.AddComponent<BoxCollider2D>();
+                box.isTrigger = true;
+                box.size = new Vector2(10.0f, 8.0f);
+
+                var point = new GameObject("出る場所");
+                point.transform.SetParent(root.transform, false);
+                point.transform.localPosition = new Vector3(3.0f, 0.0f, 0.0f);
+
+                var so = new SerializedObject(spawner);
+                SerializedProperty enemies = so.FindProperty("enemies");
+                enemies.arraySize = 1;
+                enemies.GetArrayElementAtIndex(0).FindPropertyRelative("enemy").objectReferenceValue = minion;
+                enemies.GetArrayElementAtIndex(0).FindPropertyRelative("weight").floatValue = 1.0f;
+                so.FindProperty("maxAlive").intValue = 2;
+                so.FindProperty("totalCount").intValue = 6;
+                so.FindProperty("interval").floatValue = 2.0f;
+                so.FindProperty("scatter").floatValue = 1.5f;
+                so.FindProperty("condition").FindPropertyRelative("area").objectReferenceValue = box;
+                SerializedProperty points = so.FindProperty("points");
+                points.arraySize = 1;
+                points.GetArrayElementAtIndex(0).objectReferenceValue = point.transform;
+                so.ApplyModifiedPropertiesWithoutUndo();
+
+                PrefabUtility.SaveAsPrefabAsset(root, SpawnerPrefabPath);
+            }
+            finally
+            {
+                Object.DestroyImmediate(root);
+            }
         }
     }
 

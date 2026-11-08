@@ -1,4 +1,4 @@
-/*********************************************************************/
+﻿/*********************************************************************/
 // * \file   DebugWindow.cs
 // * \brief  動作確認用のデバッグウィンドウ
 // *
@@ -30,6 +30,9 @@ public class DebugWindow : EditorWindow
     private bool foldSave = true;
     private bool foldStart = true;
     private bool foldEnemies = true;
+
+    private AttackData debugAttack;
+    private readonly Dictionary<int, int> attackChoice = new Dictionary<int, int>();
 
     private string warpScene = "";
     private string warpSpawn = "";
@@ -259,6 +262,8 @@ public class DebugWindow : EditorWindow
                 EditorGUILayout.HelpBox("このシーンでは、まだナビメッシュが作られていません（敵が経路を探すと作られます）", MessageType.None);
             }
 
+            debugAttack = (AttackData)EditorGUILayout.ObjectField(new GUIContent("出させる攻撃（どの敵にも）", "ここに攻撃を入れると、敵ごとの「攻撃」の候補の最後に出る。行動パターンに入っていない攻撃を試すときに"), debugAttack, typeof(AttackData), false);
+
             IReadOnlyList<Enemy> enemies = Enemy.All;
             EditorGUILayout.LabelField("今いる敵（新しい作り）", $"{enemies.Count} 体");
 
@@ -295,6 +300,7 @@ public class DebugWindow : EditorWindow
                     using(new EditorGUILayout.HorizontalScope())
                     {
                         if(GUILayout.Button("ひるませる", EditorStyles.miniButton, GUILayout.Width(70))) { enemy.Stagger(enemy.Data != null ? enemy.Data.StaggerTime : 1.0f); }
+                        if(enemy.Brain != null) { DrawForceAttack(enemy.Brain, enemy.GetEntityId().GetHashCode()); }
                         foreach(EnemyPart part in enemy.GetComponentsInChildren<EnemyPart>())
                         {
                             GUI.enabled = part.Breakable && !part.Broken;
@@ -316,8 +322,19 @@ public class DebugWindow : EditorWindow
                     {
                         if(GUILayout.Button(emitter.name, EditorStyles.label)) { Selection.activeGameObject = emitter.gameObject; }
                         if(GUILayout.Button(emitter.Stopped ? "動かす" : "止める", GUILayout.Width(50))) { emitter.SetStopped(!emitter.Stopped); }
+                        DrawForceAttack(emitter, emitter.GetEntityId().GetHashCode());
                     }
                     using(new EditorGUI.IndentLevelScope()) { EditorGUILayout.LabelField(emitter.StatusText, EditorStyles.miniLabel); }
+                }
+            }
+
+            // 敵のスポナー（新しい作り）
+            foreach(EnemyDataSpawner spawner in FindObjectsByType<EnemyDataSpawner>())
+            {
+                using(new EditorGUILayout.HorizontalScope())
+                {
+                    if(GUILayout.Button("スポナー：" + spawner.name, EditorStyles.label)) { Selection.activeGameObject = spawner.gameObject; }
+                    EditorGUILayout.LabelField(spawner.StatusText, EditorStyles.miniLabel);
                 }
             }
 
@@ -360,6 +377,47 @@ public class DebugWindow : EditorWindow
             }
         }
         EditorGUILayout.EndFoldoutHeaderGroup();
+    }
+
+    /// <summary>
+    /// 「この攻撃を出させる」：行動パターンに入っている攻撃（＋上の欄の攻撃）から選んで出させる
+    /// </summary>
+    private void DrawForceAttack(PatternRunner runner, int key)
+    {
+        List<AttackData> attacks = CollectAttacks(runner.Pattern);
+        if(debugAttack != null && !attacks.Contains(debugAttack)) { attacks.Add(debugAttack); }
+        if(attacks.Count == 0) { return; }
+
+        var names = new string[attacks.Count];
+        for(int i = 0; i < attacks.Count; i++) { names[i] = attacks[i].name; }
+
+        attackChoice.TryGetValue(key, out int choice);
+        choice = Mathf.Clamp(choice, 0, attacks.Count - 1);
+        choice = EditorGUILayout.Popup(choice, names, GUILayout.MinWidth(80));
+        attackChoice[key] = choice;
+
+        if(GUILayout.Button(new GUIContent("攻撃", "今の行動をやめて、選んだ攻撃をすぐに出させる（終わったらいつもの行動に戻る）"), EditorStyles.miniButton, GUILayout.Width(40)))
+        {
+            runner.ForceAttack(attacks[choice]);
+        }
+    }
+
+    /// <summary>
+    /// 行動パターンの中の攻撃（同じものは1つ）
+    /// </summary>
+    public static List<AttackData> CollectAttacks(EnemyPattern pattern)
+    {
+        var list = new List<AttackData>();
+        if(pattern == null) { return list; }
+        foreach(EnemyPhase phase in pattern.phases)
+        {
+            if(phase == null || phase.actions == null) { continue; }
+            foreach(EnemyAction action in phase.actions)
+            {
+                if(action is AttackAction a && a.attack != null && !list.Contains(a.attack)) { list.Add(a.attack); }
+            }
+        }
+        return list;
     }
 
     /// <summary>

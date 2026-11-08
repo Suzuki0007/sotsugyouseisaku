@@ -180,6 +180,28 @@ public static class SceneChecker
             }
         }
 
+        foreach(EnemyDataSpawner spawner in ctx.Find<EnemyDataSpawner>())
+        {
+            var so = new SerializedObject(spawner);
+            SerializedProperty list = so.FindProperty("enemies");
+            bool any = false;
+            for(int i = 0; i < list.arraySize; i++)
+            {
+                if(list.GetArrayElementAtIndex(i).FindPropertyRelative("enemy").objectReferenceValue != null) { any = true; }
+            }
+            if(!any) { ctx.Add(Level.Error, spawner, "敵のスポナーに、出す敵（敵のデータ）が入っていません"); }
+
+            var area = so.FindProperty("condition").FindPropertyRelative("area").objectReferenceValue as Collider2D;
+            if(area != null && !area.isTrigger)
+            {
+                ctx.Add(Level.Warning, spawner, "敵のスポナーの「プレイヤーがいる範囲」の Collider2D の Is Trigger がオフです（プレイヤーが通れません）");
+            }
+            if(so.FindProperty("totalCount").intValue == 0 && (so.FindProperty("onCleared").objectReferenceValue != null || so.FindProperty("clearedFlag").objectReferenceValue != null))
+            {
+                ctx.Add(Level.Warning, spawner, "敵のスポナーの「全部倒したら」が設定されていますが、「合計で出す数」が 0（何体でも出す）なので起きません");
+            }
+        }
+
         var switchKeys = new Dictionary<string, AttackSwitch>();
         foreach(AttackSwitch sw in ctx.Find<AttackSwitch>())
         {
