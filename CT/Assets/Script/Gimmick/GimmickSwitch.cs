@@ -1,4 +1,4 @@
-/*********************************************************************/
+﻿/*********************************************************************/
 // * \file   GimmickSwitch.cs
 // * \brief  調べると仕掛けの状態が変わるスイッチ（レバー・ボタン・燭台・ダイヤルなど）
 // *
@@ -94,7 +94,7 @@ public class GimmickSwitch : GimmickInteractable
     {
         if(!user.Allows(current))
         {
-            Refuse(wrongCharacter);
+            RefuseCharacter(wrongCharacter);
             return;
         }
         if(condition != null && !condition.IsEmpty && !condition.IsMet())

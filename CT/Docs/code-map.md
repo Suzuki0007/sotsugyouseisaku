@@ -1,6 +1,6 @@
 # コード構成と問題点（開発者・Claude 向け）
 
-最終更新：2026-11-08。CLAUDE.md から読み込まれる。コードを変えたら、この表も更新すること。
+最終更新：2026-11-09。CLAUDE.md から読み込まれる。コードを変えたら、この表も更新すること。
 ファイルの参照は `Assets/Script/` からの相対パス。行番号は目安。
 
 ---
@@ -10,8 +10,8 @@
 | フォルダ | 中身 |
 |---|---|
 | `Assets/Scenes/` | **Build Settings：`Title` → `Stage1_1` ⇄ `Stage1_2`、`SceneGameOver`**。ファイルだけ残っているもの：`Stage1` / `Stage2`（**古い作り**：プレイヤーをシーンに直接置く）、`SampleScene`、`kari/`（仮の Start / Clear）、`Tilemap/` |
-| `Assets/Prefab/` | `Players/`（Player_Noah / Player_Sigle）、`Enemies/`（Enemy＝古い作り。新しい作りの Enemy_Base は `Resources/Enemies/`）、`Bullet/`、`UI/`（DialoguePanel、**DialogueSystem**） |
-| `Assets/Resources/` | `Items/`（ItemData。**必ずここ**。`Items/Sample/` にサンプル）、`UI/`（ItemMenu・GameMenu のプレハブ。それぞれ Resources.Load で自動生成）、`PlaceNames.asset`（場所の表示名）、`Enemies/Enemy_Base.prefab`（新しい作りの敵の共通プレハブ。仲間を呼ぶときに実行中に読む）、`UI/BattleHud.prefab`（戦闘の画面表示） |
+| `Assets/Prefab/` | `Players/`（Player_Noah / Player_Sigle）、`Gimmicks/Sample/`（仕掛けのサンプルの部屋）、`Enemies/`（Enemy＝古い作り。新しい作りの Enemy_Base は `Resources/Enemies/`）、`Bullet/`、`UI/`（DialoguePanel、**DialogueSystem**） |
+| `Assets/Resources/` | `Items/`（ItemData。**必ずここ**。`Items/Sample/` にサンプル）、`UI/`（ItemMenu・GameMenu のプレハブ。それぞれ Resources.Load で自動生成）、`PlaceNames.asset`（場所の表示名）、`Enemies/Enemy_Base.prefab`（新しい作りの敵の共通プレハブ。仲間を呼ぶときに実行中に読む）、`UI/BattleHud.prefab`（戦闘の画面表示）、`Barks/`（相棒の一言 BarkData。`Sample/` にサンプル 16 個＝使うはオフ）、`BarkSettings.asset`（一言の見た目・出し方）、`PartyHints.asset`・`PuzzleUI.asset`・`Notes/` |
 | `Assets/Data/` | `Enemies/`（EnemyData・EnemyPattern・AttackData。`Sample/`〔`Attacks/`・`Patterns/`〕にサンプル）、`Characters/`（CharacterProfile：Noah / Sigle）、`Dialogue/`、`Flags/`（GameFlag）、`Animation/Sample/`（SpriteAnimData）、`Effect/Sample/`（EffectData） |
 | `Assets/Behavior/Enemy/` | Unity Behavior の敵 AI グラフ（`Behavior Graph.asset`）と独自ノード |
 | `Assets/Images/`、`Assets/BGM/`、`Assets/SE/`、`Assets/Fonts/` | 素材 |
@@ -147,7 +147,7 @@
 | `Gimmick/GimmickReaction.cs` | **条件で動く物**（扉・橋）。**Moves**（段階2：置いた位置から offset だけ、動く時間をかけてずらす。Rigidbody2D があれば position も）。条件で Show/Hide When Met を毎フレーム決める、満たした／満たさなくなったときのイベント、一度満たしたらずっと（`Reaction/<シーン>/<ID>`）。条件が空なら満たさない |
 | `Gimmick/PuzzleCheck.cs` | **答え合わせ**。入力（GimmickState）を 全部 ON／決めた順番（間違えたら戻す。読み込み時は最初から）／決めた組み合わせ。いつ確かめるか（変わるたび／イベントで）。正解で自分の GimmickState を ON・固定、入力を固定 |
 | `Gimmick/GimmickSwitch.cs`、`CharacterRestriction.cs` | **調べるスイッチ**（Intaractable）。切り替え・ON・OFF・次へ、使えるキャラ（両方・ノアだけ・シグルだけ）、使える条件、使えないとき・条件を満たさないとき・固定のときのイベント。範囲の中の操作中のキャラだけが調べられる |
-| `Gimmick/FloorSwitch.cs` | **床スイッチ**（謎解き段階2）。Is Trigger の範囲に乗った物（ノア・シグル・押せる箱・敵。中心が範囲の中）を FixedUpdate で数え、必要な数以上で押される。乗っている間だけ／一度で ON／乗るたびに切り替え |
+| `Gimmick/FloorSwitch.cs` | **床スイッチ**（謎解き段階2）。乗っている間だけ ON は、読み込み後 2 回目の FixedUpdate で、セーブの値でなく今乗っているかに合わせる（固定中は変えない）。Is Trigger の範囲に乗った物（ノア・シグル・押せる箱・敵。中心が範囲の中）を FixedUpdate で数え、必要な数以上で押される。乗っている間だけ／一度で ON／乗るたびに切り替え |
 | `Gimmick/PushBlock.cs`、`GimmickHole.cs`、`PushBlockResetEventAction.cs` | **押せる箱と穴**。箱：Kinematic、操作中のキャラが上下左右に「押し始めるまで」歩き続けると 1 マス（行き先を OverlapBox で確かめ、壁・箱・キャラ・敵があれば動かない。埋まっていない穴なら落ちて埋める）。押せるキャラ、位置と落ちたかをセーブ（`Block/<シーン>/<ID>`）、`ResetToHome`・`All`。穴：当たり判定で通れない、埋まると消える（GimmickState の ON）。イベントの部品「押せる箱を元に戻す」 |
 | `Gimmick/ItemSocket.cs` | **置き台**。アイテムをはめる（消費する／見せるだけ）、取り外せる、はめた物の絵（大きさを合わせる）、使えるキャラ |
 | `Gimmick/GimmickVisual.cs` | **状態で見た目を変える**。状態の値ごとに絵・色・表示する物・有効にする部品（燭台の火と LightSource など） |
@@ -160,6 +160,8 @@
 | `Party/ConditionalVisible.cs` | 条件で見える物（GameCondition。SpriteRenderer・Tilemap の濃さをふわっと変える、当たり判定を見えている間だけ／見えていない間だけ） |
 | `Party/LiftPoint.cs` | 持ち上げる場所（GimmickInteractable。移るキャラ・行き先・相棒の手伝いが要るか。弧を描いて移り、手伝った相棒は待機、移ったキャラを操作） |
 | `Party/PartyHint.cs`、`PartyHintView.cs`、`PartyHintSettings.cs` | 相棒の目印（使えないキャラで近づくと「シグル」「ノア」の札。仕掛けが毎フレーム `Request`、`PartyHintView` が札を出し消し。設定は `Resources/PartyHints.asset`） |
+| `Party/Bark/`（`BarkData`・`Bark`・`BarkView`・`BarkWatcher`・`BarkSettings`・`BarkEventAction`・`BarkArea`） | **相棒の一言**（謎解き段階6）。BarkData（SO、`Resources/Barks/`）：使う・きっかけ `BarkTrigger`（18 種。番号は末尾に足す）・秒数・体力の割合・倒した敵・条件（GameCondition）・優先度・確率・回数（何度でも／シーンで1回／ゲームで1回＝`Bark/<名前>` でセーブ）・次に出せるまで・出すまでの間・候補（`BarkVariant`＝行 `BarkLine` のリスト。2行以上で掛け合い。話すキャラ `BarkSpeaker`）。`Bark`（static）：`Fire(trigger, BarkContext)`（条件・待ち時間・確率で絞り、優先度の高いものを選ぶ。出している一言より高ければ割り込む）、`Play`・`PlayLines`（イベント・範囲）、`CanPlay`・`WhyNot`・`ResetHistory`・`Muted`・`Log`・`Reload`。`BarkView`：吹き出し（TMP のワールド文字・1つだけ・掛け合いは順番・画面の外は画面の下に名前つき・会話/メニュー/謎解きの画面/暗転でやめる。自動の一言は InputBlock の間は 4 秒まで待つ）。`BarkWatcher`（シーンごとに自動生成）：2人の状態（待たせた・呼び戻した・離れ離れ・合流。着いて 1.5 秒は出さない）・切り替え・ダメージ／体力・`Enemy.Defeated`・待たせている時間・止まっている時間・シーンに着いた。ほかのきっかけは GimmickInteractable（`Refuse`・`RefuseCharacter`）・PushBlock・PartyHintView（目印が出た）・PlayerSwitchManager（来られない）・PuzzleCheck／CodeLock（正解・間違い）から。BarkSettings（`Resources/BarkSettings.asset`）：一言どうしの間・秒数・見た目。BarkEventAction：イベントの部品「一言」（データか文・終わるまで待つ）。BarkArea：一言の範囲 |
+| 🛠`Party/Bark/Editor/`（`BarkMenu`・`BarkListWindow`・`BarkCsv`） | Hierarchy 右クリック > 仕掛け > 2人 > 一言の範囲、Tools > 仕掛け > 相棒の一言 > 一言の一覧（表で編集・探す・きっかけで絞る。再生中は出せない理由・▶ で出す・出さない・記録を消す・最近出した一言）／新しい一言を作る／一言の設定を作る／CSVから取り込む（`Resources/Barks/<CSV名>/`、同じ名前は上書き）／CSVのひな形／すべてCSVに書き出す。CSV の読み書きは `DialogueCsv` の internal の関数を使う |
 | 🛠`Party/Editor/PartyMenu.cs` | Hierarchy 右クリック > 仕掛け > 2人 > 狭い通路／壊せる壁／条件で見える物／持ち上げる場所、Tools > 仕掛け > 相棒の目印の設定を作る |
 | `Gimmick/UI/PuzzleUI.cs`、`PuzzleUISettings.cs` | **謎解きの画面**（段階5。必要なときに作る uGUI〔DontDestroyOnLoad、並び順 550〕）。`OpenCode`（番号錠：←→ 桁・↑↓ 変える）、`OpenChoice`（リストから選ぶ。絵つき）、`OpenText`（文章。TMP のページ）。`IsOpen` / `IsBusy`（InputBlock）。見た目は `Resources/PuzzleUI.asset` |
 | `Gimmick/CodeLock.cs` | **番号錠**（使える文字・答え・前の入力を覚える。正解で GimmickState を ON・固定） |
@@ -169,6 +171,8 @@
 | `Gimmick/GimmickInteractable.cs` | 調べる仕掛けの共通の土台（Intaractable を継承。範囲の中の操作中のキャラだけ、相棒が出たときに操作中のキャラを入れ直す、断るときの反応）。GimmickSwitch・ItemSocket が継承 |
 | `Gimmick/GimmickEventAction.cs` | イベントの部品「仕掛けを操作」（ON・OFF・切り替え・次へ・値・戻す・固定・固定を外す・答え合わせ・入力を戻す。固定されていても変える） |
 | 🛠`Gimmick/Editor/PuzzleMenu.cs` | Hierarchy 右クリック > 仕掛け > 謎解き > 番号錠／メモ／調べるたびに変わる／即死の罠／やり直す位置、Tools > 仕掛け > 謎解きの画面の設定を作る、Tools > メニュー画面 > メニューに「メモ」を足す（プレハブを作り直さずにボタンを足す） |
+| 🛠`Gimmick/Editor/GimmickListWindow.cs` | **仕掛けの一覧**（Tools > 仕掛け > 仕掛けの一覧。段階7）：シーンの GimmickState ごとに種類・使えるキャラ（部品の user / passable / breaker）・段階・最初／今の値・つながっている先（`GimmickWiring.Collect`）。つながっていない物はオレンジ（壊せる壁・穴は除く）。2人の仕掛け・演出の部品の一覧。再生中は切り替え・戻す |
+| 🛠`Gimmick/Editor/GimmickSampleBuilder.cs`、`Gimmick/GimmickSampleMemo.cs` | **サンプルの部屋**（Tools > 仕掛け > サンプルの部屋を作る。段階7）：`Assets/Prefab/Gimmicks/Sample/` に壁つきの部屋のプレハブ 6 つ（押せる箱と床スイッチ・燭台の順番・番号錠とメモ〔`Resources/Notes/Note_Sample_金庫の番号`〕・同時押し・狭い通路とお互いの扉・像の部屋）。GimmickMenu の `BuildSwitch` / `BuildDoor` / `BuildPuzzle` / `BuildFloor` / `BuildBlock` / `BuildBrazier` を使う。GimmickSampleMemo は部屋の説明（Inspector 用・ゲームでは何もしない） |
 | 🛠`Gimmick/Editor/GimmickWiring.cs`、`GimmickMenu.cs` | 配線の表示（シーンの全 MonoBehaviour の GimmickState への参照を矢印で。選んだ物につながる線だけ／Tools > 仕掛け > 配線をいつも全部表示）。Hierarchy 右クリック > 仕掛け > …（選んだスイッチを条件・入力に入れる。`FirstCallThisClick` で複数選択でも 1 回） |
 | 🛠`Flag/Editor/`、`Item/Interaction/Editor/`、`UI/ItemMenu/Editor/`、`Event/EventProcess/Editor/` | ひな形・一覧・Inspector |
 | `Singleton/Singleton.cs` | `Singleton<T>`（`persistAcrossScenes` でシーンをまたぐ） |

@@ -120,6 +120,9 @@ public class Enemy : MonoBehaviour
     /// <summary> 今いる敵（倒されて消えたものは含まない） </summary>
     public static IReadOnlyList<Enemy> All => all;
 
+    /// <summary> どれかの敵が倒されたとき（相棒の一言など） </summary>
+    public static event System.Action<Enemy> Defeated;
+
     public EnemyData Data => data;
 
     public Health Health => health;
@@ -209,6 +212,7 @@ public class Enemy : MonoBehaviour
     private static void ResetOnPlay()
     {
         all.Clear();
+        Defeated = null;
     }
 
     //=====================================================================
@@ -816,6 +820,7 @@ public class Enemy : MonoBehaviour
         if(saveDefeat) { Save.SetPending(SaveKey, true); }
         DropItems();
         if(onDefeated != null) { onDefeated.Play(gameObject); }
+        Defeated?.Invoke(this);
 
         if(style == DefeatStyle.Pacify)
         {

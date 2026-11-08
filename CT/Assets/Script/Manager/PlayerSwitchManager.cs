@@ -435,6 +435,7 @@ public class PlayerSwitchManager : Singleton<PlayerSwitchManager>
     {
         if(cannotFollow != null) { cannotFollow.Play(gameObject); }
         else                     { SeManager.PlaySe(cannotSe, currentPlayer != null ? currentPlayer.transform.position : transform.position); }
+        Bark.Fire(BarkTrigger.CannotFollow, BarkContext.Of(Partner));
     }
 
     /// <summary>

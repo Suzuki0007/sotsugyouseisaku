@@ -1,4 +1,4 @@
-/*********************************************************************/
+﻿/*********************************************************************/
 // * \file   CodeLock.cs
 // * \brief  番号錠・パスワード（調べると入力の画面が出る。正解で仕掛けが ON）
 // *
@@ -83,7 +83,7 @@ public class CodeLock : GimmickInteractable
 
     protected override void OnInteract(GameObject current)
     {
-        if(!user.Allows(current)) { Refuse(wrongCharacter); return; }
+        if(!user.Allows(current)) { RefuseCharacter(wrongCharacter); return; }
 
         if(state.IsOn)
         {
@@ -106,12 +106,14 @@ public class CodeLock : GimmickInteractable
             state.Set(1, true);
             state.SetLocked(true);
             if(onCorrect != null) { onCorrect.Play(gameObject); }
+            Bark.Fire(BarkTrigger.PuzzleSolved, BarkContext.Of(PlayerSwitchManager.Instance != null ? PlayerSwitchManager.Instance.CurrentPlayer : null, transform));
             return;
         }
 
         SeManager.PlaySe(wrongSe, transform.position);
         if(onWrong != null) { onWrong.Play(gameObject); }
         else if(wrongSe == null) { UISound.Play(UISoundType.Cannot); }
+        Bark.Fire(BarkTrigger.PuzzleWrong, BarkContext.Of(PlayerSwitchManager.Instance != null ? PlayerSwitchManager.Instance.CurrentPlayer : null, transform));
     }
 
     /// <summary> 入力が答えと同じか </summary>

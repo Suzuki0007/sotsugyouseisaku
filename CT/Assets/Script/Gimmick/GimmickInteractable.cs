@@ -56,6 +56,15 @@ public abstract class GimmickInteractable : Intaractable
     {
         if(sequence != null) { sequence.Play(gameObject); }
         else                 { UISound.Play(UISoundType.Cannot); }
+        Bark.Fire(BarkTrigger.CannotUse, BarkContext.Of(CurrentPlayer, transform));
+    }
+
+    /// <summary> 使えないキャラで調べたので断る（イベントか「できない」音 ＋ 相棒の一言） </summary>
+    protected void RefuseCharacter(EventSequence sequence)
+    {
+        if(sequence != null) { sequence.Play(gameObject); }
+        else                 { UISound.Play(UISoundType.Cannot); }
+        Bark.Fire(BarkTrigger.WrongCharacter, BarkContext.Of(CurrentPlayer, transform));
     }
 
     protected static GameObject CurrentPlayer => PlayerSwitchManager.Instance != null ? PlayerSwitchManager.Instance.CurrentPlayer : null;

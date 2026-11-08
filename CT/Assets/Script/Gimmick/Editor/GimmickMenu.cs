@@ -1,4 +1,4 @@
-﻿/*********************************************************************/
+/*********************************************************************/
 // * \file   GimmickMenu.cs
 // * \brief  Hierarchy 右クリック > 仕掛け > …（スイッチ・扉・答え合わせを置く）
 // *
@@ -23,6 +23,12 @@ public static class GimmickMenu
     [MenuItem("GameObject/仕掛け/調べるスイッチ", false, 10)]
     private static void PlaceSwitch(MenuCommand command)
     {
+        Place(BuildSwitch(), command, "調べるスイッチ");
+    }
+
+    /// <summary> 調べるスイッチを作る（サンプルの部屋からも使う） </summary>
+    public static GameObject BuildSwitch()
+    {
         var go = new GameObject("スイッチ");
 
         // 見た目（丸）。差し替えてよい
@@ -36,8 +42,7 @@ public static class GimmickMenu
         go.AddComponent<GimmickState>();
         go.AddComponent<GimmickSwitch>();
 
-        // ON / OFF で色を変えるイベント（ひな形。差し替えてよい）
-        Place(go, command, "調べるスイッチ");
+        return go;
     }
 
     //=====================================================================
@@ -49,15 +54,21 @@ public static class GimmickMenu
     {
         if(!FirstCallThisClick()) { return; }
         List<GimmickState> selected = SelectedStates();
+        GameObject go = BuildDoor(selected, new Vector2(1.0f, 2.0f));
+        Place(go, selected.Count > 0 ? new MenuCommand(null) : command, "条件で動く物");
+    }
 
+    /// <summary> 条件で開く扉を作る（条件：渡した状態がすべて ON） </summary>
+    public static GameObject BuildDoor(List<GimmickState> selected, Vector2 size)
+    {
         var go = new GameObject("条件で開く扉");
         var reaction = go.AddComponent<GimmickReaction>();
 
         // 閉じた扉（通れない）。条件を満たすと隠れる
         var closed = new GameObject("閉じた扉");
         closed.transform.SetParent(go.transform, false);
-        Look(closed, Square, new Vector2(1.0f, 2.0f), new Color(0.45f, 0.3f, 0.2f, 1.0f), 4);
-        closed.AddComponent<BoxCollider2D>().size = new Vector2(1.0f, 2.0f);
+        Look(closed, Square, size, new Color(0.45f, 0.3f, 0.2f, 1.0f), 4);
+        closed.AddComponent<BoxCollider2D>().size = size;
 
         // 開いたとき・閉じたときのイベント（音など）
         var opened = new GameObject("開いたとき");
@@ -71,8 +82,7 @@ public static class GimmickMenu
         so.FindProperty("onMet").objectReferenceValue = openSequence;
         AddConditions(so.FindProperty("condition").FindPropertyRelative("gimmicks"), selected);
         so.ApplyModifiedPropertiesWithoutUndo();
-
-        Place(go, selected.Count > 0 ? new MenuCommand(null) : command, "条件で動く物");
+        return go;
     }
 
     //=====================================================================
@@ -84,7 +94,13 @@ public static class GimmickMenu
     {
         if(!FirstCallThisClick()) { return; }
         List<GimmickState> selected = SelectedStates();
+        GameObject go = BuildPuzzle(selected);
+        Place(go, selected.Count > 0 ? new MenuCommand(null) : command, "答え合わせ");
+    }
 
+    /// <summary> 答え合わせを作る（入力：渡した状態） </summary>
+    public static GameObject BuildPuzzle(List<GimmickState> selected)
+    {
         var go = new GameObject("答え合わせ");
         go.AddComponent<GimmickState>();
         var puzzle = go.AddComponent<PuzzleCheck>();
@@ -102,8 +118,7 @@ public static class GimmickMenu
             inputs.GetArrayElementAtIndex(inputs.arraySize - 1).objectReferenceValue = state;
         }
         so.ApplyModifiedPropertiesWithoutUndo();
-
-        Place(go, selected.Count > 0 ? new MenuCommand(null) : command, "答え合わせ");
+        return go;
     }
 
     //=====================================================================
@@ -112,6 +127,12 @@ public static class GimmickMenu
 
     [MenuItem("GameObject/仕掛け/床スイッチ", false, 20)]
     private static void PlaceFloor(MenuCommand command)
+    {
+        Place(BuildFloor(), command, "床スイッチ");
+    }
+
+    /// <summary> 床スイッチを作る </summary>
+    public static GameObject BuildFloor()
     {
         var go = new GameObject("床スイッチ");
         SpriteRenderer floorSr = Look(go, Square, new Vector2(0.9f, 0.9f), new Color(0.55f, 0.55f, 0.6f, 1.0f), 1);
@@ -135,8 +156,7 @@ public static class GimmickMenu
         on.FindPropertyRelative("color").colorValue = new Color(0.4f, 0.9f, 0.5f, 1.0f);
         so.ApplyModifiedPropertiesWithoutUndo();
         _ = state;
-
-        Place(go, command, "床スイッチ");
+        return go;
     }
 
     //=====================================================================
@@ -146,6 +166,14 @@ public static class GimmickMenu
     [MenuItem("GameObject/仕掛け/押せる箱", false, 21)]
     private static void PlaceBlock(MenuCommand command)
     {
+        GameObject go = BuildBlock();
+        Place(go, command, "押せる箱");
+        SnapToGrid(go);
+    }
+
+    /// <summary> 押せる箱を作る </summary>
+    public static GameObject BuildBlock()
+    {
         var go = new GameObject("押せる箱");
         Look(go, Square, new Vector2(0.95f, 0.95f), new Color(0.65f, 0.45f, 0.25f, 1.0f), 5);
 
@@ -153,9 +181,7 @@ public static class GimmickMenu
         box.size = new Vector2(0.95f, 0.95f);
         go.AddComponent<Rigidbody2D>();
         go.AddComponent<PushBlock>();
-
-        Place(go, command, "押せる箱");
-        SnapToGrid(go);
+        return go;
     }
 
     [MenuItem("GameObject/仕掛け/穴（箱で埋まる）", false, 22)]
@@ -205,6 +231,12 @@ public static class GimmickMenu
     [MenuItem("GameObject/仕掛け/燭台（調べて灯す・明かりつき）", false, 24)]
     private static void PlaceBrazier(MenuCommand command)
     {
+        Place(BuildBrazier(), command, "燭台");
+    }
+
+    /// <summary> 燭台（調べて灯す・明かりつき）を作る </summary>
+    public static GameObject BuildBrazier()
+    {
         var go = new GameObject("燭台");
         Look(go, Knob, new Vector2(0.5f, 0.5f), new Color(0.35f, 0.3f, 0.3f, 1.0f), 5);
 
@@ -239,8 +271,7 @@ public static class GimmickMenu
         enable.GetArrayElementAtIndex(0).objectReferenceValue = light;
         so.ApplyModifiedPropertiesWithoutUndo();
         fire.SetActive(false);
-
-        Place(go, command, "燭台");
+        return go;
     }
 
     public const string Knob = "UI/Skin/Knob.psd";

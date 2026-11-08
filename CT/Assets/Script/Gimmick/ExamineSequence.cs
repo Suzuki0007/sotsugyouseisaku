@@ -1,4 +1,4 @@
-/*********************************************************************/
+﻿/*********************************************************************/
 // * \file   ExamineSequence.cs
 // * \brief  調べるたびに変わる（1 回目・2 回目・3 回目… で違うイベント）
 // *
@@ -80,7 +80,7 @@ public class ExamineSequence : GimmickInteractable
 
     protected override void OnInteract(GameObject current)
     {
-        if(!user.Allows(current)) { Refuse(wrongCharacter); return; }
+        if(!user.Allows(current)) { RefuseCharacter(wrongCharacter); return; }
         if(sequences.Count == 0) { return; }
 
         int index = count;

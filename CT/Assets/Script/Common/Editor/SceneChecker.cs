@@ -1,4 +1,4 @@
-/*********************************************************************/
+﻿/*********************************************************************/
 // * \file   SceneChecker.cs
 // * \brief  シーンの設定ミスを探すチェック処理
 // *
@@ -253,6 +253,18 @@ public static class SceneChecker
         foreach(NoteEventAction action in ctx.Find<NoteEventAction>())
         {
             if(action.Note == null) { ctx.Add(Level.Error, action, "「メモを渡す」に NoteData が入っていません"); }
+        }
+
+        // 相棒の一言
+        foreach(BarkArea area in ctx.Find<BarkArea>())
+        {
+            if(area.Data == null) { ctx.Add(Level.Error, area, "一言の範囲に一言のデータが入っていません"); }
+            Collider2D c = area.GetComponent<Collider2D>();
+            if(c != null && !c.isTrigger) { ctx.Add(Level.Error, area, "一言の範囲の Collider2D が Is Trigger になっていません（ぶつかる壁になります）"); }
+        }
+        foreach(BarkEventAction action in ctx.Find<BarkEventAction>())
+        {
+            if(!action.HasContent) { ctx.Add(Level.Error, action, "イベントの部品「一言」に、データも文も入っていません"); }
         }
 
         foreach(ExamineSequence exam in ctx.Find<ExamineSequence>())
@@ -916,9 +928,40 @@ public static class SceneChecker
         }
     }
 
+    /// <summary> 相棒の一言のデータ </summary>
+    private static void CheckBarkAssets(List<Issue> issues)
+    {
+        var names = new Dictionary<string, string>();
+        foreach(string guid in AssetDatabase.FindAssets("t:BarkData"))
+        {
+            string path = AssetDatabase.GUIDToAssetPath(guid);
+            BarkData d = AssetDatabase.LoadAssetAtPath<BarkData>(path);
+            if(d == null) { continue; }
+
+            if(!path.StartsWith("Assets/Resources/Barks/"))
+            {
+                issues.Add(new Issue { level = Level.Error, target = d, message = $"一言「{d.name}」が Assets/Resources/Barks/ の外にあります（きっかけで自動に出ません）" });
+            }
+            if(!d.HasLines)
+            {
+                issues.Add(new Issue { level = Level.Warning, target = d, message = $"一言「{d.name}」に文がありません" });
+            }
+            if(d.trigger == BarkTrigger.EnemyDefeated && d.enemy == null && d.cooldown <= 0.0f)
+            {
+                issues.Add(new Issue { level = Level.Info, target = d, message = $"一言「{d.name}」：どの敵を倒しても出て、次に出せるまでが 0 秒です（敵が多いとしゃべりすぎます）" });
+            }
+            if(names.TryGetValue(d.name, out string other))
+            {
+                issues.Add(new Issue { level = Level.Warning, target = d, message = $"一言「{d.name}」と同じ名前が {other} にあります（「ゲームの中で1回だけ」の記録が混ざります）" });
+            }
+            else { names.Add(d.name, path); }
+        }
+    }
+
     public static void CheckProject(List<Issue> issues)
     {
         CheckEnemyAssets(issues);
+        CheckBarkAssets(issues);
 
         // Build Settings
         foreach(EditorBuildSettingsScene scene in EditorBuildSettings.scenes)

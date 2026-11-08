@@ -54,7 +54,15 @@ public class PartyHintView : MonoBehaviour
         foreach(var pair in requests)
         {
             if(pair.Key == null) { continue; }
-            if(!shown.TryGetValue(pair.Key, out Marker m)) { m = Acquire(); shown[pair.Key] = m; }
+            if(!shown.TryGetValue(pair.Key, out Marker m))
+            {
+                m = Acquire();
+                shown[pair.Key] = m;
+
+                // 目印が出た（相棒の出番の仕掛けに近づいた）
+                GameObject current = PlayerSwitchManager.Instance != null ? PlayerSwitchManager.Instance.CurrentPlayer : null;
+                Bark.Fire(BarkTrigger.PartnerGimmickNear, BarkContext.Of(current, pair.Key));
+            }
 
             bool noah = pair.Value == CharacterRestriction.NoahOnly;
             m.text.text = noah ? settings.noahText : settings.sigleText;

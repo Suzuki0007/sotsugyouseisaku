@@ -70,6 +70,7 @@ public class FloorSwitch : MonoBehaviour
     private GimmickState state;
     private Collider2D[] areas;
     private bool pressed;
+    private int syncFrames;
     private readonly List<Collider2D> hits = new List<Collider2D>();
 
     //=====================================================================
@@ -96,6 +97,19 @@ public class FloorSwitch : MonoBehaviour
     {
         Count = CountOnTop();
         bool now = Count >= Mathf.Max(1, requiredCount);
+
+        // 乗っている間だけ ON：シーンを読み込んだら、セーブの値でなく今乗っているかに合わせる
+        // （ON のままセーブすると、誰も乗っていないのに ON で始まり、乗って降りるまで戻らなかった）
+        // プレイヤー・箱が出現位置・セーブの位置に置かれ、物理に反映されるのを待つため 2 回目の FixedUpdate で合わせる
+        if(syncFrames < 2)
+        {
+            syncFrames++;
+            if(syncFrames < 2) { return; }
+            pressed = now;
+            if(mode == FloorSwitchMode.WhileOn && state.IsOn != now) { state.Set(now ? 1 : 0, false, false); }
+            return;
+        }
+
         if(now == pressed) { return; }
 
         pressed = now;

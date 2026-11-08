@@ -234,6 +234,7 @@ public class PuzzleCheck : MonoBehaviour
 
         SeManager.PlaySe(solvedSe, transform.position);
         if(onSolved != null) { onSolved.Play(gameObject); }
+        Bark.Fire(BarkTrigger.PuzzleSolved, BarkContext.Of(CurrentPlayer, transform));
     }
 
     private void Wrong()
@@ -242,7 +243,10 @@ public class PuzzleCheck : MonoBehaviour
         progress = 0;
         if(resetOnWrong) { ResetInputs(); }
         if(onWrong != null) { onWrong.Play(gameObject); }
+        Bark.Fire(BarkTrigger.PuzzleWrong, BarkContext.Of(CurrentPlayer, transform));
     }
+
+    private static GameObject CurrentPlayer => PlayerSwitchManager.Instance != null ? PlayerSwitchManager.Instance.CurrentPlayer : null;
 
     /// <summary>
     /// 入力を最初の状態に戻す（順番も最初から）

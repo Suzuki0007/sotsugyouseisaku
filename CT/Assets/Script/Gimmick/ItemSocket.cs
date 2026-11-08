@@ -114,7 +114,7 @@ public class ItemSocket : GimmickInteractable
 
     protected override void OnInteract(GameObject current)
     {
-        if(!user.Allows(current)) { Refuse(wrongCharacter); return; }
+        if(!user.Allows(current)) { RefuseCharacter(wrongCharacter); return; }
 
         InventoryManager inventory = InventoryManager.Instance;
         if(inventory == null || (item == null && !ChoiceMode)) { return; }

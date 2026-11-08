@@ -1,4 +1,4 @@
-/*********************************************************************/
+﻿/*********************************************************************/
 // * \file   PushBlock.cs
 // * \brief  押せる箱（1 マスずつ動く。穴に落とすと埋まる）
 // *
@@ -161,6 +161,7 @@ public class PushBlock : MonoBehaviour
                 refuseCooldown = 1.5f;
                 if(wrongCharacter != null) { wrongCharacter.Play(gameObject); }
                 else                       { UISound.Play(UISoundType.Cannot); }
+                Bark.Fire(BarkTrigger.WrongCharacter, BarkContext.Of(player, transform));
             }
             return;
         }
@@ -174,6 +175,7 @@ public class PushBlock : MonoBehaviour
                 refuseCooldown = 1.5f;
                 if(needPartner != null) { needPartner.Play(gameObject); }
                 else                    { UISound.Play(UISoundType.Cannot); }
+                Bark.Fire(BarkTrigger.CannotUse, BarkContext.Of(player, transform));
             }
             return;
         }
