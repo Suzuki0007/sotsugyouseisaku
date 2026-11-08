@@ -5,6 +5,7 @@
 // * \author
 /*********************************************************************/
 
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -93,6 +94,44 @@ public enum BattleEndEnemies
 }
 
 /// <summary>
+/// ウェーブ（1組分）
+/// </summary>
+[System.Serializable]
+public class BattleWave
+{
+    [Tooltip("このウェーブで出てくる、シーンに置いた敵（始まるまで隠れている）")]
+    public List<Enemy> enemies = new List<Enemy>();
+
+    [Tooltip("このウェーブで新しく出す敵（敵のデータ・出る場所・数）")]
+    public List<WaveSpawn> spawns = new List<WaveSpawn>();
+
+    [Label("出てくるまでの秒数", 0.0f)]
+    [Tooltip("前のウェーブを倒してから（最初のウェーブは戦闘が始まってから）出てくるまで")]
+    public float delay = 1.0f;
+
+    [Label("メッセージ")]
+    [Tooltip("出てくるときに画面の真ん中に出す（例：第2波！）。空なら出さない")]
+    public string message = "";
+}
+
+/// <summary>
+/// ウェーブで新しく出す敵
+/// </summary>
+[System.Serializable]
+public class WaveSpawn
+{
+    [Label("敵")]
+    public EnemyData enemy;
+
+    [Label("出る場所")]
+    [Tooltip("空のオブジェクトを置いて入れる")]
+    public Transform point;
+
+    [Label("数", 1)]
+    public int count = 1;
+}
+
+/// <summary>
 /// 戦闘エリア
 /// </summary>
 ///
@@ -125,6 +164,10 @@ public class BattleArea : MonoBehaviour
 
     [SerializeField, Label("始まるまで敵を止めておく")]
     private bool holdUntilStart = true;
+
+    [SerializeField]
+    [Tooltip("ウェーブ（順に出てくる敵の組）。前のウェーブを全部倒すと次が出る。ウェーブの敵は始まるまで隠れている。勝ち方「敵を全部倒す」は、全部のウェーブを倒したら勝ち")]
+    private List<BattleWave> waves = new List<BattleWave>();
 
     [Header("勝ち方")]
 
@@ -274,6 +317,7 @@ public class BattleArea : MonoBehaviour
             if(win == BattleWin.Survive) { text += $"（あと {Mathf.Max(0.0f, surviveSeconds - elapsed):0.0} 秒で勝ち）"; }
             if(lose == BattleLose.TimeUp) { text += $"（あと {Mathf.Max(0.0f, timeLimit - elapsed):0.0} 秒で時間切れ）"; }
             if(win == BattleWin.DefeatAll) { text += $"（残り {AliveEnemyCount} 体）"; }
+            if(HasWaves) { text += $"（ウェーブ {Mathf.Max(1, CurrentWave)}/{WaveCount}）"; }
             return text;
         }
     }
@@ -282,9 +326,26 @@ public class BattleArea : MonoBehaviour
     // 初期化
     //=====================================================================
 
+    // 参加する敵（最初から＋出てきたウェーブの敵）
+    private readonly List<Enemy> participants = new List<Enemy>();
+    private readonly List<Enemy> waveMembers = new List<Enemy>();
+    private int waveIndex = -1;
+    private bool wavesDone;
+    private bool waveStarting;
+
+    private bool HasWaves => waves != null && waves.Count > 0;
+
     private void Start()
     {
         saveKey = MakeSaveKey(gameObject, saveId);
+        participants.AddRange(enemies);
+
+        // ウェーブの敵は、出番まで隠しておく
+        foreach(BattleWave wave in waves)
+        {
+            if(wave == null) { continue; }
+            foreach(Enemy e in wave.enemies) { if(e != null) { e.gameObject.SetActive(false); } }
+        }
 
         // 勝ったことがあれば、勝ったあとの状態にする（イベントは見た目だけ戻す）
         if(once && Save.Get(saveKey, false))
@@ -368,6 +429,8 @@ public class BattleArea : MonoBehaviour
         if(battleFlag != null) { battleFlag.Value = true; }
         if(onStart != null) { onStart.Play(gameObject); }
 
+        if(HasWaves && waveIndex < 0) { StartCoroutine(StartWave(0)); }
+
         BattleHud.ShowMessage(startMessage, messageSeconds);
         UpdateHud();
     }
@@ -433,6 +496,7 @@ public class BattleArea : MonoBehaviour
         }
         if(win == BattleWin.DefeatAll)
         {
+            if(HasWaves) { parts.Add($"ウェーブ {Mathf.Max(1, CurrentWave)}/{WaveCount}"); }
             parts.Add($"残り {AliveEnemyCount} 体");
         }
 
@@ -538,7 +602,7 @@ public class BattleArea : MonoBehaviour
     private void PauseEnemies(float seconds)
     {
         if(seconds <= 0.0f) { return; }
-        foreach(Enemy enemy in enemies) { if(enemy != null && !enemy.IsDead) { enemy.PauseFor(seconds); } }
+        foreach(Enemy enemy in participants) { if(enemy != null && !enemy.IsDead) { enemy.PauseFor(seconds); } }
         foreach(AttackEmitter emitter in emitters) { if(emitter != null) { emitter.StopFor(seconds); } }
     }
 
@@ -547,7 +611,7 @@ public class BattleArea : MonoBehaviour
     /// </summary>
     private void SetParticipants(bool move)
     {
-        foreach(Enemy enemy in enemies) { if(enemy != null) { enemy.SetPaused(!move); } }
+        foreach(Enemy enemy in participants) { if(enemy != null) { enemy.SetPaused(!move); } }
         foreach(AttackEmitter emitter in emitters) { if(emitter != null) { emitter.SetStopped(!move); } }
     }
 
@@ -555,7 +619,7 @@ public class BattleArea : MonoBehaviour
     {
         foreach(AttackEmitter emitter in emitters) { if(emitter != null) { emitter.SetStopped(true); } }
 
-        foreach(Enemy enemy in enemies)
+        foreach(Enemy enemy in participants)
         {
             if(enemy == null || enemy.IsDead) { continue; }
             switch(endEnemies)
@@ -579,6 +643,8 @@ public class BattleArea : MonoBehaviour
         if(EnemyBlock.IsBlocked) { return; }
         elapsed += Time.deltaTime;
 
+        UpdateWaves();
+
         if(IsWon()) { Win(); return; }
         if(IsLost()) { Lose(); return; }
 
@@ -589,7 +655,9 @@ public class BattleArea : MonoBehaviour
     {
         switch(win)
         {
-            case BattleWin.DefeatAll: return enemies.Count > 0 && AliveEnemyCount == 0;
+            case BattleWin.DefeatAll:
+                if(HasWaves) { return wavesDone && AliveEnemyCount == 0; }
+                return participants.Count > 0 && AliveEnemyCount == 0;
             case BattleWin.Survive:   return elapsed >= surviveSeconds;
             case BattleWin.Flag:      return winFlag != null && winFlag.Value;
 
@@ -610,7 +678,7 @@ public class BattleArea : MonoBehaviour
             case BattleLose.Caught:
                 GameObject player = PlayerCharacters.Get(PlayerCharacters.Current);
                 if(player == null) { return false; }
-                foreach(Enemy enemy in enemies)
+                foreach(Enemy enemy in participants)
                 {
                     if(enemy == null || enemy.IsDead || enemy.Stopped) { continue; }
                     if(Vector2.Distance(enemy.transform.position, player.transform.position) <= catchDistance) { return true; }
@@ -625,10 +693,83 @@ public class BattleArea : MonoBehaviour
         get
         {
             int count = 0;
-            foreach(Enemy enemy in enemies) { if(enemy != null && !enemy.IsDead) { count++; } }
+            foreach(Enemy enemy in participants) { if(enemy != null && !enemy.IsDead) { count++; } }
             return count;
         }
     }
+
+    //=====================================================================
+    // ウェーブ
+    //=====================================================================
+
+    /// <summary>
+    /// 今のウェーブを全部倒したら、次のウェーブを出す
+    /// </summary>
+    private void UpdateWaves()
+    {
+        if(!HasWaves || wavesDone || waveStarting || waveIndex < 0) { return; }
+
+        foreach(Enemy e in waveMembers) { if(e != null && !e.IsDead) { return; } }
+
+        if(waveIndex + 1 < waves.Count) { StartCoroutine(StartWave(waveIndex + 1)); }
+        else                            { wavesDone = true; }
+    }
+
+    private IEnumerator StartWave(int index)
+    {
+        waveStarting = true;
+        waveIndex = index;
+        BattleWave wave = waves[index];
+
+        // 出てくるまで待つ（会話中などは数えない）
+        float elapsed = 0.0f;
+        float delay = wave != null ? wave.delay : 0.0f;
+        while(elapsed < delay)
+        {
+            if(!EnemyBlock.IsBlocked) { elapsed += Time.deltaTime; }
+            yield return null;
+        }
+
+        waveMembers.Clear();
+        if(wave != null)
+        {
+            BattleHud.ShowMessage(wave.message, messageSeconds);
+
+            foreach(Enemy e in wave.enemies)
+            {
+                if(e == null) { continue; }
+                e.gameObject.SetActive(true);
+                AddWaveMember(e);
+            }
+
+            foreach(WaveSpawn spawn in wave.spawns)
+            {
+                if(spawn == null || spawn.enemy == null) { continue; }
+                Vector2 center = spawn.point != null ? (Vector2)spawn.point.position : (Vector2)transform.position;
+                for(int i = 0; i < Mathf.Max(1, spawn.count); i++)
+                {
+                    Vector2 pos = center + (i == 0 ? Vector2.zero : UnityEngine.Random.insideUnitCircle * 1.2f);
+                    NavMesh2D nav = NavMesh2D.Instance;
+                    if(nav != null) { nav.SamplePosition(pos, 1.5f, spawn.enemy.Size, out pos); }
+                    AddWaveMember(Enemy.Spawn(spawn.enemy, pos));
+                }
+            }
+        }
+
+        waveStarting = false;
+    }
+
+    private void AddWaveMember(Enemy enemy)
+    {
+        if(enemy == null) { return; }
+        waveMembers.Add(enemy);
+        if(!participants.Contains(enemy)) { participants.Add(enemy); }
+    }
+
+    /// <summary> 今のウェーブ（1 から。ウェーブがなければ 0） </summary>
+    public int CurrentWave => HasWaves ? waveIndex + 1 : 0;
+
+    public int WaveCount => HasWaves ? waves.Count : 0;
 
     //=====================================================================
     // セーブ

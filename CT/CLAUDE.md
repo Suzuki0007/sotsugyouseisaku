@@ -4,9 +4,9 @@
 主人公は **ノア（Noah）** と **シグル（Sigle）** の2人で、C キーで操作を切り替える。
 目標は「**プランナーがコードを書かずに Inspector だけで制作を進められる**」こと。
 
-最終更新：2026-11-08（①〜⑥の実装、既存の問題の修正、タイトル画面とセーブスロット、メニュー画面とセーブポイント、敵の仕組みの段階0〔シグルの射撃・体力の共有〕・段階1〔土台〕・段階2〔行動パターンと攻撃の基本〕・段階3〔ギミック連動・見えない敵・落下／突き出る／設置／弾幕／仲間を呼ぶ〕・段階4〔追跡と逃げる戦闘〕・段階5〔部位・ひるみ・見た目の変化〕まで）
+最終更新：2026-11-08（①〜⑥の実装、既存の問題の修正、タイトル画面とセーブスロット、メニュー画面とセーブポイント、敵の仕組みの段階0〔シグルの射撃・体力の共有〕・段階1〔土台〕・段階2〔行動パターンと攻撃の基本〕・段階3〔ギミック連動・見えない敵・落下／突き出る／設置／弾幕／仲間を呼ぶ〕・段階4〔追跡と逃げる戦闘〕・段階5〔部位・ひるみ・見た目の変化〕・段階6〔倒したとき・倒した後・グループ・撃破の順番・ウェーブ〕まで）
 
-**進行中：敵の仕組み**（プランナーが敵・攻撃・行動パターン・ギミック連動・追跡などを Inspector だけで作れるように）。段階 0 前提の修正 → 1 土台（DamageInfo・攻撃を受ける部品・GameCondition・EnemyData・2D ナビメッシュ〔標準の NavMesh API + 2D コライダーから自作の収集。NavMeshAgent は使わず経路だけ計算し Rigidbody2D で動かす〕）→ 2 行動パターンと攻撃の基本 → 3 ギミック連動・攻撃の発生源 → 4 追跡 → 5 部位・ひるみ・見た目 → 6 倒した後・グループ → 7 ツールと資料。**1段階ずつ終わったら報告とコミットメッセージを渡す**。今は**段階5まで完了**（次は段階6：倒したとき・倒した後〔消える／倒れたまま残る／NPC になる、倒したとき・倒した後に調べたときの EventSequence、ドロップ、倒した記録のセーブ〕・グループ・撃破の順番・ウェーブ）。
+**進行中：敵の仕組み**（プランナーが敵・攻撃・行動パターン・ギミック連動・追跡などを Inspector だけで作れるように）。段階 0 前提の修正 → 1 土台（DamageInfo・攻撃を受ける部品・GameCondition・EnemyData・2D ナビメッシュ〔標準の NavMesh API + 2D コライダーから自作の収集。NavMeshAgent は使わず経路だけ計算し Rigidbody2D で動かす〕）→ 2 行動パターンと攻撃の基本 → 3 ギミック連動・攻撃の発生源 → 4 追跡 → 5 部位・ひるみ・見た目 → 6 倒した後・グループ → 7 ツールと資料。**1段階ずつ終わったら報告とコミットメッセージを渡す**。今は**段階6まで完了**（次は段階7：ツールと資料〔サンプル・エディタの補助・手順書のまとめ〕）。
 
 ---
 
@@ -75,7 +75,9 @@
 - **実行の共通部分 `PatternRunner`**：EnemyBrain（体あり）と `AttackEmitter`（攻撃の発生源＝見えない敵。動く条件・止める命令）が継承。行動の部品・`AttackExecution` は PatternRunner を受け取る（`runner.Enemy` が null なら移動・突進・アニメは飛ばす）。
 - **仲間を呼ぶ**：`SummonAction` → `Enemy.Spawn(data, pos)`（`Resources/Enemies/Enemy_Base` を読み、Awake の前にデータを入れる）、卵 `EnemyEgg`。同時に出せる数は PatternRunner が数える。倒されたら呼んだ仲間も倒す（`EnemyData.RemoveSummonedOnDeath`）。
 - **ギミック連動**（`Enemy/Gimmick/`）：イベントの部品 `EnemyCommandEventAction`（止める・○秒・動かす・行動をやめさせる・段階・倒す・消す）／`EnemyDamageEventAction`／`DamageAreaEventAction`（一時的な AttackEmitter、`IgnoreEnemyBlock`）。`AttackSwitch`（攻撃で作動するスイッチ。DamageReceiver の OnHit を DamageRule で絞る。セーブキー `Switch/<シーン>/<ID>`）。範囲攻撃・プレイヤーの弾・敵の弾も DamageReceiver の付いた物に当たる。
-- 敵の命令：`Enemy.SetPaused(bool, 色)` / `PauseFor` / `Kill` / `Remove` / `Teleport` / `Stagger(秒)`。
+- 敵の命令：`Enemy.SetPaused(bool, 色)` / `PauseFor` / `Kill`（効き方・無敵を無視）/ `Remove` / `Teleport` / `Stagger(秒)`。
+- **倒したとき・倒した後**（段階6、`Enemy/Defeat/`）：EnemyData の `DefeatStyle`（消える／倒れた姿で残る／おとなしくなる＝NPC）・`drops`（`EnemyDrop` → `DroppedItem`、セーブしない）。置いた敵ごとに 倒したときのイベント・フラグ・倒した後に調べたとき（`DefeatedTalk`）・倒したことのセーブ（`Enemy/<シーン>/<ID か階層パス>`、`DefeatReturn`：同じ／いない／復活）。`Health.SetDeadSilently` で戻す。
+- **グループ** `EnemyGroup`（`Enemy/Battle/`）：全部／○体倒したらイベント・フラグ・1回だけ（`Group/<シーン>/<ID>`）。撃破の順番（順番でない敵は 無敵バリア／○秒で復活／攻撃したら全員回復。`DamageFilter` を包んで体力 1 未満にしない）、次の敵に目印。**ウェーブ**：`BattleArea.waves`（`BattleWave`・`WaveSpawn`）、前のウェーブを全滅で次へ。
 - **部位・ひるみ・見た目**（段階5）：`EnemyPart`（`Enemy/Parts/`。`DamageReceiver.Handler` で受け、本体へ倍率・`DamageInfo.noStagger`、`Priority` で範囲攻撃は部位を先に）。ひるみは `Enemy.AddStagger`（キャンセルできない攻撃中は `staggerPending` で待つ）、`AttackData.cancel`、`AttackExecution.CanCancel`。`Enemy.Stopped`＝Paused か Staggered（行動・戦闘エリアの捕まる判定はこちらを見る）。見た目は `EnemyLook`（Enemy が自動で付ける。色は全部ここでかける）。`EnemyData.ApplyDamageRules` は 0 ダメージを 0 のまま返す。
 - **追跡・戦闘**（段階4）：行動 `ChaseAction`（見えている間は追う、見失ったら `LastSeenPosition` を探す、距離で速さ）。どの行動にも「見え方」の条件（`PatternRunner.CanSeeTarget`：Linecast で動かない当たり判定に当たると見えない）。`BattleArea`（`Enemy/Battle/`）：始まり方×勝ち方×負け方×負けたとき（**やり直す＝始まったときに Save.Commit とセーブしないフラグの写し → 負けたら仮置きを捨てて所持品を読み直し、同じシーンを暗転で読み込み直してやり直す位置から始め直す**。拾った物・フラグ・扉・爆弾・敵がすべて始まったときに戻る。体力は満タン）、`BattleArea.AnyActive` の間は SavePoint 不可、時間は EnemyBlock 中は進まない、1回だけならセーブ `Battle/<シーン>/<ID>`。イベントの部品 `BattleControlEventAction`。画面表示 `BattleHud`（`Resources/UI/BattleHud.prefab`、Tools > 敵 > 戦闘の画面表示のプレハブを作る）：上の帯（目的・残り時間・残りの敵）と真ん中のメッセージ。
 - **効き方**：`EnemyData.damageRules`（`DamageRule`：`DamageKindFilter`〔DamageKind と同じ番号＋Any=-1〕・`CharacterFilter`・`GaugeJudge`・倍率、全部かけ算）→ `Health.DamageFilter`。0 以下は `OnBlocked`。
@@ -148,7 +150,7 @@
 - **ノア・シグルのプレハブに FootstepSe がない**（足音が鳴らない。FootstepSe は Stage1_2 の動かない `Player` オブジェクトに付いている）。
 - `BgmProgress`（BGM の進行度）が再生ごとにリセットされず、セーブもされない。
 - `StageDarkness` の明かりが操作キャラに付いていかないことがある。
-- **古い作りの敵**（Enemy.prefab / Behavior Graph）：移動が壁をすり抜ける、会話中も移動は続く（撃つのは止まる）。敵を倒しても何も起きない・セーブされない（段階6）。体当たりはプレイヤーに無敵時間がないので間隔だけで決まる。敵の攻撃にノックバックがない。攻撃の「弾を撃つ」は弾の見た目だけプール任せ。置いた爆弾の「触れたら爆発」はついてくるシグルでも爆発する。
+- **古い作りの敵**（Enemy.prefab / Behavior Graph）：移動が壁をすり抜ける、会話中も移動は続く（撃つのは止まる）。古い作りの敵は倒しても何も起きない・セーブされない（新しい作りは段階6で対応）。落ちたアイテムはシーンを出ると消える。体当たりはプレイヤーに無敵時間がないので間隔だけで決まる。敵の攻撃にノックバックがない。攻撃の「弾を撃つ」は弾の見た目だけプール任せ。置いた爆弾の「触れたら爆発」はついてくるシグルでも爆発する。
 - シグル操作中も Space / R でノアの攻撃が出る（`AttackController` が操作中かを見ていない。意図か未確認）。
 - タイトルの SceneBgm に曲が入っていない（タイトルで BGM が鳴らない）。
 - `CheckPoint` がどのシーンにもない（再開はシーンの入口から）。

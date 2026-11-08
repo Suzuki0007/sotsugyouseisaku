@@ -225,6 +225,34 @@ public static class EnemyBaseBuilder
         PlaceAtView(go, command, "攻撃で作動するスイッチ");
     }
 
+    [MenuItem("GameObject/敵/グループ（全滅・撃破の順番）", false, 26)]
+    private static void PlaceGroup(MenuCommand command)
+    {
+        var go = new GameObject("敵のグループ");
+        var group = go.AddComponent<EnemyGroup>();
+
+        // 全滅したときのイベント
+        var child = new GameObject("倒したとき");
+        child.transform.SetParent(go.transform, false);
+        var sequence = child.AddComponent<EventSequence>();
+
+        var so = new SerializedObject(group);
+        so.FindProperty("onDefeated").objectReferenceValue = sequence;
+
+        // 選んでいた敵をメンバーに入れる（複数選んでから作ると、選んだ順に入る）
+        SerializedProperty members = so.FindProperty("members");
+        foreach(GameObject selected in Selection.gameObjects)
+        {
+            Enemy enemy = selected != null ? selected.GetComponent<Enemy>() : null;
+            if(enemy == null) { continue; }
+            members.arraySize++;
+            members.GetArrayElementAtIndex(members.arraySize - 1).objectReferenceValue = enemy;
+        }
+        so.ApplyModifiedPropertiesWithoutUndo();
+
+        PlaceAtView(go, new MenuCommand(null), "敵のグループ");
+    }
+
     [MenuItem("GameObject/敵/部位を追加（選んでいる敵の子に）", false, 25)]
     private static void AddPart(MenuCommand command)
     {

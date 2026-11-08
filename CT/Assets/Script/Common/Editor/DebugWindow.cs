@@ -321,6 +321,17 @@ public class DebugWindow : EditorWindow
                 }
             }
 
+            // 敵のグループ
+            EnemyGroup[] groups = FindObjectsByType<EnemyGroup>();
+            foreach(EnemyGroup group in groups)
+            {
+                using(new EditorGUILayout.HorizontalScope())
+                {
+                    if(GUILayout.Button("グループ：" + group.name, EditorStyles.label)) { Selection.activeGameObject = group.gameObject; }
+                    EditorGUILayout.LabelField(group.StatusText, EditorStyles.miniLabel);
+                }
+            }
+
             // 戦闘エリア（追跡・逃げる戦闘など）
             BattleArea[] battles = FindObjectsByType<BattleArea>();
             if(battles.Length > 0)

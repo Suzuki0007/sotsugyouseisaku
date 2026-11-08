@@ -114,6 +114,14 @@ public class Health : MonoBehaviour
     }
 
     /// <summary>
+    /// イベントを出さずに体力を 0 にする（セーブから「倒された状態」を戻すときなど）
+    /// </summary>
+    public void SetDeadSilently()
+    {
+        currentHealth = 0;
+    }
+
+    /// <summary>
     /// 体力を共有する相手を設定する（null で共有をやめる）
     /// </summary>
     /// 例：シグルの Health → ノアの Health。シグルが受けた攻撃はノアの体力から減る

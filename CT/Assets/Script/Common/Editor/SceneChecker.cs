@@ -116,6 +116,42 @@ public static class SceneChecker
             }
         }
 
+        var enemyKeys = new Dictionary<string, Enemy>();
+        foreach(Enemy enemy in ctx.Find<Enemy>())
+        {
+            var so = new SerializedObject(enemy);
+            if(!so.FindProperty("saveDefeat").boolValue) { continue; }
+            string id = so.FindProperty("saveId").stringValue;
+            string key = string.IsNullOrEmpty(id) ? HierarchyPath(enemy.transform) : id;
+            if(enemyKeys.ContainsKey(key)) { ctx.Add(Level.Error, enemy, $"倒したことをセーブする敵のセーブ用の名前「{key}」が重なっています（ID を付けてください）"); }
+            else                           { enemyKeys.Add(key, enemy); }
+        }
+        foreach(Enemy enemy in ctx.Find<Enemy>())
+        {
+            var so = new SerializedObject(enemy);
+            if(so.FindProperty("afterTalk").objectReferenceValue != null && enemy.Data != null && enemy.Data.DefeatStyle == DefeatStyle.Vanish)
+            {
+                ctx.Add(Level.Warning, enemy, "「倒した後に調べたとき」が入っていますが、敵のデータの「倒されたあと」が「消える」なので調べられません");
+            }
+        }
+
+        var groupKeys = new Dictionary<string, EnemyGroup>();
+        foreach(EnemyGroup group in ctx.Find<EnemyGroup>())
+        {
+            var so = new SerializedObject(group);
+            SerializedProperty members = so.FindProperty("members");
+            if(members.arraySize == 0) { ctx.Add(Level.Error, group, "敵のグループのメンバーが空です"); }
+            else if(HasNullElement(members)) { ctx.Add(Level.Warning, group, "敵のグループのメンバーに空の欄があります（倒したことになります）"); }
+            if(so.FindProperty("useOrder").boolValue && members.arraySize < 2) { ctx.Add(Level.Info, group, "「順番に倒す」がオンですが、メンバーが 1 体以下です"); }
+            if(so.FindProperty("onDefeated").objectReferenceValue == null && so.FindProperty("flag").objectReferenceValue == null && !so.FindProperty("useOrder").boolValue)
+            {
+                ctx.Add(Level.Warning, group, "敵のグループに、実行するイベントも ON にするフラグもありません（倒しても何も起きません）");
+            }
+            string key = EnemyGroup.MakeSaveKey(group.gameObject, so.FindProperty("saveId").stringValue);
+            if(groupKeys.ContainsKey(key)) { ctx.Add(Level.Error, group, $"敵のグループのセーブ用の名前「{key}」が重なっています（ID を付けてください）"); }
+            else                           { groupKeys.Add(key, group); }
+        }
+
         foreach(EnemyPart part in ctx.Find<EnemyPart>())
         {
             if(part.GetComponentInParent<Enemy>(true) == null)
@@ -198,7 +234,16 @@ public static class SceneChecker
             if(winType == BattleWin.ReachGoal && goal == null) { ctx.Add(Level.Error, battle, "勝ち方が「ゴールに着く」ですが、ゴールが空です"); }
             if(winType == BattleWin.ReachGoal && goal != null && !goal.isTrigger) { ctx.Add(Level.Warning, battle, "ゴールの Collider2D の Is Trigger がオフです（ゴールに入れません）"); }
             if(winType == BattleWin.Flag && so.FindProperty("winFlag").objectReferenceValue == null) { ctx.Add(Level.Error, battle, "勝ち方が「フラグが立つ」ですが、フラグが空です"); }
-            if(winType == BattleWin.DefeatAll && enemyCount == 0) { ctx.Add(Level.Error, battle, "勝ち方が「敵を全部倒す」ですが、参加する敵が空です"); }
+            int waveCount = so.FindProperty("waves").arraySize;
+            if(winType == BattleWin.DefeatAll && enemyCount == 0 && waveCount == 0) { ctx.Add(Level.Error, battle, "勝ち方が「敵を全部倒す」ですが、参加する敵もウェーブも空です"); }
+            for(int w = 0; w < waveCount; w++)
+            {
+                SerializedProperty wave = so.FindProperty("waves").GetArrayElementAtIndex(w);
+                if(wave.FindPropertyRelative("enemies").arraySize == 0 && wave.FindPropertyRelative("spawns").arraySize == 0)
+                {
+                    ctx.Add(Level.Warning, battle, $"戦闘エリアのウェーブ {w + 1} に敵がいません（すぐ次のウェーブになります）");
+                }
+            }
             if(loseType == BattleLose.Caught && enemyCount == 0) { ctx.Add(Level.Warning, battle, "負け方が「捕まる」ですが、参加する敵が空です（捕まりません）"); }
             if(HasNullElement(so.FindProperty("enemies")) || HasNullElement(so.FindProperty("emitters"))) { ctx.Add(Level.Warning, battle, "戦闘エリアの参加する敵・攻撃の発生源に空の欄があります"); }
             if(winType == BattleWin.None && loseType == BattleLose.None) { ctx.Add(Level.Info, battle, "戦闘エリアの勝ち方・負け方がどちらも「なし」です（イベントの部品で終える前提）"); }

@@ -11,6 +11,21 @@ using UnityEngine;
 using UnityEngine.Tilemaps;
 
 /// <summary>
+/// 倒したことをセーブした敵が、シーンに戻ったときの姿
+/// </summary>
+public enum DefeatReturn
+{
+    [InspectorName("倒されたあとと同じ（消える敵はいない・残る敵は倒れた姿）")]
+    SameAsDefeat = 0,
+
+    [InspectorName("いない")]
+    Gone = 1,
+
+    [InspectorName("復活する（また戦う）")]
+    Revive = 2,
+}
+
+/// <summary>
 /// 敵の本体
 /// </summary>
 ///
@@ -32,6 +47,31 @@ public class Enemy : MonoBehaviour
     [SerializeField, Label("敵のデータ")]
     [Tooltip("体力・速さ・見た目などをまとめたデータ（Assets/Data/Enemies/ の EnemyData）")]
     private EnemyData data;
+
+    [Header("この敵だけの設定（倒したとき）")]
+
+    [SerializeField, Label("倒したときのイベント")]
+    [Tooltip("倒した瞬間に実行する（扉が開く・会話 など）。セーブから戻ったときは、見た目だけ実行後の状態にする")]
+    private EventSequence onDefeated;
+
+    [SerializeField, Label("倒したら ON にするフラグ")]
+    private GameFlag defeatFlag;
+
+    [SerializeField, Label("倒した後に調べたとき")]
+    [Tooltip("敵のデータの「倒されたあと」が「残る」「おとなしくなる」のとき、E で調べると実行する（会話・アイテムをもらう など）")]
+    private EventSequence afterTalk;
+
+    [SerializeField, Label("倒したことをセーブする")]
+    [Tooltip("オン：倒したことを覚えておき、シーンに戻ったときに「戻ったときの姿」にする（ボス・1 回だけの敵）")]
+    private bool saveDefeat = false;
+
+    [SerializeField, Label("戻ったときの姿")]
+    [Tooltip("倒したことをセーブしたとき、シーンに戻ったらどうするか")]
+    private DefeatReturn onReturn = DefeatReturn.SameAsDefeat;
+
+    [SerializeField, Label("セーブ用の ID")]
+    [Tooltip("空なら階層のパスで記録する（名前や親を変えると記録がリセットされる）")]
+    private string saveId = "";
 
     // 経路を探し直す間隔（秒）
     private const float RepathInterval = 0.25f;
@@ -361,10 +401,15 @@ public class Enemy : MonoBehaviour
     public void Kill()
     {
         if(IsDead || health == null) { return; }
+
+        // 効き方・無敵（グループのバリアなど）に関係なく倒す
         var filter = health.DamageFilter;
+        bool invincible = health.Invincible;
         health.DamageFilter = null;
+        health.Invincible = false;
         health.Damage(DamageInfo.Create(health.CurrentHealth, DamageKind.Other, null, transform.position));
         health.DamageFilter = filter;
+        health.Invincible = invincible;
     }
 
     private void Awake()
@@ -388,6 +433,54 @@ public class Enemy : MonoBehaviour
 
         // 見た目の変化（体力・攻撃・部位・段階・ひるみ・止まっている）
         if(GetComponent<EnemyLook>() == null) { gameObject.AddComponent<EnemyLook>(); }
+
+        // 倒したことをセーブしてあれば、戻ったときの姿にする
+        RestoreDefeat();
+    }
+
+    //=====================================================================
+    // 倒したことのセーブ
+    //=====================================================================
+
+    private string SaveKey
+    {
+        get
+        {
+            string name = saveId;
+            if(string.IsNullOrEmpty(name))
+            {
+                name = gameObject.name;
+                for(Transform p = transform.parent; p != null; p = p.parent) { name = p.name + "/" + name; }
+            }
+            return "Enemy/" + gameObject.scene.name + "/" + name;
+        }
+    }
+
+    /// <summary> 倒したことがセーブされているか </summary>
+    public bool DefeatSaved => saveDefeat && Save.Get(SaveKey, false);
+
+    private bool restoredDefeat;
+
+    private void RestoreDefeat()
+    {
+        if(!DefeatSaved || onReturn == DefeatReturn.Revive) { return; }
+
+        restoredDefeat = true;
+        if(onDefeated != null) { onDefeated.Restore(gameObject); }
+
+        DefeatStyle style = data != null ? data.DefeatStyle : DefeatStyle.Vanish;
+        bool gone = onReturn == DefeatReturn.Gone || (onReturn == DefeatReturn.SameAsDefeat && style == DefeatStyle.Vanish);
+        if(gone)
+        {
+            dying = true;
+            gameObject.SetActive(false);
+            Destroy(gameObject);
+            return;
+        }
+
+        // 倒れた姿のまま（またはおとなしくなった姿で）置いておく
+        dying = true;
+        health.SetDeadSilently();
     }
 
     /// <summary>
@@ -430,6 +523,14 @@ public class Enemy : MonoBehaviour
 
     private void Start()
     {
+        if(restoredDefeat)
+        {
+            // 戻ったときの姿（倒れた姿・おとなしくなった姿）
+            DefeatStyle style = data != null ? data.DefeatStyle : DefeatStyle.Remain;
+            EnterDefeatedPose(style == DefeatStyle.Pacify, true);
+            return;
+        }
+
         // マップの外に出ないように、プレイヤーと同じ範囲を使う
         PlayerSceneContext context = FindAnyObjectByType<PlayerSceneContext>();
         if(context != null) { limitTilemap = context.PlayerLimitTilemap; }
@@ -698,26 +799,121 @@ public class Enemy : MonoBehaviour
         rb.linearVelocity = Vector2.zero;
         rb.bodyType = RigidbodyType2D.Kinematic;
 
+        DefeatStyle style = data != null ? data.DefeatStyle : DefeatStyle.Vanish;
+
         // 当たり判定を消す（倒れている間に攻撃が当たったり、ぶつかったりしないように）
-        foreach(Collider2D col in GetComponentsInChildren<Collider2D>()) { col.enabled = false; }
+        // おとなしくなる敵は、体の当たり判定を残す（その場に立っている NPC のように）
+        foreach(Collider2D col in GetComponentsInChildren<Collider2D>())
+        {
+            if(style == DefeatStyle.Pacify && col.gameObject == gameObject && !col.isTrigger) { continue; }
+            col.enabled = false;
+        }
 
         if(data != null) { SeManager.PlaySe(data.DeathSe, transform.position); }
 
-        // 死亡アニメがあれば、流し終わってから消える
-        string clip = data != null ? data.DeathAnimation : "";
-        if(anim != null && !string.IsNullOrEmpty(clip) && anim.Play(clip, true))
+        // 倒したときのイベント・フラグ・セーブ・落とすアイテム
+        if(defeatFlag != null) { defeatFlag.Value = true; }
+        if(saveDefeat) { Save.SetPending(SaveKey, true); }
+        DropItems();
+        if(onDefeated != null) { onDefeated.Play(gameObject); }
+
+        if(style == DefeatStyle.Pacify)
         {
-            StartCoroutine(VanishAfterAnimation());
+            EffectManager.Play(data != null ? data.DeathEffect : null, transform.position);
+            EnterDefeatedPose(true, false);
             return;
         }
 
+        // 死亡アニメがあれば、流し終わってから消える（残る）
+        string clip = data != null ? data.DeathAnimation : "";
+        if(anim != null && !string.IsNullOrEmpty(clip) && anim.Play(clip, true))
+        {
+            StartCoroutine(AfterDeathAnimation(style));
+            return;
+        }
+
+        if(style == DefeatStyle.Remain)
+        {
+            EffectManager.Play(data != null ? data.DeathEffect : null, transform.position);
+            EnterDefeatedPose(false, false);
+            return;
+        }
         Vanish();
     }
 
-    private IEnumerator VanishAfterAnimation()
+    private IEnumerator AfterDeathAnimation(DefeatStyle style)
     {
         yield return anim.WaitForCycle();
-        Vanish();
+        if(style == DefeatStyle.Remain)
+        {
+            EffectManager.Play(data != null ? data.DeathEffect : null, transform.position);
+            EnterDefeatedPose(false, false);
+        }
+        else
+        {
+            Vanish();
+        }
+    }
+
+    /// <summary>
+    /// 倒れた姿・おとなしくなった姿にする（調べられるようにする）
+    /// </summary>
+    /// <param name="pacify"> おとなしくなる（立ったまま） </param>
+    /// <param name="restoring"> セーブから戻したとき（演出なし） </param>
+    private void EnterDefeatedPose(bool pacify, bool restoring)
+    {
+        all.Remove(this);
+        Stop();
+        if(rb != null) { rb.bodyType = RigidbodyType2D.Kinematic; rb.linearVelocity = Vector2.zero; }
+
+        SpriteRenderer sr = GetComponent<SpriteRenderer>();
+        if(pacify)
+        {
+            if(anim != null) { anim.Play("Idle", true); }
+        }
+        else
+        {
+            // 倒れた姿：死亡アニメの最後の絵で止め、色を変える
+            string clip = data != null ? data.DeathAnimation : "";
+            if(restoring && anim != null && !string.IsNullOrEmpty(clip)) { anim.JumpToEnd(clip); }
+            if(sr != null && data != null) { sr.color = data.RemainTint; }
+            foreach(Collider2D col in GetComponentsInChildren<Collider2D>()) { col.enabled = false; }
+        }
+
+        // 部位の見た目は隠す（倒れたあとに弱点の目印などが残らないように）
+        foreach(EnemyPart part in GetComponentsInChildren<EnemyPart>())
+        {
+            foreach(Renderer r in part.GetComponentsInChildren<Renderer>()) { r.enabled = false; }
+        }
+
+        if(afterTalk != null) { DefeatedTalk.Attach(this, afterTalk, Mathf.Max(1.0f, BodyRadius + 0.6f)); }
+    }
+
+    /// <summary>
+    /// 敵のデータの「落とすアイテム」を落とす
+    /// </summary>
+    private void DropItems()
+    {
+        if(data == null) { return; }
+
+        int index = 0;
+        foreach(EnemyDrop drop in data.Drops)
+        {
+            if(drop == null || drop.item == null) { continue; }
+            if(UnityEngine.Random.value > drop.chance) { continue; }
+
+            if(drop.direct)
+            {
+                if(InventoryManager.Instance != null) { InventoryManager.Instance.AddItem(drop.item, Mathf.Max(1, drop.count)); }
+                continue;
+            }
+
+            // 少しずつずらして置く
+            float angle = index * 2.4f;
+            Vector2 offset = new Vector2(Mathf.Cos(angle), Mathf.Sin(angle)) * (index == 0 ? 0.0f : 0.5f);
+            DroppedItem.Drop(drop.item, drop.count, (Vector2)transform.position + offset);
+            index++;
+        }
     }
 
     private void Vanish()

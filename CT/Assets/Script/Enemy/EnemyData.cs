@@ -127,6 +127,18 @@ public class EnemyData : ScriptableObject
     [Tooltip("アニメーションにこの名前の動きがあれば、流し終わってから消える")]
     private string deathAnimation = "Dead";
 
+    [SerializeField, Label("倒されたあと")]
+    [Tooltip("消える／倒れた姿で残る（調べられる）／おとなしくなる（攻撃しなくなり、その場に立つ。調べられる）")]
+    private DefeatStyle defeatStyle = DefeatStyle.Vanish;
+
+    [SerializeField, Label("残った姿の色")]
+    [Tooltip("「倒れた姿で残る」のときにかける色")]
+    private Color remainTint = new Color(0.6f, 0.6f, 0.6f, 1.0f);
+
+    [SerializeField]
+    [Tooltip("倒されたときに落とすアイテム（確率つき）。シーンに置いた敵の「倒したとき」の設定とは別に、この種類の敵ならいつも落とす")]
+    private List<EnemyDrop> drops = new List<EnemyDrop>();
+
     [Header("メモ")]
 
     [SerializeField, TextArea(2, 5)]
@@ -151,6 +163,9 @@ public class EnemyData : ScriptableObject
     public string DeathAnimation => deathAnimation;
     public EnemyPattern Pattern => pattern;
     public bool RemoveSummonedOnDeath => removeSummonedOnDeath;
+    public DefeatStyle DefeatStyle => defeatStyle;
+    public Color RemainTint => remainTint;
+    public IReadOnlyList<EnemyDrop> Drops => drops;
     public float StaggerThreshold => staggerThreshold;
     public float StaggerTime => staggerTime;
     public float StaggerDecay => staggerDecay;
@@ -190,6 +205,42 @@ public class EnemyData : ScriptableObject
         if(multiplier <= 0.0f) { return 0; }
         return Mathf.Max(1, Mathf.FloorToInt(info.amount * multiplier + 0.5f));
     }
+}
+
+/// <summary>
+/// 倒されたあとの姿
+/// </summary>
+public enum DefeatStyle
+{
+    [InspectorName("消える")]
+    Vanish = 0,
+
+    [InspectorName("倒れた姿で残る（調べられる）")]
+    Remain = 1,
+
+    [InspectorName("おとなしくなる（攻撃しなくなる・調べられる）")]
+    Pacify = 2,
+}
+
+/// <summary>
+/// 落とすアイテム（1行分）
+/// </summary>
+[Serializable]
+public class EnemyDrop
+{
+    [Label("アイテム")]
+    public ItemData item;
+
+    [Label("個数", 1)]
+    public int count = 1;
+
+    [Label("確率", 0.0f, 1.0f)]
+    [Tooltip("1 なら必ず、0.3 なら 30%")]
+    public float chance = 1.0f;
+
+    [Label("すぐ持ち物に入れる")]
+    [Tooltip("オン：倒した瞬間に持ち物に入る／オフ：その場に落ちて、触れると拾える（拾わずにシーンを出ると消える）")]
+    public bool direct = false;
 }
 
 /// <summary>
