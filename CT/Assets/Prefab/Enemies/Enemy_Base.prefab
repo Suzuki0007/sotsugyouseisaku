@@ -16,6 +16,7 @@ GameObject:
   - component: {fileID: 948461848681157870}
   - component: {fileID: 75072693641319995}
   - component: {fileID: 6148231572384520106}
+  - component: {fileID: 7829982145288766585}
   m_Layer: 9
   m_Name: Enemy_Base
   m_TagString: Enemies
@@ -223,3 +224,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Enemy
   data: {fileID: 11400000, guid: ee119d8e48bc2b249b0a2a967ff87444, type: 2}
+--- !u!114 &7829982145288766585
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6566376892736934401}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9ae3dd58bcfcd70489369f667311967e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyBrain
+  overridePattern: {fileID: 0}
+  patrolPoints: []
+  wakeDistance: 0

@@ -4,9 +4,9 @@
 主人公は **ノア（Noah）** と **シグル（Sigle）** の2人で、C キーで操作を切り替える。
 目標は「**プランナーがコードを書かずに Inspector だけで制作を進められる**」こと。
 
-最終更新：2026-11-08（①〜⑥の実装、既存の問題の修正、タイトル画面とセーブスロット、メニュー画面とセーブポイント、敵の仕組みの段階0〔シグルの射撃・体力の共有〕・段階1〔土台〕まで）
+最終更新：2026-11-08（①〜⑥の実装、既存の問題の修正、タイトル画面とセーブスロット、メニュー画面とセーブポイント、敵の仕組みの段階0〔シグルの射撃・体力の共有〕・段階1〔土台〕・段階2〔行動パターンと攻撃の基本〕まで）
 
-**進行中：敵の仕組み**（プランナーが敵・攻撃・行動パターン・ギミック連動・追跡などを Inspector だけで作れるように）。段階 0 前提の修正 → 1 土台（DamageInfo・攻撃を受ける部品・GameCondition・EnemyData・2D ナビメッシュ〔標準の NavMesh API + 2D コライダーから自作の収集。NavMeshAgent は使わず経路だけ計算し Rigidbody2D で動かす〕）→ 2 行動パターンと攻撃の基本 → 3 ギミック連動・攻撃の発生源 → 4 追跡 → 5 部位・ひるみ・見た目 → 6 倒した後・グループ → 7 ツールと資料。**1段階ずつ終わったら報告とコミットメッセージを渡す**。今は**段階1まで完了**（次は段階2：行動パターンと攻撃の基本。古い Enemy.prefab の置き換えもここ）。
+**進行中：敵の仕組み**（プランナーが敵・攻撃・行動パターン・ギミック連動・追跡などを Inspector だけで作れるように）。段階 0 前提の修正 → 1 土台（DamageInfo・攻撃を受ける部品・GameCondition・EnemyData・2D ナビメッシュ〔標準の NavMesh API + 2D コライダーから自作の収集。NavMeshAgent は使わず経路だけ計算し Rigidbody2D で動かす〕）→ 2 行動パターンと攻撃の基本 → 3 ギミック連動・攻撃の発生源 → 4 追跡 → 5 部位・ひるみ・見た目 → 6 倒した後・グループ → 7 ツールと資料。**1段階ずつ終わったら報告とコミットメッセージを渡す**。今は**段階2まで完了**（次は段階3：ギミック連動〔敵に命令・敵にダメージ・ダメージエリア〕・攻撃の発生源〔見えない敵・腕〕・攻撃の残り〔落下・突き出る・設置・弾幕・召喚〕）。
 
 ---
 
@@ -70,6 +70,11 @@
 - **攻撃の情報**：`DamageInfo`（量・`DamageKind`・攻撃者・`PlayerCharacter`・位置・`GaugeJudge`）。`Health.Damage(int)` は残し `Damage(DamageInfo)` を追加、`OnDamagedInfo` / `LastDamage`。**攻撃を当てる処理は `DamageUtility.Apply(collider, info)` を通す**（`DamageReceiver` があればそちら＝部位・ギミック用、なければ Health）。範囲攻撃は `HitKey` で同じ Health に1回だけ。
 - **敵を止める判定は `EnemyBlock.IsBlocked`**（`InputBlock` + デバッグ）。1体だけは `Enemy.Paused`。
 - **2D ナビメッシュ** `NavMesh2D`（自動生成・シーンごと）：標準の NavMesh API を X 軸 -90° で XY に重ねる。壁＝動かない（Rigidbody2D なし／Static）・トリガーでない 2D コライダー（Bullet・Enemies レイヤーを除く）を `Collider2D.CreateMesh` → 床より 0.5 手前に置いて通れなくする。歩ける範囲は PlayerSceneContext の Tilemap。大きさ（小中大）ごとに `NavMesh.CreateSettings`。0.5 秒ごとに壁の変化を見て非同期で作り直す（作り直し中は材料を変えない）。OnDestroy でデータと設定を消す。NavMeshAgent は使わない。`NavMeshPath` はフィールド初期化で作れない（Awake で）。`EnemyNavArea`：敵だけ入れない／通りにくい（エリア 3、コスト 5）。
+- **行動パターン**（`Enemy/Pattern/`）：`EnemyPattern`（SO）→ 段階 `EnemyPhase`（選び方・次へ進む条件・入ったときの演出）→ 行動 `EnemyAction`（`[SerializeReference]`、`[EnemyActionMenu("分類/名前")]` で「＋」メニューに出る。クラス名を変えるとデータが消えるので `[MovedFrom]`）。`EnemyBrain`（共通プレハブ）が実行。待つときは `brain.Wait` / `MoveUntil`（止められている間は数えない）。途中でやめるのは `brain.Interrupt()`（各行動の `Cleanup`、攻撃の `AttackExecution.Cleanup`）。
+- **攻撃**（`Enemy/Attack/`）：`AttackData`（SO。予告→発動→後隙）、`AttackShape`（判定と予告のメッシュを同じデータから）、`AttackExecution`（実行。当てるのは `DamageUtility.Apply`）、`TelegraphView`（予告の表示。プール・Unlit 既定・描く順番 3）。突進はプレイヤーとの衝突を切ってすり抜け、離れてから戻す。弾は EnemyBulletPool を使う。
+- **効き方**：`EnemyData.damageRules`（`DamageRule`：`DamageKindFilter`〔DamageKind と同じ番号＋Any=-1〕・`CharacterFilter`・`GaugeJudge`・倍率、全部かけ算）→ `Health.DamageFilter`。0 以下は `OnBlocked`。
+- 敵はプレイヤーに触れている向きへは進まない（重い敵がプレイヤーを押し出してイベント範囲に入れてしまうのを防ぐ）。
+- サンプル：Tools > 敵 > サンプルを作る（`Assets/Data/Enemies/Sample/`）。Stage1_2 のスポナーはまだ古い Enemy.prefab（置き換えはシーン変更なので未実施）。
 - `GameCondition`（`Common/`）：フラグ・アイテム（既存の Condition を中に持つ）・操作キャラ・パーティーの体力・範囲。
 - **Inspector の項目名は `[Label("日本語")]`**（`InspectorName` は enum の値にしか効かない）。最小値・スライダーは `[Label("名前", min)]` / `[Label("名前", min, max)]`。Range / Min と併用しない。リストには付けない。
 - エディタ：Tools > 敵 > 共通プレハブとサンプルを作る、Hierarchy 右クリック > 敵 > 敵を置く／敵の通行設定エリア。デバッグウィンドウの「敵」（止める・経路の表示・倒す）。シーンチェックに敵の項目。
@@ -137,7 +142,7 @@
 - **ノア・シグルのプレハブに FootstepSe がない**（足音が鳴らない。FootstepSe は Stage1_2 の動かない `Player` オブジェクトに付いている）。
 - `BgmProgress`（BGM の進行度）が再生ごとにリセットされず、セーブもされない。
 - `StageDarkness` の明かりが操作キャラに付いていかないことがある。
-- **古い作りの敵**（Enemy.prefab / Behavior Graph）：移動が壁をすり抜ける、会話中も移動は続く（撃つのは止まる）。敵を倒しても何も起きない・セーブされない（段階6）。体当たりはプレイヤーに無敵時間がないので間隔だけで決まる。
+- **古い作りの敵**（Enemy.prefab / Behavior Graph）：移動が壁をすり抜ける、会話中も移動は続く（撃つのは止まる）。敵を倒しても何も起きない・セーブされない（段階6）。体当たりはプレイヤーに無敵時間がないので間隔だけで決まる。敵の攻撃にノックバックがない。攻撃の「弾を撃つ」は弾のプレハブ任せ（効かないキャラ等が効かない）。
 - シグル操作中も Space / R でノアの攻撃が出る（`AttackController` が操作中かを見ていない。意図か未確認）。
 - タイトルの SceneBgm に曲が入っていない（タイトルで BGM が鳴らない）。
 - `CheckPoint` がどのシーンにもない（再開はシーンの入口から）。

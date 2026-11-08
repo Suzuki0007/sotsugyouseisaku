@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 12a468c42b056e341a2a8c75e2b9fc26, type: 3}
+  m_Name: "EnemyData_Sample_\u5DE1\u56DE"
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyData
+  displayName: "\u5DE1\u56DE\u3059\u308B\u6575"
+  maxHealth: 3
+  moveSpeed: 2
+  size: 1
+  heavy: 1
+  pattern: {fileID: 11400000, guid: 91875f4b4091a4e47ae8b831681561ff, type: 2}
+  damageRules: []
+  contactDamage: 1
+  contactInterval: 1
+  animation: {fileID: 0}
+  sprite: {fileID: 0}
+  deathEffect: {fileID: 11400000, guid: db953535983d3f047a3398fdc6e212b4, type: 2}
+  deathSe: {fileID: 0}
+  deathAnimation: Dead
+  memo: 

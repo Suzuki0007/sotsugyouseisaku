@@ -1,0 +1,66 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d9b29a5f1e02d3c47acbbafad2c0517a, type: 3}
+  m_Name: "Pattern_Sample_\u8FD1\u3065\u3044\u3066\u306A\u304E\u6255\u3046"
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyPattern
+  phases:
+  - name: "\u901A\u5E38"
+    order: 0
+    actions:
+    - rid: 1708568687347761271
+    - rid: 1708568687347761272
+    - rid: 1708568687347761273
+    exit: 0
+    healthRatio: 0.5
+    seconds: 10
+    condition:
+      flags: []
+      items: []
+      character: 0
+      partyHealth: 0
+      partyHealthRatio: 0.5
+      area: {fileID: 0}
+    interrupt: 1
+    enterEffect: {fileID: 0}
+    enterSe: {fileID: 0}
+    enterAnimation: 
+    enterPause: 0
+  memo: "\u8FD1\u3065\u3044\u3066\u3001\u8FD1\u3051\u308C\u3070\u306A\u304E\u6255\u3046"
+  references:
+    version: 2
+    RefIds:
+    - rid: 1708568687347761271
+      type: {class: ApproachAction, ns: , asm: Assembly-CSharp}
+      data:
+        distanceCheck: 0
+        distance: 4
+        weight: 1
+        stopDistance: 1.8
+        maxSeconds: 3
+        speedMultiplier: 1
+    - rid: 1708568687347761272
+      type: {class: AttackAction, ns: , asm: Assembly-CSharp}
+      data:
+        distanceCheck: 1
+        distance: 2.5
+        weight: 1
+        attack: {fileID: 11400000, guid: 93f43c13281beba4682d1503b1c18a24, type: 2}
+        repeat: 1
+        interval: 0
+    - rid: 1708568687347761273
+      type: {class: WaitAction, ns: , asm: Assembly-CSharp}
+      data:
+        distanceCheck: 0
+        distance: 4
+        weight: 1
+        minSeconds: 0.4
+        maxSeconds: 0.8

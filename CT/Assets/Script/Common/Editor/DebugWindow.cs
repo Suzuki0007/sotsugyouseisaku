@@ -272,19 +272,35 @@ public class DebugWindow : EditorWindow
                     string hp = enemy.Health != null ? $"{enemy.Health.CurrentHealth}/{enemy.Health.MaxHealth}" : "-";
                     if(GUILayout.Button(label, EditorStyles.label)) { Selection.activeGameObject = enemy.gameObject; }
                     EditorGUILayout.LabelField(hp, GUILayout.Width(50));
-                    if(GUILayout.Button("倒す", GUILayout.Width(50)) && enemy.Health != null) { enemy.Health.Damage(enemy.Health.CurrentHealth); }
+                    if(GUILayout.Button("倒す", GUILayout.Width(50))) { Kill(enemy); }
+                }
+
+                if(enemy.Brain != null)
+                {
+                    using(new EditorGUI.IndentLevelScope()) { EditorGUILayout.LabelField(enemy.Brain.StatusText, EditorStyles.miniLabel); }
                 }
             }
 
             if(enemies.Count > 0 && GUILayout.Button("全部倒す"))
             {
-                foreach(Enemy enemy in new List<Enemy>(enemies))
-                {
-                    if(enemy != null && enemy.Health != null) { enemy.Health.Damage(enemy.Health.CurrentHealth); }
-                }
+                foreach(Enemy enemy in new List<Enemy>(enemies)) { Kill(enemy); }
             }
         }
         EditorGUILayout.EndFoldoutHeaderGroup();
+    }
+
+    /// <summary>
+    /// 敵を倒す（効き方の設定に関係なく）
+    /// </summary>
+    private static void Kill(Enemy enemy)
+    {
+        if(enemy == null || enemy.Health == null) { return; }
+
+        Health health = enemy.Health;
+        var filter = health.DamageFilter;
+        health.DamageFilter = null;
+        health.Damage(DamageInfo.Create(health.CurrentHealth, DamageKind.Other, null, enemy.transform.position));
+        health.DamageFilter = filter;
     }
 
     //=====================================================================

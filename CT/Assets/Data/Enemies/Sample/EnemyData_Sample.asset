@@ -17,6 +17,8 @@ MonoBehaviour:
   moveSpeed: 2
   size: 1
   heavy: 1
+  pattern: {fileID: 11400000, guid: 84a6182d3709e4544a7d5c053d439b7c, type: 2}
+  damageRules: []
   contactDamage: 1
   contactInterval: 1
   animation: {fileID: 0}

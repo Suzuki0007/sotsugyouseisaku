@@ -95,6 +95,25 @@ public static class SceneChecker
             {
                 ctx.Add(Level.Error, enemy, "Collider2D がありません（攻撃が当たらず、壁もすり抜けます）");
             }
+
+            // 行動パターン
+            EnemyBrain brain = enemy.GetComponent<EnemyBrain>();
+            var bso = brain != null ? new SerializedObject(brain) : null;
+            var overridePattern = bso != null ? bso.FindProperty("overridePattern").objectReferenceValue as EnemyPattern : null;
+            EnemyPattern pattern = overridePattern != null ? overridePattern : (enemy.Data != null ? enemy.Data.Pattern : null);
+
+            if(brain == null)
+            {
+                ctx.Add(Level.Info, enemy, "EnemyBrain がないので、行動パターンを実行しません（その場に立っているだけ）");
+            }
+            else if(pattern == null)
+            {
+                ctx.Add(Level.Info, enemy, "行動パターンがありません（その場に立っているだけ）");
+            }
+            else if(UsesPatrol(pattern) && brain.PatrolPointCount == 0)
+            {
+                ctx.Add(Level.Warning, enemy, $"行動パターン「{pattern.name}」に「巡回する」がありますが、EnemyBrain の巡回ポイントが空です");
+            }
         }
 
         foreach(EnemyNavArea area in ctx.Find<EnemyNavArea>())
@@ -408,8 +427,71 @@ public static class SceneChecker
     // プロジェクト全体のチェック
     //=====================================================================
 
+    private static bool UsesPatrol(EnemyPattern pattern)
+    {
+        foreach(EnemyPhase phase in pattern.phases)
+        {
+            if(phase == null || phase.actions == null) { continue; }
+            foreach(EnemyAction action in phase.actions) { if(action is PatrolAction) { return true; } }
+        }
+        return false;
+    }
+
+    /// <summary>
+    /// 敵の行動パターン・攻撃のデータのチェック
+    /// </summary>
+    private static void CheckEnemyAssets(List<Issue> issues)
+    {
+        foreach(string guid in AssetDatabase.FindAssets("t:EnemyPattern"))
+        {
+            var pattern = AssetDatabase.LoadAssetAtPath<EnemyPattern>(AssetDatabase.GUIDToAssetPath(guid));
+            if(pattern == null) { continue; }
+
+            for(int i = 0; i < pattern.phases.Count; i++)
+            {
+                EnemyPhase phase = pattern.phases[i];
+                if(phase == null) { continue; }
+
+                if(phase.actions == null || phase.actions.Count == 0)
+                {
+                    issues.Add(new Issue { level = Level.Warning, target = pattern, message = $"行動パターン「{pattern.name}」の段階 {i + 1}「{phase.name}」に行動がありません（その段階では立っているだけ）" });
+                    continue;
+                }
+
+                foreach(EnemyAction action in phase.actions)
+                {
+                    if(action == null)
+                    {
+                        issues.Add(new Issue { level = Level.Error, target = pattern, message = $"行動パターン「{pattern.name}」の段階 {i + 1} に、中身が消えた行動があります（クラス名を変えた・消した）" });
+                    }
+                    else if(action is AttackAction attack && attack.attack == null)
+                    {
+                        issues.Add(new Issue { level = Level.Error, target = pattern, message = $"行動パターン「{pattern.name}」の段階 {i + 1} の「攻撃する」に、攻撃が入っていません" });
+                    }
+                }
+            }
+        }
+
+        foreach(string guid in AssetDatabase.FindAssets("t:AttackData"))
+        {
+            var attack = AssetDatabase.LoadAssetAtPath<AttackData>(AssetDatabase.GUIDToAssetPath(guid));
+            if(attack == null) { continue; }
+
+            if(attack.activation == AttackActivation.Instant && attack.motion == AttackMotion.Charge && attack.shape.type != AttackShapeType.Rectangle)
+            {
+                issues.Add(new Issue { level = Level.Warning, target = attack, message = $"攻撃「{attack.name}」は突進ですが、形が長方形ではありません（長方形の長さが走る距離になります）" });
+            }
+            if(attack.activation != AttackActivation.Bullet && attack.damage <= 0)
+            {
+                issues.Add(new Issue { level = Level.Info, target = attack, message = $"攻撃「{attack.name}」のダメージが 0 です（当たっても何も起きません）" });
+            }
+        }
+    }
+
     public static void CheckProject(List<Issue> issues)
     {
+        CheckEnemyAssets(issues);
+
         // Build Settings
         foreach(EditorBuildSettingsScene scene in EditorBuildSettings.scenes)
         {

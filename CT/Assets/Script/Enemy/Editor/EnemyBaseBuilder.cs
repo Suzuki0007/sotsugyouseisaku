@@ -94,12 +94,34 @@ public static class EnemyBaseBuilder
             eso.FindProperty("data").objectReferenceValue = sample;
             eso.ApplyModifiedPropertiesWithoutUndo();
 
+            root.AddComponent<EnemyBrain>();
+
             Directory.CreateDirectory(Path.GetDirectoryName(PrefabPath));
             return PrefabUtility.SaveAsPrefabAsset(root, PrefabPath);
         }
         finally
         {
             Object.DestroyImmediate(root);
+        }
+    }
+
+    /// <summary>
+    /// 既存の共通プレハブに、あとから足した部品（EnemyBrain など）を付け足す（作り直さない）
+    /// </summary>
+    public static void EnsurePrefabComponents()
+    {
+        if(!File.Exists(PrefabPath)) { return; }
+
+        GameObject root = PrefabUtility.LoadPrefabContents(PrefabPath);
+        try
+        {
+            bool changed = false;
+            if(root.GetComponent<EnemyBrain>() == null) { root.AddComponent<EnemyBrain>(); changed = true; }
+            if(changed) { PrefabUtility.SaveAsPrefabAsset(root, PrefabPath); }
+        }
+        finally
+        {
+            PrefabUtility.UnloadPrefabContents(root);
         }
     }
 

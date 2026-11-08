@@ -65,6 +65,14 @@ public class Enemy : MonoBehaviour
     private float contactTimer;
     private bool dying;
 
+    private bool touchingPlayer;
+    private Vector2 playerContactNormal;
+
+    private bool hasOverrideVelocity;
+    private Vector2 overrideVelocity;
+    private CharacterAnimLink animLink;
+    private EnemyBrain brain;
+
     //=====================================================================
     // プロパティ
     //=====================================================================
@@ -113,6 +121,24 @@ public class Enemy : MonoBehaviour
 
     public EnemySize Size => data != null ? data.Size : EnemySize.Medium;
 
+    /// <summary> 向いている方向（最後に動いた方向。最初はプレイヤーの方か下） </summary>
+    public Vector2 Facing { get; private set; } = Vector2.down;
+
+    /// <summary> 体の半径（当たり判定のだいたいの大きさ。突進の当たり判定・壁の手前で止まる距離に使う） </summary>
+    public float BodyRadius
+    {
+        get
+        {
+            Collider2D col = GetComponent<Collider2D>();
+            if(col == null) { return 0.5f; }
+            Vector3 size = col.bounds.size;
+            return Mathf.Max(0.1f, Mathf.Max(size.x, size.y) * 0.5f);
+        }
+    }
+
+    /// <summary> 行動パターンを実行している部品（なければ null） </summary>
+    public EnemyBrain Brain => brain;
+
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     private static void ResetOnPlay()
     {
@@ -128,10 +154,15 @@ public class Enemy : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         health = GetComponent<Health>();
         anim = GetComponent<SpriteAnimator>();
+        animLink = GetComponent<CharacterAnimLink>();
+        brain = GetComponent<EnemyBrain>();
 
         if(data == null) { Debug.LogError($"{name}: 敵のデータ（EnemyData）が入っていません", this); }
 
         ApplyData();
+
+        // 攻撃の種類・キャラごとの効き方
+        health.DamageFilter = info => data != null ? info.WithAmount(data.ApplyDamageRules(info)) : info;
     }
 
     /// <summary>
@@ -177,6 +208,45 @@ public class Enemy : MonoBehaviour
         // マップの外に出ないように、プレイヤーと同じ範囲を使う
         PlayerSceneContext context = FindAnyObjectByType<PlayerSceneContext>();
         if(context != null) { limitTilemap = context.PlayerLimitTilemap; }
+
+        // 最初はプレイヤーの方を向く
+        GameObject target = Target;
+        if(target != null)
+        {
+            Vector2 toTarget = target.transform.position - transform.position;
+            if(toTarget.sqrMagnitude > 0.0001f) { Facing = toTarget.normalized; }
+        }
+    }
+
+    //=====================================================================
+    // 外から使う関数
+    //=====================================================================
+
+    /// <summary>
+    /// 経路を使わずに、この速度で動かす（突進など）。ClearOverrideVelocity で戻す
+    /// </summary>
+    public void SetOverrideVelocity(Vector2 velocity)
+    {
+        hasOverrideVelocity = true;
+        overrideVelocity = velocity;
+        if(velocity.sqrMagnitude > 0.0001f) { Facing = velocity.normalized; }
+    }
+
+    public void ClearOverrideVelocity()
+    {
+        hasOverrideVelocity = false;
+        overrideVelocity = Vector2.zero;
+        if(rb != null) { rb.linearVelocity = Vector2.zero; }
+    }
+
+    /// <summary>
+    /// 1回だけの動き（構え・攻撃など）を流す。名前が空・その動きがなければ何もしない
+    /// </summary>
+    public bool PlayAction(string clipName)
+    {
+        if(string.IsNullOrEmpty(clipName) || IsDead) { return false; }
+        if(animLink != null) { return animLink.PlayAction(clipName); }
+        return anim != null && anim.Play(clipName, true);
     }
 
     //=====================================================================
@@ -225,13 +295,29 @@ public class Enemy : MonoBehaviour
             return;
         }
 
+        // 突進など、速度を直接決められているとき
+        if(hasOverrideVelocity)
+        {
+            rb.linearVelocity = overrideVelocity;
+            return;
+        }
+
         Vector2 velocity = Vector2.zero;
         if(hasDestination) { velocity = FollowPath(); }
 
         // ほかの敵と重ならないように少し離れる（動いているときだけ）
         if(velocity != Vector2.zero) { velocity += Separation() * (data != null ? data.MoveSpeed : 1.0f); }
 
+        // プレイヤーに触れているときは、プレイヤーの方へは進まない（重い敵がプレイヤーを押し出して、イベントの範囲などに押し込まないように）
+        if(touchingPlayer)
+        {
+            float into = Vector2.Dot(velocity, playerContactNormal);
+            if(into < 0.0f) { velocity -= playerContactNormal * into; }
+            touchingPlayer = false;
+        }
+
         rb.linearVelocity = velocity;
+        if(velocity.sqrMagnitude > 0.01f) { Facing = velocity.normalized; }
     }
 
     private void LateUpdate()
@@ -355,6 +441,13 @@ public class Enemy : MonoBehaviour
 
     private void OnCollisionStay2D(Collision2D collision)
     {
+        // プレイヤーに触れている向き（次の FixedUpdate で、そちらへ押さないようにする）
+        if(collision.collider.CompareTag("Player") && collision.contactCount > 0)
+        {
+            touchingPlayer = true;
+            playerContactNormal = collision.GetContact(0).normal;
+        }
+
         if(data == null || data.ContactDamage <= 0) { return; }
         if(contactTimer > 0.0f) { return; }
         if(!CanAct) { return; }

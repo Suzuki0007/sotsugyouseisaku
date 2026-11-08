@@ -43,6 +43,14 @@ public class Health : MonoBehaviour
     /// <summary> 最後に受けた攻撃の情報（倒されたときに、何で倒されたかを見るのに使う） </summary>
     public DamageInfo LastDamage { get; private set; }
 
+    /// <summary> 攻撃が当たったが、効き方の設定でダメージが 0 になったとき（効かない攻撃。「カキン」と弾く演出などに使う） </summary>
+    public event System.Action<DamageInfo> OnBlocked;
+
+    /// <summary>
+    /// ダメージを受ける前に量を変える処理（敵の「攻撃の種類・キャラごとの効き方」など）。null なら変えない
+    /// </summary>
+    public System.Func<DamageInfo, DamageInfo> DamageFilter { get; set; }
+
     //=====================================================================
     // プロパティ
     //=====================================================================
@@ -144,11 +152,19 @@ public class Health : MonoBehaviour
     /// </summary>
     public void Damage(DamageInfo info)
     {
-        int damage = info.amount;
-
         if(IsDead) { return; }
         if(Invincible) { return; }
         if(PlayerInvincible && CompareTag("Player")) { return; }
+
+        // 効き方の設定でダメージを変える（0 になったら「効かなかった」）
+        if(DamageFilter != null) { info = DamageFilter(info); }
+        if(info.amount <= 0)
+        {
+            OnBlocked?.Invoke(info);
+            return;
+        }
+
+        int damage = info.amount;
 
         // 共有している場合は、共有先の体力を減らす
         // 自分のイベントも出す（シグルのダメージのアニメ・エフェクトなどは、シグルの Health を見ているため）

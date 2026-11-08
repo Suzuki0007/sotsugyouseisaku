@@ -12,7 +12,7 @@
 | `Assets/Scenes/` | **Build Settings：`Title` → `Stage1_1` ⇄ `Stage1_2`、`SceneGameOver`**。ファイルだけ残っているもの：`Stage1` / `Stage2`（**古い作り**：プレイヤーをシーンに直接置く）、`SampleScene`、`kari/`（仮の Start / Clear）、`Tilemap/` |
 | `Assets/Prefab/` | `Players/`（Player_Noah / Player_Sigle）、`Enemies/`（**Enemy_Base**＝新しい作りの共通プレハブ、Enemy＝古い作り）、`Bullet/`、`UI/`（DialoguePanel、**DialogueSystem**） |
 | `Assets/Resources/` | `Items/`（ItemData。**必ずここ**。`Items/Sample/` にサンプル）、`UI/`（ItemMenu・GameMenu のプレハブ。それぞれ Resources.Load で自動生成）、`PlaceNames.asset`（場所の表示名） |
-| `Assets/Data/` | `Enemies/`（EnemyData。`Sample/` にサンプル）、`Characters/`（CharacterProfile：Noah / Sigle）、`Dialogue/`、`Flags/`（GameFlag）、`Animation/Sample/`（SpriteAnimData）、`Effect/Sample/`（EffectData） |
+| `Assets/Data/` | `Enemies/`（EnemyData・EnemyPattern・AttackData。`Sample/`〔`Attacks/`・`Patterns/`〕にサンプル）、`Characters/`（CharacterProfile：Noah / Sigle）、`Dialogue/`、`Flags/`（GameFlag）、`Animation/Sample/`（SpriteAnimData）、`Effect/Sample/`（EffectData） |
 | `Assets/Behavior/Enemy/` | Unity Behavior の敵 AI グラフ（`Behavior Graph.asset`）と独自ノード |
 | `Assets/Images/`、`Assets/BGM/`、`Assets/SE/`、`Assets/Fonts/` | 素材 |
 | `Assets/res_kari/` | 仮素材（マップタイル約2000枚、仮プレイヤー画像など） |
@@ -78,16 +78,18 @@
 | `Bullet/BulletDeleteArea.cs` | 敵の弾を消すエリア | ◎ |
 | `Pool/BulletPoolBase.cs`、`Pool/Bullet/*` | UnityEngine.Pool による弾プール（初期300、最大1000） | ◎ |
 | `Enemy/EnemyShooter.cs`、`Enemy/EnemyDead.cs`、`Enemy/EnemyMovement.cs`（空） | 古い作りの敵の射撃・死亡。EnemyShooter は狙う相手（操作中のキャラ）と弾のプールを自分で探す（スポナーなしでも撃てる）。`EnemyBlock` の間は撃たない | ○ |
-| `Enemy/Enemy.cs`、`Enemy/EnemyData.cs` | **新しい作りの敵**（段階1）。EnemyData（体力・速さ・大きさ・体当たり・見た目・倒されたとき）を反映、Rigidbody2D（Dynamic）で移動、`MoveTo` で NavMesh2D の経路に沿って進む、マップの範囲内、体当たり、`Paused`、`Enemy.All`。共通プレハブは `Prefab/Enemies/Enemy_Base.prefab` | ◎ |
+| `Enemy/Enemy.cs`、`Enemy/EnemyData.cs` | **新しい作りの敵**（段階1〜2）。EnemyData（体力・速さ・大きさ・体当たり・見た目・倒されたとき・**行動パターン**・**受けるダメージの効き方** `DamageRule`〔種類 `DamageKindFilter`・キャラ `CharacterFilter`・ゲージ判定 × 倍率〕）を反映、Rigidbody2D（Dynamic）で移動、`MoveTo` で NavMesh2D の経路に沿って進む、`SetOverrideVelocity`（突進）、`Facing`、`PlayAction`、マップの範囲内、体当たり、プレイヤーに触れている向きへは進まない（押し出さない）、`Paused`、`Enemy.All`。効き方は `Health.DamageFilter` に設定。共通プレハブは `Prefab/Enemies/Enemy_Base.prefab`（Enemy + EnemyBrain） | ◎ |
+| `Enemy/Pattern/EnemyPattern.cs`、`EnemyActions.cs`、`EnemyBrain.cs` | **行動パターン**（段階2）。EnemyPattern（SO）＝段階（選び方・次の段階へ進む条件〔体力・時間・GameCondition〕・入ったときの演出）× 行動の部品（`[SerializeReference]`：待つ／近づく／離れる／巡回／ランダムに歩く／攻撃する。`[EnemyActionMenu]` で追加メニューに出る）。EnemyBrain（共通プレハブに付く）が実行：行動の選択、`Wait`／`MoveUntil`（止められている間は数えない）、`Interrupt`（段階の切り替え・今後のひるみ）、巡回ポイント・動き出す距離・パターンの差し替え、`StatusText` | ◎ |
+| `Enemy/Attack/AttackData.cs`、`AttackShape.cs`、`AttackExecution.cs`、`TelegraphView.cs` | **攻撃**（段階2）。AttackData（SO）＝予告（時間・表示・色・満ちる・点滅・順番・Unlit）→ 起点（敵／プレイヤー〔予告時・追う〕）・向き・形（円／長方形／扇形／リング、`AttackShape` が判定と表示のメッシュを両方作る）・壁で止める → 発動（一瞬／出し続ける〔回転〕／弾〔EnemyBulletPool〕）・突進（プレイヤーをすり抜け、壁で気絶）・当たる相手・効かないキャラ → 後隙。TelegraphView は使い回し（DontDestroyOnLoad のプール） | ◎ |
 | `Enemy/EnemyBlock.cs` | 敵を止める判定（`InputBlock.IsBlocked` + デバッグの「敵を止める」）。条件を足すときはここだけ | ◎ |
 | `Enemy/Navigation/NavMesh2D.cs`、`EnemyNavArea.cs` | 2D ナビメッシュ（自動生成・シーンごと）。標準の NavMesh API を -90° 回して XY に重ね、動かない 2D コライダーを `CreateMesh` で取り出して壁にする。大きさ（小中大）ごとに別のナビメッシュ。壁の変化を 0.5 秒ごとに見て作り直す。シーンを出るときにデータと設定を消す。デバッグ表示（線のメッシュ）。EnemyNavArea：敵だけ入れない／通りにくい | ◎ |
-| 🛠`Enemy/Editor/EnemyBaseBuilder.cs` | Tools > 敵 > 共通プレハブとサンプルを作る、Hierarchy 右クリック > 敵 > 敵を置く／敵の通行設定エリア | ◎ |
+| 🛠`Enemy/Editor/EnemyBaseBuilder.cs`、`EnemySampleBuilder.cs`、`EnemyPatternEditor.cs`、`AttackDataEditor.cs` | Tools > 敵 > 共通プレハブとサンプルを作る／サンプルを作る（攻撃6・行動パターン5・敵のデータ5）、Hierarchy 右クリック > 敵 > 敵を置く／敵の通行設定エリア。行動パターンの Inspector（段階の折りたたみ・「＋」で行動の種類を選ぶ ReorderableList）、攻撃の Inspector（設定で使わない項目を隠す） | ◎ |
 | `Damage/DamageInfo.cs`、`Damage/DamageReceiver.cs` | 攻撃の情報（量・種類 `DamageKind`・攻撃者・キャラ・位置・ゲージ判定）、`PlayerCharacters`（ノア／シグルの判定・パーティーの体力）。DamageReceiver（攻撃を受ける部品：部位・ギミック用、倍率、OnHit）と `DamageUtility.Apply / HitKey`（範囲攻撃・弾・体当たりはここを通す） | ◎ |
 | `Behavior/Enemy/EnemyShotAction.cs` | Behavior Graph の「一定時間撃つ」ノード | ◎ |
 | `Behavior/Enemy/AbcdefuckAction.cs`、`SampleAction.cs` | 練習用ノード（どのグラフからも使われていない） | △ **削除推奨**（下記） |
 | `Spawner/ObjectSpawner.cs`、`Spawner/SpawnedObject.cs`、`Spawner/Enemy/EnemySpawner.cs` | 一定間隔で再出現 | ◎ |
 | `Spawner/Player/PlayerPartySpawner.cs`、`PlayerSpawnPoint.cs` | プレイヤーの生成と出現位置。出現位置に Sigle 用の位置があれば、Sigle はそこに出てノアの後ろへ歩いて付いていく（`PlayerHistory.SeedPath`） | ◎ |
-| `Health/Health.cs` | 体力、`OnDied` / `OnDamaged` / `OnHealed` / **`OnDamagedInfo`**（攻撃の情報つき）、`LastDamage`、`Damage(int)` と `Damage(DamageInfo)`、`SetMaxHealth`、`Invincible` / `PlayerInvincible`、**体力の共有**（`ShareWith`：受けたダメージ・回復を共有先へ回し、自分のイベントも出す。シグル → ノアは `PlayerPartySpawner` が設定） | ◎ |
+| `Health/Health.cs` | 体力、`OnDied` / `OnDamaged` / `OnHealed` / **`OnDamagedInfo`**（攻撃の情報つき）/ **`OnBlocked`**（効かなかった）、`DamageFilter`（受ける前に量を変える。0 以下なら OnBlocked だけ出して終わり）、`LastDamage`、`Damage(int)` と `Damage(DamageInfo)`、`SetMaxHealth`、`Invincible` / `PlayerInvincible`、**体力の共有**（`ShareWith`：受けたダメージ・回復を共有先へ回し、自分のイベントも出す。シグル → ノアは `PlayerPartySpawner` が設定） | ◎ |
 
 ### イベント・アイテム・フラグ・会話・セーブ（プランナー向けの中心）
 詳しくは CLAUDE.md の「主な仕組み」と各 Docs。
@@ -125,7 +127,7 @@
 | ファイル | 役割 |
 |---|---|
 | 🛠`Common/Editor/`（SceneChecker / SceneCheckWindow / DebugWindow / SceneLookup / PickerDrawers）、`Common/Attributes/PickerAttributes.cs` | ③④⑤（デバッグウィンドウに「敵」：止める・経路の表示・倒す。シーンチェックに敵・敵の通行設定エリア） |
-| `Common/Attributes/LabelAttribute.cs`、🛠`Common/Editor/LabelDrawer.cs` | `[Label("日本語")]`：Inspector の項目名（InspectorName は enum の値にしか効かないため）。`[Label("名前", min)]` / `[Label("名前", min, max)]` で最小値・スライダー。リストには付けない |
+| `Common/Attributes/LabelAttribute.cs`（`[SerializeReference]` の部品はクラス名を変えるとデータが消える。変えるときは `[MovedFrom]`）、🛠`Common/Editor/LabelDrawer.cs` | `[Label("日本語")]`：Inspector の項目名（InspectorName は enum の値にしか効かないため）。`[Label("名前", min)]` / `[Label("名前", min, max)]` で最小値・スライダー。リストには付けない |
 | `Common/GameCondition.cs` | 条件のまとめ（フラグ・アイテム〔既存の FlagCondition / ItemCondition をそのまま中に持つ〕・操作中のキャラ・パーティーの体力・プレイヤーがいる範囲）。`IsMet` / `AllMet` / `AnyMet` |
 | 🛠`Flag/Editor/`、`Item/Interaction/Editor/`、`UI/ItemMenu/Editor/`、`Event/EventProcess/Editor/` | ひな形・一覧・Inspector |
 | `Singleton/Singleton.cs` | `Singleton<T>`（`persistAcrossScenes` でシーンをまたぐ） |
@@ -149,7 +151,9 @@
 | **高** | `Prefab/Players/Player_Noah.prefab`、`Player_Sigle.prefab` | **FootstepSe が付いていない**ため足音が鳴らない。FootstepSe は Stage1_2 のルートの `Player`（Transform と FootstepSe だけの動かないオブジェクト）に付いている。11-06 の SE 手順書は「プレハブの FootstepSe に設定」と書いていた |
 | 中 | `Bgm/Effects/BgmProgress.cs` | 進行度（static）が `SubsystemRegistration` でリセットされない（ドメインリロード無効のエディタで前回の値が残る）。セーブもされず、はじめから・つづきからでも戻らない |
 | 中 | `StageDarkness/StageDarkness.cs` FindTarget | 明かりの追従先を `FindWithTag("Player")` の最初の1人で決めるため、キャラ切り替えで操作キャラに付いていかないことがある |
-| 中 | **古い作りの敵**の移動（`Behavior/Enemy/Behavior Graph.asset` の SetPositionToTarget、`Prefab/Enemies/Enemy.prefab`） | 「6秒撃つ → 3秒かけてプレイヤーの位置へ移動」の繰り返し。移動は transform を直接動かし、Rigidbody2D は Static なので**壁をすり抜け、プレイヤーと重なる**。会話・イベント中も移動は続く（撃つのは止まるようにした）。新しい作りの敵（Enemy）に置き換える予定（段階2） |
+| 中 | **古い作りの敵**の移動（`Behavior/Enemy/Behavior Graph.asset` の SetPositionToTarget、`Prefab/Enemies/Enemy.prefab`） | 「6秒撃つ → 3秒かけてプレイヤーの位置へ移動」の繰り返し。移動は transform を直接動かし、Rigidbody2D は Static なので**壁をすり抜け、プレイヤーと重なる**。会話・イベント中も移動は続く（撃つのは止まるようにした）。同じ動きの新しい敵（サンプル「撃つ」）はできたが、**Stage1_2 のスポナーはまだ古い Enemy.prefab**（置き換えはシーンの変更が要るので未実施） |
+| 低 | 🆕 敵の攻撃のノックバック | 攻撃が当たってもプレイヤーは押し戻されない（プレイヤーの移動が MovePosition で毎フレーム位置を決めるため、速度を足しても消える）。必要ならプレイヤー側に「押し戻される」処理を足す |
+| 低 | 🆕 `AttackData` の「弾を撃つ」 | 弾のダメージ・速さ・見た目はシーンの EnemyBulletPool の弾のプレハブで決まる（攻撃ごとに変えられない）。「当たる相手」「効かないキャラ」も弾には効かない（段階3の弾幕で弾のデータを作るときに対応予定） |
 | 低 | 敵のスポナー（`Spawner/Enemy/EnemySpawner.cs`） | 1つのスポナーで同時に出せるのは1体だけ。Stage1_1 のスポナーは非アクティブ（敵が出ない）。（スポナーなしでも敵は動くようになった） |
 | 低 | 🆕 `Enemy/Enemy.cs` の体当たり | プレイヤーに無敵時間がないため、体当たりのダメージは敵ごとの間隔（既定 1 秒）だけで決まる。敵が多いと連続で受ける。プレイヤー側の無敵時間を足すかは未定 |
 | 低 | 🆕 `Attack/AttackController.cs` | 操作中のキャラかを見ていないため、シグル操作中も Space / R でノアの位置から攻撃が出る（Q の弾消しは操作中だけ）。意図した作りかは未確認 |
