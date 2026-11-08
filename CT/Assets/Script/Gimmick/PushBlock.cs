@@ -29,6 +29,14 @@ public class PushBlock : MonoBehaviour
     [Tooltip("重い箱はシグルだけ、など")]
     private CharacterRestriction user = CharacterRestriction.Both;
 
+    [SerializeField, Label("2人で押す")]
+    [Tooltip("オン：相棒が箱のそば（2 マス以内）にいるときだけ押せる（とても重い扉・大きな岩）。「一緒」なら相棒はついてくるので、そのまま押せる")]
+    private bool requireBoth = false;
+
+    [SerializeField, Label("1人で押したとき")]
+    [Tooltip("「2人で押す」で相棒がそばにいないとき。例：「一人じゃ動かない……」。空なら「できない」音だけ")]
+    private EventSequence needPartner;
+
     [SerializeField, Label("マスの大きさ", 0.1f)]
     [Tooltip("1 回押したときに動く距離（マス）")]
     private float cellSize = 1.0f;
@@ -135,6 +143,13 @@ public class PushBlock : MonoBehaviour
         GameObject player = manager != null ? manager.CurrentPlayer : null;
         if(player == null || InputBlock.IsBlocked) { pushTimer = 0.0f; return; }
 
+        // 押せないキャラが近づいたら、押せるキャラの目印
+        if(!user.Allows(player))
+        {
+            PartyHintSettings hint = PartyHint.Settings;
+            if(hint != null && Vector2.Distance(player.transform.position, transform.position) <= hint.showDistance) { PartyHint.Request(transform, user, player.transform.position); }
+        }
+
         Vector2 direction;
         if(!IsPushedBy(player, out direction)) { pushTimer = 0.0f; return; }
 
@@ -146,6 +161,19 @@ public class PushBlock : MonoBehaviour
                 refuseCooldown = 1.5f;
                 if(wrongCharacter != null) { wrongCharacter.Play(gameObject); }
                 else                       { UISound.Play(UISoundType.Cannot); }
+            }
+            return;
+        }
+
+        // 2人で押す箱は、相棒がそばにいないと押せない
+        if(requireBoth && manager != null && manager.Partner != null && Vector2.Distance(manager.Partner.transform.position, transform.position) > cellSize * 2.0f + 0.5f)
+        {
+            pushTimer = 0.0f;
+            if(refuseCooldown <= 0.0f)
+            {
+                refuseCooldown = 1.5f;
+                if(needPartner != null) { needPartner.Play(gameObject); }
+                else                    { UISound.Play(UISoundType.Cannot); }
             }
             return;
         }
@@ -209,6 +237,13 @@ public class PushBlock : MonoBehaviour
         {
             if(hit == null || hit.isTrigger) { continue; }
             if(hit.transform.IsChildOf(transform)) { continue; }
+
+            // 2人で押すときは、ついてくる相棒が行き先にいても押せる（相棒は押した人の後ろを歩く）
+            if(requireBoth)
+            {
+                GameObject root = hit.attachedRigidbody != null ? hit.attachedRigidbody.gameObject : hit.gameObject;
+                if(root.CompareTag("Player")) { continue; }
+            }
 
             GimmickHole h = hit.GetComponentInParent<GimmickHole>();
             if(h != null && !h.Filled) { hole = h; continue; }

@@ -240,6 +240,14 @@ public class DebugWindow : EditorWindow
                 PartyMode mode = (PartyMode)EditorGUILayout.EnumPopup(new GUIContent("2人の状態", "一緒：相棒がついてくる・体力は共有（シグルの体力）／待機・別行動：相棒はその場・体力は別々"), manager.Mode);
                 if(mode != manager.Mode) { manager.SetMode(mode); }
 
+                using(new EditorGUILayout.HorizontalScope())
+                {
+                    string reach = manager.IsTogether ? "" : (manager.CanPartnerReach() ? "（呼べば来られる）" : "（来られない）");
+                    EditorGUILayout.LabelField("待て／ついてこい", (PlayerSwitchManager.WaitCommandLocked ? "使えなくしている" : "使える") + reach);
+                    if(GUILayout.Button(manager.IsTogether ? "待て" : "ついてこい", EditorStyles.miniButton, GUILayout.Width(70))) { manager.ToggleWait(); }
+                    PlayerSwitchManager.WaitCommandLocked = GUILayout.Toggle(PlayerSwitchManager.WaitCommandLocked, "使えなくする", EditorStyles.miniButton, GUILayout.Width(80));
+                }
+
                 Health noahHealth = manager.HealthOf(manager.Noah);
                 Health sigleHealth = manager.HealthOf(manager.Sigle);
                 string owner = manager.IsTogether ? "2人で共有（シグルの体力）" : (manager.CurrentPlayer == manager.Noah ? "ノア" : "シグル");

@@ -62,10 +62,39 @@ public class PlayerSwitchManager : Singleton<PlayerSwitchManager>
     [Header("2人の状態")]
 
     [SerializeField, Label("相棒が歩いて合流する距離", 0.0f)]
-    [Tooltip("「一緒」に戻したとき、相棒がこの距離より近ければ歩いて追いつく。遠ければ、操作しているキャラの位置へ移る")]
+    [Tooltip("イベントで「一緒」に戻したとき、道があってこの距離より近ければ歩いて追いつく。遠い・道がなければ、操作しているキャラの位置へ移る")]
     private float rejoinWalkDistance = 10.0f;
 
+    [Header("待て／ついてこい")]
+
+    [SerializeField, Label("待て／ついてこいのキー")]
+    [Tooltip("押すと、相棒をその場で待たせる（待機）／呼び戻す（一緒）。別行動のときは使えない")]
+    private Key waitKey = Key.F;
+
+    [SerializeField, Label("待たせたときの SE")]
+    private SeData waitSe;
+
+    [SerializeField, Label("呼び戻したときの SE")]
+    private SeData followSe;
+
+    [SerializeField, Label("相棒が来られないときの SE")]
+    [Tooltip("呼んでも道がない（狭い通路の向こう・壁の向こう）・使えないときに鳴らす")]
+    private SeData cannotSe;
+
+    [SerializeField, Label("相棒が来られないときのイベント")]
+    [Tooltip("例：「そっちには行けない……」の会話。空なら音だけ")]
+    private EventSequence cannotFollow;
+
+    /// <summary>
+    /// 待て／ついてこいのキーを使えなくする（イベントの部品「2人の状態を変える」から。追跡中・会話の流れなど）
+    /// </summary>
+    public static bool WaitCommandLocked { get; set; }
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetStatics() { WaitCommandLocked = false; }
+
     private PartyMode mode = PartyMode.Together;
+    private readonly System.Collections.Generic.List<Vector2> route = new System.Collections.Generic.List<Vector2>();
 
     private Health noahHealth;
     private Health sigleHealth;
@@ -234,6 +263,11 @@ public class PlayerSwitchManager : Singleton<PlayerSwitchManager>
         {
             SwitchPlayer();
         }
+
+        if(waitKey != Key.None && Keyboard.current[waitKey].wasPressedThisFrame)
+        {
+            ToggleWait();
+        }
     }
 
     //=====================================================================
@@ -303,28 +337,88 @@ public class PlayerSwitchManager : Singleton<PlayerSwitchManager>
     //=====================================================================
 
     /// <summary>
+    /// 待て／ついてこい（キーから）
+    /// ・一緒 → 待機（相棒がその場で待つ）
+    /// ・待機 → 一緒（相棒が歩いて合流する。道がなければ来られない）
+    /// ・別行動のとき・使えなくしているときは使えない
+    /// </summary>
+    /// <returns> 変わったか </returns>
+    public bool ToggleWait()
+    {
+        if(noah == null || sigle == null || currentPlayer == null) { return false; }
+
+        if(WaitCommandLocked || mode == PartyMode.Separated)
+        {
+            RefuseFollow();
+            return false;
+        }
+
+        if(mode == PartyMode.Together)
+        {
+            SetMode(PartyMode.Waiting);
+            SeManager.PlaySe(waitSe, Partner.transform.position);
+            return true;
+        }
+
+        if(!TrySetMode(PartyMode.Together, true))
+        {
+            RefuseFollow();
+            return false;
+        }
+        SeManager.PlaySe(followSe, Partner.transform.position);
+        return true;
+    }
+
+    private void RefuseFollow()
+    {
+        if(cannotFollow != null) { cannotFollow.Play(gameObject); }
+        else                     { SeManager.PlaySe(cannotSe, currentPlayer != null ? currentPlayer.transform.position : transform.position); }
+    }
+
+    /// <summary>
+    /// 相棒が今の場所から操作キャラのところまで歩いて来られるか
+    /// </summary>
+    public bool CanPartnerReach()
+    {
+        if(noah == null || sigle == null || currentPlayer == null) { return false; }
+        return PartyRoute.Find(Partner, Partner.transform.position, currentPlayer.transform.position, route);
+    }
+
+    /// <summary>
     /// 2人の状態を変える（イベントの部品「2人の状態を変える」・デバッグウィンドウから）
+    /// 「一緒」に戻すとき、道がなければ相棒は操作キャラの位置へ移る
     /// </summary>
     public void SetMode(PartyMode newMode)
     {
-        if(newMode == mode) { return; }
-        if(noah == null || sigle == null || currentPlayer == null) { mode = newMode; return; }
+        TrySetMode(newMode, false);
+    }
 
-        PartyMode oldMode = mode;
-        mode = newMode;
+    /// <summary>
+    /// 2人の状態を変える
+    /// </summary>
+    /// <param name="requireRoute"> 「一緒」に戻すとき、相棒が歩いて来られないなら変えない（待て／ついてこいのキー） </param>
+    /// <returns> 変わったか </returns>
+    public bool TrySetMode(PartyMode newMode, bool requireRoute)
+    {
+        if(newMode == mode) { return false; }
+        if(noah == null || sigle == null || currentPlayer == null) { mode = newMode; return true; }
 
-        // 一緒に戻ったら、相棒が合流する（近ければ歩いて、遠ければ操作しているキャラの位置へ）
-        if(newMode == PartyMode.Together && oldMode != PartyMode.Together)
+        // 一緒に戻ったら、相棒が合流する（道があれば歩いて、なければ操作しているキャラの位置へ）
+        if(newMode == PartyMode.Together)
         {
             GameObject partner = Partner;
             PlayerHistory currentHistory = currentPlayer == noah ? noahHistory : sigleHistory;
             PlayerHistory partnerHistory = partner == noah ? noahHistory : sigleHistory;
             PlayerFollower partnerFollower = partner == noah ? noahFollower : sigleFollower;
 
-            float distance = Vector2.Distance(partner.transform.position, currentPlayer.transform.position);
-            if(distance <= rejoinWalkDistance)
+            Vector2 from = partner.transform.position;
+            Vector2 to = currentPlayer.transform.position;
+            bool hasRoute = PartyRoute.Find(partner, from, to, route);
+            if(requireRoute && !hasRoute) { return false; }
+
+            if(hasRoute && (requireRoute || RouteLength() <= rejoinWalkDistance))
             {
-                currentHistory.SeedPath(partner.transform.position, currentPlayer.transform.position, partnerFollower.FollowFrames);
+                currentHistory.SeedPolyline(route, partnerFollower.FollowFrames);
             }
             else
             {
@@ -334,9 +428,19 @@ public class PlayerSwitchManager : Singleton<PlayerSwitchManager>
             partnerHistory.ResetHistory(partner.transform.position);
         }
 
+        mode = newMode;
+
         ApplyFollow();
         ApplyHealthSharing();
         ModeChanged?.Invoke(mode);
+        return true;
+    }
+
+    private float RouteLength()
+    {
+        float length = 0.0f;
+        for(int i = 1; i < route.Count; i++) { length += Vector2.Distance(route[i - 1], route[i]); }
+        return length;
     }
 
     /// <summary>
@@ -349,6 +453,29 @@ public class PlayerSwitchManager : Singleton<PlayerSwitchManager>
         bool follow = mode == PartyMode.Together;
         noahFollower.Hold = !follow;
         sigleFollower.Hold = !follow;
+
+        ApplyBodyCollision(noah);
+        ApplyBodyCollision(sigle);
+    }
+
+    // プレハブでの当たり判定の有効・無効（シグルはプレハブで無効になっている＝ついてくるときにノアに引っかからないため）
+    private readonly System.Collections.Generic.Dictionary<Collider2D, bool> originalBody = new System.Collections.Generic.Dictionary<Collider2D, bool>();
+
+    /// <summary>
+    /// 体の当たり判定：ついてきている間はプレハブのまま。操作しているとき・待っているとき・別行動のときは有効
+    /// （有効でないと、壁で止まらない・調べる範囲やイベントの範囲に入っても反応しない・狭い通路などの仕掛けが効かない）
+    /// </summary>
+    private void ApplyBodyCollision(GameObject character)
+    {
+        if(character == null) { return; }
+
+        bool following = mode == PartyMode.Together && character != currentPlayer;
+        foreach(Collider2D body in character.GetComponents<Collider2D>())
+        {
+            if(body.isTrigger) { continue; }
+            if(!originalBody.ContainsKey(body)) { originalBody[body] = body.enabled; }
+            body.enabled = following ? originalBody[body] : true;
+        }
     }
 
     /// <summary>

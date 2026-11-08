@@ -22,7 +22,14 @@ public abstract class Intaractable : MonoBehaviour
     [SerializeField]
     private Key interactKeyInput = Key.E;
 
+    /// <summary>
+    /// 範囲の中にいる「操作しているキャラ」（いなければ null）
+    /// ついてくる相棒・待たせている相棒が範囲にいても、ここには入らない
+    /// </summary>
     protected GameObject player;
+
+    // 範囲の中にいるプレイヤー（ノア・シグル。操作していない方も含む）
+    private readonly System.Collections.Generic.HashSet<GameObject> inside = new System.Collections.Generic.HashSet<GameObject>();
 
     //=====================================================================
     // 関数
@@ -30,6 +37,9 @@ public abstract class Intaractable : MonoBehaviour
 
     void Update()
     {
+        // キャラを切り替えたときに、範囲の中の操作キャラを入れ直す
+        RefreshPlayer();
+
         if(!player) { return; }
         if(player == null) { return; }
         if(Keyboard.current == null) { return; }
@@ -52,8 +62,14 @@ public abstract class Intaractable : MonoBehaviour
     protected void OnTriggerEnter2D(Collider2D collision)
     {
         if(!IsPlayerTag(collision)) { return; }
-        
-        player = collision.gameObject;
+
+        GameObject entered = collision.gameObject;
+        inside.Add(entered);
+
+        // 反応するのは操作しているキャラだけ（ついてくる相棒が先に入っても反応しない）
+        if(!IsControlled(entered)) { return; }
+
+        player = entered;
 
         Debug.Log($"{gameObject.name}を調べられるまする");
 
@@ -68,9 +84,39 @@ public abstract class Intaractable : MonoBehaviour
     {
         if(!IsPlayerTag(other)) { return; }
 
+        GameObject exited = other.gameObject;
+        inside.Remove(exited);
+
+        // 相棒が出ただけなら何もしない（操作しているキャラはまだ中にいるかもしれない）
+        if(exited != player) { return; }
+
         player = null;
 
-        OnPlayerExit(other.gameObject);
+        OnPlayerExit(exited);
+    }
+
+    /// <summary>
+    /// 操作しているキャラか（切り替えの仕組みがないシーンでは、どのプレイヤーも操作キャラとして扱う）
+    /// </summary>
+    protected static bool IsControlled(GameObject target)
+    {
+        PlayerSwitchManager manager = PlayerSwitchManager.Instance;
+        if(manager == null || manager.CurrentPlayer == null) { return true; }
+        return manager.CurrentPlayer == target;
+    }
+
+    /// <summary>
+    /// 範囲の中の操作キャラを入れ直す（キャラを切り替えたとき・相棒が出入りしたとき）
+    /// </summary>
+    private void RefreshPlayer()
+    {
+        if(inside.Count == 0) { player = null; return; }
+
+        inside.RemoveWhere(go => go == null || !go.activeInHierarchy);
+
+        GameObject controlled = null;
+        foreach(GameObject go in inside) { if(IsControlled(go)) { controlled = go; break; } }
+        player = controlled;
     }
 
     /// <summary>

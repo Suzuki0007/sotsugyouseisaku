@@ -76,6 +76,8 @@ public class GimmickSwitch : GimmickInteractable
 
     public GimmickState State => state != null ? state : GetComponent<GimmickState>();
     public CharacterRestriction User => user;
+
+    protected override CharacterRestriction Restriction => user;
     public GameCondition Condition => condition;
 
     //=====================================================================

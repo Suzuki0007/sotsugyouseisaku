@@ -21,6 +21,10 @@ public class PartyModeEventAction : EventAction
     // 変数
     //=====================================================================
 
+    [SerializeField, Label("2人の状態を変える")]
+    [Tooltip("オフにすると、状態は変えずに、下の「操作するキャラ」「待て／ついてこいのキー」だけを変える")]
+    private bool changeMode = true;
+
     [SerializeField, Label("2人の状態")]
     private PartyMode mode = PartyMode.Separated;
 
@@ -31,6 +35,22 @@ public class PartyModeEventAction : EventAction
     [SerializeField, Label("操作するキャラ")]
     private PlayerCharacter character = PlayerCharacter.Noah;
 
+    [SerializeField, Label("待て／ついてこいのキー")]
+    [Tooltip("変えない／使えなくする（追跡中・離れ離れの場面など）／使えるようにする")]
+    private WaitKeyChange waitKey = WaitKeyChange.Keep;
+
+    public enum WaitKeyChange
+    {
+        [InspectorName("変えない")]
+        Keep = 0,
+
+        [InspectorName("使えなくする")]
+        Lock = 1,
+
+        [InspectorName("使えるようにする")]
+        Unlock = 2,
+    }
+
     //=====================================================================
     // アクション関数
     //=====================================================================
@@ -40,7 +60,9 @@ public class PartyModeEventAction : EventAction
         PlayerSwitchManager manager = PlayerSwitchManager.Instance;
         if(manager == null) { return; }
 
-        manager.SetMode(mode);
+        if(changeMode) { manager.SetMode(mode); }
+        if(waitKey == WaitKeyChange.Lock)   { PlayerSwitchManager.WaitCommandLocked = true; }
+        if(waitKey == WaitKeyChange.Unlock) { PlayerSwitchManager.WaitCommandLocked = false; }
 
         if(changeCharacter)
         {

@@ -205,6 +205,45 @@ public static class SceneChecker
             }
         }
 
+        // 2人の仕掛け
+        bool usesHints = false;
+        foreach(CharacterBarrier barrier in ctx.Find<CharacterBarrier>())
+        {
+            usesHints = true;
+            bool solid = false;
+            foreach(Collider2D c in barrier.GetComponentsInChildren<Collider2D>()) { if(!c.isTrigger) { solid = true; } }
+            if(!solid) { ctx.Add(Level.Error, barrier, "キャラによって通れる壁に、当たり判定（Is Trigger オフの Collider2D）がありません"); }
+            if(barrier.Passable == CharacterRestriction.Both) { ctx.Add(Level.Warning, barrier, "キャラによって通れる壁の「通れるキャラ」が「両方」です（ただの通れる場所になります）"); }
+        }
+
+        foreach(BreakableWall wall in ctx.Find<BreakableWall>())
+        {
+            usesHints |= wall.Breaker != CharacterRestriction.Both;
+            bool solid = false;
+            foreach(Collider2D c in wall.GetComponents<Collider2D>()) { if(!c.isTrigger) { solid = true; } }
+            if(!solid) { ctx.Add(Level.Warning, wall, "壊せる壁に当たり判定（Is Trigger オフの Collider2D）がありません（通れてしまいます）"); }
+        }
+
+        foreach(LiftPoint lift in ctx.Find<LiftPoint>())
+        {
+            if(lift.Destination == null) { ctx.Add(Level.Error, lift, "持ち上げる場所の「行き先」が空です"); }
+            bool hasTrigger = false;
+            foreach(Collider2D c in lift.GetComponents<Collider2D>()) { if(c.isTrigger) { hasTrigger = true; } }
+            if(!hasTrigger) { ctx.Add(Level.Error, lift, "持ち上げる場所に Is Trigger の Collider2D（調べる範囲）がありません"); }
+        }
+
+        foreach(ConditionalVisible visible in ctx.Find<ConditionalVisible>())
+        {
+            if(visible.Condition == null || visible.Condition.IsEmpty) { ctx.Add(Level.Warning, visible, "条件で見える物の「見える条件」が空です（いつも見えます）"); }
+        }
+
+        foreach(GimmickSwitch sw in ctx.Find<GimmickSwitch>()) { usesHints |= sw.User != CharacterRestriction.Both; }
+        foreach(PushBlock block in ctx.Find<PushBlock>()) { usesHints |= block.User != CharacterRestriction.Both; }
+        if(usesHints && AssetDatabase.LoadAssetAtPath<PartyHintSettings>("Assets/Resources/PartyHints.asset") == null)
+        {
+            ctx.Add(Level.Info, null, "使えるキャラが決まった仕掛けがありますが、相棒の目印の設定（Resources/PartyHints.asset）がないので目印が出ません（Tools > 仕掛け > 相棒の目印の設定を作る）");
+        }
+
         foreach(GimmickVisual visual in ctx.Find<GimmickVisual>())
         {
             if(visual.State == null && visual.GetComponentInParent<GimmickState>() == null)

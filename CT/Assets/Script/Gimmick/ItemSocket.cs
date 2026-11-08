@@ -71,6 +71,8 @@ public class ItemSocket : GimmickInteractable
     public ItemData Item => item;
     public bool Placed => state != null && state.IsOn;
 
+    protected override CharacterRestriction Restriction => user;
+
     //=====================================================================
     // 関数
     //=====================================================================

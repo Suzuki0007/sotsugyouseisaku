@@ -93,6 +93,10 @@ public class GameCondition
     [Tooltip("ノアとシグルが一緒にいるか、離れているかで判定する")]
     public PartyCheck party = PartyCheck.Any;
 
+    [Label("2人がそろっている距離", 0.0f)]
+    [Tooltip("ノアとシグルがこの距離（マス）以内にいるとき（2人で押す扉・2人で回すレバーなど）。0 なら判定しない")]
+    public float partnerWithin = 0.0f;
+
     //=====================================================================
     // 判定
     //=====================================================================
@@ -145,6 +149,13 @@ public class GameCondition
             if(party == PartyCheck.Apart && together)     { return false; }
         }
 
+        if(partnerWithin > 0.0f)
+        {
+            PlayerSwitchManager manager = PlayerSwitchManager.Instance;
+            if(manager == null || manager.Noah == null || manager.Sigle == null) { return false; }
+            if(Vector2.Distance(manager.Noah.transform.position, manager.Sigle.transform.position) > partnerWithin) { return false; }
+        }
+
         return true;
     }
 
@@ -158,7 +169,8 @@ public class GameCondition
         partyHealth == HealthCheck.Any &&
         area == null &&
         (gimmicks == null || gimmicks.Count == 0) &&
-        party == PartyCheck.Any;
+        party == PartyCheck.Any &&
+        partnerWithin <= 0.0f;
 
     /// <summary>
     /// すべての条件を満たしているか（空なら常に満たす）

@@ -243,14 +243,14 @@ public static class GimmickMenu
         Place(go, command, "燭台");
     }
 
-    private const string Knob = "UI/Skin/Knob.psd";
-    private const string Square = "UI/Skin/UISprite.psd";
+    public const string Knob = "UI/Skin/Knob.psd";
+    public const string Square = "UI/Skin/UISprite.psd";
 
     /// <summary>
     /// 仮の見た目（Unity 付属の絵を、決めた大きさ〔マス〕で表示する。絵は差し替えてよい）
     /// 付属の絵は 0.3 マスほどしかないので、Sliced にして大きさを決める
     /// </summary>
-    private static SpriteRenderer Look(GameObject go, string builtin, Vector2 size, Color color, int order)
+    public static SpriteRenderer Look(GameObject go, string builtin, Vector2 size, Color color, int order)
     {
         Sprite sprite = AssetDatabase.GetBuiltinExtraResource<Sprite>(builtin);
 
@@ -267,7 +267,7 @@ public static class GimmickMenu
         return sr;
     }
 
-    private static void SnapToGrid(GameObject go)
+    public static void SnapToGrid(GameObject go)
     {
         Vector3 p = go.transform.position;
         go.transform.position = new Vector3(Mathf.Floor(p.x) + 0.5f, Mathf.Floor(p.y) + 0.5f, p.z);
@@ -326,7 +326,7 @@ public static class GimmickMenu
         }
     }
 
-    private static void Place(GameObject go, MenuCommand command, string undoName)
+    public static void Place(GameObject go, MenuCommand command, string undoName)
     {
         GameObjectUtility.SetParentAndAlign(go, command.context as GameObject);
         if(command.context == null && SceneView.lastActiveSceneView != null)
