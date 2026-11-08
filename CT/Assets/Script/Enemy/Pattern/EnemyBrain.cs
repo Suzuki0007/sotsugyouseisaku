@@ -47,7 +47,7 @@ public class EnemyBrain : PatternRunner
 
     public override bool IsAlive => enemy != null && !enemy.IsDead;
 
-    protected override bool CanActSelf => enemy != null && !enemy.Paused;
+    protected override bool CanActSelf => enemy != null && !enemy.Stopped;
 
     protected override bool ShouldStart => wakeDistance <= 0.0f || DistanceToTarget <= wakeDistance;
 

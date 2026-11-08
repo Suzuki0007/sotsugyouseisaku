@@ -62,6 +62,21 @@ public enum AttackActivation
 }
 
 /// <summary>
+/// ひるみで攻撃をやめるか
+/// </summary>
+public enum AttackCancel
+{
+    [InspectorName("予告中だけ（発動したら最後まで出す）")]
+    DuringTelegraph = 0,
+
+    [InspectorName("発動中も（いつでもやめる）")]
+    Always = 1,
+
+    [InspectorName("できない（スーパーアーマー）")]
+    Never = 2,
+}
+
+/// <summary>
 /// 弾の撃ち方
 /// </summary>
 public enum BulletPattern
@@ -236,6 +251,10 @@ public class AttackData : ScriptableObject
     [Label("攻撃の種類")]
     [Tooltip("当たった相手から見た攻撃の種類（敵どうしで当たるときの効き方などに使う）")]
     public DamageKind damageKind = DamageKind.EnemyAttack;
+
+    [Label("ひるみでキャンセルできる")]
+    [Tooltip("敵がひるんだとき、この攻撃を途中でやめるか（後隙ではいつでもひるむ）。できないときは、攻撃が終わってからひるむ")]
+    public AttackCancel cancel = AttackCancel.DuringTelegraph;
 
     [Label("出し続ける時間（秒）", 0.1f)]
     [Tooltip("「出し続ける」のときの長さ")]

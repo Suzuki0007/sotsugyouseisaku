@@ -141,6 +141,9 @@ public class AreaAttack : MonoBehaviour
         // ターゲットレイヤー（敵）に加えて、攻撃を受ける部品（攻撃で作動するスイッチなど）はレイヤーに関係なく当てる
         Collider2D[] targets = Physics2D.OverlapCircleAll(attackerPos.position, attackRadius);
 
+        // 本体と部位（弱点・装甲）に同時に当たったら、部位で受ける（同じ敵には1回だけ当てるため、先に当てたほうになる）
+        DamageUtility.SortByPriority(targets);
+
         //Debug.Log($"攻撃範囲内のCollider数: {targets.Length}");
 
         // foreachは、C++でいう範囲for文　それぞれの要素に対して処理を行う

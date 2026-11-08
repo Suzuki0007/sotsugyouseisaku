@@ -29,8 +29,10 @@ public static class AttackHits
         Vector2 center = data.shape.CenterOf(origin, direction, length);
         float searchRadius = data.shape.OuterRadius(length) + 1.0f;
 
+        Collider2D[] hits = Physics2D.OverlapCircleAll(center, searchRadius);
+        DamageUtility.SortByPriority(hits);
         found.Clear();
-        found.AddRange(Physics2D.OverlapCircleAll(center, searchRadius));
+        found.AddRange(hits);
 
         var hitThisCheck = new HashSet<Object>();
         foreach(Collider2D col in found)
@@ -57,7 +59,9 @@ public static class AttackHits
     /// </summary>
     public static void HitCircle(AttackData data, Vector2 center, float radius, GameObject attacker, HashSet<Object> hitOnce)
     {
-        foreach(Collider2D col in Physics2D.OverlapCircleAll(center, radius))
+        Collider2D[] hits = Physics2D.OverlapCircleAll(center, radius);
+        DamageUtility.SortByPriority(hits);
+        foreach(Collider2D col in hits)
         {
             if(!IsTarget(data, col, attacker)) { continue; }
 

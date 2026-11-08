@@ -89,11 +89,37 @@ public class Enemy : MonoBehaviour
     /// <summary> この敵だけを止める（ギミックの命令などで使う。EnemyBlock とは別） </summary>
     public bool Paused { get; set; }
 
+    /// <summary> ひるんでいる間 </summary>
+    public bool Staggered => staggerTimer > 0.0f;
+
+    /// <summary> 止められているか（命令で止めた・ひるんでいる） </summary>
+    public bool Stopped => Paused || Staggered;
+
+    /// <summary> 止めている間の色（命令で指定したとき。見た目の変化 EnemyLook が使う） </summary>
+    public Color? PausedTint { get; private set; }
+
+    /// <summary> ひるみのたまり具合（敵のデータの「ひるむまでのダメージ」でひるむ） </summary>
+    public float StaggerGauge => staggerGauge;
+
+    /// <summary> 壊れた部位の名前 </summary>
+    public IReadOnlyCollection<string> BrokenParts => brokenParts;
+
+    /// <summary> ひるんだとき </summary>
+    public event System.Action OnStaggered;
+
+    /// <summary> 部位が壊れたとき </summary>
+    public event System.Action<EnemyPart> OnPartBroken;
+
+    private float staggerGauge;
+    private float staggerTimer;
+    private readonly HashSet<string> brokenParts = new HashSet<string>();
+    private readonly HashSet<AttackData> disabledAttacks = new HashSet<AttackData>();
+
     /// <summary> 移動の速さの倍率（行動パターンで一時的に速くするなど） </summary>
     public float SpeedMultiplier { get; set; } = 1.0f;
 
-    /// <summary> 動ける状態か（止められていない・倒れていない） </summary>
-    public bool CanAct => !IsDead && !Paused && !EnemyBlock.IsBlocked;
+    /// <summary> 動ける状態か（止められていない・ひるんでいない・倒れていない） </summary>
+    public bool CanAct => !IsDead && !Stopped && !EnemyBlock.IsBlocked;
 
     /// <summary> 目的地へ向かっているか </summary>
     public bool IsMoving => hasDestination;
@@ -171,7 +197,6 @@ public class Enemy : MonoBehaviour
     //=====================================================================
 
     private Coroutine pauseRoutine;
-    private Color? colorBeforePause;
 
     /// <summary>
     /// 止める・動かす（止めている間は色を変えられる。tint が null なら色はそのまま）
@@ -209,20 +234,107 @@ public class Enemy : MonoBehaviour
         Paused = paused;
         if(paused && brain != null) { brain.Interrupt(); }
 
-        SpriteRenderer sr = GetComponent<SpriteRenderer>();
-        if(sr == null) { return; }
+        // 色は見た目の変化（EnemyLook）がまとめて付ける
+        PausedTint = paused ? tint : null;
+    }
 
-        if(paused && tint.HasValue)
+    //=====================================================================
+    // ひるみ
+    //=====================================================================
+
+    /// <summary>
+    /// ひるみをためる（攻撃を受けたとき。部位からも呼ばれる）
+    /// </summary>
+    /// <param name="amount"> たまる量（ダメージ × 部位のひるみやすさ） </param>
+    /// <param name="info"> 攻撃の情報（敵のデータの「ひるみやすさ」の倍率を選ぶのに使う） </param>
+    public void AddStagger(float amount, DamageInfo info)
+    {
+        if(data == null || data.StaggerThreshold <= 0.0f || IsDead || Staggered) { return; }
+
+        float multiplier = data.StaggerMultiplier(info);
+        if(multiplier <= 0.0f || amount <= 0.0f) { return; }
+
+        staggerGauge += amount * multiplier;
+        if(staggerGauge >= data.StaggerThreshold) { staggerPending = true; }
+        TryStagger();
+    }
+
+    // ひるむだけたまったが、攻撃の途中でキャンセルできないので待っている
+    private bool staggerPending;
+
+    /// <summary>
+    /// たまっていればひるむ（攻撃の途中でキャンセルできないときは、できるようになるまで待つ）
+    /// </summary>
+    private void TryStagger()
+    {
+        if(data == null || !staggerPending || Staggered || IsDead) { return; }
+        if(brain != null && brain.CurrentAttack != null && !brain.CurrentAttack.CanCancel) { return; }
+
+        Stagger(data.StaggerTime);
+    }
+
+    /// <summary>
+    /// ひるませる（今の行動をやめて、秒数だけ動けなくなる）。ギミックの命令からも使う
+    /// </summary>
+    public void Stagger(float seconds)
+    {
+        if(IsDead) { return; }
+
+        staggerGauge = 0.0f;
+        staggerPending = false;
+        staggerTimer = Mathf.Max(0.05f, seconds);
+        if(brain != null) { brain.Interrupt(); }
+        Stop();
+
+        if(data != null)
         {
-            if(!colorBeforePause.HasValue) { colorBeforePause = sr.color; }
-            sr.color = tint.Value;
+            PlayAction(data.StaggerAnimation);
+            EffectManager.Play(data.StaggerEffect, transform.position);
+            SeManager.PlaySe(data.StaggerSe, transform.position);
         }
-        else if(!paused && colorBeforePause.HasValue)
+        OnStaggered?.Invoke();
+    }
+
+    private void Update()
+    {
+        if(IsDead) { return; }
+
+        // ひるみの時間（会話中などは減らない）
+        if(staggerTimer > 0.0f && !EnemyBlock.IsBlocked) { staggerTimer -= Time.deltaTime; }
+
+        // ひるむ順番を待っている間は減らさない（攻撃が終わったらすぐひるむ）
+        if(staggerPending) { TryStagger(); return; }
+
+        // たまったひるみは少しずつ減る
+        if(data != null && staggerGauge > 0.0f && !Staggered)
         {
-            sr.color = colorBeforePause.Value;
-            colorBeforePause = null;
+            staggerGauge = Mathf.Max(0.0f, staggerGauge - data.StaggerDecay * Time.deltaTime);
         }
     }
+
+    //=====================================================================
+    // 部位
+    //=====================================================================
+
+    /// <summary> 部位が壊れたことを知らせる（EnemyPart から） </summary>
+    public void NotifyPartBroken(EnemyPart part)
+    {
+        if(part == null) { return; }
+        brokenParts.Add(part.PartName);
+        OnPartBroken?.Invoke(part);
+    }
+
+    /// <summary> この部位が壊れたか </summary>
+    public bool IsPartBroken(string partName) => !string.IsNullOrEmpty(partName) && brokenParts.Contains(partName);
+
+    /// <summary> この攻撃を使えなくする（部位が壊れたときなど） </summary>
+    public void DisableAttack(AttackData attack)
+    {
+        if(attack != null) { disabledAttacks.Add(attack); }
+    }
+
+    /// <summary> この攻撃が使えなくなっているか </summary>
+    public bool IsAttackDisabled(AttackData attack) => attack != null && disabledAttacks.Contains(attack);
 
     /// <summary>
     /// 指定した位置へ瞬間移動する（戦闘エリアのやり直しなど）
@@ -270,6 +382,12 @@ public class Enemy : MonoBehaviour
 
         // 攻撃の種類・キャラごとの効き方
         health.DamageFilter = info => data != null ? info.WithAmount(data.ApplyDamageRules(info)) : info;
+
+        // 本体に当たった攻撃でひるみをためる（部位から渡されたものは、部位で数え済み）
+        health.OnDamagedInfo += info => { if(!info.noStagger) { AddStagger(info.amount, info); } };
+
+        // 見た目の変化（体力・攻撃・部位・段階・ひるみ・止まっている）
+        if(GetComponent<EnemyLook>() == null) { gameObject.AddComponent<EnemyLook>(); }
     }
 
     /// <summary>

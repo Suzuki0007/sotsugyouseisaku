@@ -47,6 +47,16 @@ public class DamageReceiver : MonoBehaviour
 
     public float Multiplier { get => multiplier; set => multiplier = Mathf.Max(0.0f, value); }
 
+    /// <summary>
+    /// 受けたときの処理を差し替える（敵の部位など）。設定すると、倍率・渡す先の代わりにこれを呼ぶ（true なら受けた）
+    /// </summary>
+    public Func<DamageInfo, bool> Handler { get; set; }
+
+    /// <summary>
+    /// 1回の範囲攻撃で本体と部位に同時に当たったとき、先に当てる順番（大きいほど先。弱点 3・装甲 2・部位 1・本体 0）
+    /// </summary>
+    public int Priority { get; set; }
+
     //=====================================================================
     // 関数
     //=====================================================================
@@ -60,6 +70,8 @@ public class DamageReceiver : MonoBehaviour
         if(!isActiveAndEnabled) { return false; }
 
         OnHit?.Invoke(info);
+
+        if(Handler != null) { return Handler(info); }
 
         Health health = Target;
         if(health == null) { return false; }
@@ -109,6 +121,22 @@ public static class DamageUtility
         }
 
         return collider.GetComponent<Health>();
+    }
+
+    /// <summary>
+    /// 当てる順番に並べる（弱点・装甲などの部位を先に。本体と部位に同時に当たったとき、部位のほうで受けるため）
+    /// </summary>
+    public static void SortByPriority(Collider2D[] colliders)
+    {
+        if(colliders == null || colliders.Length < 2) { return; }
+        Array.Sort(colliders, (a, b) => PriorityOf(b).CompareTo(PriorityOf(a)));
+    }
+
+    private static int PriorityOf(Collider2D collider)
+    {
+        if(collider == null) { return -1; }
+        DamageReceiver receiver = collider.GetComponent<DamageReceiver>();
+        return receiver != null ? receiver.Priority : 0;
     }
 
     /// <summary>

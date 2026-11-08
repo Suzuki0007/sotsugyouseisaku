@@ -40,6 +40,26 @@ public class AttackExecution
     // うず巻きで、撃つたびに回す角度
     private float spiralAngle;
 
+    private enum Phase { Telegraph, Active, Recovery }
+    private Phase phase = Phase.Telegraph;
+
+    /// <summary>
+    /// 今ひるみでやめてよいか（予告中・発動中・後隙と、攻撃のデータの「ひるみでキャンセルできる」で決まる）
+    /// </summary>
+    public bool CanCancel
+    {
+        get
+        {
+            if(data == null || phase == Phase.Recovery) { return true; }
+            switch(data.cancel)
+            {
+                case AttackCancel.Always:          return true;
+                case AttackCancel.DuringTelegraph: return phase == Phase.Telegraph;
+                default:                           return false;
+            }
+        }
+    }
+
     public AttackExecution(PatternRunner runner, AttackData data)
     {
         this.runner = runner;
@@ -87,6 +107,7 @@ public class AttackExecution
         }
 
         // ---- 発動 ----
+        phase = Phase.Active;
         runner.PlayAction(data.activeAnimation);
         SeManager.PlaySe(data.activeSe, runner.Position);
 
@@ -133,6 +154,7 @@ public class AttackExecution
         }
 
         // ---- 後隙 ----
+        phase = Phase.Recovery;
         yield return runner.Wait(data.recoveryTime);
     }
 

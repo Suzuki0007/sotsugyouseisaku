@@ -190,6 +190,7 @@ public static class EnemySampleBuilder
 
         BuildStage3(swing);
         BuildStage4(swing);
+        BuildStage5(swing);
 
         AssetDatabase.SaveAssets();
         AssetDatabase.Refresh();
@@ -404,6 +405,153 @@ public static class EnemySampleBuilder
             so.FindProperty("memo").stringValue = "追跡イベント用。倒せない前提（体力 99）。捕まったかどうかは戦闘エリアで決める";
         });
         EnemyData($"{Folder}/EnemyData_Sample_見張り.asset", "見張り", 3, 2.2f, EnemySize.Medium, guard, null);
+    }
+
+    //=====================================================================
+    // 段階5のサンプル（部位・ひるみ・見た目の変化）
+    //=====================================================================
+
+    public const string PartsBossPrefabPath = "Assets/Prefab/Enemies/Enemy_Sample_部位ボス.prefab";
+
+    private static void BuildStage5(AttackData swing)
+    {
+        EffectData hit = AssetDatabase.LoadAssetAtPath<EffectData>("Assets/Data/Effect/Sample/Fx_Sample_Hit.asset");
+        EffectData explosion = AssetDatabase.LoadAssetAtPath<EffectData>("Assets/Data/Effect/Sample/Fx_Sample_Explosion.asset");
+        global::EnemyData minion = AssetDatabase.LoadAssetAtPath<global::EnemyData>(EnemyBaseBuilder.SampleDataPath);
+        EnemyPattern melee = AssetDatabase.LoadAssetAtPath<EnemyPattern>($"{PatternFolder}/Pattern_Sample_近づいてなぎ払う.asset");
+
+        string dataPath = $"{Folder}/EnemyData_Sample_部位ボス.asset";
+        EnemyData(dataPath, "部位のあるボス", 10, 1.5f, EnemySize.Medium, melee, so =>
+        {
+            so.FindProperty("staggerThreshold").floatValue = 3.0f;
+            so.FindProperty("staggerTime").floatValue = 1.2f;
+
+            SerializedProperty stagger = so.FindProperty("staggerRules");
+            stagger.arraySize = 1;
+            SetRule(stagger.GetArrayElementAtIndex(0), DamageKindFilter.GaugeAttack, CharacterFilter.Any, GaugeJudge.Perfect, 3.0f);
+
+            SerializedProperty looks = so.FindProperty("lookRules");
+            looks.arraySize = 3;
+            SetLook(looks.GetArrayElementAtIndex(0), LookTrigger.HealthBelow, new Color(1.0f, 0.55f, 0.55f), false);
+            SetLook(looks.GetArrayElementAtIndex(1), LookTrigger.Hit, new Color(0.5f, 0.9f, 1.0f), false);
+            looks.GetArrayElementAtIndex(1).FindPropertyRelative("hitKind").intValue = (int)DamageKindFilter.GaugeAttack;
+            looks.GetArrayElementAtIndex(1).FindPropertyRelative("duration").floatValue = 1.5f;
+            SetLook(looks.GetArrayElementAtIndex(2), LookTrigger.Staggered, new Color(1.0f, 1.0f, 0.4f), true);
+
+            so.FindProperty("memo").stringValue = "部位のサンプル（Enemy_Sample_部位ボス.prefab で使う）。盾（装甲）を壊さないと本体に効かない。コア（弱点）はシグル操作中だけ光って 2 倍。右腕を壊すと独立して襲ってきて、なぎ払いをしなくなる。3 ダメージでひるむ（ゲージのパーフェクトは 3 倍たまる）。体力半分で赤く、ゲージ攻撃で青く、ひるむと黄色く点滅";
+        });
+        global::EnemyData bossData = AssetDatabase.LoadAssetAtPath<global::EnemyData>(dataPath);
+
+        if(File.Exists(PartsBossPrefabPath)) { return; }
+
+        // 共通プレハブを元にした、部位つきのプレハブ（バリアント）
+        GameObject basePrefab = AssetDatabase.LoadAssetAtPath<GameObject>(EnemyBaseBuilder.PrefabPath);
+        var root = (GameObject)PrefabUtility.InstantiatePrefab(basePrefab);
+        try
+        {
+            root.name = "Enemy_Sample_部位ボス";
+            var eso = new SerializedObject(root.GetComponent<Enemy>());
+            eso.FindProperty("data").objectReferenceValue = bossData;
+            eso.ApplyModifiedPropertiesWithoutUndo();
+
+            Sprite knob = AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/Knob.psd");
+            int order = root.GetComponent<SpriteRenderer>().sortingOrder + 1;
+
+            // 盾（装甲）：体の前。3 回当てると壊れる。壊すまで本体に効かない
+            EnemyPart shield = MakePart(root, "盾", new Vector2(0.0f, -0.2f), 0.75f, knob, new Color(0.55f, 0.7f, 1.0f, 0.6f), order, EnemyPartType.Armor, so =>
+            {
+                so.FindProperty("bodyMultiplier").floatValue = 0.0f;
+                so.FindProperty("staggerMultiplier").floatValue = 0.5f;
+                so.FindProperty("partHealth").intValue = 3;
+                so.FindProperty("breakEffect").objectReferenceValue = explosion;
+                so.FindProperty("hitEffect").objectReferenceValue = hit;
+            });
+
+            // コア（弱点）：シグル操作中だけ光って 2 倍
+            EnemyPart core = MakePart(root, "コア", new Vector2(0.0f, 0.5f), 0.25f, knob, new Color(1.0f, 0.3f, 0.3f, 1.0f), order + 1, EnemyPartType.Weak, so =>
+            {
+                so.FindProperty("bodyMultiplier").floatValue = 2.0f;
+                so.FindProperty("staggerMultiplier").floatValue = 2.0f;
+                so.FindProperty("effectiveOnlyWhenRevealed").boolValue = true;
+                so.FindProperty("revealCondition").FindPropertyRelative("character").enumValueIndex = (int)GameCondition.CharacterCheck.Sigle;
+            });
+            var ring = new GameObject("目印（光る輪）");
+            ring.transform.SetParent(core.transform, false);
+            ring.transform.localScale = Vector3.one * 1.8f;
+            var ringSr = ring.AddComponent<SpriteRenderer>();
+            ringSr.sprite = knob;
+            ringSr.color = new Color(1.0f, 0.95f, 0.3f, 0.5f);
+            ringSr.sortingOrder = order;
+            var coreSo = new SerializedObject(core);
+            coreSo.FindProperty("highlight").objectReferenceValue = ring;
+            coreSo.ApplyModifiedPropertiesWithoutUndo();
+
+            // 右腕：2 回で壊れ、独立して襲ってくる。なぎ払いをしなくなる
+            MakePart(root, "右腕", new Vector2(0.75f, 0.0f), 0.3f, knob, new Color(0.8f, 0.6f, 0.4f, 1.0f), order, EnemyPartType.Normal, so =>
+            {
+                so.FindProperty("partHealth").intValue = 2;
+                so.FindProperty("independent").objectReferenceValue = minion;
+                so.FindProperty("disableAttacks").arraySize = 1;
+                so.FindProperty("disableAttacks").GetArrayElementAtIndex(0).objectReferenceValue = swing;
+                so.FindProperty("breakEffect").objectReferenceValue = explosion;
+            });
+
+            _ = shield;
+            PrefabUtility.SaveAsPrefabAsset(root, PartsBossPrefabPath);
+        }
+        finally
+        {
+            Object.DestroyImmediate(root);
+        }
+    }
+
+    private static EnemyPart MakePart(GameObject root, string name, Vector2 offset, float radius, Sprite sprite, Color color, int order, EnemyPartType type, System.Action<SerializedObject> setup)
+    {
+        var go = new GameObject(name);
+        go.transform.SetParent(root.transform, false);
+        go.transform.localPosition = offset;
+        go.tag = "Enemies";
+        go.layer = LayerMask.NameToLayer("Enemies");
+
+        var col = go.AddComponent<CircleCollider2D>();
+        col.isTrigger = true;
+        col.radius = 0.5f;
+        go.transform.localScale = Vector3.one * (radius * 2.0f);
+
+        var sr = go.AddComponent<SpriteRenderer>();
+        sr.sprite = sprite;
+        sr.color = color;
+        sr.sortingOrder = order;
+
+        var part = go.AddComponent<EnemyPart>();
+        var so = new SerializedObject(part);
+        so.FindProperty("partName").stringValue = name;
+        so.FindProperty("type").enumValueIndex = (int)type;
+        setup(so);
+        so.ApplyModifiedPropertiesWithoutUndo();
+        return part;
+    }
+
+    private static void SetRule(SerializedProperty rule, DamageKindFilter kind, CharacterFilter character, GaugeJudge judge, float multiplier)
+    {
+        rule.FindPropertyRelative("kind").intValue = (int)kind;
+        rule.FindPropertyRelative("character").enumValueIndex = (int)character;
+        rule.FindPropertyRelative("judge").enumValueIndex = (int)judge;
+        rule.FindPropertyRelative("multiplier").floatValue = multiplier;
+    }
+
+    private static void SetLook(SerializedProperty look, LookTrigger trigger, Color tint, bool blink)
+    {
+        look.FindPropertyRelative("trigger").enumValueIndex = (int)trigger;
+        look.FindPropertyRelative("healthRatio").floatValue = 0.5f;
+        look.FindPropertyRelative("hitKind").intValue = (int)DamageKindFilter.Any;
+        look.FindPropertyRelative("hitCharacter").enumValueIndex = 0;
+        look.FindPropertyRelative("hitJudge").enumValueIndex = 0;
+        look.FindPropertyRelative("duration").floatValue = 1.0f;
+        look.FindPropertyRelative("phase").intValue = 2;
+        look.FindPropertyRelative("useTint").boolValue = true;
+        look.FindPropertyRelative("tint").colorValue = tint;
+        look.FindPropertyRelative("blink").boolValue = blink;
     }
 
     //=====================================================================

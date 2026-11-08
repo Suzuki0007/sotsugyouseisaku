@@ -353,7 +353,8 @@ public class AttackAction : EnemyAction
 
     public override string Summary => attack != null ? $"攻撃する（{attack.name}{(repeat > 1 ? $" ×{repeat}" : "")}）" : "攻撃する（攻撃が空）";
 
-    protected override bool CanRunExtra(PatternRunner brain) => attack != null;
+    // 部位が壊れて使えなくなった攻撃はしない
+    protected override bool CanRunExtra(PatternRunner brain) => attack != null && (brain.Enemy == null || !brain.Enemy.IsAttackDisabled(attack));
 
     public override IEnumerator Run(PatternRunner brain)
     {

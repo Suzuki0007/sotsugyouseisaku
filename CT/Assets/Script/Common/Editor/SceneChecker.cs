@@ -116,6 +116,20 @@ public static class SceneChecker
             }
         }
 
+        foreach(EnemyPart part in ctx.Find<EnemyPart>())
+        {
+            if(part.GetComponentInParent<Enemy>(true) == null)
+            {
+                ctx.Add(Level.Error, part, "部位（EnemyPart）の親に敵（Enemy）がありません（部位として働きません）");
+            }
+            var so = new SerializedObject(part);
+            if(so.FindProperty("partHealth").intValue <= 0 &&
+               (so.FindProperty("independent").objectReferenceValue != null || so.FindProperty("changePhase").intValue > 0 || so.FindProperty("disableAttacks").arraySize > 0 || so.FindProperty("onBreak").objectReferenceValue != null))
+            {
+                ctx.Add(Level.Warning, part, "部位の「壊れたとき」の設定がありますが、部位の体力が 0（壊れない）です");
+            }
+        }
+
         foreach(AttackEmitter emitter in ctx.Find<AttackEmitter>())
         {
             var so = new SerializedObject(emitter);

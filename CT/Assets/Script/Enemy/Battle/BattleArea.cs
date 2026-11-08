@@ -612,7 +612,7 @@ public class BattleArea : MonoBehaviour
                 if(player == null) { return false; }
                 foreach(Enemy enemy in enemies)
                 {
-                    if(enemy == null || enemy.IsDead || enemy.Paused) { continue; }
+                    if(enemy == null || enemy.IsDead || enemy.Stopped) { continue; }
                     if(Vector2.Distance(enemy.transform.position, player.transform.position) <= catchDistance) { return true; }
                 }
                 return false;

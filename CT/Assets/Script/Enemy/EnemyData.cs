@@ -61,6 +61,38 @@ public class EnemyData : ScriptableObject
     [Tooltip("攻撃の種類・攻撃したキャラごとの倍率。当てはまるものを全部かける。0 なら効かない（空ならすべて等倍）。\n例：「ノアのゲージ攻撃 ×2」「シグルの弾 ×0（効かない）」")]
     private List<DamageRule> damageRules = new List<DamageRule>();
 
+    [Header("ひるみ")]
+
+    [SerializeField, Label("ひるむまでのダメージ", 0.0f)]
+    [Tooltip("受けたダメージ（弱点などの倍率をかけたもの）がこれだけたまるとひるむ。今の行動（攻撃の予告など）をやめて、少しの間動けなくなる。0 ならひるまない")]
+    private float staggerThreshold = 0.0f;
+
+    [SerializeField, Label("ひるむ時間（秒）", 0.05f)]
+    private float staggerTime = 1.0f;
+
+    [SerializeField, Label("ひるみが減る速さ（1 秒あたり）", 0.0f)]
+    [Tooltip("たまったひるみが、攻撃を受けない間に減っていく量。0 なら減らない")]
+    private float staggerDecay = 0.5f;
+
+    [SerializeField]
+    [Tooltip("攻撃の種類・キャラ・ゲージ判定ごとの「ひるみやすさ」の倍率。0 ならその攻撃ではひるまない（空ならすべて等倍）。\n例：「ゲージ攻撃・パーフェクト ×3」「シグルの弾 ×0」")]
+    private List<DamageRule> staggerRules = new List<DamageRule>();
+
+    [SerializeField, Label("ひるんだときのアニメ")]
+    private string staggerAnimation = "Stagger";
+
+    [SerializeField, Label("ひるんだときのエフェクト")]
+    private EffectData staggerEffect;
+
+    [SerializeField, Label("ひるんだときの SE")]
+    private SeData staggerSe;
+
+    [Header("見た目の変化")]
+
+    [SerializeField]
+    [Tooltip("条件を満たしている間（攻撃を受けたときは決めた秒数）、見た目を変える。下の行ほど優先される。\n例：体力 50% 以下で赤く／ゲージ攻撃で凍る（青く 2 秒）／盾が壊れたら別のアニメ")]
+    private List<EnemyLookRule> lookRules = new List<EnemyLookRule>();
+
     [Header("体当たり")]
 
     [SerializeField, Label("ぶつかったときのダメージ", 0)]
@@ -119,6 +151,26 @@ public class EnemyData : ScriptableObject
     public string DeathAnimation => deathAnimation;
     public EnemyPattern Pattern => pattern;
     public bool RemoveSummonedOnDeath => removeSummonedOnDeath;
+    public float StaggerThreshold => staggerThreshold;
+    public float StaggerTime => staggerTime;
+    public float StaggerDecay => staggerDecay;
+    public string StaggerAnimation => staggerAnimation;
+    public EffectData StaggerEffect => staggerEffect;
+    public SeData StaggerSe => staggerSe;
+    public IReadOnlyList<EnemyLookRule> LookRules => lookRules;
+
+    /// <summary>
+    /// この攻撃のひるみやすさ（当てはまる行の倍率を全部かけたもの）
+    /// </summary>
+    public float StaggerMultiplier(DamageInfo info)
+    {
+        float multiplier = 1.0f;
+        foreach(DamageRule rule in staggerRules)
+        {
+            if(rule != null && rule.Matches(info)) { multiplier *= Mathf.Max(0.0f, rule.multiplier); }
+        }
+        return multiplier;
+    }
     public IReadOnlyList<DamageRule> DamageRules => damageRules;
 
     /// <summary>
@@ -126,6 +178,9 @@ public class EnemyData : ScriptableObject
     /// </summary>
     public int ApplyDamageRules(DamageInfo info)
     {
+        // 0 のダメージ（装甲で止められた分など）は 0 のまま（下の「最低 1」で 1 にしない）
+        if(info.amount <= 0) { return 0; }
+
         float multiplier = 1.0f;
         foreach(DamageRule rule in damageRules)
         {

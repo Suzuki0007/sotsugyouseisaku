@@ -20,6 +20,14 @@ MonoBehaviour:
   pattern: {fileID: 11400000, guid: 72f02514f524c8148afa4909c904c892, type: 2}
   removeSummonedOnDeath: 1
   damageRules: []
+  staggerThreshold: 0
+  staggerTime: 1
+  staggerDecay: 0.5
+  staggerRules: []
+  staggerAnimation: Stagger
+  staggerEffect: {fileID: 0}
+  staggerSe: {fileID: 0}
+  lookRules: []
   contactDamage: 1
   contactInterval: 1
   animation: {fileID: 0}

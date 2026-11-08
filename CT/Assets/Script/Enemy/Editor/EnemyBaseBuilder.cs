@@ -225,6 +225,40 @@ public static class EnemyBaseBuilder
         PlaceAtView(go, command, "攻撃で作動するスイッチ");
     }
 
+    [MenuItem("GameObject/敵/部位を追加（選んでいる敵の子に）", false, 25)]
+    private static void AddPart(MenuCommand command)
+    {
+        var parent = command.context as GameObject;
+        if(parent == null) { parent = Selection.activeGameObject; }
+        Enemy enemy = parent != null ? parent.GetComponentInParent<Enemy>() : null;
+        if(enemy == null)
+        {
+            EditorUtility.DisplayDialog("部位を追加", "先に Hierarchy で敵（Enemy が付いたオブジェクト）を選んでください。", "OK");
+            return;
+        }
+
+        var go = new GameObject("部位");
+        go.transform.SetParent(enemy.transform, false);
+        go.transform.localPosition = new Vector3(0.6f, 0.0f, 0.0f);
+        go.tag = "Enemies";
+        go.layer = LayerMask.NameToLayer("Enemies");
+
+        var col = go.AddComponent<CircleCollider2D>();
+        col.isTrigger = true;
+        col.radius = 0.35f;
+
+        // 見た目（丸）。差し替えてよい
+        var sr = go.AddComponent<SpriteRenderer>();
+        sr.sprite = AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/Knob.psd");
+        SpriteRenderer body = enemy.GetComponent<SpriteRenderer>();
+        sr.sortingOrder = body != null ? body.sortingOrder + 1 : 6;
+
+        go.AddComponent<EnemyPart>();
+
+        Undo.RegisterCreatedObjectUndo(go, "部位を追加");
+        Selection.activeGameObject = go;
+    }
+
     [MenuItem("GameObject/敵/戦闘エリア（追跡・逃げる戦闘）", false, 24)]
     private static void PlaceBattleArea(MenuCommand command)
     {

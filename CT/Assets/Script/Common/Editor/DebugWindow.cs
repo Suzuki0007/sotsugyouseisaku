@@ -275,9 +275,33 @@ public class DebugWindow : EditorWindow
                     if(GUILayout.Button("倒す", GUILayout.Width(50))) { Kill(enemy); }
                 }
 
-                if(enemy.Brain != null)
+                using(new EditorGUI.IndentLevelScope())
                 {
-                    using(new EditorGUI.IndentLevelScope()) { EditorGUILayout.LabelField(enemy.Brain.StatusText, EditorStyles.miniLabel); }
+                    if(enemy.Brain != null) { EditorGUILayout.LabelField(enemy.Brain.StatusText, EditorStyles.miniLabel); }
+
+                    // ひるみ・部位
+                    var extra = new List<string>();
+                    if(enemy.Data != null && enemy.Data.StaggerThreshold > 0.0f)
+                    {
+                        extra.Add(enemy.Staggered ? "ひるみ中" : $"ひるみ {enemy.StaggerGauge:0.0}/{enemy.Data.StaggerThreshold:0.#}");
+                    }
+                    foreach(EnemyPart part in enemy.GetComponentsInChildren<EnemyPart>())
+                    {
+                        string state = part.Broken ? "壊れた" : (part.Breakable ? $"{part.CurrentHealth}/{part.MaxHealth}" : "-");
+                        extra.Add($"{part.PartName}:{state}{(part.Revealed ? "" : "（見えない）")}");
+                    }
+                    if(extra.Count > 0) { EditorGUILayout.LabelField(string.Join("　", extra), EditorStyles.miniLabel); }
+
+                    using(new EditorGUILayout.HorizontalScope())
+                    {
+                        if(GUILayout.Button("ひるませる", EditorStyles.miniButton, GUILayout.Width(70))) { enemy.Stagger(enemy.Data != null ? enemy.Data.StaggerTime : 1.0f); }
+                        foreach(EnemyPart part in enemy.GetComponentsInChildren<EnemyPart>())
+                        {
+                            GUI.enabled = part.Breakable && !part.Broken;
+                            if(GUILayout.Button($"{part.PartName}を壊す", EditorStyles.miniButton)) { part.Break(); }
+                            GUI.enabled = true;
+                        }
+                    }
                 }
             }
 
