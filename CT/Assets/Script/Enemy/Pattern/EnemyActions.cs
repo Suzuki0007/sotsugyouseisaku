@@ -45,6 +45,21 @@ public enum DistanceCheck
 }
 
 /// <summary>
+/// 見え方の条件
+/// </summary>
+public enum SightCheck
+{
+    [InspectorName("問わない")]
+    Any = 0,
+
+    [InspectorName("プレイヤーが見えているとき")]
+    Seen = 1,
+
+    [InspectorName("プレイヤーが見えていないとき")]
+    NotSeen = 2,
+}
+
+/// <summary>
 /// 行動の部品の基底
 /// </summary>
 ///
@@ -62,6 +77,14 @@ public abstract class EnemyAction
     [Label("距離", 0.0f)]
     public float distance = 4.0f;
 
+    [Label("この行動をする見え方")]
+    [Tooltip("プレイヤーが見えているか（間に壁がないか）で、この行動をするかを決める")]
+    public SightCheck sightCheck = SightCheck.Any;
+
+    [Label("見える距離", 0.0f)]
+    [Tooltip("これより遠いと見えない")]
+    public float sightRange = 8.0f;
+
     [Label("重み", 0.0f)]
     [Tooltip("選び方が「重みつきランダム」のときの選ばれやすさ")]
     public float weight = 1.0f;
@@ -76,6 +99,8 @@ public abstract class EnemyAction
     {
         if(distanceCheck == DistanceCheck.Closer  && brain.DistanceToTarget > distance)  { return false; }
         if(distanceCheck == DistanceCheck.Farther && brain.DistanceToTarget <= distance) { return false; }
+        if(sightCheck == SightCheck.Seen    && !brain.CanSeeTarget(sightRange)) { return false; }
+        if(sightCheck == SightCheck.NotSeen &&  brain.CanSeeTarget(sightRange)) { return false; }
         return CanRunExtra(brain);
     }
 
@@ -349,6 +374,121 @@ public class AttackAction : EnemyAction
     {
         if(brain.CurrentAttack != null) { brain.CurrentAttack.Cleanup(); }
         brain.CurrentAttack = null;
+    }
+}
+
+//=====================================================================
+// 追いかける
+//=====================================================================
+
+[Serializable, EnemyActionMenu("移動/追いかける（見失ったら探す）", 14)]
+public class ChaseAction : EnemyAction
+{
+    [Label("追いかけ中に見える距離", 0.5f)]
+    [Tooltip("追いかけている間、これより離れるか、間に壁が入ると「見失う」")]
+    public float chaseSightRange = 12.0f;
+
+    [Label("見失ってから探す時間（秒）", 0.0f)]
+    [Tooltip("見失ったら、最後に見た場所まで行って、この時間探す。見つからなければあきらめて次の行動へ")]
+    public float searchSeconds = 2.0f;
+
+    [Label("ここまで近づいたら終わる", 0.0f)]
+    [Tooltip("0 なら終わらない（追跡イベントでは、捕まえる距離は戦闘エリアで決める）。攻撃につなげたいときは 1.5 など")]
+    public float stopDistance = 0.0f;
+
+    [Label("最長の時間（秒）", 0.0f)]
+    [Tooltip("0 ならあきらめるまで追いかける")]
+    public float maxSeconds = 0.0f;
+
+    [Label("近いときの速さの倍率", 0.1f)]
+    [Tooltip("プレイヤーが近いときの速さ（少し遅くすると、ギリギリで逃げ切れる緊張感が出る）")]
+    public float nearSpeed = 0.9f;
+
+    [Label("遠いときの速さの倍率", 0.1f)]
+    [Tooltip("プレイヤーが離れているときの速さ（速くすると、引き離しすぎない）")]
+    public float farSpeed = 1.3f;
+
+    [Label("近い・遠いの境目", 0.5f)]
+    [Tooltip("この距離より遠いと「遠いとき」の速さ。間は少しずつ変わる")]
+    public float farDistance = 6.0f;
+
+    [Label("見つけたときのエフェクト")]
+    [Tooltip("追いかけ始めたとき・見失ってからもう一度見つけたときに、敵の位置に出す（「！」など）")]
+    public EffectData noticeEffect;
+
+    [Label("見つけたときの SE")]
+    public SeData noticeSe;
+
+    [Label("あきらめたときの SE")]
+    public SeData giveUpSe;
+
+    public override string Summary => stopDistance > 0.0f ? $"追いかける（{stopDistance} まで）" : "追いかける";
+
+    protected override bool CanRunExtra(PatternRunner brain) => brain.Enemy != null;
+
+    public override IEnumerator Run(PatternRunner brain)
+    {
+        Enemy enemy = brain.Enemy;
+        float elapsed = 0.0f;
+        float lostTime = 0.0f;
+        bool seeing = false;
+
+        while(maxSeconds <= 0.0f || elapsed < maxSeconds)
+        {
+            yield return null;
+            if(!brain.CanAct) { continue; }
+
+            float dt = Time.deltaTime;
+            elapsed += dt;
+
+            GameObject target = brain.Target;
+            if(target == null) { break; }
+
+            bool sees = brain.CanSeeTarget(chaseSightRange);
+            if(sees && !seeing) { Notice(brain); }
+            seeing = sees;
+
+            float distance = brain.DistanceToTarget;
+            if(stopDistance > 0.0f && sees && distance <= stopDistance) { break; }
+
+            if(sees)
+            {
+                lostTime = 0.0f;
+                float t = Mathf.InverseLerp(farDistance * 0.5f, farDistance, distance);
+                enemy.SpeedMultiplier = Mathf.Lerp(nearSpeed, farSpeed, t);
+                enemy.MoveTo(target.transform.position, stopDistance > 0.0f ? stopDistance * 0.9f : 0.1f);
+                continue;
+            }
+
+            // 見失った：最後に見た場所へ行って探す
+            lostTime += dt;
+            if(brain.LastSeenPosition.HasValue)
+            {
+                enemy.SpeedMultiplier = nearSpeed;
+                enemy.MoveTo(brain.LastSeenPosition.Value, 0.3f);
+            }
+
+            if(lostTime >= searchSeconds)
+            {
+                SeManager.PlaySe(giveUpSe, enemy.transform.position);
+                brain.ForgetLastSeen();
+                break;
+            }
+        }
+
+        enemy.SpeedMultiplier = 1.0f;
+        enemy.Stop();
+    }
+
+    private void Notice(PatternRunner brain)
+    {
+        EffectManager.Play(noticeEffect, brain.Position);
+        SeManager.PlaySe(noticeSe, brain.Position);
+    }
+
+    public override void Cleanup(PatternRunner brain)
+    {
+        if(brain.Enemy != null) { brain.Enemy.SpeedMultiplier = 1.0f; }
     }
 }
 

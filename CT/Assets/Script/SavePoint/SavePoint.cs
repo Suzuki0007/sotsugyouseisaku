@@ -45,6 +45,13 @@ public class SavePoint : Intaractable
 
     protected override void Interact()
     {
+        // 戦闘中（追跡イベントなど）はセーブできない（戦闘の途中の状態は保存しないため）
+        if(BattleArea.AnyActive)
+        {
+            UISound.Play(UISoundType.Cannot);
+            return;
+        }
+
         if(GameMenu.Instance == null)
         {
             Debug.LogWarning($"{name}: メニュー画面（GameMenu）がないのでセーブできません。Tools > メニュー画面 > メニューのプレハブを作成 で作ってください", this);

@@ -165,6 +165,43 @@ public static class SceneChecker
             }
         }
 
+        var battleKeys = new Dictionary<string, BattleArea>();
+        foreach(BattleArea battle in ctx.Find<BattleArea>())
+        {
+            var so = new SerializedObject(battle);
+            var startType = (BattleStart)so.FindProperty("start").enumValueIndex;
+            var winType = (BattleWin)so.FindProperty("win").enumValueIndex;
+            var loseType = (BattleLose)so.FindProperty("lose").enumValueIndex;
+            int enemyCount = so.FindProperty("enemies").arraySize;
+
+            Collider2D area = battle.GetComponent<Collider2D>();
+            if(startType == BattleStart.EnterArea && area != null && !area.isTrigger)
+            {
+                ctx.Add(Level.Error, battle, "戦闘エリアの Collider2D の Is Trigger がオフです（入れないので始まりません）");
+            }
+
+            var goal = so.FindProperty("goal").objectReferenceValue as Collider2D;
+            if(winType == BattleWin.ReachGoal && goal == null) { ctx.Add(Level.Error, battle, "勝ち方が「ゴールに着く」ですが、ゴールが空です"); }
+            if(winType == BattleWin.ReachGoal && goal != null && !goal.isTrigger) { ctx.Add(Level.Warning, battle, "ゴールの Collider2D の Is Trigger がオフです（ゴールに入れません）"); }
+            if(winType == BattleWin.Flag && so.FindProperty("winFlag").objectReferenceValue == null) { ctx.Add(Level.Error, battle, "勝ち方が「フラグが立つ」ですが、フラグが空です"); }
+            if(winType == BattleWin.DefeatAll && enemyCount == 0) { ctx.Add(Level.Error, battle, "勝ち方が「敵を全部倒す」ですが、参加する敵が空です"); }
+            if(loseType == BattleLose.Caught && enemyCount == 0) { ctx.Add(Level.Warning, battle, "負け方が「捕まる」ですが、参加する敵が空です（捕まりません）"); }
+            if(HasNullElement(so.FindProperty("enemies")) || HasNullElement(so.FindProperty("emitters"))) { ctx.Add(Level.Warning, battle, "戦闘エリアの参加する敵・攻撃の発生源に空の欄があります"); }
+            if(winType == BattleWin.None && loseType == BattleLose.None) { ctx.Add(Level.Info, battle, "戦闘エリアの勝ち方・負け方がどちらも「なし」です（イベントの部品で終える前提）"); }
+
+            string key = BattleArea.MakeSaveKey(battle.gameObject, so.FindProperty("saveId").stringValue);
+            if(battleKeys.ContainsKey(key)) { ctx.Add(Level.Error, battle, $"戦闘エリアのセーブ用の名前「{key}」が重なっています（ID を付けてください）"); }
+            else                            { battleKeys.Add(key, battle); }
+        }
+
+        foreach(BattleControlEventAction action in ctx.Find<BattleControlEventAction>())
+        {
+            if(new SerializedObject(action).FindProperty("battle").objectReferenceValue == null)
+            {
+                ctx.Add(Level.Error, action, "「戦闘エリアを操作」に戦闘エリアが入っていません");
+            }
+        }
+
         foreach(DamageAreaEventAction action in ctx.Find<DamageAreaEventAction>())
         {
             var so = new SerializedObject(action);

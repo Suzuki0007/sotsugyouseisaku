@@ -225,6 +225,46 @@ public static class EnemyBaseBuilder
         PlaceAtView(go, command, "攻撃で作動するスイッチ");
     }
 
+    [MenuItem("GameObject/敵/戦闘エリア（追跡・逃げる戦闘）", false, 24)]
+    private static void PlaceBattleArea(MenuCommand command)
+    {
+        var go = new GameObject("戦闘エリア");
+        var box = go.AddComponent<BoxCollider2D>();
+        box.isTrigger = true;
+        box.size = new Vector2(4.0f, 4.0f);
+        var battle = go.AddComponent<BattleArea>();
+
+        // ゴール（入ったら勝ち）
+        var goalGo = new GameObject("ゴール");
+        goalGo.transform.SetParent(go.transform, false);
+        goalGo.transform.localPosition = new Vector3(12.0f, 0.0f, 0.0f);
+        var goal = goalGo.AddComponent<BoxCollider2D>();
+        goal.isTrigger = true;
+        goal.size = new Vector2(2.0f, 3.0f);
+
+        // やり直す位置
+        var restart = new GameObject("やり直す位置");
+        restart.transform.SetParent(go.transform, false);
+
+        // 始まったとき・勝ったとき・負けたとき のイベント
+        EventSequence MakeSequence(string name)
+        {
+            var child = new GameObject(name);
+            child.transform.SetParent(go.transform, false);
+            return child.AddComponent<EventSequence>();
+        }
+
+        var so = new SerializedObject(battle);
+        so.FindProperty("goal").objectReferenceValue = goal;
+        so.FindProperty("restartPoint").objectReferenceValue = restart.transform;
+        so.FindProperty("onStart").objectReferenceValue = MakeSequence("始まったとき");
+        so.FindProperty("onWin").objectReferenceValue = MakeSequence("勝ったとき");
+        so.FindProperty("onLose").objectReferenceValue = MakeSequence("負けたとき");
+        so.ApplyModifiedPropertiesWithoutUndo();
+
+        PlaceAtView(go, command, "戦闘エリア");
+    }
+
     private static void PlaceAtView(GameObject go, MenuCommand command, string undoName)
     {
         GameObjectUtility.SetParentAndAlign(go, command.context as GameObject);

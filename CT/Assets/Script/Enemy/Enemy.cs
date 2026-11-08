@@ -225,6 +225,17 @@ public class Enemy : MonoBehaviour
     }
 
     /// <summary>
+    /// 指定した位置へ瞬間移動する（戦闘エリアのやり直しなど）
+    /// </summary>
+    public void Teleport(Vector2 position)
+    {
+        Stop();
+        ClearOverrideVelocity();
+        transform.position = new Vector3(position.x, position.y, transform.position.z);
+        if(rb != null) { rb.position = position; rb.linearVelocity = Vector2.zero; }
+    }
+
+    /// <summary>
     /// 倒された演出なしで消す
     /// </summary>
     public void Remove()

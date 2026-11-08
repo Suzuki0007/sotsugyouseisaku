@@ -1,0 +1,81 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d9b29a5f1e02d3c47acbbafad2c0517a, type: 3}
+  m_Name: "Pattern_Sample_\u898B\u5F35\u308A\uFF08\u898B\u3064\u3051\u305F\u3089\u8FFD\u3046\uFF09"
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyPattern
+  phases:
+  - name: "\u901A\u5E38"
+    order: 0
+    actions:
+    - rid: 1708568687347761348
+    - rid: 1708568687347761349
+    - rid: 1708568687347761350
+    exit: 0
+    healthRatio: 0.5
+    seconds: 10
+    condition:
+      flags: []
+      items: []
+      character: 0
+      partyHealth: 0
+      partyHealthRatio: 0.5
+      area: {fileID: 0}
+    interrupt: 1
+    enterEffect: {fileID: 0}
+    enterSe: {fileID: 0}
+    enterAnimation: 
+    enterPause: 0
+  memo: "\u30D7\u30EC\u30A4\u30E4\u30FC\u304C\u898B\u3048\u306A\u3044\uFF08\u58C1\u306E\u5411\u3053\u3046\u30FB7
+    \u30DE\u30B9\u3088\u308A\u9060\u3044\uFF09\u3068\u304D\u306F\u5DE1\u56DE\u3002\u898B\u3064\u3051\u305F\u3089\u8FFD\u3044\u304B\u3051\u3001\u8FD1\u3065\u3044\u305F\u3089\u306A\u304E\u6255\u3046\u3002\u898B\u5931\u3063\u305F\u3089\u63A2\u3057\u3066\u5DE1\u56DE\u306B\u623B\u308B\uFF08\u96A0\u308C\u3066\u3084\u308A\u904E\u3054\u305B\u308B\uFF09"
+  references:
+    version: 2
+    RefIds:
+    - rid: 1708568687347761348
+      type: {class: ChaseAction, ns: , asm: Assembly-CSharp}
+      data:
+        distanceCheck: 0
+        distance: 4
+        sightCheck: 1
+        sightRange: 7
+        weight: 1
+        chaseSightRange: 12
+        searchSeconds: 2
+        stopDistance: 1.6
+        maxSeconds: 0
+        nearSpeed: 0.9
+        farSpeed: 1.3
+        farDistance: 6
+        noticeEffect: {fileID: 11400000, guid: 227ad72a71e3d2946ab18d0478447895, type: 2}
+        noticeSe: {fileID: 0}
+        giveUpSe: {fileID: 0}
+    - rid: 1708568687347761349
+      type: {class: AttackAction, ns: , asm: Assembly-CSharp}
+      data:
+        distanceCheck: 1
+        distance: 2.2
+        sightCheck: 0
+        sightRange: 8
+        weight: 1
+        attack: {fileID: 11400000, guid: 93f43c13281beba4682d1503b1c18a24, type: 2}
+        repeat: 1
+        interval: 0
+    - rid: 1708568687347761350
+      type: {class: PatrolAction, ns: , asm: Assembly-CSharp}
+      data:
+        distanceCheck: 0
+        distance: 4
+        sightCheck: 2
+        sightRange: 7
+        weight: 1
+        allPoints: 0
+        waitAtPoint: 0.8
+        speedMultiplier: 1

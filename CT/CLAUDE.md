@@ -4,9 +4,9 @@
 主人公は **ノア（Noah）** と **シグル（Sigle）** の2人で、C キーで操作を切り替える。
 目標は「**プランナーがコードを書かずに Inspector だけで制作を進められる**」こと。
 
-最終更新：2026-11-08（①〜⑥の実装、既存の問題の修正、タイトル画面とセーブスロット、メニュー画面とセーブポイント、敵の仕組みの段階0〔シグルの射撃・体力の共有〕・段階1〔土台〕・段階2〔行動パターンと攻撃の基本〕・段階3〔ギミック連動・見えない敵・落下／突き出る／設置／弾幕／仲間を呼ぶ〕まで）
+最終更新：2026-11-08（①〜⑥の実装、既存の問題の修正、タイトル画面とセーブスロット、メニュー画面とセーブポイント、敵の仕組みの段階0〔シグルの射撃・体力の共有〕・段階1〔土台〕・段階2〔行動パターンと攻撃の基本〕・段階3〔ギミック連動・見えない敵・落下／突き出る／設置／弾幕／仲間を呼ぶ〕・段階4〔追跡と逃げる戦闘〕まで）
 
-**進行中：敵の仕組み**（プランナーが敵・攻撃・行動パターン・ギミック連動・追跡などを Inspector だけで作れるように）。段階 0 前提の修正 → 1 土台（DamageInfo・攻撃を受ける部品・GameCondition・EnemyData・2D ナビメッシュ〔標準の NavMesh API + 2D コライダーから自作の収集。NavMeshAgent は使わず経路だけ計算し Rigidbody2D で動かす〕）→ 2 行動パターンと攻撃の基本 → 3 ギミック連動・攻撃の発生源 → 4 追跡 → 5 部位・ひるみ・見た目 → 6 倒した後・グループ → 7 ツールと資料。**1段階ずつ終わったら報告とコミットメッセージを渡す**。今は**段階3まで完了**（次は段階4：追跡と逃げる戦闘〔経路探索＋視界・見失ったら最後に見た場所・捕まったら追跡の始まりから・戦闘エリアの勝ち方／負け方・戦闘中はセーブポイント不可〕）。
+**進行中：敵の仕組み**（プランナーが敵・攻撃・行動パターン・ギミック連動・追跡などを Inspector だけで作れるように）。段階 0 前提の修正 → 1 土台（DamageInfo・攻撃を受ける部品・GameCondition・EnemyData・2D ナビメッシュ〔標準の NavMesh API + 2D コライダーから自作の収集。NavMeshAgent は使わず経路だけ計算し Rigidbody2D で動かす〕）→ 2 行動パターンと攻撃の基本 → 3 ギミック連動・攻撃の発生源 → 4 追跡 → 5 部位・ひるみ・見た目 → 6 倒した後・グループ → 7 ツールと資料。**1段階ずつ終わったら報告とコミットメッセージを渡す**。今は**段階4まで完了**（次は段階5：部位〔弱点・装甲・破壊・独立〕・ひるみとキャンセル・見た目の変化〔HP・攻撃の種類・部位・段階・操作キャラ・止まっている〕・弱点が見える条件）。
 
 ---
 
@@ -75,7 +75,8 @@
 - **実行の共通部分 `PatternRunner`**：EnemyBrain（体あり）と `AttackEmitter`（攻撃の発生源＝見えない敵。動く条件・止める命令）が継承。行動の部品・`AttackExecution` は PatternRunner を受け取る（`runner.Enemy` が null なら移動・突進・アニメは飛ばす）。
 - **仲間を呼ぶ**：`SummonAction` → `Enemy.Spawn(data, pos)`（`Resources/Enemies/Enemy_Base` を読み、Awake の前にデータを入れる）、卵 `EnemyEgg`。同時に出せる数は PatternRunner が数える。倒されたら呼んだ仲間も倒す（`EnemyData.RemoveSummonedOnDeath`）。
 - **ギミック連動**（`Enemy/Gimmick/`）：イベントの部品 `EnemyCommandEventAction`（止める・○秒・動かす・行動をやめさせる・段階・倒す・消す）／`EnemyDamageEventAction`／`DamageAreaEventAction`（一時的な AttackEmitter、`IgnoreEnemyBlock`）。`AttackSwitch`（攻撃で作動するスイッチ。DamageReceiver の OnHit を DamageRule で絞る。セーブキー `Switch/<シーン>/<ID>`）。範囲攻撃・プレイヤーの弾・敵の弾も DamageReceiver の付いた物に当たる。
-- 敵の命令：`Enemy.SetPaused(bool, 色)` / `PauseFor` / `Kill` / `Remove`。
+- 敵の命令：`Enemy.SetPaused(bool, 色)` / `PauseFor` / `Kill` / `Remove` / `Teleport`。
+- **追跡・戦闘**（段階4）：行動 `ChaseAction`（見えている間は追う、見失ったら `LastSeenPosition` を探す、距離で速さ）。どの行動にも「見え方」の条件（`PatternRunner.CanSeeTarget`：Linecast で動かない当たり判定に当たると見えない）。`BattleArea`（`Enemy/Battle/`）：始まり方×勝ち方×負け方×負けたとき（**やり直す＝始まったときに Save.Commit とセーブしないフラグの写し → 負けたら仮置きを捨てて所持品を読み直し、同じシーンを暗転で読み込み直してやり直す位置から始め直す**。拾った物・フラグ・扉・爆弾・敵がすべて始まったときに戻る。体力は満タン）、`BattleArea.AnyActive` の間は SavePoint 不可、時間は EnemyBlock 中は進まない、1回だけならセーブ `Battle/<シーン>/<ID>`。イベントの部品 `BattleControlEventAction`。画面表示 `BattleHud`（`Resources/UI/BattleHud.prefab`、Tools > 敵 > 戦闘の画面表示のプレハブを作る）：上の帯（目的・残り時間・残りの敵）と真ん中のメッセージ。
 - **効き方**：`EnemyData.damageRules`（`DamageRule`：`DamageKindFilter`〔DamageKind と同じ番号＋Any=-1〕・`CharacterFilter`・`GaugeJudge`・倍率、全部かけ算）→ `Health.DamageFilter`。0 以下は `OnBlocked`。
 - 敵はプレイヤーに触れている向きへは進まない（重い敵がプレイヤーを押し出してイベント範囲に入れてしまうのを防ぐ）。
 - サンプル：Tools > 敵 > サンプルを作る（`Assets/Data/Enemies/Sample/`）。Stage1_2 のスポナーはまだ古い Enemy.prefab（置き換えはシーン変更なので未実施）。

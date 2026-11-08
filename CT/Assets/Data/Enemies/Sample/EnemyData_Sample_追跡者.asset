@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 12a468c42b056e341a2a8c75e2b9fc26, type: 3}
+  m_Name: "EnemyData_Sample_\u8FFD\u8DE1\u8005"
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyData
+  displayName: "\u8FFD\u3044\u304B\u3051\u3066\u304F\u308B\u6575"
+  maxHealth: 99
+  moveSpeed: 4
+  size: 1
+  heavy: 1
+  pattern: {fileID: 11400000, guid: 6c32d9e7a913d084893cdcfb93b43d7b, type: 2}
+  removeSummonedOnDeath: 1
+  damageRules: []
+  contactDamage: 0
+  contactInterval: 1
+  animation: {fileID: 0}
+  sprite: {fileID: 0}
+  deathEffect: {fileID: 11400000, guid: db953535983d3f047a3398fdc6e212b4, type: 2}
+  deathSe: {fileID: 0}
+  deathAnimation: Dead
+  memo: "\u8FFD\u8DE1\u30A4\u30D9\u30F3\u30C8\u7528\u3002\u5012\u305B\u306A\u3044\u524D\u63D0\uFF08\u4F53\u529B
+    99\uFF09\u3002\u6355\u307E\u3063\u305F\u304B\u3069\u3046\u304B\u306F\u6226\u95D8\u30A8\u30EA\u30A2\u3067\u6C7A\u3081\u308B"

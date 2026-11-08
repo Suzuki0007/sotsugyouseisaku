@@ -189,6 +189,7 @@ public static class EnemySampleBuilder
         EnemyData($"{Folder}/EnemyData_Sample_巡回.asset", "巡回する敵", 3, 2.0f, EnemySize.Medium, patrol, null);
 
         BuildStage3(swing);
+        BuildStage4(swing);
 
         AssetDatabase.SaveAssets();
         AssetDatabase.Refresh();
@@ -370,6 +371,39 @@ public static class EnemySampleBuilder
         // 見えない敵の行動パターンは、敵のデータではなく攻撃の発生源（AttackEmitter）に入れて使う
         _ = hidden;
         _ = swing;
+    }
+
+    //=====================================================================
+    // 段階4のサンプル（追跡）
+    //=====================================================================
+
+    private static void BuildStage4(AttackData swing)
+    {
+        EffectData notice = AssetDatabase.LoadAssetAtPath<EffectData>("Assets/Data/Effect/Sample/Fx_Sample_Hit.asset");
+
+        EnemyPattern chaser = Pattern("Pattern_Sample_追いかけてくる（追跡イベント用）", p =>
+        {
+            EnemyPhase phase = p.phases[0];
+            phase.actions.Add(new ChaseAction { searchSeconds = 3.0f, nearSpeed = 0.9f, farSpeed = 1.4f, farDistance = 6.0f, noticeEffect = notice });
+            phase.actions.Add(new WanderAction { radius = 2.0f, count = 1, speedMultiplier = 0.6f });
+            p.memo = "見えている間は追いかけ、見失ったら最後に見た場所を 3 秒探す。あきらめたら少しうろつく。戦闘エリア（負け方：捕まる）と組み合わせて追跡イベントにする";
+        });
+
+        EnemyPattern guard = Pattern("Pattern_Sample_見張り（見つけたら追う）", p =>
+        {
+            EnemyPhase phase = p.phases[0];
+            phase.actions.Add(new ChaseAction { stopDistance = 1.6f, searchSeconds = 2.0f, sightCheck = SightCheck.Seen, sightRange = 7.0f, noticeEffect = notice });
+            phase.actions.Add(new AttackAction { attack = swing, distanceCheck = DistanceCheck.Closer, distance = 2.2f });
+            phase.actions.Add(new PatrolAction { allPoints = false, waitAtPoint = 0.8f, sightCheck = SightCheck.NotSeen, sightRange = 7.0f });
+            p.memo = "プレイヤーが見えない（壁の向こう・7 マスより遠い）ときは巡回。見つけたら追いかけ、近づいたらなぎ払う。見失ったら探して巡回に戻る（隠れてやり過ごせる）";
+        });
+
+        EnemyData($"{Folder}/EnemyData_Sample_追跡者.asset", "追いかけてくる敵", 99, 4.0f, EnemySize.Medium, chaser, so =>
+        {
+            so.FindProperty("contactDamage").intValue = 0;
+            so.FindProperty("memo").stringValue = "追跡イベント用。倒せない前提（体力 99）。捕まったかどうかは戦闘エリアで決める";
+        });
+        EnemyData($"{Folder}/EnemyData_Sample_見張り.asset", "見張り", 3, 2.2f, EnemySize.Medium, guard, null);
     }
 
     //=====================================================================

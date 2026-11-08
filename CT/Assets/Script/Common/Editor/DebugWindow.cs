@@ -297,6 +297,28 @@ public class DebugWindow : EditorWindow
                 }
             }
 
+            // 戦闘エリア（追跡・逃げる戦闘など）
+            BattleArea[] battles = FindObjectsByType<BattleArea>();
+            if(battles.Length > 0)
+            {
+                EditorGUILayout.LabelField("戦闘エリア", BattleArea.AnyActive ? "戦闘中（セーブポイント不可）" : "-");
+                foreach(BattleArea battle in battles)
+                {
+                    using(new EditorGUILayout.HorizontalScope())
+                    {
+                        if(GUILayout.Button(battle.name, EditorStyles.label)) { Selection.activeGameObject = battle.gameObject; }
+                        GUI.enabled = !battle.Running && !battle.Won;
+                        if(GUILayout.Button("始める", GUILayout.Width(50))) { battle.Begin(); }
+                        GUI.enabled = !battle.Won;
+                        if(GUILayout.Button("勝ち", GUILayout.Width(40))) { battle.ForceWin(); }
+                        GUI.enabled = battle.Running;
+                        if(GUILayout.Button("やめる", GUILayout.Width(50))) { battle.Cancel(); }
+                        GUI.enabled = true;
+                    }
+                    using(new EditorGUI.IndentLevelScope()) { EditorGUILayout.LabelField(battle.StatusText, EditorStyles.miniLabel); }
+                }
+            }
+
             if(enemies.Count > 0 && GUILayout.Button("全部倒す"))
             {
                 foreach(Enemy enemy in new List<Enemy>(enemies)) { Kill(enemy); }

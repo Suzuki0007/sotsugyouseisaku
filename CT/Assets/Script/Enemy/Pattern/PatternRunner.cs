@@ -501,6 +501,41 @@ public abstract class PatternRunner : MonoBehaviour
         return best;
     }
 
+    //=====================================================================
+    // 視界
+    //=====================================================================
+
+    /// <summary> 最後にプレイヤーを見た場所（見たことがなければ null） </summary>
+    public Vector2? LastSeenPosition { get; private set; }
+
+    /// <summary>
+    /// プレイヤーが見えるか（range 以内で、間に壁がない）。見えたら「最後に見た場所」を更新する
+    /// </summary>
+    public bool CanSeeTarget(float range)
+    {
+        GameObject target = Target;
+        if(target == null) { return false; }
+
+        Vector2 from = transform.position;
+        Vector2 to = target.transform.position;
+        if(Vector2.Distance(from, to) > range) { return false; }
+
+        // 間に壁（動かない当たり判定）があれば見えない。敵だけ入れないエリアなどは見通せる
+        foreach(RaycastHit2D hit in Physics2D.LinecastAll(from, to))
+        {
+            if(hit.collider != null && NavMesh2D.IsObstacle(hit.collider)) { return false; }
+        }
+
+        LastSeenPosition = to;
+        return true;
+    }
+
+    /// <summary> 最後に見た場所を忘れる（探し終わった・やり直し） </summary>
+    public void ForgetLastSeen()
+    {
+        LastSeenPosition = null;
+    }
+
     // 巡回（体のある敵だけ。EnemyBrain が上書きする）
     public virtual int PatrolPointCount => 0;
     public virtual Vector2 NextPatrolPoint() => transform.position;
