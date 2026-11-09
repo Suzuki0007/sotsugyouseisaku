@@ -1,0 +1,58 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9257d48ce2358194abffcebe09ecc181, type: 3}
+  m_Name: "Attack_Sample_\u30EA\u30F3\u30B0"
+  m_EditorClassIdentifier: Assembly-CSharp::AttackData
+  telegraphTime: 1
+  showTelegraph: 1
+  telegraphStyle: 0
+  telegraphColor: {r: 1, g: 0.6, b: 0.1, a: 0.35}
+  telegraphFill: 1
+  telegraphBlink: 0
+  telegraphSortingOrder: 3
+  telegraphUnlit: 1
+  telegraphSe: {fileID: 0}
+  telegraphAnimation: Windup
+  origin: 0
+  aim: 0
+  fixedAngle: 0
+  trackDuringTelegraph: 0
+  forwardOffset: 0
+  shape:
+    type: 3
+    radius: 3.5
+    innerRadius: 1.8
+    length: 6
+    width: 1
+    angle: 90
+  stopAtWall: 1
+  activation: 0
+  damage: 1
+  targets: 0
+  ignoreNoah: 0
+  ignoreSigle: 0
+  damageKind: 11
+  sustainTime: 1.5
+  hitInterval: 0.5
+  rotateSpeed: 0
+  bulletCount: 1
+  bulletSpread: 30
+  bulletVolleys: 1
+  bulletVolleyInterval: 0.3
+  motion: 0
+  chargeSpeed: 12
+  chargeStunTime: 0
+  activeEffect: {fileID: 0}
+  activeSe: {fileID: 0}
+  activeAnimation: Attack
+  recoveryTime: 0.5
+  memo: "\u6575\u306E\u307E\u308F\u308A\u306E\u30C9\u30FC\u30CA\u30C4\u3002\u6575\u306E\u8FD1\u304F\u306B\u5165\u308C\u3070\u5B89\u5168"

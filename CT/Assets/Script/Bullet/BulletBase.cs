@@ -54,9 +54,13 @@ public abstract class BulletBase : MonoBehaviour
     // プロパティ
     //=====================================================================
 
-    public float BulletSpeed => bulletSpeed;
+    // 攻撃のデータで上書きする速さ・ダメージ（負なら上書きしない。取り出すたびに戻す）
+    private float speedOverride = -1.0f;
+    private int damageOverride = -1;
 
-    public int BulletDamage => bulletDamage;
+    public float BulletSpeed => speedOverride > 0.0f ? speedOverride : bulletSpeed;
+
+    public int BulletDamage => damageOverride >= 0 ? damageOverride : bulletDamage;
 
     public GameObject Shooter => shooter;
 
@@ -83,6 +87,8 @@ public abstract class BulletBase : MonoBehaviour
         isReturned = false;
         bulletLifeTime = initialLifeTime;
         shooter = null;
+        speedOverride = -1.0f;
+        damageOverride = -1;
         ResetVelocity();
     }
 
@@ -173,7 +179,16 @@ public abstract class BulletBase : MonoBehaviour
     {
         if(rb == null) return;
 
-        rb.linearVelocity = direction.normalized * bulletSpeed;
+        rb.linearVelocity = direction.normalized * BulletSpeed;
+    }
+
+    /// <summary>
+    /// 速さとダメージを、この1発だけ変える（SetDirection より前に呼ぶ。速さ 0 以下・ダメージ負なら変えない）
+    /// </summary>
+    public void Configure(float speed, int damage)
+    {
+        speedOverride = speed > 0.0f ? speed : -1.0f;
+        damageOverride = damage;
     }
 
     /// <summary>

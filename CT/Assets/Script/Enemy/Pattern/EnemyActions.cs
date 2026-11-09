@@ -1,0 +1,761 @@
+/*********************************************************************/
+// * \file   EnemyActions.cs
+// * \brief  敵の行動の部品（待つ・近づく・離れる・巡回・ランダムに歩く・攻撃する）
+// *
+// * \author
+/*********************************************************************/
+
+using System;
+using System.Collections;
+using UnityEngine;
+
+//=====================================================================
+// 共通
+//=====================================================================
+
+/// <summary>
+/// 行動の部品の、追加メニューでの名前（EnemyPattern の「＋行動を追加」に出る）
+/// </summary>
+[AttributeUsage(AttributeTargets.Class)]
+public class EnemyActionMenuAttribute : Attribute
+{
+    public readonly string path;
+    public readonly int order;
+
+    public EnemyActionMenuAttribute(string path, int order = 0)
+    {
+        this.path = path;
+        this.order = order;
+    }
+}
+
+/// <summary>
+/// 距離の条件
+/// </summary>
+public enum DistanceCheck
+{
+    [InspectorName("問わない")]
+    Any = 0,
+
+    [InspectorName("プレイヤーがこの距離より近いとき")]
+    Closer = 1,
+
+    [InspectorName("プレイヤーがこの距離より遠いとき")]
+    Farther = 2,
+}
+
+/// <summary>
+/// 見え方の条件
+/// </summary>
+public enum SightCheck
+{
+    [InspectorName("問わない")]
+    Any = 0,
+
+    [InspectorName("プレイヤーが見えているとき")]
+    Seen = 1,
+
+    [InspectorName("プレイヤーが見えていないとき")]
+    NotSeen = 2,
+}
+
+/// <summary>
+/// 行動の部品の基底
+/// </summary>
+///
+/// ・新しい部品を作るときはこれを継承し、[Serializable] と [EnemyActionMenu("分類/名前")] を付ける
+/// ・Run はコルーチン。待つときは brain.Wait / brain.MoveUntil を使う（止められている間は時間が進まない）
+/// ・途中でやめられたときの片づけは Cleanup に書く
+/// ・クラス名を変えるとデータが消える（SerializeReference のため）。変えるときは [UnityEngine.Scripting.APIUpdating.MovedFrom] を付ける
+[Serializable]
+public abstract class EnemyAction
+{
+    [Label("この行動をする距離")]
+    [Tooltip("プレイヤーとの距離で、この行動をするかを決める（満たさないときは飛ばす）")]
+    public DistanceCheck distanceCheck = DistanceCheck.Any;
+
+    [Label("距離", 0.0f)]
+    public float distance = 4.0f;
+
+    [Label("この行動をする見え方")]
+    [Tooltip("プレイヤーが見えているか（間に壁がないか）で、この行動をするかを決める")]
+    public SightCheck sightCheck = SightCheck.Any;
+
+    [Label("見える距離", 0.0f)]
+    [Tooltip("これより遠いと見えない")]
+    public float sightRange = 8.0f;
+
+    [Label("重み", 0.0f)]
+    [Tooltip("選び方が「重みつきランダム」のときの選ばれやすさ")]
+    public float weight = 1.0f;
+
+    /// <summary> 一覧に出す説明（例：「近づく（1.5 まで）」） </summary>
+    public abstract string Summary { get; }
+
+    /// <summary>
+    /// 今この行動をしてよいか
+    /// </summary>
+    public bool CanRun(PatternRunner brain)
+    {
+        if(distanceCheck == DistanceCheck.Closer  && brain.DistanceToTarget > distance)  { return false; }
+        if(distanceCheck == DistanceCheck.Farther && brain.DistanceToTarget <= distance) { return false; }
+        if(sightCheck == SightCheck.Seen    && !brain.CanSeeTarget(sightRange)) { return false; }
+        if(sightCheck == SightCheck.NotSeen &&  brain.CanSeeTarget(sightRange)) { return false; }
+        return CanRunExtra(brain);
+    }
+
+    protected virtual bool CanRunExtra(PatternRunner brain) => true;
+
+    /// <summary> 行動する（コルーチン） </summary>
+    public abstract IEnumerator Run(PatternRunner brain);
+
+    /// <summary> 途中でやめられたときの片づけ </summary>
+    public virtual void Cleanup(PatternRunner brain) { }
+}
+
+//=====================================================================
+// 待つ
+//=====================================================================
+
+[Serializable, EnemyActionMenu("待つ", 0)]
+public class WaitAction : EnemyAction
+{
+    [Label("最短（秒）", 0.0f)]
+    public float minSeconds = 1.0f;
+
+    [Label("最長（秒）", 0.0f)]
+    [Tooltip("最短と最長の間でランダムに待つ（同じなら決まった時間）")]
+    public float maxSeconds = 1.0f;
+
+    public override string Summary => Mathf.Approximately(minSeconds, maxSeconds) ? $"待つ（{minSeconds} 秒）" : $"待つ（{minSeconds}〜{maxSeconds} 秒）";
+
+    public override IEnumerator Run(PatternRunner brain)
+    {
+        if(brain.Enemy != null) { brain.Enemy.Stop(); }
+        float seconds = UnityEngine.Random.Range(Mathf.Min(minSeconds, maxSeconds), Mathf.Max(minSeconds, maxSeconds));
+        yield return brain.Wait(seconds);
+    }
+}
+
+//=====================================================================
+// 近づく
+//=====================================================================
+
+[Serializable, EnemyActionMenu("移動/近づく", 10)]
+public class ApproachAction : EnemyAction
+{
+    [Label("ここまで近づく", 0.0f)]
+    [Tooltip("プレイヤーとの距離がこれ以下になったら終わる")]
+    public float stopDistance = 1.5f;
+
+    [Label("最長の時間（秒）", 0.1f)]
+    [Tooltip("この時間が経ったら、着いていなくても終わる")]
+    public float maxSeconds = 3.0f;
+
+    [Label("速さの倍率", 0.1f)]
+    public float speedMultiplier = 1.0f;
+
+    public override string Summary => $"近づく（{stopDistance} まで、最長 {maxSeconds} 秒）";
+
+    public override IEnumerator Run(PatternRunner brain)
+    {
+        brain.Enemy.SpeedMultiplier = speedMultiplier;
+        yield return brain.MoveUntil(() =>
+        {
+            GameObject target = brain.Enemy.Target;
+            if(target == null) { return true; }
+            if(brain.DistanceToTarget <= stopDistance) { return true; }
+            brain.Enemy.MoveTo(target.transform.position, stopDistance * 0.9f);
+            return false;
+        }, maxSeconds);
+        brain.Enemy.SpeedMultiplier = 1.0f;
+        brain.Enemy.Stop();
+    }
+
+    public override void Cleanup(PatternRunner brain)
+    {
+        if(brain.Enemy != null) { brain.Enemy.SpeedMultiplier = 1.0f; }
+    }
+
+    // 移動は、敵の体があるときだけ（見えない敵では飛ばす）
+    protected override bool CanRunExtra(PatternRunner brain) => brain.Enemy != null;
+}
+
+//=====================================================================
+// 離れる
+//=====================================================================
+
+[Serializable, EnemyActionMenu("移動/離れる", 11)]
+public class RetreatAction : EnemyAction
+{
+    [Label("ここまで離れる", 0.5f)]
+    [Tooltip("プレイヤーとの距離がこれ以上になったら終わる")]
+    public float keepDistance = 5.0f;
+
+    [Label("最長の時間（秒）", 0.1f)]
+    public float maxSeconds = 2.0f;
+
+    [Label("速さの倍率", 0.1f)]
+    public float speedMultiplier = 1.0f;
+
+    public override string Summary => $"離れる（{keepDistance} まで、最長 {maxSeconds} 秒）";
+
+    public override IEnumerator Run(PatternRunner brain)
+    {
+        brain.Enemy.SpeedMultiplier = speedMultiplier;
+
+        // 行き止まりに逃げ込まないよう、歩ける場所の中からプレイヤーから遠い所を選ぶ
+        Vector2? goal = brain.FindRetreatPoint(keepDistance);
+        if(goal.HasValue)
+        {
+            brain.Enemy.MoveTo(goal.Value, 0.2f);
+            yield return brain.MoveUntil(() => brain.DistanceToTarget >= keepDistance || !brain.Enemy.IsMoving, maxSeconds);
+        }
+        else
+        {
+            yield return brain.Wait(0.3f);
+        }
+
+        brain.Enemy.SpeedMultiplier = 1.0f;
+        brain.Enemy.Stop();
+    }
+
+    public override void Cleanup(PatternRunner brain)
+    {
+        if(brain.Enemy != null) { brain.Enemy.SpeedMultiplier = 1.0f; }
+    }
+
+    // 移動は、敵の体があるときだけ（見えない敵では飛ばす）
+    protected override bool CanRunExtra(PatternRunner brain) => brain.Enemy != null;
+}
+
+//=====================================================================
+// 巡回
+//=====================================================================
+
+[Serializable, EnemyActionMenu("移動/巡回する", 12)]
+public class PatrolAction : EnemyAction
+{
+    [Label("全部のポイントを回る")]
+    [Tooltip("オン：巡回ポイントを全部回ってから次の行動へ ／ オフ：次のポイントへ1つ進んだら次の行動へ")]
+    public bool allPoints = false;
+
+    [Label("ポイントで待つ（秒）", 0.0f)]
+    public float waitAtPoint = 0.5f;
+
+    [Label("速さの倍率", 0.1f)]
+    public float speedMultiplier = 1.0f;
+
+    public override string Summary => allPoints ? "巡回する（全部のポイント）" : "巡回する（次のポイントへ）";
+
+    public override IEnumerator Run(PatternRunner brain)
+    {
+        int count = brain.PatrolPointCount;
+        if(count == 0)
+        {
+            // 巡回ポイントがないときは少し待つ（シーンチェックで知らせる）
+            yield return brain.Wait(0.5f);
+            yield break;
+        }
+
+        brain.Enemy.SpeedMultiplier = speedMultiplier;
+
+        int steps = allPoints ? count : 1;
+        for(int i = 0; i < steps; i++)
+        {
+            Vector2 point = brain.NextPatrolPoint();
+            brain.Enemy.MoveTo(point, 0.15f);
+            yield return brain.MoveUntil(() => !brain.Enemy.IsMoving, 10.0f);
+            brain.Enemy.Stop();
+            yield return brain.Wait(waitAtPoint);
+        }
+
+        brain.Enemy.SpeedMultiplier = 1.0f;
+    }
+
+    public override void Cleanup(PatternRunner brain)
+    {
+        if(brain.Enemy != null) { brain.Enemy.SpeedMultiplier = 1.0f; }
+    }
+
+    // 移動は、敵の体があるときだけ（見えない敵では飛ばす）
+    protected override bool CanRunExtra(PatternRunner brain) => brain.Enemy != null;
+}
+
+//=====================================================================
+// ランダムに歩く
+//=====================================================================
+
+[Serializable, EnemyActionMenu("移動/ランダムに歩く", 13)]
+public class WanderAction : EnemyAction
+{
+    [Label("歩き回る範囲（半径）", 0.5f)]
+    [Tooltip("最初にいた場所から、この半径の中を歩く")]
+    public float radius = 3.0f;
+
+    [Label("歩く回数", 1)]
+    public int count = 1;
+
+    [Label("着いたら待つ（秒）", 0.0f)]
+    public float waitAtPoint = 0.5f;
+
+    [Label("速さの倍率", 0.1f)]
+    public float speedMultiplier = 0.7f;
+
+    public override string Summary => $"ランダムに歩く（半径 {radius}、{count} 回）";
+
+    public override IEnumerator Run(PatternRunner brain)
+    {
+        brain.Enemy.SpeedMultiplier = speedMultiplier;
+
+        for(int i = 0; i < Mathf.Max(1, count); i++)
+        {
+            Vector2? point = brain.FindRandomPoint(brain.HomePosition, radius);
+            if(point.HasValue)
+            {
+                brain.Enemy.MoveTo(point.Value, 0.15f);
+                yield return brain.MoveUntil(() => !brain.Enemy.IsMoving, 6.0f);
+                brain.Enemy.Stop();
+            }
+            yield return brain.Wait(waitAtPoint);
+        }
+
+        brain.Enemy.SpeedMultiplier = 1.0f;
+    }
+
+    public override void Cleanup(PatternRunner brain)
+    {
+        if(brain.Enemy != null) { brain.Enemy.SpeedMultiplier = 1.0f; }
+    }
+
+    // 移動は、敵の体があるときだけ（見えない敵では飛ばす）
+    protected override bool CanRunExtra(PatternRunner brain) => brain.Enemy != null;
+}
+
+//=====================================================================
+// 攻撃する
+//=====================================================================
+
+[Serializable, EnemyActionMenu("攻撃する", 20)]
+public class AttackAction : EnemyAction
+{
+    [Label("攻撃")]
+    [Tooltip("AttackData（予告 → 発動 → 後隙）")]
+    public AttackData attack;
+
+    [Label("回数", 1)]
+    [Tooltip("続けて何回出すか")]
+    public int repeat = 1;
+
+    [Label("間隔（秒）", 0.0f)]
+    [Tooltip("続けて出すときの、後隙のあとの待ち時間")]
+    public float interval = 0.0f;
+
+    public override string Summary => attack != null ? $"攻撃する（{attack.name}{(repeat > 1 ? $" ×{repeat}" : "")}）" : "攻撃する（攻撃が空）";
+
+    // 部位が壊れて使えなくなった攻撃はしない
+    protected override bool CanRunExtra(PatternRunner brain) => attack != null && (brain.Enemy == null || !brain.Enemy.IsAttackDisabled(attack));
+
+    public override IEnumerator Run(PatternRunner brain)
+    {
+        if(attack == null) { yield break; }
+
+        for(int i = 0; i < Mathf.Max(1, repeat); i++)
+        {
+            var execution = new AttackExecution(brain, attack);
+            brain.CurrentAttack = execution;
+            yield return execution.Run();
+            brain.CurrentAttack = null;
+
+            if(i < repeat - 1) { yield return brain.Wait(interval); }
+        }
+    }
+
+    public override void Cleanup(PatternRunner brain)
+    {
+        if(brain.CurrentAttack != null) { brain.CurrentAttack.Cleanup(); }
+        brain.CurrentAttack = null;
+    }
+}
+
+//=====================================================================
+// 追いかける
+//=====================================================================
+
+[Serializable, EnemyActionMenu("移動/追いかける（見失ったら探す）", 14)]
+public class ChaseAction : EnemyAction
+{
+    [Label("追いかけ中に見える距離", 0.5f)]
+    [Tooltip("追いかけている間、これより離れるか、間に壁が入ると「見失う」")]
+    public float chaseSightRange = 12.0f;
+
+    [Label("見失ってから探す時間（秒）", 0.0f)]
+    [Tooltip("見失ったら、最後に見た場所まで行って、この時間探す。見つからなければあきらめて次の行動へ")]
+    public float searchSeconds = 2.0f;
+
+    [Label("ここまで近づいたら終わる", 0.0f)]
+    [Tooltip("0 なら終わらない（追跡イベントでは、捕まえる距離は戦闘エリアで決める）。攻撃につなげたいときは 1.5 など")]
+    public float stopDistance = 0.0f;
+
+    [Label("最長の時間（秒）", 0.0f)]
+    [Tooltip("0 ならあきらめるまで追いかける")]
+    public float maxSeconds = 0.0f;
+
+    [Label("近いときの速さの倍率", 0.1f)]
+    [Tooltip("プレイヤーが近いときの速さ（少し遅くすると、ギリギリで逃げ切れる緊張感が出る）")]
+    public float nearSpeed = 0.9f;
+
+    [Label("遠いときの速さの倍率", 0.1f)]
+    [Tooltip("プレイヤーが離れているときの速さ（速くすると、引き離しすぎない）")]
+    public float farSpeed = 1.3f;
+
+    [Label("近い・遠いの境目", 0.5f)]
+    [Tooltip("この距離より遠いと「遠いとき」の速さ。間は少しずつ変わる")]
+    public float farDistance = 6.0f;
+
+    [Label("見つけたときのエフェクト")]
+    [Tooltip("追いかけ始めたとき・見失ってからもう一度見つけたときに、敵の位置に出す（「！」など）")]
+    public EffectData noticeEffect;
+
+    [Label("見つけたときの SE")]
+    public SeData noticeSe;
+
+    [Label("あきらめたときの SE")]
+    public SeData giveUpSe;
+
+    public override string Summary => stopDistance > 0.0f ? $"追いかける（{stopDistance} まで）" : "追いかける";
+
+    protected override bool CanRunExtra(PatternRunner brain) => brain.Enemy != null;
+
+    public override IEnumerator Run(PatternRunner brain)
+    {
+        Enemy enemy = brain.Enemy;
+        float elapsed = 0.0f;
+        float lostTime = 0.0f;
+        bool seeing = false;
+
+        while(maxSeconds <= 0.0f || elapsed < maxSeconds)
+        {
+            yield return null;
+            if(!brain.CanAct) { continue; }
+
+            float dt = Time.deltaTime;
+            elapsed += dt;
+
+            GameObject target = brain.Target;
+            if(target == null) { break; }
+
+            bool sees = brain.CanSeeTarget(chaseSightRange);
+            if(sees && !seeing) { Notice(brain); }
+            seeing = sees;
+
+            float distance = brain.DistanceToTarget;
+            if(stopDistance > 0.0f && sees && distance <= stopDistance) { break; }
+
+            if(sees)
+            {
+                lostTime = 0.0f;
+                float t = Mathf.InverseLerp(farDistance * 0.5f, farDistance, distance);
+                enemy.SpeedMultiplier = Mathf.Lerp(nearSpeed, farSpeed, t);
+                enemy.MoveTo(target.transform.position, stopDistance > 0.0f ? stopDistance * 0.9f : 0.1f);
+                continue;
+            }
+
+            // 見失った：最後に見た場所へ行って探す
+            lostTime += dt;
+            if(brain.LastSeenPosition.HasValue)
+            {
+                enemy.SpeedMultiplier = nearSpeed;
+                enemy.MoveTo(brain.LastSeenPosition.Value, 0.3f);
+            }
+
+            if(lostTime >= searchSeconds)
+            {
+                SeManager.PlaySe(giveUpSe, enemy.transform.position);
+                brain.ForgetLastSeen();
+                break;
+            }
+        }
+
+        enemy.SpeedMultiplier = 1.0f;
+        enemy.Stop();
+    }
+
+    private void Notice(PatternRunner brain)
+    {
+        EffectManager.Play(noticeEffect, brain.Position);
+        SeManager.PlaySe(noticeSe, brain.Position);
+    }
+
+    public override void Cleanup(PatternRunner brain)
+    {
+        if(brain.Enemy != null) { brain.Enemy.SpeedMultiplier = 1.0f; }
+    }
+}
+
+//=====================================================================
+// 見ていない間に近づく（謎解き・2人の仕掛け 段階5）
+//=====================================================================
+
+/// <summary>
+/// 「見られている」の判定
+/// </summary>
+public enum WatchCheck
+{
+    [InspectorName("プレイヤーがこちらを向いている")]
+    Facing = 0,
+
+    [InspectorName("画面に映っている")]
+    OnScreen = 1,
+
+    [InspectorName("向いている、または画面に映っている")]
+    Either = 2,
+
+    [InspectorName("向いていて、画面にも映っている")]
+    Both = 3,
+}
+
+[Serializable, EnemyActionMenu("移動/見ていない間に近づく（像・人形）", 15)]
+public class UnseenApproachAction : EnemyAction
+{
+    [Label("見られている判定")]
+    [Tooltip("見られている間は止まり、見られていない間だけ近づく（Ib の像・だるまさんが転んだ）")]
+    public WatchCheck watch = WatchCheck.Facing;
+
+    [Label("プレイヤーの視野（度）", 1.0f, 360.0f)]
+    [Tooltip("プレイヤーの向いている方の、この角度の中にいると「見られている」")]
+    public float viewAngle = 140.0f;
+
+    [Label("プレイヤーから見える距離", 0.0f)]
+    [Tooltip("これより遠いと、向いていても見られていない")]
+    public float viewDistance = 10.0f;
+
+    [Label("壁の向こうは見えない")]
+    [Tooltip("オン：間に壁があると、向いていても見られていない")]
+    public bool wallBlocks = true;
+
+    [Label("近づく速さの倍率", 0.1f)]
+    public float speedMultiplier = 1.0f;
+
+    [Label("止まる距離", 0.0f)]
+    [Tooltip("プレイヤーにここまで近づいたら、この行動を終える（0 ならずっと近づく。体当たりのダメージで当てる）")]
+    public float stopDistance = 0.0f;
+
+    [Label("最長の時間（秒）", 0.0f)]
+    [Tooltip("この秒数で行動を終える（0 ならずっと）")]
+    public float maxSeconds = 0.0f;
+
+    [Label("見られたときの SE")]
+    [Tooltip("見られて止まった瞬間に鳴らす（ゴトッ）")]
+    public SeData frozenSe;
+
+    public override string Summary => "見ていない間に近づく";
+
+    protected override bool CanRunExtra(PatternRunner brain) => brain.Enemy != null;
+
+    public override IEnumerator Run(PatternRunner brain)
+    {
+        Enemy enemy = brain.Enemy;
+        float elapsed = 0.0f;
+        bool wasSeen = true;
+
+        while(maxSeconds <= 0.0f || elapsed < maxSeconds)
+        {
+            yield return null;
+            if(!brain.CanAct) { continue; }
+            elapsed += Time.deltaTime;
+
+            GameObject target = brain.Target;
+            if(target == null) { break; }
+            if(stopDistance > 0.0f && brain.DistanceToTarget <= stopDistance) { break; }
+
+            bool seen = IsWatched(brain, target);
+            if(seen)
+            {
+                if(!wasSeen) { SeManager.PlaySe(frozenSe, enemy.transform.position); }
+                enemy.Stop();
+            }
+            else
+            {
+                enemy.SpeedMultiplier = speedMultiplier;
+                enemy.MoveTo(target.transform.position, 0.1f);
+            }
+            wasSeen = seen;
+        }
+
+        enemy.SpeedMultiplier = 1.0f;
+        enemy.Stop();
+    }
+
+    /// <summary>
+    /// プレイヤーに見られているか
+    /// </summary>
+    public bool IsWatched(PatternRunner brain, GameObject target)
+    {
+        Vector2 me = brain.Position;
+        Vector2 player = target.transform.position;
+
+        bool facing = false;
+        if(watch != WatchCheck.OnScreen)
+        {
+            CharacterMovement movement = target.GetComponent<CharacterMovement>();
+            Vector2 look = movement != null ? movement.LastDirection : Vector2.down;
+            float distance = Vector2.Distance(me, player);
+            facing = distance <= viewDistance
+                && Vector2.Angle(look, me - player) <= viewAngle * 0.5f
+                && (!wallBlocks || brain.CanSeeTarget(viewDistance));
+        }
+
+        bool onScreen = false;
+        if(watch != WatchCheck.Facing)
+        {
+            Camera cam = Camera.main;
+            if(cam != null)
+            {
+                Vector3 vp = cam.WorldToViewportPoint(me);
+                onScreen = vp.x >= 0.0f && vp.x <= 1.0f && vp.y >= 0.0f && vp.y <= 1.0f;
+            }
+        }
+
+        switch(watch)
+        {
+            case WatchCheck.Facing:   return facing;
+            case WatchCheck.OnScreen: return onScreen;
+            case WatchCheck.Either:   return facing || onScreen;
+            default:                  return facing && onScreen;
+        }
+    }
+
+    public override void Cleanup(PatternRunner brain)
+    {
+        if(brain.Enemy != null) { brain.Enemy.SpeedMultiplier = 1.0f; }
+    }
+}
+
+//=====================================================================
+// 仲間を呼ぶ
+//=====================================================================
+
+/// <summary>
+/// 仲間を呼ぶときの出る場所
+/// </summary>
+public enum SummonPlace
+{
+    [InspectorName("自分のまわり")]
+    AroundSelf = 0,
+
+    [InspectorName("プレイヤーのまわり")]
+    AroundPlayer = 1,
+
+    [InspectorName("自分のまわりに卵を置く（時間でかえる。壊せる）")]
+    Egg = 2,
+}
+
+[Serializable, EnemyActionMenu("仲間を呼ぶ", 30)]
+public class SummonAction : EnemyAction
+{
+    [Label("呼ぶ敵")]
+    [Tooltip("出てくる敵のデータ（EnemyData）")]
+    public EnemyData enemy;
+
+    [Label("1回に呼ぶ数", 1)]
+    public int count = 2;
+
+    [Label("同時にいられる数", 1)]
+    [Tooltip("呼び出した仲間がこの数以上いるときは、この行動を飛ばす")]
+    public int maxAlive = 4;
+
+    [Label("出る場所")]
+    public SummonPlace place = SummonPlace.AroundSelf;
+
+    [Label("距離", 0.0f)]
+    [Tooltip("出る場所の中心からの距離（マス）")]
+    public float radius = 2.5f;
+
+    [Label("予告の時間（秒）", 0.0f)]
+    [Tooltip("出る場所に丸を見せてから出す。0 ならすぐ出る")]
+    public float telegraphTime = 0.8f;
+
+    [Label("予告の色")]
+    public Color telegraphColor = new Color(0.6f, 0.3f, 1.0f, 0.35f);
+
+    [Label("卵がかえるまで（秒）", 0.1f)]
+    public float hatchTime = 3.0f;
+
+    [Label("卵の体力", 1)]
+    [Tooltip("この回数分攻撃すると、かえる前に壊せる")]
+    public int eggHealth = 2;
+
+    [Label("卵の絵")]
+    [Tooltip("空なら丸で表示")]
+    public Sprite eggSprite;
+
+    [Label("出たときのエフェクト")]
+    public EffectData spawnEffect;
+
+    [Label("出たときの SE")]
+    public SeData spawnSe;
+
+    [Label("呼ぶときの敵のアニメ")]
+    public string animation = "Summon";
+
+    public override string Summary => enemy != null ? $"仲間を呼ぶ（{enemy.DisplayName}×{count}）" : "仲間を呼ぶ（敵が空）";
+
+    protected override bool CanRunExtra(PatternRunner brain) => enemy != null && brain.SummonedCount < maxAlive;
+
+    public override IEnumerator Run(PatternRunner brain)
+    {
+        if(enemy == null) { yield break; }
+        if(brain.Enemy != null) { brain.Enemy.Stop(); }
+        brain.PlayAction(animation);
+
+        // 出る場所を決める（歩ける場所だけ）
+        Vector2 center = brain.Position;
+        if(place == SummonPlace.AroundPlayer && brain.Target != null) { center = brain.Target.transform.position; }
+
+        int n = Mathf.Min(Mathf.Max(1, count), Mathf.Max(0, maxAlive - brain.SummonedCount));
+        var points = new System.Collections.Generic.List<Vector2>();
+        NavMesh2D nav = NavMesh2D.Instance;
+        for(int i = 0; i < n; i++)
+        {
+            float angle = 360.0f * i / n + UnityEngine.Random.Range(-20.0f, 20.0f);
+            Vector2 p = center + (Vector2)(Quaternion.Euler(0.0f, 0.0f, angle) * Vector2.right) * radius;
+            if(nav != null && !nav.SamplePosition(p, 1.5f, enemy.Size, out p)) { continue; }
+            points.Add(p);
+        }
+
+        // 予告
+        var views = new System.Collections.Generic.List<TelegraphView>();
+        if(telegraphTime > 0.0f)
+        {
+            foreach(Vector2 p in points) { views.Add(TelegraphView.ShowCircle(p, 0.6f, telegraphColor)); }
+            float elapsed = 0.0f;
+            while(elapsed < telegraphTime)
+            {
+                if(brain.CanAct) { elapsed += Time.deltaTime; }
+                foreach(TelegraphView v in views) { if(v != null) { v.SetProgress(elapsed / telegraphTime); } }
+                yield return null;
+            }
+            foreach(TelegraphView v in views) { if(v != null) { v.Hide(); } }
+        }
+
+        // 出す
+        foreach(Vector2 p in points)
+        {
+            EffectManager.Play(spawnEffect, p);
+            SeManager.PlaySe(spawnSe, p);
+
+            if(place == SummonPlace.Egg)
+            {
+                EnemyEgg.Create(enemy, p, hatchTime, eggHealth, eggSprite, brain, spawnEffect, spawnSe);
+            }
+            else
+            {
+                Enemy spawned = Enemy.Spawn(enemy, p);
+                brain.AddSummoned(spawned);
+            }
+        }
+
+        yield return brain.Wait(0.3f);
+    }
+}

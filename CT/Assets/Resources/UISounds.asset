@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9f5b436acf9398846a63188db3cc9b58, type: 3}
+  m_Name: UISounds
+  m_EditorClassIdentifier: Assembly-CSharp::UISoundSettings
+  select: {fileID: 11400000, guid: b7e12152efc56bc41a5e8aa2c998d803, type: 2}
+  decide: {fileID: 11400000, guid: 28d9e837eb698154ca6505474fa4cc0d, type: 2}
+  cancel: {fileID: 11400000, guid: 75b2990cfd16a404fbb176a25c31938c, type: 2}
+  menuOpen: {fileID: 11400000, guid: ede7d0db46e7098459892d4090e197d0, type: 2}
+  menuClose: {fileID: 11400000, guid: ae692c478b5298849b8618b304a70ffa, type: 2}
+  save: {fileID: 11400000, guid: ce877d4cb2c62624791b8302fd969638, type: 2}
+  cannot: {fileID: 11400000, guid: f28695914e53ecc478cb5e3ac3779330, type: 2}

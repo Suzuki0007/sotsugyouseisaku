@@ -1,4 +1,4 @@
-/*********************************************************************/
+﻿/*********************************************************************/
 // * \file   SceneChecker.cs
 // * \brief  シーンの設定ミスを探すチェック処理
 // *
@@ -71,6 +71,491 @@ public static class SceneChecker
         CheckActions(ctx);
         CheckSwitches(ctx);
         CheckDialogues(ctx);
+        CheckEnemies(ctx);
+        CheckGimmicks(ctx);
+    }
+
+    //=====================================================================
+    // 仕掛け（謎解き）
+    //=====================================================================
+
+    private static void CheckGimmicks(Context ctx)
+    {
+        // 仕掛けの状態：セーブの名前が重なっていないか・どこからも見られていないか
+        List<GimmickWiring.Edge> edges = null;
+        var keys = new Dictionary<string, GimmickState>();
+        foreach(GimmickState state in ctx.Find<GimmickState>())
+        {
+            var so = new SerializedObject(state);
+            if(so.FindProperty("save").boolValue)
+            {
+                string key = GimmickState.MakeSaveKey(state.gameObject, so.FindProperty("saveId").stringValue);
+                if(keys.TryGetValue(key, out GimmickState other)) { ctx.Add(Level.Error, state, $"仕掛けのセーブの名前が「{other.name}」と重なっています（同じ名前の物が同じ親の下にある）。セーブ用の ID を付けてください"); }
+                else { keys[key] = state; }
+            }
+
+            if(so.FindProperty("initialValue").intValue >= Mathf.Max(2, so.FindProperty("stateCount").intValue))
+            {
+                ctx.Add(Level.Warning, state, "仕掛けの「最初の状態」が段階の数より大きいです（最後の段階になります）");
+            }
+
+            if(edges == null) { edges = GimmickWiring.Collect(); }
+            bool used = false;
+            foreach(GimmickWiring.Edge e in edges) { if(e.from == state) { used = true; break; } }
+            if(!used) { ctx.Add(Level.Info, state, "この仕掛けの状態は、どの条件・答え合わせからも使われていません（扉などの「条件」に入れると動きます）"); }
+        }
+
+        foreach(GimmickReaction reaction in ctx.Find<GimmickReaction>())
+        {
+            if(reaction.Condition == null || reaction.Condition.IsEmpty)
+            {
+                ctx.Add(Level.Warning, reaction, "条件で動く物の「条件」が空です（ずっと満たさないので動きません）");
+            }
+            else if(reaction.Condition.gimmicks != null && reaction.Condition.gimmicks.Exists(g => g == null || g.target == null))
+            {
+                ctx.Add(Level.Error, reaction, "条件で動く物の「仕掛け」の条件に、仕掛けが入っていない行があります（満たさないので動きません）");
+            }
+
+            bool nothing = reaction.ShowWhenMet.Count == 0 && reaction.HideWhenMet.Count == 0 && reaction.OnMetSequence == null && reaction.Moves.Count == 0;
+            if(nothing) { ctx.Add(Level.Warning, reaction, "条件で動く物に、表示を切り替える物もイベントも入っていません（満たしても何も起きません）"); }
+
+            foreach(GameObject go in reaction.HideWhenMet)
+            {
+                if(go != null && reaction.transform.IsChildOf(go.transform))
+                {
+                    ctx.Add(Level.Error, reaction, $"条件で動く物が、自分（か親）の「{go.name}」を隠します。隠れると条件を見られなくなります（隠す物は子にしてください）");
+                }
+            }
+        }
+
+        foreach(PuzzleCheck puzzle in ctx.Find<PuzzleCheck>())
+        {
+            if(puzzle.Inputs.Count == 0 || ((List<GimmickState>)puzzle.Inputs).Exists(g => g == null))
+            {
+                ctx.Add(Level.Error, puzzle, "答え合わせの入力が空か、空の行があります");
+            }
+            if(puzzle.Mode == PuzzleMode.Pattern && puzzle.Answer.Count != puzzle.Inputs.Count)
+            {
+                ctx.Add(Level.Error, puzzle, $"答え合わせの「答え」の数（{puzzle.Answer.Count}）が、入力の数（{puzzle.Inputs.Count}）と合っていません");
+            }
+            if(puzzle.Mode == PuzzleMode.Order && puzzle.Inputs.Count < 2)
+            {
+                ctx.Add(Level.Warning, puzzle, "「決めた順番」の答え合わせに、入力が 1 つしかありません");
+            }
+        }
+
+        foreach(GimmickSwitch sw in ctx.Find<GimmickSwitch>())
+        {
+            bool hasTrigger = false;
+            foreach(Collider2D c in sw.GetComponents<Collider2D>()) { if(c.isTrigger) { hasTrigger = true; } }
+            if(!hasTrigger) { ctx.Add(Level.Error, sw, "調べるスイッチに Is Trigger の Collider2D（調べる範囲）がありません"); }
+        }
+
+        foreach(GimmickEventAction action in ctx.Find<GimmickEventAction>())
+        {
+            if(action.Target == null) { ctx.Add(Level.Error, action, "「仕掛けを操作」の仕掛けが空です"); }
+        }
+
+        foreach(FloorSwitch floor in ctx.Find<FloorSwitch>())
+        {
+            bool hasTrigger = false;
+            foreach(Collider2D c in floor.GetComponents<Collider2D>()) { if(c.isTrigger) { hasTrigger = true; } }
+            if(!hasTrigger) { ctx.Add(Level.Error, floor, "床スイッチに Is Trigger の Collider2D（乗る範囲）がありません"); }
+        }
+
+        foreach(ItemSocket socket in ctx.Find<ItemSocket>())
+        {
+            if(socket.Item == null) { ctx.Add(Level.Error, socket, "置き台に「はめるアイテム」が入っていません"); }
+            bool hasTrigger = false;
+            foreach(Collider2D c in socket.GetComponents<Collider2D>()) { if(c.isTrigger) { hasTrigger = true; } }
+            if(!hasTrigger) { ctx.Add(Level.Error, socket, "置き台に Is Trigger の Collider2D（調べる範囲）がありません"); }
+        }
+
+        foreach(GimmickHole hole in ctx.Find<GimmickHole>())
+        {
+            bool solid = false;
+            foreach(Collider2D c in hole.GetComponents<Collider2D>()) { if(!c.isTrigger) { solid = true; } }
+            if(!solid && new SerializedObject(hole).FindProperty("blocker").objectReferenceValue == null)
+            {
+                ctx.Add(Level.Warning, hole, "穴に当たり判定（Is Trigger オフの Collider2D）がありません（通れてしまい、箱も落ちません）");
+            }
+        }
+
+        var blockKeys = new Dictionary<string, PushBlock>();
+        foreach(PushBlock block in ctx.Find<PushBlock>())
+        {
+            BoxCollider2D col = block.GetComponent<BoxCollider2D>();
+            if(col != null && col.isTrigger) { ctx.Add(Level.Error, block, "押せる箱の BoxCollider2D の Is Trigger がオンです（押せません）"); }
+
+            Vector2 size = col != null ? Vector2.Scale(col.size, block.transform.lossyScale) : Vector2.zero;
+            if(size.x > block.CellSize + 0.01f || size.y > block.CellSize + 0.01f)
+            {
+                ctx.Add(Level.Warning, block, "押せる箱の当たり判定が「マスの大きさ」より大きいです（1 マス先がいつもふさがって押せないことがあります）");
+            }
+
+            var so = new SerializedObject(block);
+            if(so.FindProperty("save").boolValue)
+            {
+                string id = so.FindProperty("saveId").stringValue;
+                string path = block.name;
+                for(Transform p = block.transform.parent; p != null; p = p.parent) { path = p.name + "/" + path; }
+                string key = block.gameObject.scene.name + "/" + (string.IsNullOrEmpty(id) ? path : id);
+                if(blockKeys.TryGetValue(key, out PushBlock other)) { ctx.Add(Level.Error, block, $"押せる箱のセーブの名前が「{other.name}」と重なっています（同じ名前の箱が同じ親の下にある）。セーブ用の ID を付けてください"); }
+                else { blockKeys[key] = block; }
+            }
+        }
+
+        // 2人の仕掛け
+        bool usesHints = false;
+        foreach(CharacterBarrier barrier in ctx.Find<CharacterBarrier>())
+        {
+            usesHints = true;
+            bool solid = false;
+            foreach(Collider2D c in barrier.GetComponentsInChildren<Collider2D>()) { if(!c.isTrigger) { solid = true; } }
+            if(!solid) { ctx.Add(Level.Error, barrier, "キャラによって通れる壁に、当たり判定（Is Trigger オフの Collider2D）がありません"); }
+            if(barrier.Passable == CharacterRestriction.Both) { ctx.Add(Level.Warning, barrier, "キャラによって通れる壁の「通れるキャラ」が「両方」です（ただの通れる場所になります）"); }
+        }
+
+        foreach(BreakableWall wall in ctx.Find<BreakableWall>())
+        {
+            usesHints |= wall.Breaker != CharacterRestriction.Both;
+            bool solid = false;
+            foreach(Collider2D c in wall.GetComponents<Collider2D>()) { if(!c.isTrigger) { solid = true; } }
+            if(!solid) { ctx.Add(Level.Warning, wall, "壊せる壁に当たり判定（Is Trigger オフの Collider2D）がありません（通れてしまいます）"); }
+        }
+
+        foreach(LiftPoint lift in ctx.Find<LiftPoint>())
+        {
+            if(lift.Destination == null) { ctx.Add(Level.Error, lift, "持ち上げる場所の「行き先」が空です"); }
+            bool hasTrigger = false;
+            foreach(Collider2D c in lift.GetComponents<Collider2D>()) { if(c.isTrigger) { hasTrigger = true; } }
+            if(!hasTrigger) { ctx.Add(Level.Error, lift, "持ち上げる場所に Is Trigger の Collider2D（調べる範囲）がありません"); }
+        }
+
+        // 謎解き（段階5）
+        foreach(CodeLock code in ctx.Find<CodeLock>())
+        {
+            if(string.IsNullOrEmpty(code.Answer)) { ctx.Add(Level.Error, code, "番号錠の「答え」が空です"); }
+            else
+            {
+                foreach(char ch in code.Answer)
+                {
+                    if(code.Symbols.IndexOf(ch) < 0) { ctx.Add(Level.Error, code, $"番号錠の答えの「{ch}」が、使える文字（{code.Symbols}）にありません（正解できません）"); break; }
+                }
+            }
+        }
+
+        foreach(NotePickup note in ctx.Find<NotePickup>())
+        {
+            if(note.Note == null) { ctx.Add(Level.Error, note, "メモ（NotePickup）に NoteData が入っていません"); }
+            else if(!AssetDatabase.GetAssetPath(note.Note).StartsWith("Assets/Resources/Notes/")) { ctx.Add(Level.Warning, note, $"メモ「{note.Note.name}」が Assets/Resources/Notes/ の外にあります（メニューの「メモ」に出ません）"); }
+        }
+        foreach(NoteEventAction action in ctx.Find<NoteEventAction>())
+        {
+            if(action.Note == null) { ctx.Add(Level.Error, action, "「メモを渡す」に NoteData が入っていません"); }
+        }
+
+        // 相棒の一言
+        foreach(BarkArea area in ctx.Find<BarkArea>())
+        {
+            if(area.Data == null) { ctx.Add(Level.Error, area, "一言の範囲に一言のデータが入っていません"); }
+            Collider2D c = area.GetComponent<Collider2D>();
+            if(c != null && !c.isTrigger) { ctx.Add(Level.Error, area, "一言の範囲の Collider2D が Is Trigger になっていません（ぶつかる壁になります）"); }
+        }
+        foreach(BarkEventAction action in ctx.Find<BarkEventAction>())
+        {
+            if(!action.HasContent) { ctx.Add(Level.Error, action, "イベントの部品「一言」に、データも文も入っていません"); }
+        }
+
+        foreach(ExamineSequence exam in ctx.Find<ExamineSequence>())
+        {
+            if(exam.Sequences.Count == 0) { ctx.Add(Level.Warning, exam, "調べるたびに変わる に、イベントが入っていません"); }
+        }
+
+        bool hasRetryPoint = ctx.Find<RetryPoint>().Count > 0;
+        foreach(DeathTrap trap in ctx.Find<DeathTrap>())
+        {
+            Collider2D c = trap.GetComponent<Collider2D>();
+            if(c != null && !c.isTrigger) { ctx.Add(Level.Error, trap, "即死の罠の Collider2D の Is Trigger がオフです（壁になって入れません）"); }
+            if(trap.Result == DeathResult.Retry && !hasRetryPoint) { ctx.Add(Level.Info, trap, "このシーンに「やり直す位置」がないので、即死したらセーブの再開する位置（シーンの入口・セーブポイント）からやり直します"); }
+        }
+
+        foreach(RetryPoint retry in ctx.Find<RetryPoint>())
+        {
+            Collider2D c = retry.GetComponent<Collider2D>();
+            if(c != null && !c.isTrigger) { ctx.Add(Level.Error, retry, "やり直す位置の Collider2D の Is Trigger がオフです"); }
+        }
+
+        foreach(PartyRejoinArea rejoin in ctx.Find<PartyRejoinArea>())
+        {
+            Collider2D c = rejoin.GetComponent<Collider2D>();
+            if(c != null && !c.isTrigger) { ctx.Add(Level.Error, rejoin, "合流の範囲の Collider2D の Is Trigger がオフです（キャラが入れません）"); }
+        }
+
+        var cameraAreas = ctx.Find<CameraArea>();
+        foreach(CameraArea area in cameraAreas)
+        {
+            BoxCollider2D box = area.GetComponent<BoxCollider2D>();
+            if(box != null && !box.isTrigger) { ctx.Add(Level.Warning, area, "カメラの範囲の BoxCollider2D の Is Trigger がオフです（再生すると自動でオンにしますが、編集中は壁になって見えます）"); }
+
+            // 小さすぎる範囲（カメラに映る広さより小さいと、真ん中に固定される）
+            Camera cam = Camera.main;
+            if(cam != null && box != null && cam.orthographic)
+            {
+                float h = cam.orthographicSize * 2.0f;
+                float w = h * cam.aspect;
+                Vector2 size = Vector2.Scale(box.size, area.transform.lossyScale);
+                if(size.x < w - 0.01f || size.y < h - 0.01f) { ctx.Add(Level.Info, area, $"カメラの範囲（{size.x:0.#}×{size.y:0.#}）が画面の広さ（{w:0.#}×{h:0.#}）より小さいので、中ではカメラが動きません（真ん中に固定）"); }
+            }
+        }
+
+        foreach(ConditionalVisible visible in ctx.Find<ConditionalVisible>())
+        {
+            if(visible.Condition == null || visible.Condition.IsEmpty) { ctx.Add(Level.Warning, visible, "条件で見える物の「見える条件」が空です（いつも見えます）"); }
+        }
+
+        foreach(GimmickSwitch sw in ctx.Find<GimmickSwitch>()) { usesHints |= sw.User != CharacterRestriction.Both; }
+        foreach(PushBlock block in ctx.Find<PushBlock>()) { usesHints |= block.User != CharacterRestriction.Both; }
+        if(usesHints && AssetDatabase.LoadAssetAtPath<PartyHintSettings>("Assets/Resources/PartyHints.asset") == null)
+        {
+            ctx.Add(Level.Info, null, "使えるキャラが決まった仕掛けがありますが、相棒の目印の設定（Resources/PartyHints.asset）がないので目印が出ません（Tools > 仕掛け > 相棒の目印の設定を作る）");
+        }
+
+        foreach(GimmickVisual visual in ctx.Find<GimmickVisual>())
+        {
+            if(visual.State == null && visual.GetComponentInParent<GimmickState>() == null)
+            {
+                ctx.Add(Level.Error, visual, "状態で見た目を変える部品に、仕掛けの状態がありません（同じオブジェクトか親に GimmickState、または欄に入れる）");
+            }
+        }
+    }
+
+    private static void CheckEnemies(Context ctx)
+    {
+        int enemiesLayer = LayerMask.NameToLayer("Enemies");
+
+        foreach(Enemy enemy in ctx.Find<Enemy>())
+        {
+            var so = new SerializedObject(enemy);
+            if(so.FindProperty("data").objectReferenceValue == null)
+            {
+                ctx.Add(Level.Error, enemy, "敵のデータ（EnemyData）が入っていません");
+            }
+
+            if(!enemy.CompareTag("Enemies") || enemy.gameObject.layer != enemiesLayer)
+            {
+                ctx.Add(Level.Warning, enemy, "タグかレイヤーが「Enemies」になっていません（ノアの範囲攻撃・シグルの弾が当たりません）");
+            }
+
+            if(enemy.GetComponentInChildren<Collider2D>(true) == null)
+            {
+                ctx.Add(Level.Error, enemy, "Collider2D がありません（攻撃が当たらず、壁もすり抜けます）");
+            }
+
+            // 行動パターン
+            EnemyBrain brain = enemy.GetComponent<EnemyBrain>();
+            var bso = brain != null ? new SerializedObject(brain) : null;
+            var overridePattern = bso != null ? bso.FindProperty("overridePattern").objectReferenceValue as EnemyPattern : null;
+            EnemyPattern pattern = overridePattern != null ? overridePattern : (enemy.Data != null ? enemy.Data.Pattern : null);
+
+            if(brain == null)
+            {
+                ctx.Add(Level.Info, enemy, "EnemyBrain がないので、行動パターンを実行しません（その場に立っているだけ）");
+            }
+            else if(pattern == null)
+            {
+                ctx.Add(Level.Info, enemy, "行動パターンがありません（その場に立っているだけ）");
+            }
+            else if(UsesPatrol(pattern) && brain.PatrolPointCount == 0)
+            {
+                ctx.Add(Level.Warning, enemy, $"行動パターン「{pattern.name}」に「巡回する」がありますが、EnemyBrain の巡回ポイントが空です");
+            }
+        }
+
+        var enemyKeys = new Dictionary<string, Enemy>();
+        foreach(Enemy enemy in ctx.Find<Enemy>())
+        {
+            var so = new SerializedObject(enemy);
+            if(!so.FindProperty("saveDefeat").boolValue) { continue; }
+            string id = so.FindProperty("saveId").stringValue;
+            string key = string.IsNullOrEmpty(id) ? HierarchyPath(enemy.transform) : id;
+            if(enemyKeys.ContainsKey(key)) { ctx.Add(Level.Error, enemy, $"倒したことをセーブする敵のセーブ用の名前「{key}」が重なっています（ID を付けてください）"); }
+            else                           { enemyKeys.Add(key, enemy); }
+        }
+        foreach(Enemy enemy in ctx.Find<Enemy>())
+        {
+            var so = new SerializedObject(enemy);
+            if(so.FindProperty("afterTalk").objectReferenceValue != null && enemy.Data != null && enemy.Data.DefeatStyle == DefeatStyle.Vanish)
+            {
+                ctx.Add(Level.Warning, enemy, "「倒した後に調べたとき」が入っていますが、敵のデータの「倒されたあと」が「消える」なので調べられません");
+            }
+        }
+
+        var groupKeys = new Dictionary<string, EnemyGroup>();
+        foreach(EnemyGroup group in ctx.Find<EnemyGroup>())
+        {
+            var so = new SerializedObject(group);
+            SerializedProperty members = so.FindProperty("members");
+            if(members.arraySize == 0) { ctx.Add(Level.Error, group, "敵のグループのメンバーが空です"); }
+            else if(HasNullElement(members)) { ctx.Add(Level.Warning, group, "敵のグループのメンバーに空の欄があります（倒したことになります）"); }
+            if(so.FindProperty("useOrder").boolValue && members.arraySize < 2) { ctx.Add(Level.Info, group, "「順番に倒す」がオンですが、メンバーが 1 体以下です"); }
+            if(so.FindProperty("onDefeated").objectReferenceValue == null && so.FindProperty("flag").objectReferenceValue == null && !so.FindProperty("useOrder").boolValue)
+            {
+                ctx.Add(Level.Warning, group, "敵のグループに、実行するイベントも ON にするフラグもありません（倒しても何も起きません）");
+            }
+            string key = EnemyGroup.MakeSaveKey(group.gameObject, so.FindProperty("saveId").stringValue);
+            if(groupKeys.ContainsKey(key)) { ctx.Add(Level.Error, group, $"敵のグループのセーブ用の名前「{key}」が重なっています（ID を付けてください）"); }
+            else                           { groupKeys.Add(key, group); }
+        }
+
+        foreach(EnemyPart part in ctx.Find<EnemyPart>())
+        {
+            if(part.GetComponentInParent<Enemy>(true) == null)
+            {
+                ctx.Add(Level.Error, part, "部位（EnemyPart）の親に敵（Enemy）がありません（部位として働きません）");
+            }
+            var so = new SerializedObject(part);
+            if(so.FindProperty("partHealth").intValue <= 0 &&
+               (so.FindProperty("independent").objectReferenceValue != null || so.FindProperty("changePhase").intValue > 0 || so.FindProperty("disableAttacks").arraySize > 0 || so.FindProperty("onBreak").objectReferenceValue != null))
+            {
+                ctx.Add(Level.Warning, part, "部位の「壊れたとき」の設定がありますが、部位の体力が 0（壊れない）です");
+            }
+        }
+
+        foreach(AttackEmitter emitter in ctx.Find<AttackEmitter>())
+        {
+            var so = new SerializedObject(emitter);
+            if(so.FindProperty("emitterPattern").objectReferenceValue == null)
+            {
+                ctx.Add(Level.Warning, emitter, "攻撃の発生源に行動パターンが入っていません（何もしません）");
+            }
+            var area = so.FindProperty("condition").FindPropertyRelative("area").objectReferenceValue as Collider2D;
+            if(area != null && !area.isTrigger)
+            {
+                ctx.Add(Level.Warning, emitter, "攻撃の発生源の「プレイヤーがいる範囲」の Collider2D の Is Trigger がオフです（プレイヤーが通れません）");
+            }
+        }
+
+        foreach(EnemyDataSpawner spawner in ctx.Find<EnemyDataSpawner>())
+        {
+            var so = new SerializedObject(spawner);
+            SerializedProperty list = so.FindProperty("enemies");
+            bool any = false;
+            for(int i = 0; i < list.arraySize; i++)
+            {
+                if(list.GetArrayElementAtIndex(i).FindPropertyRelative("enemy").objectReferenceValue != null) { any = true; }
+            }
+            if(!any) { ctx.Add(Level.Error, spawner, "敵のスポナーに、出す敵（敵のデータ）が入っていません"); }
+
+            var area = so.FindProperty("condition").FindPropertyRelative("area").objectReferenceValue as Collider2D;
+            if(area != null && !area.isTrigger)
+            {
+                ctx.Add(Level.Warning, spawner, "敵のスポナーの「プレイヤーがいる範囲」の Collider2D の Is Trigger がオフです（プレイヤーが通れません）");
+            }
+            if(so.FindProperty("totalCount").intValue == 0 && (so.FindProperty("onCleared").objectReferenceValue != null || so.FindProperty("clearedFlag").objectReferenceValue != null))
+            {
+                ctx.Add(Level.Warning, spawner, "敵のスポナーの「全部倒したら」が設定されていますが、「合計で出す数」が 0（何体でも出す）なので起きません");
+            }
+        }
+
+        var switchKeys = new Dictionary<string, AttackSwitch>();
+        foreach(AttackSwitch sw in ctx.Find<AttackSwitch>())
+        {
+            var so = new SerializedObject(sw);
+            if(so.FindProperty("sequence").objectReferenceValue == null)
+            {
+                ctx.Add(Level.Warning, sw, "攻撃で作動するスイッチに「実行するイベント」が入っていません（当たっても何も起きません）");
+            }
+            string key = AttackSwitch.MakeSaveKey(sw.gameObject, so.FindProperty("saveId").stringValue);
+            if(switchKeys.ContainsKey(key)) { ctx.Add(Level.Error, sw, $"攻撃で作動するスイッチのセーブ用の名前「{key}」が重なっています（ID を付けてください）"); }
+            else                            { switchKeys.Add(key, sw); }
+        }
+
+        foreach(EnemyCommandEventAction action in ctx.Find<EnemyCommandEventAction>())
+        {
+            var so = new SerializedObject(action);
+            if(so.FindProperty("enemies").arraySize == 0 && so.FindProperty("emitters").arraySize == 0)
+            {
+                ctx.Add(Level.Warning, action, "「敵に命令」の相手（敵・攻撃の発生源）が空です");
+            }
+            else if(HasNullElement(so.FindProperty("enemies")) || HasNullElement(so.FindProperty("emitters")))
+            {
+                ctx.Add(Level.Warning, action, "「敵に命令」の相手に空の欄があります");
+            }
+        }
+
+        foreach(EnemyDamageEventAction action in ctx.Find<EnemyDamageEventAction>())
+        {
+            var so = new SerializedObject(action);
+            if(so.FindProperty("enemies").arraySize == 0 && so.FindProperty("parts").arraySize == 0)
+            {
+                ctx.Add(Level.Warning, action, "「敵にダメージ」の相手（敵・部分）が空です");
+            }
+        }
+
+        var battleKeys = new Dictionary<string, BattleArea>();
+        foreach(BattleArea battle in ctx.Find<BattleArea>())
+        {
+            var so = new SerializedObject(battle);
+            var startType = (BattleStart)so.FindProperty("start").enumValueIndex;
+            var winType = (BattleWin)so.FindProperty("win").enumValueIndex;
+            var loseType = (BattleLose)so.FindProperty("lose").enumValueIndex;
+            int enemyCount = so.FindProperty("enemies").arraySize;
+
+            Collider2D area = battle.GetComponent<Collider2D>();
+            if(startType == BattleStart.EnterArea && area != null && !area.isTrigger)
+            {
+                ctx.Add(Level.Error, battle, "戦闘エリアの Collider2D の Is Trigger がオフです（入れないので始まりません）");
+            }
+
+            var goal = so.FindProperty("goal").objectReferenceValue as Collider2D;
+            if(winType == BattleWin.ReachGoal && goal == null) { ctx.Add(Level.Error, battle, "勝ち方が「ゴールに着く」ですが、ゴールが空です"); }
+            if(winType == BattleWin.ReachGoal && goal != null && !goal.isTrigger) { ctx.Add(Level.Warning, battle, "ゴールの Collider2D の Is Trigger がオフです（ゴールに入れません）"); }
+            if(winType == BattleWin.Flag && so.FindProperty("winFlag").objectReferenceValue == null) { ctx.Add(Level.Error, battle, "勝ち方が「フラグが立つ」ですが、フラグが空です"); }
+            int waveCount = so.FindProperty("waves").arraySize;
+            if(winType == BattleWin.DefeatAll && enemyCount == 0 && waveCount == 0) { ctx.Add(Level.Error, battle, "勝ち方が「敵を全部倒す」ですが、参加する敵もウェーブも空です"); }
+            for(int w = 0; w < waveCount; w++)
+            {
+                SerializedProperty wave = so.FindProperty("waves").GetArrayElementAtIndex(w);
+                if(wave.FindPropertyRelative("enemies").arraySize == 0 && wave.FindPropertyRelative("spawns").arraySize == 0)
+                {
+                    ctx.Add(Level.Warning, battle, $"戦闘エリアのウェーブ {w + 1} に敵がいません（すぐ次のウェーブになります）");
+                }
+            }
+            if(loseType == BattleLose.Caught && enemyCount == 0) { ctx.Add(Level.Warning, battle, "負け方が「捕まる」ですが、参加する敵が空です（捕まりません）"); }
+            if(HasNullElement(so.FindProperty("enemies")) || HasNullElement(so.FindProperty("emitters"))) { ctx.Add(Level.Warning, battle, "戦闘エリアの参加する敵・攻撃の発生源に空の欄があります"); }
+            if(winType == BattleWin.None && loseType == BattleLose.None) { ctx.Add(Level.Info, battle, "戦闘エリアの勝ち方・負け方がどちらも「なし」です（イベントの部品で終える前提）"); }
+
+            string key = BattleArea.MakeSaveKey(battle.gameObject, so.FindProperty("saveId").stringValue);
+            if(battleKeys.ContainsKey(key)) { ctx.Add(Level.Error, battle, $"戦闘エリアのセーブ用の名前「{key}」が重なっています（ID を付けてください）"); }
+            else                            { battleKeys.Add(key, battle); }
+        }
+
+        foreach(BattleControlEventAction action in ctx.Find<BattleControlEventAction>())
+        {
+            if(new SerializedObject(action).FindProperty("battle").objectReferenceValue == null)
+            {
+                ctx.Add(Level.Error, action, "「戦闘エリアを操作」に戦闘エリアが入っていません");
+            }
+        }
+
+        foreach(DamageAreaEventAction action in ctx.Find<DamageAreaEventAction>())
+        {
+            var so = new SerializedObject(action);
+            if(so.FindProperty("attack").objectReferenceValue == null)
+            {
+                ctx.Add(Level.Error, action, "「ダメージエリアを出す」に攻撃が入っていません");
+            }
+        }
+
+        foreach(EnemyNavArea area in ctx.Find<EnemyNavArea>())
+        {
+            Collider2D col = area.GetComponent<Collider2D>();
+            if(col != null && !col.isTrigger)
+            {
+                ctx.Add(Level.Warning, area, "敵の通行設定エリアの Collider2D の Is Trigger がオフです（プレイヤーも通れなくなります）");
+            }
+        }
     }
 
     private static void CheckSceneChanges(Context ctx)
@@ -374,8 +859,110 @@ public static class SceneChecker
     // プロジェクト全体のチェック
     //=====================================================================
 
+    private static bool UsesPatrol(EnemyPattern pattern)
+    {
+        foreach(EnemyPhase phase in pattern.phases)
+        {
+            if(phase == null || phase.actions == null) { continue; }
+            foreach(EnemyAction action in phase.actions) { if(action is PatrolAction) { return true; } }
+        }
+        return false;
+    }
+
+    /// <summary>
+    /// 敵の行動パターン・攻撃のデータのチェック
+    /// </summary>
+    private static void CheckEnemyAssets(List<Issue> issues)
+    {
+        foreach(string guid in AssetDatabase.FindAssets("t:EnemyPattern"))
+        {
+            var pattern = AssetDatabase.LoadAssetAtPath<EnemyPattern>(AssetDatabase.GUIDToAssetPath(guid));
+            if(pattern == null) { continue; }
+
+            for(int i = 0; i < pattern.phases.Count; i++)
+            {
+                EnemyPhase phase = pattern.phases[i];
+                if(phase == null) { continue; }
+
+                if(phase.actions == null || phase.actions.Count == 0)
+                {
+                    issues.Add(new Issue { level = Level.Warning, target = pattern, message = $"行動パターン「{pattern.name}」の段階 {i + 1}「{phase.name}」に行動がありません（その段階では立っているだけ）" });
+                    continue;
+                }
+
+                foreach(EnemyAction action in phase.actions)
+                {
+                    if(action == null)
+                    {
+                        issues.Add(new Issue { level = Level.Error, target = pattern, message = $"行動パターン「{pattern.name}」の段階 {i + 1} に、中身が消えた行動があります（クラス名を変えた・消した）" });
+                    }
+                    else if(action is AttackAction attack && attack.attack == null)
+                    {
+                        issues.Add(new Issue { level = Level.Error, target = pattern, message = $"行動パターン「{pattern.name}」の段階 {i + 1} の「攻撃する」に、攻撃が入っていません" });
+                    }
+                    else if(action is SummonAction summon && summon.enemy == null)
+                    {
+                        issues.Add(new Issue { level = Level.Error, target = pattern, message = $"行動パターン「{pattern.name}」の段階 {i + 1} の「仲間を呼ぶ」に、呼ぶ敵が入っていません" });
+                    }
+                    else if(action is SummonAction summon2 && summon2.enemy != null && summon2.enemy.Pattern == pattern)
+                    {
+                        issues.Add(new Issue { level = Level.Warning, target = pattern, message = $"行動パターン「{pattern.name}」は、同じ行動パターンの敵を呼びます（呼ばれた敵もまた呼ぶので、「同時にいられる数」に気をつけてください）" });
+                    }
+                }
+            }
+        }
+
+        foreach(string guid in AssetDatabase.FindAssets("t:AttackData"))
+        {
+            var attack = AssetDatabase.LoadAssetAtPath<AttackData>(AssetDatabase.GUIDToAssetPath(guid));
+            if(attack == null) { continue; }
+
+            if(attack.activation == AttackActivation.Instant && attack.motion == AttackMotion.Charge && attack.shape.type != AttackShapeType.Rectangle)
+            {
+                issues.Add(new Issue { level = Level.Warning, target = attack, message = $"攻撃「{attack.name}」は突進ですが、形が長方形ではありません（長方形の長さが走る距離になります）" });
+            }
+            if(attack.damage <= 0)
+            {
+                issues.Add(new Issue { level = Level.Info, target = attack, message = $"攻撃「{attack.name}」のダメージが 0 です（当たっても何も起きません）" });
+            }
+        }
+    }
+
+    /// <summary> 相棒の一言のデータ </summary>
+    private static void CheckBarkAssets(List<Issue> issues)
+    {
+        var names = new Dictionary<string, string>();
+        foreach(string guid in AssetDatabase.FindAssets("t:BarkData"))
+        {
+            string path = AssetDatabase.GUIDToAssetPath(guid);
+            BarkData d = AssetDatabase.LoadAssetAtPath<BarkData>(path);
+            if(d == null) { continue; }
+
+            if(!path.StartsWith("Assets/Resources/Barks/"))
+            {
+                issues.Add(new Issue { level = Level.Error, target = d, message = $"一言「{d.name}」が Assets/Resources/Barks/ の外にあります（きっかけで自動に出ません）" });
+            }
+            if(!d.HasLines)
+            {
+                issues.Add(new Issue { level = Level.Warning, target = d, message = $"一言「{d.name}」に文がありません" });
+            }
+            if(d.trigger == BarkTrigger.EnemyDefeated && d.enemy == null && d.cooldown <= 0.0f)
+            {
+                issues.Add(new Issue { level = Level.Info, target = d, message = $"一言「{d.name}」：どの敵を倒しても出て、次に出せるまでが 0 秒です（敵が多いとしゃべりすぎます）" });
+            }
+            if(names.TryGetValue(d.name, out string other))
+            {
+                issues.Add(new Issue { level = Level.Warning, target = d, message = $"一言「{d.name}」と同じ名前が {other} にあります（「ゲームの中で1回だけ」の記録が混ざります）" });
+            }
+            else { names.Add(d.name, path); }
+        }
+    }
+
     public static void CheckProject(List<Issue> issues)
     {
+        CheckEnemyAssets(issues);
+        CheckBarkAssets(issues);
+
         // Build Settings
         foreach(EditorBuildSettingsScene scene in EditorBuildSettings.scenes)
         {
@@ -498,6 +1085,15 @@ public static class SceneChecker
         {
             SerializedProperty p = array.GetArrayElementAtIndex(i).FindPropertyRelative(relative);
             if(p != null && p.objectReferenceValue == null) { return true; }
+        }
+        return false;
+    }
+
+    private static bool HasNullElement(SerializedProperty array)
+    {
+        for(int i = 0; i < array.arraySize; i++)
+        {
+            if(array.GetArrayElementAtIndex(i).objectReferenceValue == null) { return true; }
         }
         return false;
     }

@@ -6,26 +6,17 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/SampleScene.unity
-    guid: 8c9cfa26abfee488c85f1582747f6a02
+    path: Assets/Scenes/Title.unity
+    guid: ce9b5037bb878d240a06eee09ef48756
   - enabled: 1
-    path: Assets/Scenes/Stage1.unity
-    guid: 856ac4b474a04a140b6ec02ba5ff0460
-  - enabled: 1
-    path: Assets/Scenes/kari/kari_Scene_Clear.unity
-    guid: 811e3a2592cc9424c9a4c4d7bbe2ccea
-  - enabled: 1
-    path: Assets/Scenes/Stage2.unity
-    guid: 99ac6ef5ec4ae5949971da78a612fc5f
-  - enabled: 1
-    path: Assets/Scenes/SceneGameOver.unity
-    guid: 2630a94b3d32cf74b866128173783e27
+    path: Assets/Scenes/Stage1_1.unity
+    guid: e9d6de47ef09c914cae366895672797b
   - enabled: 1
     path: Assets/Scenes/Stage1_2.unity
     guid: 26194b9bce620e543a04fe1a784e9af9
   - enabled: 1
-    path: Assets/Scenes/Stage1_1.unity
-    guid: e9d6de47ef09c914cae366895672797b
+    path: Assets/Scenes/SceneGameOver.unity
+    guid: 2630a94b3d32cf74b866128173783e27
   m_configObjects:
     com.unity.dt.app-ui: {fileID: 11400000, guid: 1b1c20d82303e4b5781c3ef50ac1449f, type: 2}
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}

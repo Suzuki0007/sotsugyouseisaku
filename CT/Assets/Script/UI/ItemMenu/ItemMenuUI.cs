@@ -18,7 +18,8 @@ using UnityEngine.UI;
 /// 取得したアイテムを確認する画面
 /// </summary>
 ///
-/// ・Tab キーで開閉する（Esc でも閉じる）。↑↓ / W・S で選択、マウスでも選択できる
+/// ・メニュー画面（GameMenu）の「アイテム」から開く。Tab / Esc で閉じるとメニューに戻る
+///   （メニュー画面がないときだけ、Tab で直接開閉する）。↑↓ / W・S で選択、マウスでも選択できる
 /// ・左に所持アイテムの一覧、右に選んだアイテムの名前・説明・アイコンを表示する
 /// ・開いている間はゲームを止める（Time.timeScale = 0）
 /// ・開いている間は IsBusy が true になるので、プレイヤーの操作側はこれを見て入力を止める
@@ -115,6 +116,9 @@ public class ItemMenuUI : MonoBehaviour
 
     // 開いた／閉じたフレーム（同じフレームのキー入力を無視するため）
     private int lastToggleFrame = -1;
+
+    // メニュー画面から開いたとき、閉じたら呼ぶ処理（メニューに戻る）
+    private System.Action onClosedToMenu;
 
     //=====================================================================
     // プロパティ
@@ -215,6 +219,9 @@ public class ItemMenuUI : MonoBehaviour
 
         if(!isOpen)
         {
+            // メニュー画面があるときは、Tab はメニュー画面が受け持つ（アイテム画面はメニューから開く）
+            if(GameMenu.Instance != null) { return; }
+
             if(Keyboard.current[toggleKey].wasPressedThisFrame && CanOpen())
             {
                 Open();
@@ -263,7 +270,7 @@ public class ItemMenuUI : MonoBehaviour
         if(next == selectedIndex) { return; }
 
         Select(next);
-        SeManager.PlaySe(selectSe);
+        UISound.Play(selectSe, UISoundType.Select);
     }
 
     //=====================================================================
@@ -287,6 +294,30 @@ public class ItemMenuUI : MonoBehaviour
     }
 
     /// <summary>
+    /// メニュー画面から開く（閉じたら onClosed が呼ばれる。メニューに戻るため）
+    /// </summary>
+    /// <returns> 開けたら true（アイテム画面がない・設定が足りないときは false） </returns>
+    public static bool OpenFromMenu(System.Action onClosed)
+    {
+        if(instance == null || instance.panel == null || InventoryManager.Instance == null) { return false; }
+
+        instance.onClosedToMenu = onClosed;
+        instance.Open();
+        return true;
+    }
+
+    /// <summary>
+    /// 開いていれば、SE なしで閉じる（メニュー画面ごと閉じるとき用。メニューに戻る処理は呼ばない）
+    /// </summary>
+    public static void CloseIfOpen()
+    {
+        if(instance == null) { return; }
+
+        instance.onClosedToMenu = null;
+        instance.Close(false);
+    }
+
+    /// <summary>
     /// アイテム画面を開く
     /// </summary>
     public void Open()
@@ -304,7 +335,9 @@ public class ItemMenuUI : MonoBehaviour
         InventoryManager.Instance.OnChanged += Refresh;
         Refresh();
 
-        SeManager.PlaySe(openSe);
+        // メニューから開いたときは、メニュー側で決定の音が鳴っているので、個別の SE があるときだけ鳴らす
+        if(onClosedToMenu == null) { UISound.Play(openSe, UISoundType.MenuOpen); }
+        else if(openSe != null)    { SeManager.PlaySe(openSe); }
     }
 
     /// <summary>
@@ -324,7 +357,13 @@ public class ItemMenuUI : MonoBehaviour
 
         ResumeGame();
 
-        if(playSe) { SeManager.PlaySe(closeSe); }
+        // メニューに戻るときは「戻る」、ゲームに戻るときは「メニューを閉じる」の音（個別の SE があればそちら）
+        if(playSe) { UISound.Play(closeSe, onClosedToMenu != null ? UISoundType.Cancel : UISoundType.MenuClose); }
+
+        // メニュー画面から開いていたら、メニューに戻る
+        System.Action callback = onClosedToMenu;
+        onClosedToMenu = null;
+        callback?.Invoke();
     }
 
     private void UnsubscribeInventory()

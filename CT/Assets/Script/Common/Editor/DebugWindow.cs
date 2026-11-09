@@ -1,4 +1,4 @@
-/*********************************************************************/
+﻿/*********************************************************************/
 // * \file   DebugWindow.cs
 // * \brief  動作確認用のデバッグウィンドウ
 // *
@@ -29,6 +29,11 @@ public class DebugWindow : EditorWindow
     private bool foldPlayer = true;
     private bool foldSave = true;
     private bool foldStart = true;
+    private bool foldEnemies = true;
+    private bool foldGimmicks = true;
+
+    private AttackData debugAttack;
+    private readonly Dictionary<int, int> attackChoice = new Dictionary<int, int>();
 
     private string warpScene = "";
     private string warpSpawn = "";
@@ -85,6 +90,8 @@ public class DebugWindow : EditorWindow
             DrawFlags();
             DrawWarp();
             DrawPlayer();
+            DrawEnemies();
+            DrawGimmicks();
         }
 
         DrawStartState();
@@ -221,24 +228,288 @@ public class DebugWindow : EditorWindow
         if(foldPlayer)
         {
             PlayerSwitchManager manager = PlayerSwitchManager.Instance;
-            Health health = manager != null && manager.Noah != null ? manager.Noah.GetComponent<Health>() : null;
+            Health health = PlayerCharacters.PartyHealth;
 
-            if(health == null)
+            if(health == null || manager == null)
             {
                 EditorGUILayout.LabelField("（プレイヤーの Health が見つかりません）");
             }
             else
             {
-                EditorGUILayout.LabelField("体力", $"{health.CurrentHealth} / {health.MaxHealth}");
+                // 2人の状態
+                PartyMode mode = (PartyMode)EditorGUILayout.EnumPopup(new GUIContent("2人の状態", "一緒：相棒がついてくる・体力は共有（シグルの体力）／待機・別行動：相棒はその場・体力は別々"), manager.Mode);
+                if(mode != manager.Mode) { manager.SetMode(mode); }
+
                 using(new EditorGUILayout.HorizontalScope())
                 {
-                    if(GUILayout.Button("全回復")) { health.Heal(health.MaxHealth); }
-                    if(GUILayout.Button("1 ダメージ")) { health.Damage(1); }
+                    string reach = manager.IsTogether ? "" : (manager.CanPartnerReach() ? "（呼べば来られる）" : "（来られない）");
+                    EditorGUILayout.LabelField("待て／ついてこい", (PlayerSwitchManager.WaitCommandLocked ? "使えなくしている" : "使える") + reach);
+                    if(GUILayout.Button(manager.IsTogether ? "待て" : "ついてこい", EditorStyles.miniButton, GUILayout.Width(70))) { manager.ToggleWait(); }
+                    PlayerSwitchManager.WaitCommandLocked = GUILayout.Toggle(PlayerSwitchManager.WaitCommandLocked, "使えなくする", EditorStyles.miniButton, GUILayout.Width(80));
+                }
+
+                Health noahHealth = manager.HealthOf(manager.Noah);
+                Health sigleHealth = manager.HealthOf(manager.Sigle);
+                string owner = manager.IsTogether ? "2人で共有（シグルの体力）" : (manager.CurrentPlayer == manager.Noah ? "ノア" : "シグル");
+                EditorGUILayout.LabelField("今の体力", $"{health.CurrentHealth} / {health.MaxHealth}　{owner}");
+                if(noahHealth != null && sigleHealth != null)
+                {
+                    // 一緒のときのノアの体力は共有先を見るので、自分の値は離れたときに使う値
+                    string noahOwn = manager.IsTogether ? "（離れたときに使う）" : "";
+                    EditorGUILayout.LabelField("　ノア／シグル", $"{(manager.IsTogether ? "-" : noahHealth.CurrentHealth.ToString())} / {noahHealth.MaxHealth}{noahOwn}　　{sigleHealth.CurrentHealth} / {sigleHealth.MaxHealth}", EditorStyles.miniLabel);
+                }
+
+                using(new EditorGUILayout.HorizontalScope())
+                {
+                    if(GUILayout.Button("全回復（2人とも）"))
+                    {
+                        if(sigleHealth != null) { sigleHealth.Heal(sigleHealth.MaxHealth); }
+                        if(noahHealth != null && !manager.IsTogether) { noahHealth.Heal(noahHealth.MaxHealth); }
+                    }
+                    if(GUILayout.Button("1 ダメージ（今の体力）")) { health.Damage(1); }
                 }
                 Health.PlayerInvincible = EditorGUILayout.ToggleLeft("無敵（ダメージを受けない。シーンが変わっても続く）", Health.PlayerInvincible);
             }
         }
         EditorGUILayout.EndFoldoutHeaderGroup();
+    }
+
+    //=====================================================================
+    // 敵
+    //=====================================================================
+
+    private void DrawEnemies()
+    {
+        foldEnemies = EditorGUILayout.BeginFoldoutHeaderGroup(foldEnemies, "敵");
+        if(foldEnemies)
+        {
+            EnemyBlock.StopAll = EditorGUILayout.ToggleLeft("敵を止める（動き・攻撃・体当たり）", EnemyBlock.StopAll);
+            NavMesh2D.ShowDebug = EditorGUILayout.ToggleLeft("歩ける範囲（水色）と敵の経路（黄色）を表示", NavMesh2D.ShowDebug);
+            if(NavMesh2D.ShowDebug && !NavMesh2D.Exists)
+            {
+                EditorGUILayout.HelpBox("このシーンでは、まだナビメッシュが作られていません（敵が経路を探すと作られます）", MessageType.None);
+            }
+
+            debugAttack = (AttackData)EditorGUILayout.ObjectField(new GUIContent("出させる攻撃（どの敵にも）", "ここに攻撃を入れると、敵ごとの「攻撃」の候補の最後に出る。行動パターンに入っていない攻撃を試すときに"), debugAttack, typeof(AttackData), false);
+
+            IReadOnlyList<Enemy> enemies = Enemy.All;
+            EditorGUILayout.LabelField("今いる敵（新しい作り）", $"{enemies.Count} 体");
+
+            foreach(Enemy enemy in enemies)
+            {
+                if(enemy == null) { continue; }
+
+                using(new EditorGUILayout.HorizontalScope())
+                {
+                    string label = enemy.Data != null ? enemy.Data.DisplayName : enemy.name;
+                    string hp = enemy.Health != null ? $"{enemy.Health.CurrentHealth}/{enemy.Health.MaxHealth}" : "-";
+                    if(GUILayout.Button(label, EditorStyles.label)) { Selection.activeGameObject = enemy.gameObject; }
+                    EditorGUILayout.LabelField(hp, GUILayout.Width(50));
+                    if(GUILayout.Button("倒す", GUILayout.Width(50))) { Kill(enemy); }
+                }
+
+                using(new EditorGUI.IndentLevelScope())
+                {
+                    if(enemy.Brain != null) { EditorGUILayout.LabelField(enemy.Brain.StatusText, EditorStyles.miniLabel); }
+
+                    // ひるみ・部位
+                    var extra = new List<string>();
+                    if(enemy.Data != null && enemy.Data.StaggerThreshold > 0.0f)
+                    {
+                        extra.Add(enemy.Staggered ? "ひるみ中" : $"ひるみ {enemy.StaggerGauge:0.0}/{enemy.Data.StaggerThreshold:0.#}");
+                    }
+                    foreach(EnemyPart part in enemy.GetComponentsInChildren<EnemyPart>())
+                    {
+                        string state = part.Broken ? "壊れた" : (part.Breakable ? $"{part.CurrentHealth}/{part.MaxHealth}" : "-");
+                        extra.Add($"{part.PartName}:{state}{(part.Revealed ? "" : "（見えない）")}");
+                    }
+                    if(extra.Count > 0) { EditorGUILayout.LabelField(string.Join("　", extra), EditorStyles.miniLabel); }
+
+                    using(new EditorGUILayout.HorizontalScope())
+                    {
+                        if(GUILayout.Button("ひるませる", EditorStyles.miniButton, GUILayout.Width(70))) { enemy.Stagger(enemy.Data != null ? enemy.Data.StaggerTime : 1.0f); }
+                        if(enemy.Brain != null) { DrawForceAttack(enemy.Brain, enemy.GetEntityId().GetHashCode()); }
+                        foreach(EnemyPart part in enemy.GetComponentsInChildren<EnemyPart>())
+                        {
+                            GUI.enabled = part.Breakable && !part.Broken;
+                            if(GUILayout.Button($"{part.PartName}を壊す", EditorStyles.miniButton)) { part.Break(); }
+                            GUI.enabled = true;
+                        }
+                    }
+                }
+            }
+
+            // 攻撃の発生源（見えない敵）
+            AttackEmitter[] emitters = FindObjectsByType<AttackEmitter>();
+            if(emitters.Length > 0)
+            {
+                EditorGUILayout.LabelField("攻撃の発生源（見えない敵）", $"{emitters.Length} 個");
+                foreach(AttackEmitter emitter in emitters)
+                {
+                    using(new EditorGUILayout.HorizontalScope())
+                    {
+                        if(GUILayout.Button(emitter.name, EditorStyles.label)) { Selection.activeGameObject = emitter.gameObject; }
+                        if(GUILayout.Button(emitter.Stopped ? "動かす" : "止める", GUILayout.Width(50))) { emitter.SetStopped(!emitter.Stopped); }
+                        DrawForceAttack(emitter, emitter.GetEntityId().GetHashCode());
+                    }
+                    using(new EditorGUI.IndentLevelScope()) { EditorGUILayout.LabelField(emitter.StatusText, EditorStyles.miniLabel); }
+                }
+            }
+
+            // 敵のスポナー（新しい作り）
+            foreach(EnemyDataSpawner spawner in FindObjectsByType<EnemyDataSpawner>())
+            {
+                using(new EditorGUILayout.HorizontalScope())
+                {
+                    if(GUILayout.Button("スポナー：" + spawner.name, EditorStyles.label)) { Selection.activeGameObject = spawner.gameObject; }
+                    EditorGUILayout.LabelField(spawner.StatusText, EditorStyles.miniLabel);
+                }
+            }
+
+            // 敵のグループ
+            EnemyGroup[] groups = FindObjectsByType<EnemyGroup>();
+            foreach(EnemyGroup group in groups)
+            {
+                using(new EditorGUILayout.HorizontalScope())
+                {
+                    if(GUILayout.Button("グループ：" + group.name, EditorStyles.label)) { Selection.activeGameObject = group.gameObject; }
+                    EditorGUILayout.LabelField(group.StatusText, EditorStyles.miniLabel);
+                }
+            }
+
+            // 戦闘エリア（追跡・逃げる戦闘など）
+            BattleArea[] battles = FindObjectsByType<BattleArea>();
+            if(battles.Length > 0)
+            {
+                EditorGUILayout.LabelField("戦闘エリア", BattleArea.AnyActive ? "戦闘中（セーブポイント不可）" : "-");
+                foreach(BattleArea battle in battles)
+                {
+                    using(new EditorGUILayout.HorizontalScope())
+                    {
+                        if(GUILayout.Button(battle.name, EditorStyles.label)) { Selection.activeGameObject = battle.gameObject; }
+                        GUI.enabled = !battle.Running && !battle.Won;
+                        if(GUILayout.Button("始める", GUILayout.Width(50))) { battle.Begin(); }
+                        GUI.enabled = !battle.Won;
+                        if(GUILayout.Button("勝ち", GUILayout.Width(40))) { battle.ForceWin(); }
+                        GUI.enabled = battle.Running;
+                        if(GUILayout.Button("やめる", GUILayout.Width(50))) { battle.Cancel(); }
+                        GUI.enabled = true;
+                    }
+                    using(new EditorGUI.IndentLevelScope()) { EditorGUILayout.LabelField(battle.StatusText, EditorStyles.miniLabel); }
+                }
+            }
+
+            if(enemies.Count > 0 && GUILayout.Button("全部倒す"))
+            {
+                foreach(Enemy enemy in new List<Enemy>(enemies)) { Kill(enemy); }
+            }
+        }
+        EditorGUILayout.EndFoldoutHeaderGroup();
+    }
+
+    //=====================================================================
+    // 仕掛け（謎解き）
+    //=====================================================================
+
+    private void DrawGimmicks()
+    {
+        foldGimmicks = EditorGUILayout.BeginFoldoutHeaderGroup(foldGimmicks, "仕掛け");
+        if(foldGimmicks)
+        {
+            IReadOnlyList<GimmickState> states = GimmickState.All;
+            if(states.Count == 0) { EditorGUILayout.LabelField("（このシーンに仕掛けはありません）", EditorStyles.miniLabel); }
+
+            if(PushBlock.All.Count > 0)
+            {
+                using(new EditorGUILayout.HorizontalScope())
+                {
+                    EditorGUILayout.LabelField("押せる箱", $"{PushBlock.All.Count} 個");
+                    if(GUILayout.Button(new GUIContent("全部元に戻す", "置いた位置に戻す（穴に落ちた箱はそのまま）"), EditorStyles.miniButton, GUILayout.Width(90)))
+                    {
+                        foreach(PushBlock block in new List<PushBlock>(PushBlock.All)) { if(block != null) { block.ResetToHome(); } }
+                    }
+                }
+            }
+
+            foreach(GimmickState state in new List<GimmickState>(states))
+            {
+                if(state == null) { continue; }
+                PuzzleCheck puzzle = state.GetComponent<PuzzleCheck>();
+
+                using(new EditorGUILayout.HorizontalScope())
+                {
+                    string label = (puzzle != null ? "答え合わせ：" : "") + state.DisplayName;
+                    if(GUILayout.Button(label, EditorStyles.label, GUILayout.MinWidth(120))) { Selection.activeGameObject = state.gameObject; }
+                    string extra = state.Locked ? "（固定）" : (state.RemainingTime > 0.0f ? $"（あと {state.RemainingTime:0.0} 秒）" : "");
+                    EditorGUILayout.LabelField(state.ValueText + extra, GUILayout.Width(110));
+
+                    if(puzzle != null)
+                    {
+                        if(GUILayout.Button("答え合わせ", EditorStyles.miniButton, GUILayout.Width(70))) { puzzle.Judge(); }
+                        if(GUILayout.Button("入力を戻す", EditorStyles.miniButton, GUILayout.Width(70))) { puzzle.ResetInputs(); }
+                    }
+                    else
+                    {
+                        if(GUILayout.Button(state.StateCount == 2 ? "切り替え" : "次へ", EditorStyles.miniButton, GUILayout.Width(60))) { state.Toggle(true); }
+                    }
+                    if(GUILayout.Button("戻す", EditorStyles.miniButton, GUILayout.Width(40))) { state.SetLocked(false); state.ResetValue(true); }
+                }
+                if(puzzle != null)
+                {
+                    using(new EditorGUI.IndentLevelScope()) { EditorGUILayout.LabelField(puzzle.StatusText, EditorStyles.miniLabel); }
+                }
+            }
+        }
+        EditorGUILayout.EndFoldoutHeaderGroup();
+    }
+
+    /// <summary>
+    /// 「この攻撃を出させる」：行動パターンに入っている攻撃（＋上の欄の攻撃）から選んで出させる
+    /// </summary>
+    private void DrawForceAttack(PatternRunner runner, int key)
+    {
+        List<AttackData> attacks = CollectAttacks(runner.Pattern);
+        if(debugAttack != null && !attacks.Contains(debugAttack)) { attacks.Add(debugAttack); }
+        if(attacks.Count == 0) { return; }
+
+        var names = new string[attacks.Count];
+        for(int i = 0; i < attacks.Count; i++) { names[i] = attacks[i].name; }
+
+        attackChoice.TryGetValue(key, out int choice);
+        choice = Mathf.Clamp(choice, 0, attacks.Count - 1);
+        choice = EditorGUILayout.Popup(choice, names, GUILayout.MinWidth(80));
+        attackChoice[key] = choice;
+
+        if(GUILayout.Button(new GUIContent("攻撃", "今の行動をやめて、選んだ攻撃をすぐに出させる（終わったらいつもの行動に戻る）"), EditorStyles.miniButton, GUILayout.Width(40)))
+        {
+            runner.ForceAttack(attacks[choice]);
+        }
+    }
+
+    /// <summary>
+    /// 行動パターンの中の攻撃（同じものは1つ）
+    /// </summary>
+    public static List<AttackData> CollectAttacks(EnemyPattern pattern)
+    {
+        var list = new List<AttackData>();
+        if(pattern == null) { return list; }
+        foreach(EnemyPhase phase in pattern.phases)
+        {
+            if(phase == null || phase.actions == null) { continue; }
+            foreach(EnemyAction action in phase.actions)
+            {
+                if(action is AttackAction a && a.attack != null && !list.Contains(a.attack)) { list.Add(a.attack); }
+            }
+        }
+        return list;
+    }
+
+    /// <summary>
+    /// 敵を倒す（効き方の設定に関係なく）
+    /// </summary>
+    private static void Kill(Enemy enemy)
+    {
+        if(enemy != null) { enemy.Kill(); }
     }
 
     //=====================================================================
@@ -287,18 +558,21 @@ public class DebugWindow : EditorWindow
         foldSave = EditorGUILayout.BeginFoldoutHeaderGroup(foldSave, "セーブ");
         if(foldSave)
         {
-            string path = Path.Combine(Application.persistentDataPath, "save.json");
-            EditorGUILayout.LabelField("セーブファイル", File.Exists(path) ? "あり" : "なし");
-
-            bool load = EditorPrefs.GetBool(AutoSave.EditorLoadOnPlayKey, true);
-            bool nextLoad = EditorGUILayout.ToggleLeft("再生するときにセーブを読み込む（オフ：毎回まっさらな状態で始める）", load);
-            if(nextLoad != load) { EditorPrefs.SetBool(AutoSave.EditorLoadOnPlayKey, nextLoad); }
-            if(!nextLoad)
+            if(Application.isPlaying)
             {
-                EditorGUILayout.HelpBox("オフの間にチェックポイントを通ると、それまでのセーブは今回の内容で上書きされます。", MessageType.Warning);
+                EditorGUILayout.LabelField("使っているスロット", Save.HasSlot ? $"スロット{Save.CurrentSlot}" : "なし（ファイルに保存されない）");
+                EditorGUILayout.LabelField("プレイ時間", SaveSlotInfo.FormatPlayTime(GameSession.PlayTime));
             }
 
-            using(new EditorGUI.DisabledScope(!Application.isPlaying))
+            // ステージから直接再生するときに使うスロット
+            var options = new string[Save.SlotCount + 1];
+            options[0] = "使わない（保存もしない）";
+            for(int i = 1; i <= Save.SlotCount; i++) { options[i] = $"スロット{i}"; }
+            int slotOnPlay = Mathf.Clamp(EditorPrefs.GetInt(AutoSave.EditorSlotOnPlayKey, 0), 0, Save.SlotCount);
+            int nextSlot = EditorGUILayout.Popup(new GUIContent("ステージから再生するとき", "タイトル以外のシーンで再生したときに読み込むスロット。タイトルから再生したときは、タイトル画面で選んだスロットを使う"), slotOnPlay, options);
+            if(nextSlot != slotOnPlay) { EditorPrefs.SetInt(AutoSave.EditorSlotOnPlayKey, nextSlot); }
+
+            using(new EditorGUI.DisabledScope(!Application.isPlaying || !Save.HasSlot))
             {
                 if(GUILayout.Button("今の状態をセーブ（チェックポイントと同じ）"))
                 {
@@ -307,18 +581,32 @@ public class DebugWindow : EditorWindow
                 }
             }
 
-            if(GUILayout.Button("セーブファイルを消す"))
+            EditorGUILayout.Space();
+            EditorGUILayout.LabelField("スロット", EditorStyles.boldLabel);
+            for(int slot = 1; slot <= Save.SlotCount; slot++)
             {
-                if(EditorUtility.DisplayDialog("セーブファイルを消す", "セーブファイルを削除します。元に戻せません。\n（再生中の所持品やフラグは、再生を止めるまでそのままです）", "消す", "やめる"))
+                SaveSlotInfo info = SaveSlotInfo.Load(slot);
+                using(new EditorGUILayout.HorizontalScope())
                 {
-                    if(Application.isPlaying) { Save.Clear(); }
-                    if(File.Exists(path)) { File.Delete(path); }
+                    string text = info.Exists
+                        ? $"{slot}: {(string.IsNullOrEmpty(info.SceneName) ? "場所不明" : info.SceneName)}  {SaveSlotInfo.FormatPlayTime(info.PlayTime)}  {(info.SavedAt.HasValue ? info.SavedAt.Value.ToString("yyyy/MM/dd HH:mm") : "")}"
+                        : $"{slot}: データなし";
+                    EditorGUILayout.LabelField(text);
+
+                    using(new EditorGUI.DisabledScope(!info.Exists))
+                    {
+                        if(GUILayout.Button("消す", GUILayout.Width(44)) &&
+                           EditorUtility.DisplayDialog("セーブデータを消す", $"スロット{slot}のセーブデータを削除します。元に戻せません。", "消す", "やめる"))
+                        {
+                            Save.DeleteSlot(slot);
+                        }
+                    }
                 }
             }
 
             if(GUILayout.Button("セーブファイルの場所を開く"))
             {
-                EditorUtility.RevealInFinder(File.Exists(path) ? path : Application.persistentDataPath);
+                EditorUtility.RevealInFinder(Application.persistentDataPath);
             }
         }
         EditorGUILayout.EndFoldoutHeaderGroup();

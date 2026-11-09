@@ -304,7 +304,7 @@ public static class DialogueCsv
     /// <summary>
     /// UTF-8 で読めなければ Shift-JIS（Excel の「CSV（コンマ区切り）」）として読む
     /// </summary>
-    private static string ReadText(string fullPath)
+    internal static string ReadText(string fullPath)
     {
         byte[] bytes = File.ReadAllBytes(fullPath);
         try
@@ -318,7 +318,7 @@ public static class DialogueCsv
         }
     }
 
-    private static void WriteUtf8Bom(string assetPath, string text)
+    internal static void WriteUtf8Bom(string assetPath, string text)
     {
         // BOM 付きにすると、Excel で開いても文字化けしない
         File.WriteAllText(Path.GetFullPath(assetPath), text, new UTF8Encoding(true));
@@ -327,7 +327,7 @@ public static class DialogueCsv
     /// <summary>
     /// CSV を行・セルに分ける（"" で囲んだセルの中のカンマ・改行・"" に対応）
     /// </summary>
-    private static List<List<string>> Parse(string text)
+    internal static List<List<string>> Parse(string text)
     {
         var rows = new List<List<string>>();
         var row = new List<string>();
@@ -378,7 +378,7 @@ public static class DialogueCsv
         return rows;
     }
 
-    private static string Escape(string value)
+    internal static string Escape(string value)
     {
         if(value.IndexOfAny(new[] { ',', '"', '\n', '\r' }) < 0) { return value; }
         return "\"" + value.Replace("\"", "\"\"") + "\"";
@@ -430,7 +430,7 @@ public static class DialogueCsv
         return map;
     }
 
-    private static string ToAssetPath(string fullPath)
+    internal static string ToAssetPath(string fullPath)
     {
         string data = Path.GetFullPath(Application.dataPath).Replace('\\', '/');
         string full = Path.GetFullPath(fullPath).Replace('\\', '/');

@@ -1,0 +1,75 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d9b29a5f1e02d3c47acbbafad2c0517a, type: 3}
+  m_Name: "Pattern_Sample_\u5F3E\u5E55"
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyPattern
+  phases:
+  - name: "\u901A\u5E38"
+    order: 0
+    actions:
+    - rid: 1708568687347761326
+    - rid: 1708568687347761327
+    - rid: 1708568687347761328
+    - rid: 1708568687347761329
+    exit: 0
+    healthRatio: 0.5
+    seconds: 10
+    condition:
+      flags: []
+      items: []
+      character: 0
+      partyHealth: 0
+      partyHealthRatio: 0.5
+      area: {fileID: 0}
+    interrupt: 1
+    enterEffect: {fileID: 0}
+    enterSe: {fileID: 0}
+    enterAnimation: 
+    enterPause: 0
+  memo: "\u5168\u65B9\u4F4D\u5F3E \u2192 \u3046\u305A\u5DFB\u304D\u5F3E"
+  references:
+    version: 2
+    RefIds:
+    - rid: 1708568687347761326
+      type: {class: AttackAction, ns: , asm: Assembly-CSharp}
+      data:
+        distanceCheck: 0
+        distance: 4
+        weight: 1
+        attack: {fileID: 11400000, guid: ed57f5fac8f9f52448ef0ca4db2cdf97, type: 2}
+        repeat: 1
+        interval: 0
+    - rid: 1708568687347761327
+      type: {class: WaitAction, ns: , asm: Assembly-CSharp}
+      data:
+        distanceCheck: 0
+        distance: 4
+        weight: 1
+        minSeconds: 1
+        maxSeconds: 1
+    - rid: 1708568687347761328
+      type: {class: AttackAction, ns: , asm: Assembly-CSharp}
+      data:
+        distanceCheck: 0
+        distance: 4
+        weight: 1
+        attack: {fileID: 11400000, guid: 9fee74b9647b378439690c3dcb7978fe, type: 2}
+        repeat: 1
+        interval: 0
+    - rid: 1708568687347761329
+      type: {class: WaitAction, ns: , asm: Assembly-CSharp}
+      data:
+        distanceCheck: 0
+        distance: 4
+        weight: 1
+        minSeconds: 1
+        maxSeconds: 1

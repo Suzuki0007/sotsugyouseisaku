@@ -21,6 +21,8 @@ GameObject:
   - component: {fileID: 2114953636450028307}
   - component: {fileID: 2678763537733708394}
   - component: {fileID: 5893461590104330874}
+  - component: {fileID: 6144506670913621034}
+  - component: {fileID: 8489184389865483796}
   m_Layer: 0
   m_Name: Player_Sigle
   m_TagString: Player
@@ -289,3 +291,31 @@ MonoBehaviour:
   damageClip: Damage
   moveThreshold: 0.1
   stopDelay: 0.1
+--- !u!114 &6144506670913621034
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3848283961383208032}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b14af8ae112f1a548becf12a7d9be144, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SigleShooter
+  shotSe: {fileID: 0}
+  shotEffect: {fileID: 11400000, guid: 544a8b184d8005847abe5dd5ca834e17, type: 2}
+--- !u!114 &8489184389865483796
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3848283961383208032}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5bd47a2a0e74f6b43bf61a6620909c21, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Health
+  maxHealth: 6
+  shareWith: {fileID: 0}

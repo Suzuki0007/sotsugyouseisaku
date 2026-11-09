@@ -1,0 +1,70 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d9b29a5f1e02d3c47acbbafad2c0517a, type: 3}
+  m_Name: "Pattern_Sample_\u8FFD\u3044\u304B\u3051\u3066\u304F\u308B\uFF08\u8FFD\u8DE1\u30A4\u30D9\u30F3\u30C8\u7528\uFF09"
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyPattern
+  phases:
+  - name: "\u901A\u5E38"
+    order: 0
+    actions:
+    - rid: 1708568687347761346
+    - rid: 1708568687347761347
+    exit: 0
+    healthRatio: 0.5
+    seconds: 10
+    condition:
+      flags: []
+      items: []
+      character: 0
+      partyHealth: 0
+      partyHealthRatio: 0.5
+      area: {fileID: 0}
+    interrupt: 1
+    enterEffect: {fileID: 0}
+    enterSe: {fileID: 0}
+    enterAnimation: 
+    enterPause: 0
+  memo: "\u898B\u3048\u3066\u3044\u308B\u9593\u306F\u8FFD\u3044\u304B\u3051\u3001\u898B\u5931\u3063\u305F\u3089\u6700\u5F8C\u306B\u898B\u305F\u5834\u6240\u3092
+    3 \u79D2\u63A2\u3059\u3002\u3042\u304D\u3089\u3081\u305F\u3089\u5C11\u3057\u3046\u308D\u3064\u304F\u3002\u6226\u95D8\u30A8\u30EA\u30A2\uFF08\u8CA0\u3051\u65B9\uFF1A\u6355\u307E\u308B\uFF09\u3068\u7D44\u307F\u5408\u308F\u305B\u3066\u8FFD\u8DE1\u30A4\u30D9\u30F3\u30C8\u306B\u3059\u308B"
+  references:
+    version: 2
+    RefIds:
+    - rid: 1708568687347761346
+      type: {class: ChaseAction, ns: , asm: Assembly-CSharp}
+      data:
+        distanceCheck: 0
+        distance: 4
+        sightCheck: 0
+        sightRange: 8
+        weight: 1
+        chaseSightRange: 12
+        searchSeconds: 3
+        stopDistance: 0
+        maxSeconds: 0
+        nearSpeed: 0.9
+        farSpeed: 1.4
+        farDistance: 6
+        noticeEffect: {fileID: 11400000, guid: 227ad72a71e3d2946ab18d0478447895, type: 2}
+        noticeSe: {fileID: 0}
+        giveUpSe: {fileID: 0}
+    - rid: 1708568687347761347
+      type: {class: WanderAction, ns: , asm: Assembly-CSharp}
+      data:
+        distanceCheck: 0
+        distance: 4
+        sightCheck: 0
+        sightRange: 8
+        weight: 1
+        radius: 2
+        count: 1
+        waitAtPoint: 0.5
+        speedMultiplier: 0.6

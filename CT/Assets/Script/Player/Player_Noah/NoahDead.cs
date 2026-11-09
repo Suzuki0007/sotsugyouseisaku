@@ -53,6 +53,7 @@ public class NoahDead : CharaBase
     private void OnEnable()
     {
         health.OnDied += OnPlayerDied;
+        if(partnerHealth != null) { partnerHealth.OnDied += OnPartnerDied; }
     }
 
     /// <summary>
@@ -63,30 +64,64 @@ public class NoahDead : CharaBase
     private void OnDisable()
     {
         health.OnDied -= OnPlayerDied;
+        if(partnerHealth != null) { partnerHealth.OnDied -= OnPartnerDied; }
     }
 
-    private void OnPlayerDied()
+    //=====================================================================
+    // 相棒（シグル）
+    //=====================================================================
+
+    private GameObject partner;
+    private Health partnerHealth;
+
+    /// <summary>
+    /// 相棒（シグル）を設定する。相棒が倒れてもゲームオーバーにする
+    /// （一緒のときはシグルの体力を2人で共有、離れているときはどちらが倒れてもゲームオーバー）
+    /// </summary>
+    public void SetPartner(GameObject partnerObject)
+    {
+        if(partnerHealth != null) { partnerHealth.OnDied -= OnPartnerDied; }
+
+        partner = partnerObject;
+        partnerHealth = partner != null ? partner.GetComponent<Health>() : null;
+        if(partnerHealth != null && isActiveAndEnabled) { partnerHealth.OnDied += OnPartnerDied; }
+    }
+
+    private void OnPlayerDied() => BeginGameOver(gameObject);
+
+    private void OnPartnerDied() => BeginGameOver(partner);
+
+    /// <summary>
+    /// 倒れたキャラの死亡アニメを流してから、ゲームオーバー画面へ
+    /// </summary>
+    private void BeginGameOver(GameObject fallen)
     {
         if(dying) { return; }
         dying = true;
 
-        Debug.Log("プレイヤーが死亡しました！");
+        Debug.Log($"{(fallen != null ? fallen.name : "プレイヤー")}が倒れました");
 
-        // 死亡アニメがあれば、操作を止めて流し終わるのを待つ
-        SpriteAnimator anim = GetComponent<SpriteAnimator>();
+        // 2人とも動けなくする
+        StopMovement(gameObject);
+        StopMovement(partner);
+
+        // 死亡アニメがあれば、流し終わるのを待つ
+        SpriteAnimator anim = fallen != null ? fallen.GetComponent<SpriteAnimator>() : null;
         if(anim != null && anim.Play(deathAnimation, true))
         {
-            PlayerMovement movement = GetComponent<PlayerMovement>();
-            if(movement != null)
-            {
-                movement.Stop();
-                movement.SetControlEnabled(false);
-            }
             StartCoroutine(GameOverAfterAnimation(anim));
             return;
         }
 
         GoToGameOver();
+    }
+
+    private static void StopMovement(GameObject target)
+    {
+        PlayerMovement movement = target != null ? target.GetComponent<PlayerMovement>() : null;
+        if(movement == null) { return; }
+        movement.Stop();
+        movement.SetControlEnabled(false);
     }
 
     private System.Collections.IEnumerator GameOverAfterAnimation(SpriteAnimator anim)

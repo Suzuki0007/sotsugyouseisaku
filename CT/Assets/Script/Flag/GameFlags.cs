@@ -95,6 +95,27 @@ public static class GameFlags
     }
 
     /// <summary>
+    /// セーブしないフラグの今の状態を写し取る（戦闘エリアのやり直しで、始まったときの状態に戻すため）
+    /// </summary>
+    public static HashSet<string> CaptureTemporary()
+    {
+        return new HashSet<string>(temporary);
+    }
+
+    /// <summary>
+    /// 写し取った状態に戻す
+    /// </summary>
+    public static void RestoreTemporary(HashSet<string> snapshot)
+    {
+        if(snapshot == null) { return; }
+        if(temporary.SetEquals(snapshot)) { return; }
+
+        temporary.Clear();
+        temporary.UnionWith(snapshot);
+        OnChanged?.Invoke();
+    }
+
+    /// <summary>
     /// セーブしないフラグをすべて OFF にする
     /// </summary>
     public static void ClearTemporary()

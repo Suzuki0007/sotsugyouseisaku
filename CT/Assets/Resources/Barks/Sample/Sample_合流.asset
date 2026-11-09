@@ -1,0 +1,48 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d02dd72b1725da5478609a9671eae967, type: 3}
+  m_Name: "Sample_\u5408\u6D41"
+  m_EditorClassIdentifier: Assembly-CSharp::BarkData
+  active: 0
+  trigger: 12
+  seconds: 20
+  healthRatio: 0.34
+  enemy: {fileID: 0}
+  condition:
+    flags: []
+    items: []
+    character: 0
+    partyHealth: 0
+    partyHealthRatio: 0.5
+    area: {fileID: 0}
+    gimmicks: []
+    party: 0
+    partnerWithin: 0
+  priority: 10
+  chance: 1
+  repeat: 0
+  cooldown: 0
+  delay: 0.3
+  variants:
+  - lines:
+    - speaker: 0
+      text: "\u7121\u4E8B\u3067\u3088\u304B\u3063\u305F"
+      seconds: 0
+      gap: 0.2
+      se: {fileID: 0}
+    - speaker: 1
+      text: "\u305D\u3063\u3061\u3053\u305D"
+      seconds: 0
+      gap: 0.2
+      se: {fileID: 0}
+    weight: 1
+  memo: 

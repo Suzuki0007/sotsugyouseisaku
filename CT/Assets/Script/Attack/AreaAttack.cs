@@ -45,8 +45,12 @@ public class AreaAttack : MonoBehaviour
 
     private Transform attackerPos;
 
-    // 現在の攻撃ですでにダメージを与えた対象
-    private HashSet<GameObject> hitTargets = new();
+    // 現在の攻撃ですでにダメージを与えた対象（体力を減らす相手ごと。本体と部位に同時に当たっても1回だけ）
+    private HashSet<Object> hitTargets = new();
+
+    // 今の攻撃の種類・ゲージの判定（敵ごとの効き方・ギミックの反応に使う）
+    private DamageKind currentKind = DamageKind.AreaAttack;
+    private GaugeJudge currentJudge = GaugeJudge.None;
 
     private float defaultDamage = 1f;
 
@@ -72,9 +76,20 @@ public class AreaAttack : MonoBehaviour
     /// </summary>
     public void StartAttack(float damageMultiplier)
     {
+        StartAttack(damageMultiplier, DamageKind.AreaAttack, GaugeJudge.None);
+    }
+
+    /// <summary>
+    /// 攻撃の種類を指定して攻撃を始める（ゲージ攻撃は GaugeAttack と判定の結果を渡す）
+    /// </summary>
+    public void StartAttack(float damageMultiplier, DamageKind kind, GaugeJudge judge)
+    {
         if(attackerPos == null) { return; }
 
         if(isAttacking) { return; }
+
+        currentKind = kind;
+        currentJudge = judge;
 
         // 体力は整数なので四捨五入する（切り捨てだと 1 × 1.5 も 1 になり、倍率が効かない）
         // 最低でも 1 ダメージは与える
@@ -123,11 +138,11 @@ public class AreaAttack : MonoBehaviour
     private void CheckAttackTargets()
     {
         // 指定した半径内のすべてのコライダーを取得
-        Collider2D[] targets = Physics2D.OverlapCircleAll(
-            attackerPos.position, 
-            attackRadius,
-            targetLayer
-        );
+        // ターゲットレイヤー（敵）に加えて、攻撃を受ける部品（攻撃で作動するスイッチなど）はレイヤーに関係なく当てる
+        Collider2D[] targets = Physics2D.OverlapCircleAll(attackerPos.position, attackRadius);
+
+        // 本体と部位（弱点・装甲）に同時に当たったら、部位で受ける（同じ敵には1回だけ当てるため、先に当てたほうになる）
+        DamageUtility.SortByPriority(targets);
 
         //Debug.Log($"攻撃範囲内のCollider数: {targets.Length}");
 
@@ -136,30 +151,31 @@ public class AreaAttack : MonoBehaviour
         // inは、C++でいうconst参照
         foreach(var target in targets)
         {
-            Health targetHealth = target.GetComponent<Health>();
-            if(targetHealth == null)
-            { 
-                Debug.Log("TargetHealthがnullです"); 
-                continue;
-            }
+            bool inTargetLayer = (targetLayer.value & (1 << target.gameObject.layer)) != 0;
+            if(!inTargetLayer && target.GetComponent<DamageReceiver>() == null) { continue; }
 
-            GameObject targetObject = target.gameObject;
-            if(targetObject == null)
-            { 
-                Debug.Log("TargetObjectがnullです"); 
+            // 攻撃を受ける相手（DamageReceiver の渡す先か、同じオブジェクトの Health）
+            Object key = DamageUtility.HitKey(target);
+            if(key == null)
+            {
+                Debug.Log("TargetHealthがnullです");
                 continue;
             }
 
             // Addメソッドは、要素がすでに存在する場合はfalseを返す、それを利用してスキップする
-            if(!hitTargets.Add(targetObject)) { continue; }
+            if(!hitTargets.Add(key)) { continue; }
 
-            //Debug.Log($"{targetObject.name} に攻撃がヒットしました");
+            //Debug.Log($"{target.name} に攻撃がヒットしました");
 
-            targetHealth.Damage(attackDamage);
+            Vector2 hitPoint = target.ClosestPoint(attackerPos.position);
+            DamageInfo info = DamageInfo.Create(attackDamage, currentKind, attackerPos.gameObject, hitPoint);
+            info.judge = currentJudge;
+            DamageUtility.Apply(target, info);
 
-            EffectManager.Play(hitEffect, target.ClosestPoint(attackerPos.position));
+            EffectManager.Play(hitEffect, hitPoint);
 
-            Debug.Log(" 残り体力: " + targetHealth.CurrentHealth);
+            Health targetHealth = DamageUtility.FindHealth(target);
+            if(targetHealth != null) { Debug.Log(" 残り体力: " + targetHealth.CurrentHealth); }
         }
     }
 

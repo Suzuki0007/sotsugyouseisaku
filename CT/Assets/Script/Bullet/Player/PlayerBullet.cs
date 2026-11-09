@@ -31,18 +31,15 @@ public class PlayerBullet : BulletBase
         // 味方（ノア・シグル）には当たらない
         if(collision.CompareTag("Player")) return;
 
-        bool isTarget = collision.CompareTag("Enemies");
+        // 敵と、攻撃で作動するスイッチなど（攻撃を受ける部品）に当たる
+        bool isTarget = collision.CompareTag("Enemies") || collision.GetComponent<DamageReceiver>() != null;
 
         // イベントの範囲・調べる範囲・シーン遷移などのトリガーは通り抜ける（弾どうしは今まで通りぶつかる）
         if(!isTarget && IgnoresTrigger(collision)) return;
         if(isTarget)
         {
-            Health health = collision.GetComponent<Health>();
-
-            if(health != null)
-            {
-                health.Damage(BulletDamage);
-            }
+            // DamageReceiver（部位など）があればそれ、なければ Health に当てる
+            DamageUtility.Apply(collision, DamageInfo.Create(BulletDamage, DamageKind.PlayerBullet, shooter, transform.position));
         }
 
         PlayHitEffect(collision, isTarget);

@@ -11,28 +11,35 @@ using UnityEngine.SceneManagement;
 public static class  AutoSave
 {
     /// <summary>
-    /// エディタで再生するときにセーブを読み込むかの設定名（EditorPrefs。デバッグウィンドウで切り替える）
+    /// エディタでステージのシーンから直接再生するときに使うスロットの設定名
+    /// （EditorPrefs。0 = 使わない。デバッグウィンドウで切り替える）
     /// </summary>
-    public static string EditorLoadOnPlayKey => "CT.LoadSaveOnPlay." + Application.productName;
+    public static string EditorSlotOnPlayKey => "CT.SaveSlotOnPlay." + Application.productName;
 
-    // 起動時（最初のシーンを読み込む前）にセーブデータを読み込む
-    // 最初のシーンの Awake（宝箱など）や InventoryManager より先に読む必要があるので BeforeSceneLoad で呼ぶ
-    // （Save の ResetOnPlay は SubsystemRegistration なので、それより後に呼ばれる）
+    // 起動時（最初のシーンを読み込む前）の処理
+    // ・スロット導入前の save.json をスロット1に引き継ぐ
+    // ・ゲームはタイトル画面から始まり、そこで選んだスロットを読み込む（ここでは読み込まない）
+    // ・エディタでステージから直接再生したときだけ、デバッグウィンドウで選んだスロットを読み込む
+    //   （最初のシーンの Awake（宝箱など）や InventoryManager より先に読む必要があるので BeforeSceneLoad で呼ぶ）
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
     private static void LoadOnStartup()
     {
+        Save.MigrateLegacy();
+
 #if UNITY_EDITOR
-        // エディタでは、デバッグウィンドウの設定で「読み込まない」にできる（毎回まっさらな状態で確認したいとき）
-        if(!UnityEditor.EditorPrefs.GetBool(EditorLoadOnPlayKey, true))
+        if(SceneManager.GetActiveScene().name == GameSession.TitleSceneName) { return; }
+
+        int slot = UnityEditor.EditorPrefs.GetInt(EditorSlotOnPlayKey, 0);
+        if(slot < 1 || slot > Save.SlotCount)
         {
-            Debug.Log("[セーブ] デバッグウィンドウの設定により、セーブを読み込まずに始めます");
+            Debug.Log("[セーブ] スロットを使わずに始めます（この再生の内容はファイルに保存されません。デバッグウィンドウで変更できます）");
             return;
         }
+
+        Save.LoadSlot(slot);
+        GameSession.PlayTime = Save.Get(SaveSlotInfo.PlayTimeKey, 0f);
+        Debug.Log($"[セーブ] デバッグウィンドウの設定により、スロット{slot}を読み込みました（{Save.Count} 件）");
 #endif
-
-        Save.Read();
-
-        if(Save.Count > 0) { Debug.Log($"[セーブ] セーブデータを読み込みました（{Save.Count} 件）"); }
     }
 
     // RuntimeInitializeOnLoadMethodは1度だけstaticの関数を自動で呼び出せる

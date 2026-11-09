@@ -291,6 +291,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Health
   maxHealth: 3
+  shareWith: {fileID: 0}
 --- !u!114 &7073812536728877654
 MonoBehaviour:
   m_ObjectHideFlags: 0
