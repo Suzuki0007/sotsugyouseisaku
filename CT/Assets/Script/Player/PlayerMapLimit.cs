@@ -17,7 +17,7 @@ public class PlayerMapLimit : CharaBase
     // 変数
     //=====================================================================
 
-    private PlayerMovement movement;
+    private CharacterMovement movement;
 
     private Tilemap tilemap;
 
@@ -30,10 +30,13 @@ public class PlayerMapLimit : CharaBase
     private void Awake()
     {
         movement = GetComponent<PlayerMovement>();
+    }
+
+    private void Start()
+    {
         if(movement == null) { Debug.LogError($"{name}: PlayerMovementが見つかりません。", this); }
 
         // マップ範囲がnullな場合は、FindAnyObjectByTypeで探す
-        // FindAnyObjectByTypeは、シーン内の指定された型のオブジェクトを1つだけ返す
         if(mapBounds == null) { mapBounds = FindAnyObjectByType<MapBounds>(); }
         if(mapBounds == null) { Debug.LogError($"{name}: MapBoundsが見つかりません。", this); }
     }
@@ -90,15 +93,27 @@ public class PlayerMapLimit : CharaBase
     // 設定関数
     //=====================================================================
 
-    public void SetTilemap(Tilemap newTilemap)
+    public bool SetTilemap(Tilemap newTilemap)
     {
-        if(newTilemap == null) { Debug.LogError($"{name}: Tilemapの設定に失敗しました", this); }
+        if(newTilemap == null)
+        {
+            Debug.LogError($"{name}: Tilemapの設定に失敗しました", this);
+            return false;
+        }
+
         tilemap = newTilemap;
+        return true;
     }
 
-    public void SetMapBounds(MapBounds newMapBounds)
+    public bool SetMapBounds(MapBounds newMapBounds)
     {
-        if(newMapBounds == null) { Debug.LogError($"{name}: MapBoundsの設定に失敗しました", this); }
+        if(newMapBounds == null)
+        {
+            Debug.LogError($"{name}: MapBoundsの設定に失敗しました", this);
+            return false;
+        }
+
         mapBounds = newMapBounds;
+        return true;
     }
 }

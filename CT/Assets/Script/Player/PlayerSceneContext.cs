@@ -89,4 +89,45 @@ public class PlayerSceneContext : MonoBehaviour
     public BulletDeleteArea BulletDeleteArea => bulletDeleteArea;
 
     public MapBounds MapBounds => mapBounds;
+
+    //=====================================================================
+    // 初期化
+    //=====================================================================
+
+    private void Awake()
+    {
+        if(PlayerLimitTilemap == null) { playerLimitTilemap = FindAnyObjectByType<Tilemap>(); }
+
+        if(MapBounds == null)
+        {
+            // もしタグがMapFloorのオブジェクトがある場合、そのMapBoundsを使用する
+            GameObject mapFloorObject = GameObject.FindGameObjectWithTag("MapFloor");
+            if(mapFloorObject != null)
+            {
+                MapBounds mapBoundsFromFloor = mapFloorObject.GetComponent<MapBounds>();
+                if(mapBoundsFromFloor != null)
+                {
+                    mapBounds = mapBoundsFromFloor;
+                    return;
+                }
+            }
+
+            // タグでも見つからなかった場合は、FindAnyObjectByTypeで探す
+            mapBounds = FindAnyObjectByType<MapBounds>();
+        }
+    }
+
+    private void Start()
+    {
+        if(PlayerLimitTilemap == null) { Debug.LogError($"{name}: PlayerLimitTilemapが見つかりません", this); }
+        if(PlayerBulletPool == null) { Debug.LogError($"{name}: PlayerBulletPoolが見つかりません", this); }
+        if(TargetCamera == null) { Debug.LogError($"{name}: TargetCameraが見つかりません", this); }
+        if(TimingGaugeUI == null) { Debug.LogError($"{name}: TimingGaugeUIが見つかりません", this); }
+        if(LifeUIController == null) { Debug.LogError($"{name}: LifeUIControllerが見つかりません", this); }
+        if(FocusCamera == null) { Debug.LogError($"{name}: FocusCameraが見つかりません", this); }
+        if(SceneChange == null) { Debug.LogError($"{name}: SceneChangeが見つかりません", this); }
+        if(AreaAttack == null) { Debug.LogError($"{name}: AreaAttackが見つかりません", this); }
+        if(BulletDeleteArea == null) { Debug.LogError($"{name}: BulletDeleteAreaが見つかりません", this); }
+        if(MapBounds == null) { Debug.LogError($"{name}: MapBoundsが見つかりません", this); }
+    }
 }

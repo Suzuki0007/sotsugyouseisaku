@@ -32551,6 +32551,7 @@ GameObject:
   - component: {fileID: 472545793}
   - component: {fileID: 472545792}
   - component: {fileID: 472545791}
+  - component: {fileID: 472545794}
   m_Layer: 0
   m_Name: soto_yuka
   m_TagString: Untagged
@@ -32640,7 +32641,7 @@ BoxCollider2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 472545788}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Density: 1
   m_Material: {fileID: 0}
@@ -32686,7 +32687,7 @@ BoxCollider2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 472545788}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Density: 1
   m_Material: {fileID: 0}
@@ -32732,7 +32733,7 @@ BoxCollider2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 472545788}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Density: 1
   m_Material: {fileID: 0}
@@ -32771,6 +32772,18 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 4, y: 21.605274}
   m_EdgeRadius: 0
+--- !u!114 &472545794
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 472545788}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fb7fbb1ef765f8d4d900db94cdabd861, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MapBounds
 --- !u!1 &502491018
 GameObject:
   m_ObjectHideFlags: 0
@@ -32992,7 +33005,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 2
-  m_BackGroundColor: {r: 0.6886792, g: 0.6886792, b: 0.6886792, a: 0}
+  m_BackGroundColor: {r: 0, g: 0, b: 0, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
@@ -33061,10 +33074,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Focus
   player: {fileID: 0}
-  upperLeftPosition: {fileID: 0}
-  upperRightPosition: {fileID: 0}
-  lowerLeftPosition: {fileID: 0}
-  lowerRightPosition: {fileID: 0}
   tilemap: {fileID: 185692953}
 --- !u!1 &619394800
 GameObject:
@@ -33706,6 +33715,14 @@ MonoBehaviour:
   focusCamera: {fileID: 519420033}
   switchKey: 17
   switchSe: {fileID: 0}
+  rejoinWalkDistance: 10
+  apartSwitchStyle: 1
+  apartEnemyTarget: 0
+  waitKey: 20
+  waitSe: {fileID: 0}
+  followSe: {fileID: 0}
+  cannotSe: {fileID: 0}
+  cannotFollow: {fileID: 0}
 --- !u!1 &823229329
 GameObject:
   m_ObjectHideFlags: 0
@@ -34593,6 +34610,9 @@ MonoBehaviour:
   - {fileID: 993645947}
   fullLifeSprite: {fileID: -5278734259511242463, guid: 29f9d22d367350748a50a97882610df1, type: 3}
   emptyLifeSprite: {fileID: -4379365998897781662, guid: 87d5df650ea9abf4794d5079d922e0e4, type: 3}
+  togetherColor: {r: 1, g: 1, b: 1, a: 1}
+  noahColor: {r: 1, g: 0.78, b: 0.88, a: 1}
+  sigleColor: {r: 0.75, g: 0.88, b: 1, a: 1}
 --- !u!114 &1168512693
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -34797,7 +34817,7 @@ Transform:
   m_GameObject: {fileID: 1338695969}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -6.71, y: -8.52, z: 0}
+  m_LocalPosition: {x: -2.82, y: 4.1, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -35977,6 +35997,7 @@ MonoBehaviour:
   sceneChange: {fileID: 1443821977}
   areaAttack: {fileID: 1420506456}
   bulletDeleteArea: {fileID: 54569704}
+  mapBounds: {fileID: 472545794}
 --- !u!4 &1554118606
 Transform:
   m_ObjectHideFlags: 0
@@ -36716,7 +36737,7 @@ Transform:
   m_GameObject: {fileID: 1751531093}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -4.08, y: -3.31, z: 0}
+  m_LocalPosition: {x: -2.8, y: 2.21, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

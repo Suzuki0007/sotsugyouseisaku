@@ -36,6 +36,8 @@ public class CharacterMovement : CharaBase
     /// </summary>
     public Vector2 LastDirection { get; private set; } = Vector2.down;
 
+    public Rigidbody2D Rb => rb;
+
     //=====================================================================
     // 初期化
     //=====================================================================
