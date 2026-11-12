@@ -14,23 +14,23 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DialogueData
   lines:
   - character: {fileID: 11400000, guid: 5dd6beef385447d41b6fb1926a5d911e, type: 2}
-    expression: 0
+    expression: 4
     speakerName: 
     text: "(\u307E\u305F\u982D\u306B\uFF01\u4E00\u4F53\u306A\u3093\u306A\u3093\u3060\uFF1F)"
   - character: {fileID: 11400000, guid: 1e130490a0c3e1c45886bec74eba2656, type: 2}
-    expression: 0
+    expression: 3
     speakerName: 
     text: "\u3001\u3001\u3001\u3002"
   - character: {fileID: 11400000, guid: 5dd6beef385447d41b6fb1926a5d911e, type: 2}
-    expression: 0
+    expression: 5
     speakerName: 
     text: "\u30B7\u30B0\u30EB\uFF1F"
   - character: {fileID: 11400000, guid: 1e130490a0c3e1c45886bec74eba2656, type: 2}
-    expression: 0
+    expression: 3
     speakerName: 
     text: "\u3001\u3001\u3001\u3002"
   - character: {fileID: 11400000, guid: 5dd6beef385447d41b6fb1926a5d911e, type: 2}
-    expression: 0
+    expression: 5
     speakerName: 
     text: "\u5927\u4E08\u592B\uFF1F"
   - character: {fileID: 11400000, guid: 5dd6beef385447d41b6fb1926a5d911e, type: 2}

@@ -26,10 +26,10 @@ MonoBehaviour:
     speakerName: 
     text: "\u300C\u30C6\u30A3\u30EC\u30AA\u30FC\u30EB\u2022\u30A2\u30D1\u30B7\u30CA\u30FC\u30C8\u300D"
   - character: {fileID: 11400000, guid: 1e130490a0c3e1c45886bec74eba2656, type: 2}
-    expression: 0
+    expression: 5
     speakerName: 
     text: "\u30C6\u30A3\u30EC\u30AA\u30FC\u30EB\u3001\u3001\u3002"
   - character: {fileID: 11400000, guid: 1e130490a0c3e1c45886bec74eba2656, type: 2}
-    expression: 0
+    expression: 3
     speakerName: 
     text: "\u8A18\u61B6\u306B\u306F\u306A\u3044\u306E\u306B\u3056\u308F\u3064\u304F\u3002"

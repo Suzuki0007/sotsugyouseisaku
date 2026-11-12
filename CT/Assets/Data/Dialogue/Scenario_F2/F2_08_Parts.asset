@@ -14,10 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DialogueData
   lines:
   - character: {fileID: 11400000, guid: 1e130490a0c3e1c45886bec74eba2656, type: 2}
-    expression: 0
+    expression: 4
     speakerName: 
     text: "\u4FFA\u306E\u8155\u3068\u4F3C\u305F\u3088\u3046\u306A\u90E8\u54C1\u304C\u3053\u3093\u306A\u306B\u3001\u3002"
   - character: {fileID: 11400000, guid: 1e130490a0c3e1c45886bec74eba2656, type: 2}
-    expression: 0
+    expression: 3
     speakerName: 
     text: "\u4FFA\u306F\u4E00\u4F53\u3001\u3001\u3002"

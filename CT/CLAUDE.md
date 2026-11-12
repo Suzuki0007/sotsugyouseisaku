@@ -4,7 +4,7 @@
 主人公は **ノア（Noah）** と **シグル（Sigle）** の2人で、C キーで操作を切り替える。F キーで相棒を待たせる・呼び戻す。
 目標は「**プランナーがコードを書かずに Inspector だけで制作を進められる**」こと。
 
-最終更新：2026-11-13（シナリオの会話〔一層・二層〕を CSV にして取り込み：`Assets/Data/Dialogue/Scenario_F1`・`Scenario_F2`）
+最終更新：2026-11-13（OP を作成：Stage1_1 の `OP`、会話 `Scenario_OP`、部品「画面の暗転」・`SceneStartEvent`、シグルの合流フラグでノア1人。シナリオの会話〔一層・二層〕を CSV で取り込み、表情を推測で入れた）
 
 ## 進み具合
 - **完了：敵の仕組み**（段階0〜7）。→ `.claude/rules/enemy.md`
@@ -85,6 +85,7 @@
 - 共有用（Claude Docs）：プランナー向け作業手順書 https://claude.ai/artifact/HawxoKhE7Pz73WdbUbxwt4 、引き継ぎ資料 https://claude.ai/artifact/MZz5A9WgmQNB8owyj3yxeW 。**Markdown と自動で同期はしない**ので、Markdown を大きく直したら共有用にも反映する（頼まれたとき）。
 
 ## 問題点の要約（優先度の高いもの）
+- 🆕 **Stage1_2 のシグルの合流イベントが未作成**（Stage1_1 はノア1人。Stage1_2 は PlayerSwitchManager にフラグが入っていないので、入るとシグルが出る）。
 全体は `Docs/code-map.md` の「4. 問題点」と、引き継ぎ資料の「8. 既知の問題（すべて）」。
 - 🆕 プレイヤーの歩ける範囲（`MapBounds`）と、カメラ・敵のナビメッシュ・相棒の道の範囲（Tilemap）が別々（11-10 の変更から）。
 - **ノア・シグルのプレハブに FootstepSe がない**（足音が鳴らない。FootstepSe は Stage1_2 の動かない `Player` オブジェクトに付いている）。

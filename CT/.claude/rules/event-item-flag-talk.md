@@ -21,6 +21,9 @@ paths:
 - `EventAction`：`Execute` / `Run`（コルーチン。待つ部品がオーバーライド）/ `OnExit` / `Restore`（セーブからの復元。見た目だけ）。
 - 部品：Dialogue / Se / SetActive / SpriteChange / Anim（終わるまで待てる）/ Effect / Bgm系 / ItemGive / ItemTake / SetFlag / Wait、ほか各機能のイベントの部品（敵・仕掛け・2人・カメラ・一言）。
 - 注意：順番に実行中に、自分（か親）を非表示にすると途中で止まる（シーンチェックで検出）。
+- `ScreenFadeEventAction`（画面の暗転）：`ScreenCurtain`（シーンごとの Canvas、並び順 90 = 会話 100 より奥・HUD より手前）。`SceneFader`（全 UI より手前）とは別。
+- `SceneStartEvent`：シーン開始時に GameCondition（Awake で1回だけ判定）を満たせば、1フレーム待って（プレイヤーの生成後）EventSequence を実行。「最初から暗転しておく」は Awake で幕を真っ暗に。
+- **OP**（Stage1_1 の `OP`）：`OP_はじめ`（SceneStartEvent、条件 `Flag_OP_Done` OFF → 待つ → F1_00 → OP_01 → 明転 → OP_02 → フラグ ON）、`OP_途中`・`OP_塔の入口`（ItemInteraction のエリアに入る・1回だけ、saveId `OP_Bell` / `OP_TowerEntrance`）。会話用の Dialogue は子の「会話」に置く（調べる範囲なし。シーンチェックは DialogueEventAction から使われていれば対象外）。
 - `EventZone` の「1回だけ」はセーブされない（提案⑦で未着手）。
 
 ## アイテム連動（`Assets/Script/Item/`）
@@ -39,7 +42,7 @@ paths:
 - `DialogueManager`（シーンごとのシングルトン）。`Assets/Prefab/UI/DialogueSystem.prefab` を置けば使える。Stage1_1 / SampleScene に配置済み。Stage1_2 はシーンの Canvas に直接組んだもの。
 - `Dialogue`：DialogueManager がないシーンでは旧方式。
 - `DialogueCsv`（エディタ）：CSV（会話ID, キャラ, 表情, 名前, 本文）⇄ DialogueData。UTF-8 / Shift-JIS、同名は上書き（GUID 維持）。`DialogueCsv.Import(path, showDialog:false)`。Parse などは internal にして `BarkCsv` が使い回す。
-- シナリオの会話：`Assets/Data/Dialogue/Scenario_F1.csv`（一層）・`Scenario_F2.csv`（二層）が元（台本 `セリフ.xlsx` から変換。演出は「#」のメモ行）。会話ID は `F<層>_<番号>_<場面>`。**直すときは CSV を直して取り込み直す**（DialogueData を直接直さない）。ノア・シグル以外は CharacterProfile がなく「名前」の列だけ（ティンパニ・ヴェルツィー・カイロス・？？？）。正体を隠すシグルは キャラ=Sigle・名前=？？？。
+- シナリオの会話：`Assets/Data/Dialogue/Scenario_OP.csv`（OP）・`Scenario_F1.csv`（一層）・`Scenario_F2.csv`（二層）が元。表情は台本から推測して入れてある（立ち絵は今「通常」だけなので、ほかの表情も通常の絵になる）（台本 `セリフ.xlsx` から変換。演出は「#」のメモ行）。会話ID は `F<層>_<番号>_<場面>`。**直すときは CSV を直して取り込み直す**（DialogueData を直接直さない）。ノア・シグル以外は CharacterProfile がなく「名前」の列だけ（ティンパニ・ヴェルツィー・カイロス・？？？）。正体を隠すシグルは キャラ=Sigle・名前=？？？。
 
 ## プランナー用ツール（`Assets/Script/Common/`）
 - `[SceneName]` / `[SpawnPointId(nameof(sceneField))]`：string をドロップダウンに。`SceneLookup` が Build Settings と閉じたシーンのファイルから出現位置 ID を読む（プレハブ内のものは読めない）。

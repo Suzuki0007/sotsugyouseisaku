@@ -187,7 +187,8 @@ public static class Bark
     public static bool CanSpeak()
     {
         BarkSettings s = Settings;
-        return s.enabled && !Muted;
+        // 相棒（シグル）がまだ仲間になっていない間は、相棒の一言は出さない
+        return s.enabled && !Muted && !PlayerSwitchManager.IsPartnerAbsent;
     }
 
     private static bool Start(BarkData data, BarkContext context, bool fromEvent)

@@ -142,6 +142,16 @@ public class PlayerSwitchManager : Singleton<PlayerSwitchManager>
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     private static void ResetStatics() { WaitCommandLocked = false; }
 
+    [Header("相棒の合流")]
+
+    [SerializeField, Label("シグルが仲間になったフラグ")]
+    [Tooltip("このフラグが立つまで、シグルは出てこない（ノア1人で進む。体力はノアの分だけ、C・F キーは使えない）。" +
+             "イベントでフラグを立てると、その場でノアの位置に出てきて一緒になる（出る場所はイベントの部品「キャラを移す」で変えられる）。空なら最初から2人")]
+    private GameFlag sigleJoinedFlag;
+
+    // シグルがまだ仲間になっていない（出ていない）か
+    private bool partnerAbsent;
+
     private PartyMode mode = PartyMode.Together;
     private readonly System.Collections.Generic.List<Vector2> route = new System.Collections.Generic.List<Vector2>();
 
@@ -185,6 +195,12 @@ public class PlayerSwitchManager : Singleton<PlayerSwitchManager>
     /// <summary> 操作していない方のキャラ </summary>
     public GameObject Partner => currentPlayer == noah ? sigle : noah;
 
+    /// <summary> シグルがまだ仲間になっていない（ノア1人）か </summary>
+    public bool PartnerAbsent => partnerAbsent;
+
+    /// <summary> シグルがまだ仲間になっていない（ノア1人）か。シーンにいなければ false </summary>
+    public static bool IsPartnerAbsent => Instance != null && Instance.partnerAbsent;
+
     /// <summary>
     /// 今の体力（ライフ表示・ゲームオーバー・条件で見るもの）
     /// 一緒：シグルの体力（2人で共有）／ 待機・別行動：操作しているキャラの体力
@@ -193,6 +209,7 @@ public class PlayerSwitchManager : Singleton<PlayerSwitchManager>
     {
         get
         {
+            if(partnerAbsent) { return noahHealth; }
             if(mode == PartyMode.Together) { return sigleHealth; }
             if(currentPlayer == null) { return null; }
             return currentPlayer == noah ? noahHealth : sigleHealth;
@@ -265,6 +282,53 @@ public class PlayerSwitchManager : Singleton<PlayerSwitchManager>
         mode = PartyMode.Together;
         ApplyFollow();
         ApplyHealthSharing();
+
+        // シグルがまだ仲間になっていなければ隠す
+        ApplyPartnerPresence();
+    }
+
+    private void OnEnable()
+    {
+        GameFlags.OnChanged -= ApplyPartnerPresence;
+        GameFlags.OnChanged += ApplyPartnerPresence;
+    }
+
+    private void OnDisable()
+    {
+        GameFlags.OnChanged -= ApplyPartnerPresence;
+    }
+
+    /// <summary>
+    /// 「シグルが仲間になったフラグ」に合わせて、シグルを出す・隠す
+    /// ・まだ：シグルを非表示にして、ノア1人（体力はノアの分）
+    /// ・フラグが立った：ノアの位置にシグルを出して「一緒」にする
+    /// </summary>
+    private void ApplyPartnerPresence()
+    {
+        if(noah == null || sigle == null || noahHistory == null) { return; }
+
+        bool absent = sigleJoinedFlag != null && !GameFlags.Get(sigleJoinedFlag);
+        if(absent == partnerAbsent && sigle.activeSelf != absent) { return; }
+
+        partnerAbsent = absent;
+
+        if(absent)
+        {
+            if(currentPlayer == sigle) { SwitchTo(noah, sigle, false); }
+            sigle.SetActive(false);
+        }
+        else
+        {
+            MoveTo(sigle, noah.transform.position);
+            sigle.SetActive(true);
+            noahHistory.ResetHistory(noah.transform.position);
+            sigleHistory.ResetHistory(sigle.transform.position);
+        }
+
+        mode = PartyMode.Together;
+        ApplyFollow();
+        ApplyHealthSharing();
+        ModeChanged?.Invoke(mode);
     }
 
     /// <summary>
@@ -308,6 +372,9 @@ public class PlayerSwitchManager : Singleton<PlayerSwitchManager>
         // 会話中・シーン遷移中はキャラクターを切り替えない
         if(InputBlock.IsBlocked) { return; }
 
+        // シグルがまだ仲間になっていないときは、切り替え・待て／ついてこいは使えない
+        if(partnerAbsent) { return; }
+
         if(Keyboard.current[switchKey].wasPressedThisFrame)
         {
             SwitchPlayer();
@@ -328,6 +395,8 @@ public class PlayerSwitchManager : Singleton<PlayerSwitchManager>
     /// </summary>
     public void SwitchPlayer()
     {
+        if(partnerAbsent) { return; }
+
         GameObject next = currentPlayer == noah ? sigle : noah;
         GameObject prev = currentPlayer == noah ? noah : sigle;
 
@@ -408,6 +477,7 @@ public class PlayerSwitchManager : Singleton<PlayerSwitchManager>
     public bool ToggleWait()
     {
         if(noah == null || sigle == null || currentPlayer == null) { return false; }
+        if(partnerAbsent) { return false; }
 
         if(WaitCommandLocked || mode == PartyMode.Separated)
         {
@@ -464,6 +534,10 @@ public class PlayerSwitchManager : Singleton<PlayerSwitchManager>
     public bool TrySetMode(PartyMode newMode, bool requireRoute)
     {
         if(newMode == mode) { return false; }
+
+        // シグルがまだ仲間になっていないときは「一緒」のまま（ノア1人）
+        if(partnerAbsent) { return false; }
+
         if(noah == null || sigle == null || currentPlayer == null) { mode = newMode; return true; }
 
         // 一緒に戻ったら、相棒が合流する（道があれば歩いて、なければ操作しているキャラの位置へ）
@@ -572,6 +646,6 @@ public class PlayerSwitchManager : Singleton<PlayerSwitchManager>
         if(noahHealth == null || sigleHealth == null) { return; }
 
         sigleHealth.ShareWith(null);
-        noahHealth.ShareWith(mode == PartyMode.Together ? sigleHealth : null);
+        noahHealth.ShareWith(mode == PartyMode.Together && !partnerAbsent ? sigleHealth : null);
     }
 }

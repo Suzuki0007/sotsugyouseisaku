@@ -18,10 +18,10 @@ MonoBehaviour:
     speakerName: 
     text: "\u3069\u308C\u304F\u3089\u3044\u7D4C\u3063\u305F\uFF1F"
   - character: {fileID: 11400000, guid: 1e130490a0c3e1c45886bec74eba2656, type: 2}
-    expression: 0
+    expression: 5
     speakerName: 
     text: "\u30CE\u30A2\u306F"
   - character: {fileID: 11400000, guid: 1e130490a0c3e1c45886bec74eba2656, type: 2}
-    expression: 0
+    expression: 5
     speakerName: 
     text: "\u307E\u305A\u3044\u306A\u3001\u65E9\u304F\u5408\u6D41\u3057\u306A\u3051\u308C\u3070\u3002"

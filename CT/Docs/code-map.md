@@ -12,7 +12,7 @@
 | `Assets/Scenes/` | **Build Settings：`Title` → `Stage1_1` ⇄ `Stage1_2`、`SceneGameOver`**。ファイルだけ残っているもの：`Stage1` / `Stage2`（**古い作り**：プレイヤーをシーンに直接置く）、`SampleScene`、`kari/`（仮の Start / Clear）、`Tilemap/` |
 | `Assets/Prefab/` | `Players/`（Player_Noah / Player_Sigle）、`Gimmicks/Sample/`（仕掛けのサンプルの部屋）、`Enemies/`（Enemy＝古い作り。新しい作りの Enemy_Base は `Resources/Enemies/`）、`Bullet/`、`UI/`（DialoguePanel、**DialogueSystem**） |
 | `Assets/Resources/` | `Items/`（ItemData。**必ずここ**。`Items/Sample/` にサンプル）、`UI/`（ItemMenu・GameMenu のプレハブ。それぞれ Resources.Load で自動生成）、`PlaceNames.asset`（場所の表示名）、`Enemies/Enemy_Base.prefab`（新しい作りの敵の共通プレハブ。仲間を呼ぶときに実行中に読む）、`UI/BattleHud.prefab`（戦闘の画面表示）、`Barks/`（相棒の一言 BarkData。`Sample/` にサンプル 16 個＝使うはオフ）、`BarkSettings.asset`（一言の見た目・出し方）、`PartyHints.asset`・`PuzzleUI.asset`・`Notes/` |
-| `Assets/Data/` | `Enemies/`（EnemyData・EnemyPattern・AttackData。`Sample/`〔`Attacks/`・`Patterns/`〕にサンプル）、`Characters/`（CharacterProfile：Noah / Sigle）、`Dialogue/`（シナリオの会話：`Scenario_F1.csv`〔一層〕・`Scenario_F2.csv`〔二層〕と、取り込んだ DialogueData の `Scenario_F1/`・`Scenario_F2/`）、`Flags/`（GameFlag）、`Animation/Sample/`（SpriteAnimData）、`Effect/Sample/`（EffectData） |
+| `Assets/Data/` | `Enemies/`（EnemyData・EnemyPattern・AttackData。`Sample/`〔`Attacks/`・`Patterns/`〕にサンプル）、`Characters/`（CharacterProfile：Noah / Sigle）、`Dialogue/`（シナリオの会話：`Scenario_OP.csv`〔OP〕・`Scenario_F1.csv`〔一層〕・`Scenario_F2.csv`〔二層〕と、取り込んだ DialogueData の `Scenario_OP/`・`Scenario_F1/`・`Scenario_F2/`）、`Flags/`（GameFlag。`Flag_OP_Done`＝OP を見た、`Flag_Sigle_Joined`＝シグルが仲間になった）、`Animation/Sample/`（SpriteAnimData）、`Effect/Sample/`（EffectData） |
 | `Assets/Behavior/Enemy/` | Unity Behavior の敵 AI グラフ（`Behavior Graph.asset`）と独自ノード |
 | `Assets/Images/`、`Assets/BGM/`、`Assets/SE/`、`Assets/Fonts/` | 素材 |
 | `Assets/res_kari/` | 仮素材（マップタイル約2000枚、仮プレイヤー画像など） |
@@ -57,7 +57,7 @@
 | `Player/PlayerMapLimit.cs` | マップの範囲（`MapBounds`）に収める。`ClampToMap`（体の大きさの分だけ内側。当たり判定が無効でも形から大きさを出す）を PlayerMovement が動く前に使い、LateUpdate でも念のため戻す（物理の位置も合わせる）。**LateUpdate の順番**：PlayerFollower（0）→ PlayerMapLimit（100）→ PlayerHistory（200）→ CharacterAnimLink（300）。`DefaultExecutionOrder` で決めている（順番が崩れると、ついてくる相棒が端で震える） | ◎ |
 | `Player/PlayerMovement.cs` | 操作できるかのフラグを追加。操作できなくなったら向きと速さを消す。FixedUpdate で毎回速さを 0 にしてから動かす（押されて滑らない） | ◎ |
 | `Player/PlayerInput.cs` | キー入力 → 操作中キャラの移動、Q で弾消し、**マウスの左クリックで射撃**（操作中のキャラに SigleShooter があれば。Update で直接読む。Target Camera が空ならメインカメラ。`OnShot` は Input System のイベント用に残しているが未使用） | ◎ |
-| `Manager/PlayerSwitchManager.cs` | Noah / Sigle の切り替え（位置の入れ替え、追従、カメラ）、`Warp`。**2人の状態** `PartyMode`（一緒／待機／別行動。`SetMode`、`ModeChanged`・`Switched` イベント）：一緒のときだけ位置を入れ替え・相棒がついてくる（待機・別行動は `PlayerFollower.Hold`、カメラだけ移る）。一緒に戻ると相棒が合流（道があれば歩く）。**待て／ついてこい**（F キー、`ToggleWait`・`TrySetMode(..., requireRoute)`・`CanPartnerReach`・`WaitCommandLocked`）。体の当たり判定（`ApplyBodyCollision`：ついてきている間だけプレハブのまま＝シグルは無効）。体力の共有（一緒＝ノア → シグル、離れる＝別々）、`PartyHealth`（一緒＝シグル、離れる＝操作中のキャラ）、`HealthOf` | ◎ |
+| `Manager/PlayerSwitchManager.cs` | Noah / Sigle の切り替え（位置の入れ替え、追従、カメラ）、`Warp`。**2人の状態** `PartyMode`（一緒／待機／別行動。`SetMode`、`ModeChanged`・`Switched` イベント）：一緒のときだけ位置を入れ替え・相棒がついてくる（待機・別行動は `PlayerFollower.Hold`、カメラだけ移る）。一緒に戻ると相棒が合流（道があれば歩く）。**待て／ついてこい**（F キー、`ToggleWait`・`TrySetMode(..., requireRoute)`・`CanPartnerReach`・`WaitCommandLocked`）。体の当たり判定（`ApplyBodyCollision`：ついてきている間だけプレハブのまま＝シグルは無効）。体力の共有（一緒＝ノア → シグル、離れる＝別々）、`PartyHealth`（一緒＝シグル、離れる＝操作中のキャラ）、`HealthOf`。**相棒の合流**（11-13）：「シグルが仲間になったフラグ」（`sigleJoinedFlag`、空なら最初から2人）が立つまでシグルを非表示にしてノア1人（`PartnerAbsent` / `IsPartnerAbsent`。体力はノアの分、C・F・`SetMode` は効かない）。`GameFlags.OnChanged` を見て、フラグが立つとノアの位置にシグルを出して一緒にする | ◎ |
 | `Party/PartyModeEventAction.cs` | イベントの部品「2人の状態を変える」（状態〔変えないも可〕・操作するキャラ・待て／ついてこいのキーを使えなくする）。まだセーブしない | ◎ |
 | `Player/PlayerHistory.cs`（`SeedPolyline`：曲がり角のある道を歩いてきた履歴にする）、`Player/PlayerFollower.cs` | 位置の履歴と、操作していない側の追従（何フレーム前の位置か） | ◎ |
 | `Player/PlayerMapLimit.cs` | Tilemap の範囲内に収める | ◎ |
@@ -111,7 +111,7 @@
 
 | フォルダ | 主なファイル |
 |---|---|
-| `Event/` | `EventProcess/EventSequence.cs`、`EventAction.cs`、`EventZone.cs`、`Actions/`（SetActive / SpriteChange / Wait） |
+| `Event/` | `EventProcess/EventSequence.cs`、`EventAction.cs`、`EventZone.cs`、`Actions/`（SetActive / SpriteChange / Wait / **ScreenFade**＝画面の暗転。会話の画面〔並び順 100〕より奥の黒い幕 `ScreenCurtain`〔90、シーンごと〕なので、暗いまま会話できる）、**`SceneStartEvent.cs`**（シーンが始まったときに条件〔GameCondition〕を満たせば EventSequence を実行。「最初から暗転しておく」。OP で使用） |
 | `Item/` | `ItemData.cs`、`ItemPickup.cs`、`Interaction/`（ItemInteraction / ItemCondition / ItemPossessionSwitch / ItemGive / ItemTake） |
 | `Flag/` | `GameFlag.cs`、`GameFlags.cs`、`FlagCondition.cs`、`SetFlagEventAction.cs`、`FlagSwitch.cs` |
 | `Talk/` | `DialogueManager.cs`、`Dialogue.cs`、`DialogueData.cs`、`DialogueEventAction.cs`、`CharacterProfile.cs`、`Expression.cs`、🛠`Editor/DialogueCsv.cs` |
@@ -252,6 +252,8 @@
 |---|---|
 | Stage1_1 / Stage1_2 / SampleScene の `MapEntity/OB_TRbox` | 宝箱の Id が空（シーンチェックでエラー。ほかの宝箱と開いた記録が混ざる） |
 | 同じ3シーンの `Event`（ルート） | 中身が空の EventZone / EventSequence。Is Trigger の Collider2D もない（シーンチェックでエラー・注意が出るが、動作上の害はない。不要なら消す） |
+| 🆕 Stage1_1 の `Event/DialogueEventZone` | 入ると古い会話（非表示の `OB_Text` の Dialogue）を出す EventZone が、マップの右側（-106.8, 17.3）に残っている。OP とは別。要らなければ消す |
+| 🆕 Stage1_2 のシグルの合流 | Stage1_1 は「シグルが仲間になったフラグ」でノア1人。**Stage1_2 の PlayerSwitchManager にはまだフラグを入れていない**（今は Stage1_2 に入るとシグルが一緒に出る）。出会いのイベント（F1_05〜F1_07）を作るときに、フラグを入れてイベントの最後で立てる |
 | Stage1_2 | 会話 UI がシーンの Canvas に直接組まれている（他のシーンは DialogueSystem.prefab）。揃えるなら置き換え |
 | 🆕 Stage1_2 のルートの `Player` | Transform と FootstepSe だけの動かないオブジェクト（上の「FootstepSe が付いていない」を参照）。プレハブに移したら消す |
 | Stage1_1 / Stage1_2 の `OtherSystem/SceneChange`、SceneGameOver の SceneChange | 遷移先が空（シーンチェックで「参考」）。死亡時・リトライでコードから `ChangeScene` を呼ぶためのもので、問題なし |

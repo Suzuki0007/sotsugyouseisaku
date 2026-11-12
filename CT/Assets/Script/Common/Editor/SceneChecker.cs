@@ -612,10 +612,18 @@ public static class SceneChecker
 
     private static void CheckInteractables(Context ctx)
     {
+        // イベントの部品「会話」（DialogueEventAction）から使われている Dialogue
+        var usedByEvent = new HashSet<Object>();
+        foreach(DialogueEventAction action in ctx.Find<DialogueEventAction>())
+        {
+            Object dialogue = new SerializedObject(action).FindProperty("dialogue").objectReferenceValue;
+            if(dialogue != null) { usedByEvent.Add(dialogue); }
+        }
+
         foreach(Intaractable target in ctx.Find<Intaractable>())
         {
             // DialogueEventAction から呼ぶための Dialogue は、調べる範囲がなくてよい
-            if(target is Dialogue && target.GetComponent<EventAction>() != null) { continue; }
+            if(target is Dialogue && (target.GetComponent<EventAction>() != null || usedByEvent.Contains(target))) { continue; }
 
             if(!HasTrigger(target.gameObject))
             {

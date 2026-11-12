@@ -18,11 +18,11 @@ MonoBehaviour:
     speakerName: 
     text: "\u3053\u3053\u304C\u3002"
   - character: {fileID: 11400000, guid: 5dd6beef385447d41b6fb1926a5d911e, type: 2}
-    expression: 0
+    expression: 5
     speakerName: 
     text: "\u624B\u7D19\u3060\u3068\u3053\u306E\u4E2D\u306B\u30AB\u30A4\u30ED\u30B9\u304C\u3044\u308B\u306F\u305A\u306A\u3093\u3060\u3051\u3069\u3001\u3001\u3002"
   - character: {fileID: 11400000, guid: 5dd6beef385447d41b6fb1926a5d911e, type: 2}
-    expression: 0
+    expression: 3
     speakerName: 
     text: "\u3001\u3001\u3001\u3002"
   - character: {fileID: 11400000, guid: 5dd6beef385447d41b6fb1926a5d911e, type: 2}
