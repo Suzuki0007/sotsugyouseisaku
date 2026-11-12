@@ -69,7 +69,7 @@
 | `Player/Player_Sigle/SigleShooter.cs` | Sigle の射撃（プール・SE・エフェクト） | ◎ |
 | `Player/FocusPlayer.cs`、`Player_Noah/NoahMapLimit.cs`、`Player_Noah/NoahHistory.cs` | 古い仕組み（Stage1 / Stage2 で使われている） | △ |
 | `CharaBase/CharacterSorting.cs` | Sigle の描画順を Noah との上下で切り替え | ○ |
-| `Gimmick/WalkArea.cs` | （11-13）歩ける範囲を円・四角・多角形の組み合わせで決める（子の Collider2D を形として読み、再生中は無効にする）。`Clamp`・`Contains`。`PlayerMapLimit.ClampToMap` が最後に呼ぶ（置いていないシーンは今までどおり）。Stage_1_3 のティンパニ部屋で使用 | ◎ |
+| `Gimmick/WalkArea.cs` | （11-13）歩ける範囲を円・四角・多角形の組み合わせで決める（子の Collider2D を形として読み、再生中は無効にする）。`Clamp`・`Contains`・`ContainsPoint`／`ShapeCount`（エディタでも使える。シーンチェック用）。`PlayerMapLimit.ClampToMap` が最後に呼ぶ（置いていないシーンは今までどおり）。Stage_1_3 のティンパニ部屋で使用 | ◎ |
 | `Party/GuardGauge.cs` | （11-13）守り（弾消し）のゲージ。置いたシーンだけ、弾消しを出せる時間とリチャージを決める（空になると決めた量までたまるまで出せない）。画面の HP の下に「シグルの守り（Q）」のゲージ。`Use`（`NoahBulletDeleteAreaController` が呼ぶ）・`Refill`・`BoostRecharge`・`ResetGauge`・`Emptied`・`Ready`。Stage_1_3 で使用 | ◎ |
 | `Item/InstantPickup.cs` | （11-13）触れるとすぐ効くアイテム（回復／守りのゲージ）。持ち物に入らない・セーブしない。決めた時間で点滅して消える。`Spawn`・`Picked`・`Appeared`。プレハブ `Prefab/Gimmicks/Timpani/Item_Heal`・`Item_GuardBoost` | ◎ |
 | `Timpani/TimpaniUnit.cs` | （11-13）ティンパニ1台。ペグが締まるたびに周りの弾を消し敵を止める、全部締まると敵をおとなしくする（`Kill`・絵の差し替え・♪・回復アイテム）。`Calmed`・`AttacksCleared` | ◎ |

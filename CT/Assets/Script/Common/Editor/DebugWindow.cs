@@ -92,6 +92,7 @@ public class DebugWindow : EditorWindow
             DrawPlayer();
             DrawEnemies();
             DrawGimmicks();
+            DrawTimpani();
         }
 
         DrawStartState();
@@ -410,6 +411,74 @@ public class DebugWindow : EditorWindow
     //=====================================================================
     // 仕掛け（謎解き）
     //=====================================================================
+
+    private bool foldTimpani = true;
+
+    /// <summary>
+    /// ティンパニの部屋（Stage_1_3）：進み具合と、ペグ・調律を飛ばすボタン
+    /// </summary>
+    private void DrawTimpani()
+    {
+        TimpaniRoom room = TimpaniRoom.Active;
+        if(room == null) { return; }
+
+        foldTimpani = EditorGUILayout.BeginFoldoutHeaderGroup(foldTimpani, "ティンパニ");
+        if(foldTimpani)
+        {
+            EditorGUILayout.LabelField("進み具合", $"ペグ {room.TightenedPegs} / {room.TotalPegs}　調律 {room.CalmedCount} / {room.UnitCount}");
+
+            using(new EditorGUILayout.HorizontalScope())
+            {
+                if(GUILayout.Button(new GUIContent("近くのペグを締める", "操作中のキャラに一番近い、締まっていないペグを締める（リズムゲームを飛ばす）"), EditorStyles.miniButton))
+                {
+                    TimpaniPeg nearest = null;
+                    float best = float.MaxValue;
+                    GameObject current = PlayerSwitchManager.Instance != null ? PlayerSwitchManager.Instance.CurrentPlayer : null;
+                    Vector2 from = current != null ? (Vector2)current.transform.position : Vector2.zero;
+                    foreach(TimpaniPeg peg in FindObjectsByType<TimpaniPeg>())
+                    {
+                        if(peg.IsTightened) { continue; }
+                        float d = ((Vector2)peg.transform.position - from).sqrMagnitude;
+                        if(d < best) { best = d; nearest = peg; }
+                    }
+                    if(nearest != null) { TightenForDebug(nearest); }
+                }
+
+                if(GUILayout.Button(new GUIContent("1台調律する", "まだ調律できていないティンパニを1台、ペグを全部締めて調律する"), EditorStyles.miniButton))
+                {
+                    foreach(TimpaniUnit unit in FindObjectsByType<TimpaniUnit>())
+                    {
+                        if(unit.IsCalmed) { continue; }
+                        foreach(TimpaniPeg peg in unit.Pegs) { if(peg != null && !peg.IsTightened) { TightenForDebug(peg); } }
+                        break;
+                    }
+                }
+
+                if(GUILayout.Button(new GUIContent("全部調律する", "全部のペグを締めてクリアにする"), EditorStyles.miniButton))
+                {
+                    foreach(TimpaniPeg peg in FindObjectsByType<TimpaniPeg>()) { if(!peg.IsTightened) { TightenForDebug(peg); } }
+                }
+            }
+
+            GuardGauge gauge = GuardGauge.Active;
+            if(gauge != null)
+            {
+                using(new EditorGUILayout.HorizontalScope())
+                {
+                    EditorGUILayout.LabelField("守りのゲージ", $"{gauge.Amount * 100.0f:0}%" + (gauge.Exhausted ? "（回復中）" : ""));
+                    if(GUILayout.Button("満タン", EditorStyles.miniButton, GUILayout.Width(60))) { gauge.ResetGauge(); }
+                    if(GUILayout.Button("空にする", EditorStyles.miniButton, GUILayout.Width(60))) { GuardGauge.Use(999.0f); }
+                }
+            }
+        }
+        EditorGUILayout.EndFoldoutHeaderGroup();
+    }
+
+    // ペグの「締まった」処理をそのまま呼ぶ（攻撃を消す・調律・一言も、遊んだときと同じに起きる）
+    private static void TightenForDebug(TimpaniPeg peg)
+    {
+        typeof(TimpaniPeg).GetMethod("Tighten", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)?.Invoke(peg, null);
+    }
 
     private void DrawGimmicks()
     {

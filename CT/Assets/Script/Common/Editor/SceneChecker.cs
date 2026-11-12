@@ -73,6 +73,76 @@ public static class SceneChecker
         CheckDialogues(ctx);
         CheckEnemies(ctx);
         CheckGimmicks(ctx);
+        CheckWalkAreaAndTimpani(ctx);
+    }
+
+    //=====================================================================
+    // 歩ける範囲・ティンパニ
+    //=====================================================================
+
+    private static void CheckWalkAreaAndTimpani(Context ctx)
+    {
+        // 歩ける範囲：形があるか・出現位置や調べる物が範囲の中か
+        List<WalkArea> areas = new List<WalkArea>(ctx.Find<WalkArea>());
+        if(areas.Count > 1) { ctx.Add(Level.Warning, areas[1], "歩ける範囲（WalkArea）が2つ以上あります（使われるのは1つだけです）"); }
+
+        WalkArea area = areas.Count > 0 ? areas[0] : null;
+        if(area != null)
+        {
+            if(area.ShapeCount == 0)
+            {
+                ctx.Add(Level.Error, area, "歩ける範囲（WalkArea）に形がありません。子に Circle / Box / Polygon Collider 2D の付いた物を置いてください（このままだとどこへでも歩けます）");
+            }
+            else
+            {
+                foreach(PlayerSpawnPoint point in ctx.Find<PlayerSpawnPoint>())
+                {
+                    if(!area.ContainsPoint(point.transform.position))
+                    {
+                        ctx.Add(Level.Error, point, $"出現位置「{point.SpawnPointId}」が歩ける範囲の外にあります（出たとたんに範囲のふちへ動かされます）");
+                    }
+                }
+                foreach(TimpaniPeg peg in ctx.Find<TimpaniPeg>())
+                {
+                    Collider2D col = peg.GetComponent<Collider2D>();
+                    bool reachable = area.ContainsPoint(peg.transform.position) ||
+                                     (col != null && area.ContainsPoint(col.bounds.ClosestPoint(peg.transform.position + Vector3.down * 10.0f)));
+                    if(!reachable) { ctx.Add(Level.Warning, peg, "ペグが歩ける範囲の外にあります（近づけないかもしれません）"); }
+                }
+            }
+        }
+
+        // ティンパニ1台：真ん中の敵とペグがあるか
+        foreach(TimpaniUnit unit in ctx.Find<TimpaniUnit>())
+        {
+            if(unit.GetComponentInChildren<Enemy>(true) == null && new SerializedObject(unit).FindProperty("creature").objectReferenceValue == null)
+            {
+                ctx.Add(Level.Error, unit, "ティンパニ（TimpaniUnit）に真ん中の敵がありません（子に敵を置くか、「真ん中の敵」に入れてください）");
+            }
+            if(unit.GetComponentsInChildren<TimpaniPeg>(true).Length == 0 && new SerializedObject(unit).FindProperty("pegs").arraySize == 0)
+            {
+                ctx.Add(Level.Error, unit, "ティンパニ（TimpaniUnit）にペグがありません（子にペグのプレハブを置いてください）");
+            }
+        }
+
+        // 部屋全体：クリアのフラグ・激しさのフラグ
+        foreach(TimpaniRoom room in ctx.Find<TimpaniRoom>())
+        {
+            var so = new SerializedObject(room);
+            if(so.FindProperty("clearedFlag").objectReferenceValue == null)
+            {
+                ctx.Add(Level.Warning, room, "ティンパニの部屋（TimpaniRoom）の「全部調律できたら立てるフラグ」が空です（戦闘の勝ち方・クリア後に戻ってきたときの姿に使います）");
+            }
+
+            SerializedProperty flags = so.FindProperty("escalationFlags");
+            for(int i = 0; i < flags.arraySize; i++)
+            {
+                if(flags.GetArrayElementAtIndex(i).objectReferenceValue is GameFlag flag && flag.Saved)
+                {
+                    ctx.Add(Level.Info, room, $"激しさのフラグ「{flag.Id}」がセーブするフラグです（シーンが始まるたびに OFF に戻すので動きますが、セーブしないフラグにするのがおすすめです）");
+                }
+            }
+        }
     }
 
     //=====================================================================

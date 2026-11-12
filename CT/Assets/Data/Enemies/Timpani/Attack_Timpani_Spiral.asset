@@ -46,11 +46,11 @@ MonoBehaviour:
   hitInterval: 0.5
   rotateSpeed: 0
   bulletPattern: 2
-  bulletCount: 4
+  bulletCount: 3
   bulletSpread: 30
-  bulletSpiralStep: 11
-  bulletVolleys: 24
-  bulletVolleyInterval: 0.12
+  bulletSpiralStep: 14
+  bulletVolleys: 14
+  bulletVolleyInterval: 0.14
   bulletSpeed: 3
   bulletDeletable: 1
   dropObject: {fileID: 0}
@@ -70,6 +70,9 @@ MonoBehaviour:
   activeEffect: {fileID: 0}
   activeSe: {fileID: 0}
   activeShake: 0
+  spawnOnActive: {fileID: 0}
+  spawnChance: 0.3
   activeAnimation: Attack
   recoveryTime: 0.8
-  memo: "\u3082\u3063\u3068\u6FC0\u3057\u3044\u6BB5\u968E\u3067\u5897\u3048\u308B\u653B\u6483\uFF1A\u3046\u305A\u5DFB\u304D\u306E\u5F3E\uFF08\u4E88\u5146\u306F\u30D4\u30F3\u30AF\u306E\u8F2A\uFF09\u3002\u5F3E\u6D88\u3057\u3067\u6D88\u305B\u308B"
+  memo: "\u3082\u3063\u3068\u6FC0\u3057\u3044\u6BB5\u968E\u3067\u5897\u3048\u308B\u653B\u6483\uFF1A3
+    \u672C\u306E\u3046\u305A\u5DFB\u304D\uFF0814 \u56DE\u30FB\u7D04 2 \u79D2\uFF09\u3002\u4E88\u5146\u306F\u30D4\u30F3\u30AF\u306E\u8F2A\u3002\u5F3E\u6D88\u3057\u3067\u6D88\u305B\u308B"

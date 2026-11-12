@@ -134,6 +134,32 @@ public class WalkArea : MonoBehaviour
         return false;
     }
 
+    /// <summary>
+    /// 位置がこの範囲の中か（エディタでも使える。シーンチェック用）
+    /// </summary>
+    public bool ContainsPoint(Vector2 position)
+    {
+        if(!Application.isPlaying) { Collect(false); }
+
+        foreach(Shape shape in shapes)
+        {
+            if(shape.owner != null && shape.owner.activeInHierarchy && Closest(shape, position, out _)) { return true; }
+        }
+        return false;
+    }
+
+    /// <summary> 形の数（表示されているもの） </summary>
+    public int ShapeCount
+    {
+        get
+        {
+            if(!Application.isPlaying) { Collect(false); }
+            int count = 0;
+            foreach(Shape shape in shapes) { if(shape.owner != null && shape.owner.activeInHierarchy) { count++; } }
+            return count;
+        }
+    }
+
     private Vector2 ClampInternal(Vector2 position)
     {
         bool found = false;

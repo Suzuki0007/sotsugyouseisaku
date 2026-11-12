@@ -50,6 +50,6 @@ paths:
 
 ## プランナー用ツール（`Assets/Script/Common/`）
 - `[SceneName]` / `[SpawnPointId(nameof(sceneField))]`：string をドロップダウンに。`SceneLookup` が Build Settings と閉じたシーンのファイルから出現位置 ID を読む（プレハブ内のものは読めない）。
-- `SceneChecker` / `SceneCheckWindow`（Tools > シーンチェック）：設定ミスの一覧。**チェックを増やすときは `SceneChecker.CheckScene` / `CheckProject` に足す。**
-- `DebugWindow`（Tools > デバッグ）：アイテム増減、フラグ、ワープ（`PlayerSwitchManager.Warp`）、シーン移動、回復、無敵（`Health.PlayerInvincible`）、再生開始時の状態（`DebugStartState`、EditorPrefs）、セーブ操作、敵、仕掛け。
+- `SceneChecker` / `SceneCheckWindow`（Tools > シーンチェック）：設定ミスの一覧（11-13：歩ける範囲・ティンパニの確認を追加）。**チェックを増やすときは `SceneChecker.CheckScene` / `CheckProject` に足す。**
+- `DebugWindow`（Tools > デバッグ）：アイテム増減、フラグ、ワープ（`PlayerSwitchManager.Warp`）、シーン移動、回復、無敵（`Health.PlayerInvincible`）、再生開始時の状態（`DebugStartState`、EditorPrefs）、セーブ操作、敵、仕掛け、ティンパニ（TimpaniRoom があるときだけ）。
 - `GameCondition`：フラグ・アイテム・操作キャラ・パーティーの体力・範囲・仕掛けの状態・2人の状態。`IsMet` / `AllMet` / `AnyMet`。
