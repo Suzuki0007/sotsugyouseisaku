@@ -4,7 +4,8 @@
 #   event.ps1 -Advance 3                   advance N dialogue lines (finish typing + next)
 #   event.ps1 -UntilIdle                   keep advancing until no dialogue and no event sequence is running
 #   event.ps1 -Warp "-128.6,13.0"          warp Noah and Sigle to x,y
-#   event.ps1 -Run "Root/Child/Object"     run ItemInteraction (as the current player) or EventSequence on an active object
+#   event.ps1 -Run "Root/Child/Object"     run ItemInteraction (as the current player) or EventSequence on an active object;
+#                                          any other Intaractable (switch, peg...) gets its Interact() called (= pressing E in range)
 #   event.ps1 -Flag Flag_OP_Done -Value 1  set a GameFlag asset (Assets/Data/Flags/<name>.asset) on/off
 #   event.ps1 -Capture name                capture the Game view to %TEMP%\ct_playtest_capture\name.png
 # Each eval round trip takes ~1.5 s, so effects shorter than that (flash, shot) cannot be captured.
@@ -96,7 +97,9 @@ var m = UnityEngine.Object.FindAnyObjectByType<PlayerSwitchManager>();
 var who = m != null ? m.CurrentPlayer : null;
 var ii = go.GetComponent<ItemInteraction>(); if (ii != null) { ii.Run(who); return "ItemInteraction.Run"; }
 var seq = go.GetComponent<EventSequence>(); if (seq != null) { seq.Play(who); return "EventSequence.Play"; }
-return "no ItemInteraction / EventSequence on " + go.name;
+var any = go.GetComponent<Intaractable>();
+if (any != null) { var mi = typeof(Intaractable).GetMethod("Interact", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance); mi.Invoke(any, null); return any.GetType().Name + ".Interact (same as pressing E; the player must be in range)"; }
+return "no ItemInteraction / EventSequence / Intaractable on " + go.name;
 '@
     Invoke-UnityEval -Code ($code.Replace("__PATH__", $Run.Replace('"', '\"')))
     return
