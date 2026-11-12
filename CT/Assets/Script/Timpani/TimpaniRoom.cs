@@ -43,6 +43,10 @@ public class TimpaniRoom : MonoBehaviour
     [SerializeField, Label("全部調律できたら残りの弾を消す")]
     private bool clearBulletsOnFinish = true;
 
+    [SerializeField]
+    [Tooltip("全部調律できたら表示する物（出口への通路の「歩ける範囲」など）。クリアしたあとに戻ってきたときも表示する")]
+    private List<GameObject> showWhenCleared = new List<GameObject>();
+
     private int calmedCount;
 
     //=====================================================================
@@ -87,6 +91,21 @@ public class TimpaniRoom : MonoBehaviour
         }
     }
 
+    private void Start()
+    {
+        // クリアしたあとに戻ってきた：全部調律できた姿にする（会話・アイテム・音はなし）
+        if(clearedFlag == null || !GameFlags.Get(clearedFlag)) { return; }
+
+        foreach(TimpaniUnit u in units) { if(u != null) { u.RestoreCalmed(); } }
+        calmedCount = units.Count;
+        ShowClearedObjects();
+    }
+
+    private void ShowClearedObjects()
+    {
+        foreach(GameObject go in showWhenCleared) { if(go != null) { go.SetActive(true); } }
+    }
+
     private void OnDestroy()
     {
         if(Active == this) { Active = null; }
@@ -126,6 +145,7 @@ public class TimpaniRoom : MonoBehaviour
         }
 
         if(clearedFlag != null) { GameFlags.Set(clearedFlag, true); }
+        ShowClearedObjects();
         AllCalmed?.Invoke();
         if(onAllCalmed != null) { onAllCalmed.Play(gameObject); }
     }

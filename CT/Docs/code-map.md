@@ -74,6 +74,7 @@
 | `Item/InstantPickup.cs` | （11-13）触れるとすぐ効くアイテム（回復／守りのゲージ）。持ち物に入らない・セーブしない。決めた時間で点滅して消える。`Spawn`・`Picked`・`Appeared`。プレハブ `Prefab/Gimmicks/Timpani/Item_Heal`・`Item_GuardBoost` | ◎ |
 | `Timpani/TimpaniUnit.cs` | （11-13）ティンパニ1台。ペグが締まるたびに周りの弾を消し敵を止める、全部締まると敵をおとなしくする（`Kill`・絵の差し替え・♪・回復アイテム）。`Calmed`・`AttacksCleared` | ◎ |
 | `Timpani/TimpaniRoom.cs` | （11-13）ティンパニの部屋全体。調律できた数で敵の段階を進めるフラグを立てる、全部でクリアのフラグ・`AllCalmed`・イベント | ◎ |
+| `Timpani/TimpaniBarks.cs` | （11-13）ティンパニ戦の一言。戦闘エリアが動いている間、できごと（ペグ・調律・守り・アイテム・ダメージ・体力・進まない・始まった）ごとに候補の一言を確率と間隔で出す（`Bark.PlayLines`） | ◎ |
 | `Timpani/TimpaniPeg.cs` | （11-13）ティンパニのペグ。調べるとリズムゲーム（縮む輪が中心の輪に重なるときに E）、決めた回数の成功で締まり GimmickState が ON。ゲームは止まらない・離れると中断・使えるキャラ（ノアだけ）。色と印（◆◇・♪）で進み具合。`Succeeded`・`Missed`・`Tightened`（static イベント）。プレハブ `Prefab/Gimmicks/Timpani/Peg.prefab` | ◎ |
 | `Scene/SceneChangeEventAction.cs` | （11-13）イベントの部品「シーンを移る」（シーンの `SceneChange.ChangeScene` を呼ぶ。イベントの最後に置く）。Stage1_2 の正面の扉 → Stage_1_3 | ◎ |
 | `Camera/CameraShake.cs`、`ShakeEventAction.cs` | （11-13）画面を揺らす。描画の間だけカメラの位置をずらす（`RenderPipelineManager.begin/endCameraRendering`）ので、FocusCamera の追従とぶつからない。イベントの部品「画面を揺らす」 | ◎ |
@@ -265,7 +266,7 @@
 | Stage1_1 / Stage1_2 / SampleScene の `MapEntity/OB_TRbox` | 宝箱の Id が空（シーンチェックでエラー。ほかの宝箱と開いた記録が混ざる） |
 | 同じ3シーンの `Event`（ルート） | 中身が空の EventZone / EventSequence。Is Trigger の Collider2D もない（シーンチェックでエラー・注意が出るが、動作上の害はない。不要なら消す） |
 | 🆕 Stage1_1 の `Event/DialogueEventZone` | 入ると古い会話（非表示の `OB_Text` の Dialogue）を出す EventZone が、マップの右側（-106.8, 17.3）に残っている。OP とは別。要らなければ消す |
-| 🆕 Stage_1_3 の音楽生物・弾 | 絵は仮（紫の丸い生き物 `Images/Enemy/Enemy_Timpani_Creature_kari.png`、丸い弾 `Bullet_Timpani_Note_kari.png`）。今は戦闘の始まりがないので、再生するとすぐ攻撃してくる（段階5 で戦闘エリアにする） |
+| 🆕 Stage_1_3 の音楽生物・弾・アイテム | 絵は仮（紫の丸い生き物・調律後の水色の絵・丸い弾・ハート・青い菱形）。音は空欄。左の出口の先（台本 F1_13 の階段・二層）のシーンはまだない |
 | 🆕 Stage_1_3（ティンパニ部屋。作りかけ） | Stage1_1 のコピーが元なので、使わない物（`soto_*`・`OB_*`・`Event`・古い `EnemySpawner` など）が非表示で残っている。`SavePoint` は部屋の外にあったので非表示にした。`Grid/room_timpani_yuka_0`（床だけの絵）が `soto_yuka`（部屋全体の絵）の下に少しずれて重なっている。左の出入口は歩ける範囲の外 |
 | 🆕 Stage1_2 の追跡の敵（`Stage1_2_イベント/塔の化け物`） | 見た目が仮（敵の共通プレハブの絵＝シグルに似た絵）。敵の画像ができたら `EnemyData_Stage1_2_Chaser` の Sprite / Animation に入れる。ランタンも仮の丸（`見た目（仮）`） |
 | 🆕 シグルのアニメのデータ（`Anim_Sample_Sigle`） | 「Walk」の動きがないので、歩いても立ち姿のまま動く（ついてくるとき・Stage1_2 の助けの場面で歩いてくるとき）。ノアのデータには Walk がある |

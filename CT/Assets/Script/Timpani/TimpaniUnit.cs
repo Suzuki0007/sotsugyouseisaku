@@ -206,6 +206,25 @@ public class TimpaniUnit : MonoBehaviour
         if(onCalmed != null) { onCalmed.Play(gameObject); }
     }
 
+    /// <summary>
+    /// 音・演出・アイテムなしで調律できた状態にする（クリアしたあとに戻ってきたとき）
+    /// </summary>
+    public void RestoreCalmed()
+    {
+        if(calmed) { return; }
+        calmed = true;
+
+        foreach(TimpaniPeg peg in pegs) { if(peg != null) { peg.SetTightenedSilently(); } }
+
+        if(creature != null)
+        {
+            if(creature.Health != null && !creature.IsDead) { creature.Health.SetDeadSilently(); }
+            if(calmSprite != null) { SetCreatureSprite(); }
+        }
+
+        ShowCalmMark(creature != null ? (Vector2)creature.transform.position : (Vector2)transform.position);
+    }
+
     private void SetCreatureSprite()
     {
         if(creature == null) { return; }

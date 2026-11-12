@@ -288,6 +288,18 @@ public class TimpaniPeg : GimmickInteractable
     }
 
     /// <summary>
+    /// 音や演出なしで締まった状態にする（クリアしたあとに戻ってきたとき）
+    /// </summary>
+    public void SetTightenedSilently()
+    {
+        if(state == null) { state = GetComponent<GimmickState>(); }
+        playing = false;
+        successCount = RequiredSuccess;
+        state.Set(1, true, false);
+        RefreshVisuals();
+    }
+
+    /// <summary>
     /// 最初の状態に戻す（戦闘のやり直し・デバッグ用）
     /// </summary>
     public void ResetPeg()
