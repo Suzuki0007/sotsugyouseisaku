@@ -5,7 +5,6 @@
 // * \author 成田悠真
 /*********************************************************************/
 
-using System;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
@@ -19,52 +18,42 @@ public class PlayerSceneContext : MonoBehaviour
     //=====================================================================
 
     [Header("マップ")]
-
     [SerializeField]
     private Tilemap playerLimitTilemap;
 
-    [Header("弾")]
+    [SerializeField]
+    private MapBounds mapBounds;
 
+    [Header("弾")]
     [SerializeField]
     private PlayerBulletPool playerBulletPool;
 
-    [Header("カメラ")]
-
+    [Header("フォーカスカメラ")]
     [SerializeField]
-    private Camera targetCamera;
+    private FocusCamera focusCamera;
+
+    [Header("シーン切り替え")]
+    [SerializeField]
+    private SceneChange sceneChange;
 
     [Header("UI")]
-
     [SerializeField]
     private TimingGaugeUI timingGaugeUI;
 
     [SerializeField]
     private LifeUIController lifeUIController;
 
-    [Header("フォーカスカメラ")]
-
+    [Header("カメラ")]
     [SerializeField]
-    private FocusCamera focusCamera;
-
-    [Header("シーン切り替え")]
-
-    [SerializeField]
-    private SceneChange sceneChange;
+    private Camera targetCamera;
 
     [Header("範囲攻撃")]
-
     [SerializeField]
     private AreaAttack areaAttack;
 
     [Header("弾丸削除エリア")]
-
     [SerializeField]
     private BulletDeleteArea bulletDeleteArea;
-
-    [Header("マップ範囲")]
-
-    [SerializeField]
-    private MapBounds mapBounds;
 
     //=====================================================================
     // プロパティ
@@ -72,23 +61,23 @@ public class PlayerSceneContext : MonoBehaviour
 
     public Tilemap PlayerLimitTilemap => playerLimitTilemap;
 
+    public MapBounds MapBounds => mapBounds;
+
     public PlayerBulletPool PlayerBulletPool => playerBulletPool;
-
-    public Camera TargetCamera => targetCamera;
-
-    public TimingGaugeUI TimingGaugeUI => timingGaugeUI;
-
-    public LifeUIController LifeUIController => lifeUIController;
 
     public FocusCamera FocusCamera => focusCamera;
 
     public SceneChange SceneChange => sceneChange;
 
+    public TimingGaugeUI TimingGaugeUI => timingGaugeUI;
+
+    public LifeUIController LifeUIController => lifeUIController;
+
+    public Camera TargetCamera => targetCamera;
+
     public AreaAttack AreaAttack => areaAttack;
 
     public BulletDeleteArea BulletDeleteArea => bulletDeleteArea;
-
-    public MapBounds MapBounds => mapBounds;
 
     //=====================================================================
     // 初期化
@@ -96,38 +85,38 @@ public class PlayerSceneContext : MonoBehaviour
 
     private void Awake()
     {
-        if(PlayerLimitTilemap == null) { playerLimitTilemap = FindAnyObjectByType<Tilemap>(); }
+        // 参照が正しく設定されているかを検証する
+        ValidateReferences();
+    }
 
-        if(MapBounds == null)
+    private void ValidateReferences()
+    {
+        bool isValid = true;
+
+        // isValid = isValid && ValidateReference(...);
+        isValid &= ValidateReference(playerLimitTilemap, nameof(playerLimitTilemap));
+        isValid &= ValidateReference(mapBounds, nameof(mapBounds));
+        isValid &= ValidateReference(playerBulletPool, nameof(playerBulletPool));
+        isValid &= ValidateReference(focusCamera, nameof(focusCamera));
+        isValid &= ValidateReference(sceneChange, nameof(sceneChange));
+        isValid &= ValidateReference(timingGaugeUI, nameof(timingGaugeUI));
+        isValid &= ValidateReference(lifeUIController, nameof(lifeUIController));
+        isValid &= ValidateReference(targetCamera, nameof(targetCamera));
+        isValid &= ValidateReference(areaAttack, nameof(areaAttack));
+        isValid &= ValidateReference(bulletDeleteArea, nameof(bulletDeleteArea));
+
+        if(!isValid)
         {
-            // もしタグがMapFloorのオブジェクトがある場合、そのMapBoundsを使用する
-            GameObject mapFloorObject = GameObject.FindGameObjectWithTag("MapFloor");
-            if(mapFloorObject != null)
-            {
-                MapBounds mapBoundsFromFloor = mapFloorObject.GetComponent<MapBounds>();
-                if(mapBoundsFromFloor != null)
-                {
-                    mapBounds = mapBoundsFromFloor;
-                    return;
-                }
-            }
-
-            // タグでも見つからなかった場合は、FindAnyObjectByTypeで探す
-            mapBounds = FindAnyObjectByType<MapBounds>();
+            Debug.LogError($"{name}: PlayerSceneContextの参照設定が不足しています", this);
         }
     }
 
-    private void Start()
+    private bool ValidateReference(Object reference, string referenceName)
     {
-        if(PlayerLimitTilemap == null) { Debug.LogError($"{name}: PlayerLimitTilemapが見つかりません", this); }
-        if(PlayerBulletPool == null) { Debug.LogError($"{name}: PlayerBulletPoolが見つかりません", this); }
-        if(TargetCamera == null) { Debug.LogError($"{name}: TargetCameraが見つかりません", this); }
-        if(TimingGaugeUI == null) { Debug.LogError($"{name}: TimingGaugeUIが見つかりません", this); }
-        if(LifeUIController == null) { Debug.LogError($"{name}: LifeUIControllerが見つかりません", this); }
-        if(FocusCamera == null) { Debug.LogError($"{name}: FocusCameraが見つかりません", this); }
-        if(SceneChange == null) { Debug.LogError($"{name}: SceneChangeが見つかりません", this); }
-        if(AreaAttack == null) { Debug.LogError($"{name}: AreaAttackが見つかりません", this); }
-        if(BulletDeleteArea == null) { Debug.LogError($"{name}: BulletDeleteAreaが見つかりません", this); }
-        if(MapBounds == null) { Debug.LogError($"{name}: MapBoundsが見つかりません", this); }
+        if(reference != null) { return true; }
+
+        Debug.LogError($"{name}: {referenceName}が設定されていません", this);
+
+        return false;
     }
 }

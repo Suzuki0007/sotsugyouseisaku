@@ -36566,15 +36566,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerSceneContext
   playerLimitTilemap: {fileID: 185692953}
+  mapBounds: {fileID: 61014303}
   playerBulletPool: {fileID: 1665152894}
-  targetCamera: {fileID: 519420031}
-  timingGaugeUI: {fileID: 423259413}
-  lifeUIController: {fileID: 1168512692}
   focusCamera: {fileID: 519420033}
   sceneChange: {fileID: 1443821977}
+  timingGaugeUI: {fileID: 423259413}
+  lifeUIController: {fileID: 1168512692}
+  targetCamera: {fileID: 519420031}
   areaAttack: {fileID: 1420506456}
   bulletDeleteArea: {fileID: 54569704}
-  mapBounds: {fileID: 0}
 --- !u!4 &1554118606
 Transform:
   m_ObjectHideFlags: 0

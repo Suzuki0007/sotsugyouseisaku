@@ -48,15 +48,21 @@ public class PlayerPartySpawner : MonoBehaviour
 
     private void Awake()
     {
+        if(sceneContext == null) { sceneContext = FindAnyObjectByType<PlayerSceneContext>(); }
+
+        if(sceneContext == null)
+        {
+            Debug.LogError("PlayerSceneContextがシーンに存在しません", this);
+            return;
+        }
+
         if(noahPrefab == null ||
             siglePrefab == null ||
             noahSpawnPoint == null ||
             sigleSpawnPoint == null ||
-            playerSwitchManager == null || 
-            sceneContext == null)
+            playerSwitchManager == null)
         {
             Debug.LogError("プレイヤー生成に必要な参照が設定されていません", this);
-            return;
         }
     }
 
