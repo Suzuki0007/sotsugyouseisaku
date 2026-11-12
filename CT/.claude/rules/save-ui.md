@@ -33,6 +33,13 @@ ID が空のときは階層パスでセーブする物が多い（名前や親�
 - **メニュー画面** `GameMenu`（`Assets/Script/UI/GameMenu/`、`Resources/UI/GameMenu.prefab` から自動生成・シーンをまたぐ）：Tab で開閉（ゲーム停止）、アイテム（`ItemMenuUI.OpenFromMenu`、閉じるとメニューへ）／メモ（`NoteBook.OpenList`）／ロード／タイトルに戻る。`OpenSave` でセーブの流れ（確認 → スロット選択 → `GameSession.SaveAt` → メッセージ）。プレハブは `GameMenuBuilder`（Tools > メニュー画面）。
 - **セーブポイント** `SavePoint`（Intaractable、`Assets/Script/SavePoint/`）：調べると `GameMenu.OpenSave`。`Resume Offset` の位置から再開。`BattleArea.AnyActive` の間は不可。Hierarchy 右クリック > セーブポイント（`SavePointCreator`）。
 
+## 画面の決まり（11-13）
+- ウィンドウは 16:9（ビルドは 1920×1080 フルスクリーン）。**マップは中央の 4:3**（`Camera/MapCameraAspect`、FocusCamera のカメラに自動で付く）、UI は画面全体を使ってよい（4:3 に収めなくてよい）。
+- Screen Space - Overlay の Canvas はすべて **Scale With Screen Size・1920×1080・Match 0.5** にそろえる。HP（`LifeUI`）は左上固定（anchor 0,1）。
+- 会話の枠（DialoguePanel）は幅 1600×高さ 260、画面の下の中央（下から 40）。立ち絵の枠は 820×1040、画面の左下・右下の端から（`DialogueSystem.prefab` と Stage1_2 のシーンの会話画面の両方）。
+- 文字は **NotoSansJP**（TMP は `NotoSansJP-Regular SDF`＝TMP の既定、古い Text は `NotoSansJP-Regular.ttf`）。新しい UI もこれを使う。
+- 並び順：帯 -1000 ＜ 通常の UI ＜ 画面の暗転の幕 90 ＜ 会話 100 ＜ シーン遷移の暗転（最大）。
+
 ## 共通 UI（`Assets/Script/UI/Common/`）
 - `SaveSlotPanel`（NewGame / Continue / Load / Save）、`ConfirmDialog`（はい／いいえ、Esc = いいえ。左右移動は明示的に設定＝自動だと後ろの画面のボタンが選ばれる）、`PlaceNameTable`（`Resources/PlaceNames.asset`）、🛠`MenuUIBuilder`（ボタン・スロット画面・確認ダイアログを作る共通処理）。
 - **入力停止の判定は `InputBlock.IsBlocked`** に一本化（会話・暗転・アイテム画面・イベント・メニュー・謎解きの画面）。条件を足すときはここだけ変える。

@@ -35,6 +35,7 @@ paths:
 - **相棒の目印** `PartyHint` / `PartyHintView` / `PartyHintSettings`（`Resources/PartyHints.asset`）。
 
 ## 離れ離れ（段階4）
+- `MapCameraAspect`（11-13）：マップのカメラは画面の中央 4:3（`Camera.rect`）。`cam.aspect` も 4:3 になるので、カメラの範囲の計算・ビューポートの判定はそのままでよい。画面の端を `Screen.width` で計算する処理を作るときは、カメラの `pixelRect` を使う。
 - `CameraArea`（Is Trigger の四角。`FocusCamera` はその中ならその範囲で、なければ Tilemap で止める。範囲が変わるとなめらかに移る）、`FocusCamera.BeginBlend` / `LookAt`、`CameraLookEventAction`。
 - `PlayerSwitchManager` の「離れているとき」設定（切り替えの演出：すぐ／スライド／暗転〔`SceneFader.FadeThrough`〕、敵が狙う相手：操作中だけ／近い方＝`EnemyTargetFrom`）。
 - `PartyRejoinArea`（2人がそろったら一緒に）、`PartyWarpEventAction`（キャラを移す）、`PartyModeEventAction`。

@@ -69,6 +69,7 @@
 | `Player/Player_Sigle/SigleShooter.cs` | Sigle の射撃（プール・SE・エフェクト） | ◎ |
 | `Player/FocusPlayer.cs`、`Player_Noah/NoahMapLimit.cs`、`Player_Noah/NoahHistory.cs` | 古い仕組み（Stage1 / Stage2 で使われている） | △ |
 | `CharaBase/CharacterSorting.cs` | Sigle の描画順を Noah との上下で切り替え | ○ |
+| `Camera/MapCameraAspect.cs` | （11-13）マップを写すカメラを画面の中央の 4:3 にし（`Camera.rect`）、左右（上下）に帯（並び順 -1000 の Overlay Canvas）を出す。FocusCamera の付いたカメラにシーン読み込み時に自動で付く。比率・帯の色は Inspector。UI は画面全体（16:9）を使う | ◎ |
 | `Camera/FocusCamera.cs` | プレイヤーを追い、Tilemap の範囲で止める。**カメラの範囲**（`CameraArea`）の中ならその範囲で止める。`BeginBlend`（なめらかに移る。範囲が変わったとき・`SetTarget(t, true)`）、`LookAt`（決めた場所を映す）（謎解き段階4） | ◎ |
 | `Camera/CameraArea.cs` | カメラの範囲（Is Trigger の BoxCollider2D。`Find` で位置を含む範囲〔優先度〕） | ◎ |
 | `Camera/CameraLookEventAction.cs` | イベントの部品「カメラを向ける」（見せる場所・動く時間・見せる時間・戻す） | ◎ |
@@ -127,7 +128,7 @@
 | `CheckPoint/CheckPoint.cs` | 触れると再開する位置を記録して Commit + Write | ○（**どのシーンにも置かれていない**） |
 | `Scene/SceneChange.cs`、`Scene/SceneFader.cs` | 暗転つきシーン遷移（SceneFader は自動生成・シーンをまたぐ。`FadeThrough`：シーンを変えずに暗転→処理→明転） | ◎ |
 | `UI/ItemMenu/ItemMenuUI.cs`、`ItemSlotUI.cs` | アイテム画面（Resources から自動生成）。メニュー画面から `OpenFromMenu` で開く（GameMenu がないときだけ Tab で直接開く） | ◎ |
-| `UI/Life/LifeUIController.cs` | ハートの表示。`PlayerCharacters.PartyHealth`（一緒＝シグルの体力、離れる＝操作中のキャラ）を見る。最大の体力の数だけハートを出す（足りなければ複製）。色で区別（一緒・ノア・シグル） | ◎ |
+| `UI/Life/LifeUIController.cs` | ハートの表示（Stage1_1・Stage1_2 の `Canvas/LifeUI` は画面の左上に固定。11-13）。`PlayerCharacters.PartyHealth`（一緒＝シグルの体力、離れる＝操作中のキャラ）を見る。最大の体力の数だけハートを出す（足りなければ複製）。色で区別（一緒・ノア・シグル） | ◎ |
 
 ### 演出（音・エフェクト・アニメ・明るさ）
 | フォルダ | 内容 | 手順書 |
@@ -196,7 +197,7 @@
 | 優先度 | 場所 | 内容 |
 |---|---|---|
 | **高** | `Prefab/Players/Player_Noah.prefab`、`Player_Sigle.prefab` | **FootstepSe が付いていない**ため足音が鳴らない。FootstepSe は Stage1_2 のルートの `Player`（Transform と FootstepSe だけの動かないオブジェクト）に付いている。11-06 の SE 手順書は「プレハブの FootstepSe に設定」と書いていた |
-| 中 | 🆕 `Player/PlayerMapLimit.cs`（11-10 の変更） | 歩ける範囲が `MapBounds`（絵の大きさ）になったが、カメラ（`FocusCamera`）・敵のナビメッシュ（`NavMesh2D`）・相棒の道（`PartyRoute`）は今も `PlayerSceneContext` の Tilemap の範囲を使う。2つの範囲が違うと、プレイヤーは行けるのに敵・カメラが付いてこない場所ができる |
+| 中 | 🆕 `Player/PlayerMapLimit.cs`（11-10 の変更） | 歩ける範囲が `MapBounds`（絵の大きさ）になったが、カメラ（`FocusCamera`）・敵のナビメッシュ（`NavMesh2D`）・相棒の道（`PartyRoute`）は今も `PlayerSceneContext` の Tilemap の範囲を使う。2つの範囲が違うと、プレイヤーは行けるのに敵・カメラが付いてこない場所ができる。**カメラがマップの絵の外まで写る**（11-13 の 4:3 化の確認で、Stage1_1 は左に黒、Stage1_2 は右下に灰色の何もない所が見えた。Stage1_1 の Tilemap `Jimen` の範囲がマップの絵より大きく広い）。カメラを `MapBounds` で止めるか、CameraArea を置くと直る |
 | 中 | `Bgm/Effects/BgmProgress.cs` | 進行度（static）が `SubsystemRegistration` でリセットされない（ドメインリロード無効のエディタで前回の値が残る）。セーブもされず、はじめから・つづきからでも戻らない |
 | 中 | `StageDarkness/StageDarkness.cs` FindTarget | 明かりの追従先を `FindWithTag("Player")` の最初の1人で決めるため、キャラ切り替えで操作キャラに付いていかないことがある |
 | 中 | **古い作りの敵**の移動（`Behavior/Enemy/Behavior Graph.asset` の SetPositionToTarget、`Prefab/Enemies/Enemy.prefab`） | 「6秒撃つ → 3秒かけてプレイヤーの位置へ移動」の繰り返し。移動は transform を直接動かし、Rigidbody2D は Static なので**壁をすり抜け、プレイヤーと重なる**。会話・イベント中も移動は続く（撃つのは止まるようにした）。同じ動きの新しい敵（サンプル「撃つ」）はできたが、**Stage1_2 のスポナーはまだ古い Enemy.prefab**（置き換えはシーンの変更が要るので未実施） |
