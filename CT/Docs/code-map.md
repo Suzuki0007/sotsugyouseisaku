@@ -70,6 +70,7 @@
 | `Player/FocusPlayer.cs`、`Player_Noah/NoahMapLimit.cs`、`Player_Noah/NoahHistory.cs` | 古い仕組み（Stage1 / Stage2 で使われている） | △ |
 | `CharaBase/CharacterSorting.cs` | Sigle の描画順を Noah との上下で切り替え | ○ |
 | `Gimmick/WalkArea.cs` | （11-13）歩ける範囲を円・四角・多角形の組み合わせで決める（子の Collider2D を形として読み、再生中は無効にする）。`Clamp`・`Contains`。`PlayerMapLimit.ClampToMap` が最後に呼ぶ（置いていないシーンは今までどおり）。Stage_1_3 のティンパニ部屋で使用 | ◎ |
+| `Party/GuardGauge.cs` | （11-13）守り（弾消し）のゲージ。置いたシーンだけ、弾消しを出せる時間とリチャージを決める（空になると決めた量までたまるまで出せない）。画面の HP の下に「シグルの守り（Q）」のゲージ。`Use`（`NoahBulletDeleteAreaController` が呼ぶ）・`Refill`・`BoostRecharge`・`ResetGauge`・`Emptied`・`Ready`。Stage_1_3 で使用 | ◎ |
 | `Timpani/TimpaniPeg.cs` | （11-13）ティンパニのペグ。調べるとリズムゲーム（縮む輪が中心の輪に重なるときに E）、決めた回数の成功で締まり GimmickState が ON。ゲームは止まらない・離れると中断・使えるキャラ（ノアだけ）。色と印（◆◇・♪）で進み具合。`Succeeded`・`Missed`・`Tightened`（static イベント）。プレハブ `Prefab/Gimmicks/Timpani/Peg.prefab` | ◎ |
 | `Scene/SceneChangeEventAction.cs` | （11-13）イベントの部品「シーンを移る」（シーンの `SceneChange.ChangeScene` を呼ぶ。イベントの最後に置く）。Stage1_2 の正面の扉 → Stage_1_3 | ◎ |
 | `Camera/CameraShake.cs`、`ShakeEventAction.cs` | （11-13）画面を揺らす。描画の間だけカメラの位置をずらす（`RenderPipelineManager.begin/endCameraRendering`）ので、FocusCamera の追従とぶつからない。イベントの部品「画面を揺らす」 | ◎ |
@@ -261,7 +262,8 @@
 | Stage1_1 / Stage1_2 / SampleScene の `MapEntity/OB_TRbox` | 宝箱の Id が空（シーンチェックでエラー。ほかの宝箱と開いた記録が混ざる） |
 | 同じ3シーンの `Event`（ルート） | 中身が空の EventZone / EventSequence。Is Trigger の Collider2D もない（シーンチェックでエラー・注意が出るが、動作上の害はない。不要なら消す） |
 | 🆕 Stage1_1 の `Event/DialogueEventZone` | 入ると古い会話（非表示の `OB_Text` の Dialogue）を出す EventZone が、マップの右側（-106.8, 17.3）に残っている。OP とは別。要らなければ消す |
-| 🆕 Stage_1_3（ティンパニ部屋。作りかけ・段階1まで） | Stage1_1 のコピーが元なので、使わない物（`soto_*`・`OB_*`・`Event`・古い `EnemySpawner` など）が非表示で残っている。`SavePoint` は部屋の外にあったので非表示にした。`Grid/room_timpani_yuka_0`（床だけの絵）が `soto_yuka`（部屋全体の絵）の下に少しずれて重なっている。左の出入口は歩ける範囲の外 |
+| 🆕 Stage_1_3 の音楽生物・弾 | 絵は仮（紫の丸い生き物 `Images/Enemy/Enemy_Timpani_Creature_kari.png`、丸い弾 `Bullet_Timpani_Note_kari.png`）。今は戦闘の始まりがないので、再生するとすぐ攻撃してくる（段階5 で戦闘エリアにする） |
+| 🆕 Stage_1_3（ティンパニ部屋。作りかけ） | Stage1_1 のコピーが元なので、使わない物（`soto_*`・`OB_*`・`Event`・古い `EnemySpawner` など）が非表示で残っている。`SavePoint` は部屋の外にあったので非表示にした。`Grid/room_timpani_yuka_0`（床だけの絵）が `soto_yuka`（部屋全体の絵）の下に少しずれて重なっている。左の出入口は歩ける範囲の外 |
 | 🆕 Stage1_2 の追跡の敵（`Stage1_2_イベント/塔の化け物`） | 見た目が仮（敵の共通プレハブの絵＝シグルに似た絵）。敵の画像ができたら `EnemyData_Stage1_2_Chaser` の Sprite / Animation に入れる。ランタンも仮の丸（`見た目（仮）`） |
 | 🆕 シグルのアニメのデータ（`Anim_Sample_Sigle`） | 「Walk」の動きがないので、歩いても立ち姿のまま動く（ついてくるとき・Stage1_2 の助けの場面で歩いてくるとき）。ノアのデータには Walk がある |
 | 🆕 Stage1_2 のガレキ・シグルの攻撃 | 仮の絵（四角を並べたガレキ、プレイヤーの弾の絵）。絵ができたら差し替える |

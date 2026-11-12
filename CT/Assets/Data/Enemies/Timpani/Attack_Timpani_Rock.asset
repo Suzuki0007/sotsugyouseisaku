@@ -1,0 +1,76 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9257d48ce2358194abffcebe09ecc181, type: 3}
+  m_Name: Attack_Timpani_Rock
+  m_EditorClassIdentifier: Assembly-CSharp::AttackData
+  telegraphTime: 1.3
+  showTelegraph: 1
+  telegraphStyle: 0
+  telegraphColor: {r: 0, g: 0, b: 0, a: 0.35}
+  telegraphFill: 1
+  telegraphBlink: 0
+  telegraphSortingOrder: 3
+  telegraphUnlit: 1
+  telegraphSe: {fileID: 0}
+  telegraphAnimation: Windup
+  origin: 1
+  aim: 0
+  fixedAngle: 0
+  trackDuringTelegraph: 0
+  forwardOffset: 0
+  shape:
+    type: 0
+    radius: 1
+    innerRadius: 1
+    length: 6
+    width: 1
+    angle: 90
+  stopAtWall: 1
+  activation: 3
+  damage: 1
+  targets: 0
+  ignoreNoah: 0
+  ignoreSigle: 0
+  damageKind: 11
+  cancel: 0
+  sustainTime: 1.5
+  hitInterval: 0.5
+  rotateSpeed: 0
+  bulletPattern: 0
+  bulletCount: 1
+  bulletSpread: 30
+  bulletSpiralStep: 15
+  bulletVolleys: 1
+  bulletVolleyInterval: 0.3
+  bulletSpeed: 0
+  bulletDeletable: 1
+  dropObject: {fileID: 0}
+  dropHeight: 6
+  dropTime: 0.35
+  riseObject: {fileID: 0}
+  riseLinger: 1
+  riseHitWhileLingering: 0
+  placeObject: {fileID: 0}
+  fuseTime: 3
+  detonateOnTouch: 1
+  detonateOnAttacked: 0
+  showFuseRange: 1
+  motion: 0
+  chargeSpeed: 12
+  chargeStunTime: 0
+  activeEffect: {fileID: 11400000, guid: db953535983d3f047a3398fdc6e212b4, type: 2}
+  activeSe: {fileID: 0}
+  activeShake: 0.15
+  activeAnimation: Attack
+  recoveryTime: 0.2
+  memo: "\u632F\u52D5\u3067\u5CA9\u3092\u964D\u3089\u305B\u308B\uFF1A\u30D7\u30EC\u30A4\u30E4\u30FC\u306E\u8DB3\u5143\u306B\u5F71\uFF08\u4E88\u5146\uFF09\u2192
+    \u843D\u3061\u308B\u3002\u767A\u52D5\u3067\u753B\u9762\u304C\u63FA\u308C\u308B\u3002\u5F3E\u6D88\u3057\u3067\u306F\u6D88\u3048\u306A\u3044\uFF08\u3088\u3051\u308B\uFF09"

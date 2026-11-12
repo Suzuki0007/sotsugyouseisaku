@@ -110,6 +110,7 @@ public class AttackExecution
         phase = Phase.Active;
         runner.PlayAction(data.activeAnimation);
         SeManager.PlaySe(data.activeSe, runner.Position);
+        if(data.activeShake > 0.0f) { CameraShake.Shake(data.activeShake, 0.4f); }
 
         Vector2 center = data.shape.CenterOf(PlacedOrigin, direction, length);
         if(data.activation != AttackActivation.Place && data.activation != AttackActivation.Bullet)

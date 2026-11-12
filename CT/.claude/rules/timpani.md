@@ -27,7 +27,12 @@ paths:
 ## 段階
 1. **部屋と遷移（完了）**：Stage1_2 の正面の扉（合流後に調べる → F1_08・F1_08b → 揺れ → 部品「シーンを移る」）→ Stage_1_3 の `出現位置_Stage1_2 から（中央）`（ID `FromStage1_2`）。`ティンパニ部屋/歩ける範囲`（`WalkArea`：円3つ＝半径 4.3、中央の六角形）。カメラは `CameraArea` で部屋の絵の中。
 2. **ペグとリズムゲーム（完了）**：`Timpani/TimpaniPeg`（GimmickInteractable。調べる E で開始 → 縮む輪が中心の輪に重なるときに E で成功 → 決めた回数で締まり、同じオブジェクトの GimmickState が ON）。プレハブ `Assets/Prefab/Gimmicks/Timpani/Peg.prefab`（絵は仮の丸・GimmickState はセーブしない）。Stage_1_3 は `ティンパニ部屋/ティンパニ_上・左下・右下` の下に `ペグ1〜3`（中心から 3.5 マス、90°・210°・330°）。static イベント `TimpaniPeg.Succeeded / Missed / Tightened`（段階4・5 で、攻撃を消す・一言に使う）、`ResetPeg()`。
-3. 敵（中央の音楽生物：全方位の弾の輪＝弾消しで消せる・落石）とガードのリチャージ（弾消しに使える時間とリチャージ。UI）。
+3. **敵とガードのリチャージ（完了）**：
+   - 音楽生物：`Data/Enemies/Timpani/EnemyData_Timpani_Creature`（動かない・攻撃では倒れない＝すべての攻撃 ×0・倒されたあと「おとなしくなる」・絵は仮 `Images/Enemy/Enemy_Timpani_Creature_kari.png`）。各ティンパニの中心に `音楽生物`（Enemy_Base）。
+   - 行動 `Pattern_Timpani_Creature`：通常（待つ 0.5〜2.5 → 弾の輪 → 待つ 2〜3 → 落石×2 → 待つ 2〜3）→ `Flag_Timpani_Calmed1` で「激しい」（16 方向×2・落石×3・待ち短め）→ `Flag_Timpani_Calmed2` で「もっと激しい」（うず巻きが増える）。フラグはセーブしない。**段階4 で、おとなしくなった数に合わせてフラグを立てる**。
+   - 攻撃：`Attack_Timpani_Ring`（予兆＝黄色い輪が点滅 1 秒 → 12 方向。弾消しで消せる）・`Ring_Hard`・`Spiral`（予兆ピンク）・`Rock`（足元に影 1.3 秒 → 落ちる・画面が揺れる＝AttackData に足した「発動したときの画面の揺れ」0.15）。
+   - 弾の絵：Stage_1_3 の EnemyBulletPool だけ `Prefab/Bullet/EnemyBullet_TimpaniNote`（丸い弾・仮）。ほかのシーンは今までの EnemyBullet。
+   - 守りのゲージ `Party/GuardGauge`（`ティンパニ部屋/守りのゲージ`）：弾消し（ノアの Q のまま）を出している間減る（2 秒）、空になると 5 割たまるまで出せない、空から満タン 6 秒、やめて 0.4 秒でたまり始める。表示「シグルの守り（Q）」（HP の下・空のとき「回復中…」）。`Refill(割合)`・`BoostRecharge(倍率, 秒)`（段階4 のアイテム）・`ResetGauge`、`Emptied`・`Ready`（一言のきっかけ）。`NoahBulletDeleteAreaController.Update` が `GuardGauge.Use` を呼ぶ（ゲージがないシーンはいつでも出せる）。
 4. アイテム（拾うとすぐ効く：リチャージ短縮・回復。落石と一緒に落ちる）、ペグ成功で周囲の攻撃が消える、1台そろうとおとなしくなる＋回復＋残りの敵の段階が進む。
 5. 会話と流れ（戦闘前 F1_09・F1_10＋ペグの説明、クリア後 F1_11、ゲームオーバーで戦闘前から）、戦闘中の一言。
 6. 調整と手順書。
@@ -39,5 +44,7 @@ paths:
 - リズムゲームは E で始めて E でタイミング。ペグから離れる・キャラを切り替えると中断（進んだ分は残る）。音楽生物は動かない。
 - ペグの調整項目（Inspector）：成功する回数 3・輪が縮む時間 1.3 秒・成功するたびに速くなる割合 0.1・判定の甘さ 0.16・失敗で戻る回数 0・失敗のあと押せない時間 0.35 秒・輪の大きさ・色・音・エフェクト・締まったときのイベント。
 - 確かめ方：タイミングは eval では合わせられないので、private の `ringTime` を 0.766（重なる瞬間）や 0.1（外れ）にしてから `Interact` を呼ぶ（`event.ps1 -Run` は Intaractable の Interact も呼べる）。
+- 守りのゲージは Q キーがテストで届かないので、`PlayerInput` を無効にしてから `NoahBulletDeleteAreaController.SetBulletDeleteAreaActive(true)` で確かめる（終わったら戻す）。段階の切り替えは `event.ps1 -Flag Flag_Timpani_Calmed1 -Value 1`。
+- 今は戦闘エリアがないので、再生するとすぐ敵が攻撃してくる（段階5 で戦闘前の会話・始まりを足す）。
 - Stage_1_3 を直接再生すると `Flag_Sigle_Joined` が立っていないのでノア1人で始まる。2人で確かめるときは `event.ps1 -Flag Flag_Sigle_Joined -Value 1`。
 - 左の出入口（絵の左の開いた所）は今は歩ける範囲の外。クリア後に開けるなら、歩ける範囲に通路の子を足して表示する。

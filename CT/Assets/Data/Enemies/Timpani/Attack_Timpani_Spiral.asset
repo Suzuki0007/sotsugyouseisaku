@@ -1,0 +1,75 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9257d48ce2358194abffcebe09ecc181, type: 3}
+  m_Name: Attack_Timpani_Spiral
+  m_EditorClassIdentifier: Assembly-CSharp::AttackData
+  telegraphTime: 0.9
+  showTelegraph: 1
+  telegraphStyle: 0
+  telegraphColor: {r: 1, g: 0.5, b: 0.9, a: 0.45}
+  telegraphFill: 1
+  telegraphBlink: 1
+  telegraphSortingOrder: 3
+  telegraphUnlit: 1
+  telegraphSe: {fileID: 0}
+  telegraphAnimation: Windup
+  origin: 0
+  aim: 2
+  fixedAngle: 0
+  trackDuringTelegraph: 0
+  forwardOffset: 0
+  shape:
+    type: 3
+    radius: 2.2
+    innerRadius: 1.6
+    length: 6
+    width: 1
+    angle: 90
+  stopAtWall: 1
+  activation: 2
+  damage: 1
+  targets: 0
+  ignoreNoah: 0
+  ignoreSigle: 0
+  damageKind: 11
+  cancel: 0
+  sustainTime: 1.5
+  hitInterval: 0.5
+  rotateSpeed: 0
+  bulletPattern: 2
+  bulletCount: 4
+  bulletSpread: 30
+  bulletSpiralStep: 11
+  bulletVolleys: 24
+  bulletVolleyInterval: 0.12
+  bulletSpeed: 3
+  bulletDeletable: 1
+  dropObject: {fileID: 0}
+  dropHeight: 6
+  dropTime: 0.35
+  riseObject: {fileID: 0}
+  riseLinger: 1
+  riseHitWhileLingering: 0
+  placeObject: {fileID: 0}
+  fuseTime: 3
+  detonateOnTouch: 1
+  detonateOnAttacked: 0
+  showFuseRange: 1
+  motion: 0
+  chargeSpeed: 12
+  chargeStunTime: 0
+  activeEffect: {fileID: 0}
+  activeSe: {fileID: 0}
+  activeShake: 0
+  activeAnimation: Attack
+  recoveryTime: 0.8
+  memo: "\u3082\u3063\u3068\u6FC0\u3057\u3044\u6BB5\u968E\u3067\u5897\u3048\u308B\u653B\u6483\uFF1A\u3046\u305A\u5DFB\u304D\u306E\u5F3E\uFF08\u4E88\u5146\u306F\u30D4\u30F3\u30AF\u306E\u8F2A\uFF09\u3002\u5F3E\u6D88\u3057\u3067\u6D88\u305B\u308B"

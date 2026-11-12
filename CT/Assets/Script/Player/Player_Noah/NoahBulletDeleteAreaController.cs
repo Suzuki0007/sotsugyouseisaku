@@ -60,6 +60,9 @@ public class NoahBulletDeleteAreaController : CharaBase
 
         bool isActive = isDebugMode || isBulletDeleteAreaActive;
 
+        // 守りのゲージ（GuardGauge）があるシーンでは、ゲージが残っている間だけ出せる（ないシーンは今までどおり）
+        if(isActive && !isDebugMode) { isActive = GuardGauge.Use(Time.deltaTime); }
+
         bulletDeleteArea.SetAreaActive(isActive);
 
         // 追従ターゲットの位置にエリアを追従させる

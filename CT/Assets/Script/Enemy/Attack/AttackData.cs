@@ -359,6 +359,10 @@ public class AttackData : ScriptableObject
     [Label("発動の SE")]
     public SeData activeSe;
 
+    [Label("発動したときの画面の揺れ（マス）", 0.0f)]
+    [Tooltip("地響き・落石などで画面を揺らす大きさ（0.1 で小さく、0.3 で大きく）。0 なら揺らさない")]
+    public float activeShake = 0.0f;
+
     [Label("発動中の敵のアニメ")]
     public string activeAnimation = "Attack";
 
