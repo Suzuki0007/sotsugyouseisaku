@@ -12,7 +12,7 @@ public static class  AutoSave
 {
     /// <summary>
     /// エディタでステージのシーンから直接再生するときに使うスロットの設定名
-    /// （EditorPrefs。0 = 使わない。デバッグウィンドウで切り替える）
+    /// （EditorPrefs。0 = 使わない、1〜3 = 手動の枠、Save.AutoSlot = オートセーブ枠。デバッグウィンドウで切り替える）
     /// </summary>
     public static string EditorSlotOnPlayKey => "CT.SaveSlotOnPlay." + Application.productName;
 
@@ -30,7 +30,7 @@ public static class  AutoSave
         if(SceneManager.GetActiveScene().name == GameSession.TitleSceneName) { return; }
 
         int slot = UnityEditor.EditorPrefs.GetInt(EditorSlotOnPlayKey, 0);
-        if(slot < 1 || slot > Save.SlotCount)
+        if(slot != Save.AutoSlot && (slot < 1 || slot > Save.SlotCount))
         {
             Debug.Log("[セーブ] スロットを使わずに始めます（この再生の内容はファイルに保存されません。デバッグウィンドウで変更できます）");
             return;
@@ -42,29 +42,13 @@ public static class  AutoSave
 #endif
     }
 
-    // RuntimeInitializeOnLoadMethodは1度だけstaticの関数を自動で呼び出せる
+    // 終了時・シーンを読み込んだときの書き込みはやめた（2026-11-13）
+    // ・ファイルに書くのは、オートセーブ（シーンに着いたとき＝PlayerPartySpawner、イベントの部品「オートセーブ」、
+    //   チェックポイント）と、セーブポイントの手動セーブだけ
+    // ・終了時・シーンの読み込み（ゲームオーバー画面など）で書くと、「進み具合は新しいのに、再開する場所は古い」
+    //   セーブになり、ロードしたときに通れない場所に出ることがあった（Stage1_2 のガレキの向こう側）
     [RuntimeInitializeOnLoadMethod]
     private static void Init()
     {
-        // ドメインリロード無効のエディタでは、前回の再生の登録が残っているので先に外す
-        // （外さないと、再生するたびに同じ処理が二重・三重に呼ばれる）
-        SceneManager.sceneLoaded -= OnSceneLoaded;
-        Application.quitting -= OnQuitting;
-
-        SceneManager.sceneLoaded += OnSceneLoaded;
-
-        Application.quitting += OnQuitting;// Application.quittingはアプリケーションが終了する時に呼ばれるイベント
-    }
-
-    // 終了時に呼ばれるイベントの解除
-    private static void OnQuitting()
-    {
-        Save.Write();
-    }
-
-    // シーンがロードされた時に呼ばれるイベント
-    private static void OnSceneLoaded(Scene scene, LoadSceneMode mode)
-    {
-        Save.WriteAsync();
     }
 }

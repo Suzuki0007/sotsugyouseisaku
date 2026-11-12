@@ -24,6 +24,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .claude/skills/finish-task/s
 ## 1. 確認
 - [ ] `unity-check` を実行した（エラー・自分の書いたコードの警告なし）。シーンに置く物を変えたなら `-SceneCheck` も。
 - [ ] 動きを変えたなら `unity-playtest` で再生して確かめた（`end.ps1` まで実行した）。
+- [ ] イベント・セーブ・シーンの通り道を変えたなら、**ロードしても困らないか**を確かめた（イベントの前・後で `GameSession.ReturnToTitle()` → `GameSession.Continue(Save.AutoSlot, ...)`。出た位置から進めるか・イベントが繰り返さないか。手順は `rules/save-ui.md`）。通り道が変わるイベントの最後に部品「オートセーブ」があるか。
 - [ ] **確認できなかった項目**（キー入力・UI のフォーカス・見た目・音など）を書き出した。
 - [ ] テスト用のアセット（`Assets/__ClaudeTest/`）が残っていない。シーンを勝手に保存していない（保存したなら理由を伝える）。
 

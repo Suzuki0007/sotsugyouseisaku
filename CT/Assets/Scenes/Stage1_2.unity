@@ -152,6 +152,7 @@ GameObject:
   - component: {fileID: 5094749}
   - component: {fileID: 5094748}
   - component: {fileID: 5094747}
+  - component: {fileID: 5094771}
   m_Layer: 0
   m_Name: "\u52DD\u3063\u305F\u3068\u304D\uFF08\u8FFD\u3044\u8A70\u3081\u3089\u308C\u308B
     \u2192 \u30B7\u30B0\u30EB\u306B\u52A9\u3051\u3089\u308C\u308B\uFF09"
@@ -572,6 +573,20 @@ MonoBehaviour:
   playMode: 0
   lockPlayer: 1
   actions: []
+--- !u!114 &5094771
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5094745}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 61aab4fcd6cd3cc42aea1e8ac2d159d6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AutoSaveEventAction
+  where: 0
+  customPoint: {fileID: 0}
 --- !u!1 &12192313
 GameObject:
   m_ObjectHideFlags: 0
@@ -32082,6 +32097,10 @@ MonoBehaviour:
   inactivePortraitColor: {r: 0.45, g: 0.45, b: 0.45, a: 1}
   keepPortraitsOnNarration: 0
   advanceKey: 19
+  extraAdvanceKeys: 01000000020000004d000000
+  showKeyHint: 1
+  keyHintText: "<b>E</b> / <b>Space</b> / <b>Enter</b>\u3000\u6B21\u3078"
+  keyHintSize: 24
   charInterval: 0.04
 --- !u!4 &353919149
 Transform:
@@ -33909,6 +33928,7 @@ MonoBehaviour:
     markCompleted: 0
   otherwise: {fileID: 0}
   afterCompleted: {fileID: 0}
+  promptLabel: "\u8ABF\u3079\u308B"
   saveId: Stage1_2_FrontDoor
   saveCompleted: 0
 --- !u!61 &460020992
@@ -35161,6 +35181,7 @@ MonoBehaviour:
     markCompleted: 1
   otherwise: {fileID: 0}
   afterCompleted: {fileID: 0}
+  promptLabel: "\u8ABF\u3079\u308B"
   saveId: Stage1_2_Lantern
   saveCompleted: 1
 --- !u!58 &598011942
@@ -37249,6 +37270,7 @@ MonoBehaviour:
     markCompleted: 1
   otherwise: {fileID: 262987125}
   afterCompleted: {fileID: 0}
+  promptLabel: "\u8ABF\u3079\u308B"
   saveId: Sample_Door
   saveCompleted: 1
 --- !u!61 &1116016816
@@ -37754,6 +37776,7 @@ MonoBehaviour:
     markCompleted: 1
   otherwise: {fileID: 2146947390}
   afterCompleted: {fileID: 364490160}
+  promptLabel: "\u8ABF\u3079\u308B"
   saveId: Sample_Statue
   saveCompleted: 1
 --- !u!61 &1231524512

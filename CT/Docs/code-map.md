@@ -25,7 +25,8 @@
 ## 2. 起動とシーン開始時の流れ
 
 0. 起動：`AutoSave.LoadOnStartup`（BeforeSceneLoad）が旧 `save.json` をスロット1へ移す。`GameSession.Init` がプレイ時間のカウンターを作る。
-   - **Title**：`TitleMenu` でスロットを選ぶ → `GameSession.StartNewGame`（スロットを空に）か `Continue`（`Save.LoadSlot` → 記録した場所を `PlayerSpawnPoint.PendingSpawnPointId` / `PendingPosition` に）→ `InventoryManager.ReloadFromSave` → SceneFader でステージへ
+   - **セーブの枠（11-13）**：オートセーブ枠 `save_auto.json`（`Save.AutoSlot` = -1）と手動の枠 `save_1〜3.json`。**自動で書くのはいつもオートセーブ枠**（シーンに着いたとき・CheckPoint・イベントの部品「オートセーブ」）。手動の枠はセーブポイントの手動セーブ（`Save.SaveToSlot`）だけが書く。終了時・タイトルへ戻るとき・シーンを読み込んだときは**書かない**（古い再開位置で進み具合だけ書かれて、ロードで進めなくなる不具合があったため）
+   - **Title**：`TitleMenu` でスロットを選ぶ → `GameSession.StartNewGame`（オートセーブ枠を空にして始める）か `Continue`（`Save.LoadSlot` → 記録した場所を `PlayerSpawnPoint.PendingSpawnPointId` / `PendingPosition` に）→ `InventoryManager.ReloadFromSave` → SceneFader でステージへ
    - エディタでステージから直接再生したときだけ、デバッグウィンドウで選んだスロットをここで読む（初期値は使わない）
 
 ステージ（Stage1_1 / Stage1_2）の開始：
@@ -33,7 +34,7 @@
 2. シーンの Awake：`InventoryManager`（なければ AfterSceneLoad で自動生成。セーブから所持品を復元）、`DialogueManager`、宝箱などがセーブを読む
 3. `PlayerPartySpawner.Start`（`Spawner/Player/`）
    - `PlayerSpawnPoint.ConsumePendingPosition()`（つづきから・チェックポイント）→ `ConsumePending()`（出現位置ID）→ 既定の位置 の順で出現位置を決める
-   - **着いた場所を「再開する場所」として記録し、`Save.Commit()` + `WriteAsync()`**（スロットを使っていなければファイルには書かない）
+   - **着いた場所を「再開する場所」として記録し、`GameSession.AutoSaveOnArrival()`**（Commit ＋ オートセーブ枠へ WriteAsync。セーブを使っていなければファイルには書かない）
    - Noah / Sigle のプレハブを Instantiate
    - `PlayerRuntimeInitializer` で、シーンの参照（`PlayerSceneContext`：Tilemap・弾プール・カメラ・UI・SceneChange・AreaAttack・BulletDeleteArea）を渡す
    - カメラ・ライフ UI・攻撃・死亡時の SceneChange などを配線し、最後に `PlayerSwitchManager.InitializePlayers`
@@ -127,17 +128,18 @@
 | `Event/` | `EventProcess/EventSequence.cs`、`EventAction.cs`、`EventZone.cs`、`Actions/`（SetActive / SpriteChange / Wait / **ScreenFade**＝画面の暗転。会話の画面〔並び順 100〕より奥の黒い幕 `ScreenCurtain`〔90、シーンごと〕なので、暗いまま会話できる）、**`SceneStartEvent.cs`**（シーンが始まったときに条件〔GameCondition〕を満たせば EventSequence を実行。「最初から暗転しておく」。OP で使用） |
 | `Item/` | `ItemData.cs`、`ItemPickup.cs`、`Interaction/`（ItemInteraction / ItemCondition / ItemPossessionSwitch / ItemGive / ItemTake） |
 | `Flag/` | `GameFlag.cs`、`GameFlags.cs`、`FlagCondition.cs`、`SetFlagEventAction.cs`、`FlagSwitch.cs` |
-| `Talk/` | `DialogueManager.cs`、`Dialogue.cs`、`DialogueData.cs`、`DialogueEventAction.cs`、`CharacterProfile.cs`、`Expression.cs`、🛠`Editor/DialogueCsv.cs` |
-| `Save/` | `Save.cs`（スロット・仮置き・確定・書き込み）、`AutoSave.cs`（旧ファイルの引き継ぎ・エディタでの直接再生・シーン読み込み時と終了時の書き込み）、`GameSession.cs`（はじめから・つづきから・タイトルへ・プレイ時間・再開場所の記録）、`SaveSlotInfo.cs`（Meta キーとスロットの概要）、`PlayTimeCounter.cs` |
-| `Title/` | `TitleMenu.cs`（タイトル画面）、`SaveSlotButton.cs`（スロット1つ分の表示）、`ReturnToTitleButton.cs`（ボタンからタイトルへ）、🛠`Editor/TitleSceneBuilder.cs`（Title.unity を作る） |
+| `Talk/` | `DialogueManager.cs`（11-13：送りは E・Space・Enter、枠の右下の下にキーの説明 `showKeyHint`）、`Dialogue.cs`、`DialogueData.cs`、`DialogueEventAction.cs`、`CharacterProfile.cs`、`Expression.cs`、🛠`Editor/DialogueCsv.cs` |
+| `Save/` | `Save.cs`（スロット・仮置き・確定・書き込み。`AutoSlot`＝オートセーブ枠、`Write` はいつもオートセーブ枠へ、手動は `SaveToSlot`）、`AutoSave.cs`（旧ファイルの引き継ぎ・エディタでの直接再生。**終了時・シーン読み込み時の書き込みはやめた**）、`GameSession.cs`（はじめから・つづきから・タイトルへ・プレイ時間・再開場所の記録・`AutoSaveAt`／`AutoSaveOnArrival`・`AutoSaved` イベント）、`AutoSaveEventAction.cs`（イベントの部品「オートセーブ」：今の位置か指定した場所を再開位置にしてオートセーブ枠へ書く）、`AutoSaveIndicator.cs`（オートセーブしたとき右上に「オートセーブしました」。自動生成）、`SaveSlotInfo.cs`（Meta キーとスロットの概要）、`PlayTimeCounter.cs` |
+| `Title/` | `TitleMenu.cs`（タイトル画面）、`SaveSlotButton.cs`（スロット1つ分の表示。オートセーブ枠は「オートセーブ」）、`ReturnToTitleButton.cs`（ボタンからタイトルへ）、🛠`Editor/TitleSceneBuilder.cs`（Title.unity を作る） |
 | `UI/GameMenu/`（メニューに「メモ」：`noteButton`、`NoteBook.OpenList`）  | `GameMenu.cs`（Tab のメニュー：アイテム・ロード・タイトルへ、セーブポイントからのセーブの流れ、メッセージ）、🛠`Editor/GameMenuBuilder.cs`（`Resources/UI/GameMenu.prefab` を作る） |
-| `UI/Common/` | `SaveSlotPanel.cs`（セーブデータ選択画面。NewGame / Continue / Load / Save）、`ConfirmDialog.cs`（はい／いいえ。左右移動は2つの間だけ）、`UISubmitKeys.cs`（UI の決定に Space を足す・キー操作で選択が動いたら選択の SE。起動時に自動生成）、`UISound.cs` / `UISoundSettings.cs`（UI の効果音。`Resources/UISounds.asset`）、`UIButtonSound.cs`（ボタンに付けると押したときに鳴る）、🛠`Editor/UISoundGenerator.cs`（仮の電子音を `Assets/SE/UI/` に作る）、`PlaceNameTable.cs`（場所の表示名、`Resources/PlaceNames.asset`）、🛠`Editor/MenuUIBuilder.cs`（メニュー系 UI を作る共通処理） |
+| `UI/Common/` | `SaveSlotPanel.cs`（セーブデータ選択画面。NewGame / Continue / Load / Save。一番上にオートセーブ枠の行を実行中に複製して足す〔セーブのときは出さない・はじめからはこの行だけ〕。`AnySaveExists`）、`MenuKeyboardNav.cs`（ボタンの並びをキーボードで選ぶ：最初のボタンを選ぶ・↑↓で回る・外れたらキーで戻す・選ばれた色。SceneGameOver の Canvas に付けた）、`ConfirmDialog.cs`（はい／いいえ。左右移動は2つの間だけ）、`UISubmitKeys.cs`（UI の決定に Space を足す・キー操作で選択が動いたら選択の SE。起動時に自動生成）、`UISound.cs` / `UISoundSettings.cs`（UI の効果音。`Resources/UISounds.asset`）、`UIButtonSound.cs`（ボタンに付けると押したときに鳴る）、🛠`Editor/UISoundGenerator.cs`（仮の電子音を `Assets/SE/UI/` に作る）、`PlaceNameTable.cs`（場所の表示名、`Resources/PlaceNames.asset`）、🛠`Editor/MenuUIBuilder.cs`（メニュー系 UI を作る共通処理） |
 | `SavePoint/` | `SavePoint.cs`（調べるとセーブ。Intaractable。戦闘エリアの戦闘中はセーブできない）、🛠`Editor/SavePointCreator.cs`（Hierarchy 右クリック > セーブポイント） |
 | `Common/InputBlock.cs` | プレイヤーの操作を止める判定（会話・暗転・アイテム画面・イベント・メニュー・謎解きの画面） |
 | `Intaract/Intaractable.cs` | 「調べる」の基底（範囲に入って E）。範囲の中のプレイヤーを覚え、**操作中のキャラだけ**を player にする（ついてくる相棒・待たせている相棒には反応しない。キャラを切り替えると入れ直す）。`OnPlayerEnter` / `OnPlayerExit` も操作中のキャラだけ（謎解き段階3） |
+| `Intaract/InteractPrompt.cs` | **キーの案内**（11-13）：`IInteractPrompt`（`PromptVisible`・`PromptLabel`）と `InteractPromptView`（自動生成・シーンをまたぐ。操作中のキャラが範囲にいる調べる物のうち一番近い物の上に「[E] 調べる」など。入力停止中は出さない）。IInteractPrompt を持つ物（ItemInteraction〔調べたとき・実行できるルールがあるときだけ・文は Inspector〕、GimmickInteractable〔使えるキャラだけ・`CanPrompt`〕、NotePickup「読む」、TimpaniPeg「締める」）はその判断、持たない物は種類ごとの文（ItemPickup「拾う」・SavePoint「セーブ」・Dialogue／DefeatedTalk「話す」・Treasure「開ける」・KeyItem）で、Intaractable の player をリフレクションで見る |
 | `Manager/InventoryManager.cs` | 所持品（シングルトン、シーンをまたぐ、セーブ） |
 | `Key/KeyItem.cs`、`Treasure/Treasure.cs` | 古い鍵・宝箱（NoahData.hasKey を使う）。ItemInteraction で同じことができる | △（シーンで使用中） |
-| `CheckPoint/CheckPoint.cs` | 触れると再開する位置を記録して Commit + Write | ○（**どのシーンにも置かれていない**） |
+| `CheckPoint/CheckPoint.cs` | 触れると再開する位置を記録して Commit + Write（Write はオートセーブ枠へ） | ○（**どのシーンにも置かれていない**） |
 | `Scene/SceneChange.cs`、`Scene/SceneFader.cs` | 暗転つきシーン遷移（SceneFader は自動生成・シーンをまたぐ。`FadeThrough`：シーンを変えずに暗転→処理→明転） | ◎ |
 | `UI/ItemMenu/ItemMenuUI.cs`、`ItemSlotUI.cs` | アイテム画面（Resources から自動生成）。メニュー画面から `OpenFromMenu` で開く（GameMenu がないときだけ Tab で直接開く） | ◎ |
 | `UI/Life/LifeUIController.cs` | ハートの表示（Stage1_1・Stage1_2 の `Canvas/LifeUI` は画面の左上に固定。11-13）。`PlayerCharacters.PartyHealth`（一緒＝シグルの体力、離れる＝操作中のキャラ）を見る。最大の体力の数だけハートを出す（足りなければ複製）。色で区別（一緒・ノア・シグル） | ◎ |
@@ -225,7 +227,9 @@
 | 低 | 🆕 落ちたアイテム（`Enemy/Defeat/DroppedItem.cs`） | セーブしないので、拾わずにシーンを出ると消える（手順書に「大事な物はすぐ持ち物に入れる／イベントで渡す」と書いた） |
 | 低 | 🆕 「仲間を呼ぶ」・ウェーブで新しく出した敵（`Enemy.Spawn`） | 階層のパスが毎回同じでないため、倒したことのセーブ・グループのメンバーには使えない（ウェーブの「新しく出す敵」はセーブしない） |
 | 低 | 🆕 `Prefab/Enemies/Enemy.prefab` | 見た目が仮（シグルの画像 `Sigle-front_0`）。SpriteAnimator がないので死亡アニメ（Dead）は流れない。`Behavior Graph.asset` の EnemyShot ノードに、コードから消えた `shootInterval` の値が残っている（害はない） |
-| 低 | `CheckPoint/CheckPoint.cs` | どのシーンにも置かれていない（自動セーブ用。手動セーブはセーブポイント） |
+| 低 | `CheckPoint/CheckPoint.cs` | どのシーンにも置かれていない（自動セーブ用。手動セーブはセーブポイント）。イベントの区切りのオートセーブは部品「オートセーブ」で置ける |
+| 中 | 🆕 ゲームオーバーのリトライ（11-13） | リトライは「シーンに着いた位置」から始まるが、進み具合はメモリに残る。入口に戻れなくなるイベント（Stage1_2 のガレキなど）のあとで倒れると、入口側から始まって進めなくなるおそれがある（Stage1_2 は今は倒れる場面がないので起きない）。そうした場面を作るときは、リトライの位置もオートセーブの位置にするなどの対応が要る |
+| 低 | 🆕 キーの案内（`InteractPromptView`） | 調べる範囲が小さい物は、範囲の端に触れたときだけ出る（Stage1_2 のランタンは円の半径 1、ノアの体の当たり判定が届く所でだけ出る）。範囲を広げるかはシーンごとに調整 |
 | 低 | Stage1_1 / Stage1_2 の `SavePoint` | 位置と見た目は仮（入口の右・青い丸）。Stage1_1 は入口がマップ下端にあり、再開位置を下にずらすとマップ外になるので左にずらしている |
 | 低 | `UI/GameMenu/GameMenu.cs` | ゲームオーバー画面・タイトルでは開かない（プレイヤーがいるシーンだけ）。ゲームパッド操作は未対応（キーボード・マウスのみ） |
 | 低 | `Scenes/Stage1.unity`、`Stage2.unity`、`SampleScene.unity` | Build Settings から外した古いシーン（ファイルは残っている）。Stage1 / Stage2 は開くと「Creating missing Rigidbody2D / PlayerMovement」が出る。不要なら削除してよい |

@@ -64,6 +64,24 @@ public class DialogueManager : Singleton<DialogueManager>
     [SerializeField]
     private Key advanceKey = Key.E;
 
+    [Tooltip("送りに使えるほかのキー（初期値：Space・Enter・テンキーの Enter）")]
+    [SerializeField]
+    private Key[] extraAdvanceKeys = { Key.Space, Key.Enter, Key.NumpadEnter };
+
+    [Header("キーの案内（テキストボックスの下・右下）")]
+
+    [SerializeField, Label("キーの案内を出す")]
+    private bool showKeyHint = true;
+
+    [SerializeField, Label("キーの案内の文")]
+    [Tooltip("テキストボックスの下の右側に出す。会話の画面が出ている間だけ")]
+    private string keyHintText = "<b>E</b> / <b>Space</b> / <b>Enter</b>　次へ";
+
+    [SerializeField, Label("キーの案内の大きさ", 8.0f)]
+    private float keyHintSize = 24.0f;
+
+    private TMP_Text keyHint;
+
     [Tooltip("1文字あたりの表示間隔（秒）。0以下なら一度に全文表示")]
     [SerializeField]
     private float charInterval = 0.04f;
@@ -129,8 +147,46 @@ public class DialogueManager : Singleton<DialogueManager>
         if(portraitRight != null) { portraitRight.preserveAspect = true; }
 
         HideAllPortraits();
+        BuildKeyHint();
 
         if(panel != null) { panel.SetActive(false); }
+    }
+
+    /// <summary>
+    /// テキストボックスの下（右下）にキーの案内を作る（会話の枠の子なので、枠と一緒に出たり消えたりする）
+    /// </summary>
+    private void BuildKeyHint()
+    {
+        if(!showKeyHint || panel == null || keyHint != null) { return; }
+
+        var go = new GameObject("キーの案内", typeof(RectTransform));
+        go.transform.SetParent(panel.transform, false);
+        var rect = (RectTransform)go.transform;
+        rect.anchorMin = rect.anchorMax = new Vector2(1.0f, 0.0f);
+        rect.pivot = new Vector2(1.0f, 1.0f);
+        rect.anchoredPosition = new Vector2(-8.0f, -4.0f);
+        rect.sizeDelta = new Vector2(600.0f, keyHintSize + 8.0f);
+
+        TextMeshProUGUI text = go.AddComponent<TextMeshProUGUI>();
+        if(bodyText != null) { text.font = bodyText.font; }
+        text.text = keyHintText;
+        text.fontSize = keyHintSize;
+        text.alignment = TextAlignmentOptions.Right;
+        text.color = new Color(1.0f, 1.0f, 1.0f, 0.85f);
+        text.raycastTarget = false;
+        keyHint = text;
+    }
+
+    private bool AdvancePressed()
+    {
+        Keyboard kb = Keyboard.current;
+        if(kb[advanceKey].wasPressedThisFrame) { return true; }
+        if(extraAdvanceKeys == null) { return false; }
+        foreach(Key key in extraAdvanceKeys)
+        {
+            if(key != Key.None && kb[key].wasPressedThisFrame) { return true; }
+        }
+        return false;
     }
 
     //=====================================================================
@@ -207,7 +263,7 @@ public class DialogueManager : Singleton<DialogueManager>
         // 開いたフレームのキー入力で、すぐに送られないようにする
         if(Time.frameCount == lastToggleFrame) { return; }
 
-        if(Keyboard.current[advanceKey].wasPressedThisFrame)
+        if(AdvancePressed())
         {
             if(isTyping)
             {

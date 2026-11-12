@@ -1,4 +1,4 @@
-/*********************************************************************/
+﻿/*********************************************************************/
 // * \file   TitleMenu.cs
 // * \brief  タイトル画面（はじめから・つづきから・ゲーム終了）
 // *
@@ -157,11 +157,8 @@ public class TitleMenu : MonoBehaviour
 
     private static bool AnySlotExists()
     {
-        for(int slot = 1; slot <= Save.SlotCount; slot++)
-        {
-            if(Save.SlotExists(slot)) { return true; }
-        }
-        return false;
+        // オートセーブ枠か手動の枠のどれかにデータがあるか
+        return SaveSlotPanel.AnySaveExists();
     }
 
     // 決定の SE（個別の SE が空なら共通の UI 効果音）

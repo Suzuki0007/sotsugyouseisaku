@@ -24,7 +24,7 @@ using UnityEngine;
 ///
 /// Collider2D（Is Trigger）を付けたオブジェクトに付けて使う
 [RequireComponent(typeof(Collider2D))]
-public class ItemInteraction : Intaractable
+public class ItemInteraction : Intaractable, IInteractPrompt
 {
     //=====================================================================
     // 型
@@ -92,6 +92,13 @@ public class ItemInteraction : Intaractable
     [SerializeField]
     private EventSequence afterCompleted;
 
+    [Header("キーの案内（調べたとき だけ）")]
+
+    [SerializeField, Label("キーの案内の文")]
+    [Tooltip("近づいたときに物の上に「[E] ○○」と出す文。空なら案内を出さない。" +
+             "実行できるルール（か「満たさないとき」「完了後」）がないときは出さない")]
+    private string promptLabel = "調べる";
+
     [Header("保存")]
 
     [Tooltip("完了したことを記録するためのID。空ならヒエラルキー上の名前を使う（同じシーンで重複しないようにする）")]
@@ -118,6 +125,29 @@ public class ItemInteraction : Intaractable
     /// 完了しているか
     /// </summary>
     public bool IsCompleted => completedRule >= 0;
+
+    /// <summary>
+    /// キーの案内を出すか（調べたときのきっかけで、範囲に操作中のキャラがいて、調べると何か起きるとき）
+    /// </summary>
+    public bool PromptVisible
+    {
+        get
+        {
+            if(trigger != TriggerType.Interact || player == null || string.IsNullOrEmpty(promptLabel)) { return false; }
+            if(IsCompleted) { return afterCompleted != null; }
+            if(otherwise != null) { return true; }
+
+            foreach(Rule rule in rules)
+            {
+                if(rule == null || rule.sequence == null) { continue; }
+                if(ItemCondition.AllMet(rule.conditions) && FlagCondition.AllMet(rule.flagConditions)) { return true; }
+            }
+            return false;
+        }
+    }
+
+    /// <summary> キーの案内の文 </summary>
+    public string PromptLabel => promptLabel;
 
     //=====================================================================
     // 初期化

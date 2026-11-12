@@ -30892,6 +30892,7 @@ MonoBehaviour:
     markCompleted: 1
   otherwise: {fileID: 0}
   afterCompleted: {fileID: 0}
+  promptLabel: "\u8ABF\u3079\u308B"
   saveId: OP_TowerEntrance
   saveCompleted: 1
 --- !u!61 &304447959
@@ -31169,6 +31170,7 @@ MonoBehaviour:
     markCompleted: 1
   otherwise: {fileID: 0}
   afterCompleted: {fileID: 0}
+  promptLabel: "\u8ABF\u3079\u308B"
   saveId: OP_Bell
   saveCompleted: 1
 --- !u!61 &332126241
@@ -33188,6 +33190,7 @@ GameObject:
   - component: {fileID: 500608193}
   - component: {fileID: 500608192}
   - component: {fileID: 500608191}
+  - component: {fileID: 500608201}
   m_Layer: 0
   m_Name: "OP_\u306F\u3058\u3081\uFF08\u6697\u8EE2\u304B\u3089\u30DE\u30C3\u30D7\u3078\uFF09"
   m_TagString: Untagged
@@ -33375,6 +33378,20 @@ MonoBehaviour:
     partnerWithin: 0
   delay: 0
   startDark: 1
+--- !u!114 &500608201
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 500608189}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 61aab4fcd6cd3cc42aea1e8ac2d159d6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AutoSaveEventAction
+  where: 0
+  customPoint: {fileID: 0}
 --- !u!1 &502491018
 GameObject:
   m_ObjectHideFlags: 0

@@ -162,6 +162,10 @@ public class TimpaniPeg : GimmickInteractable
 
     protected override CharacterRestriction Restriction => restriction;
 
+    // 締まったペグには案内を出さない。リズムゲーム中は「今！」の合図にする
+    protected override bool CanPrompt => !IsTightened;
+    public override string PromptLabel => playing ? "重なった瞬間に押す" : "締める";
+
     //=====================================================================
     // 初期化
     //=====================================================================

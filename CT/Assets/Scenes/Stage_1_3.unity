@@ -36914,6 +36914,7 @@ GameObject:
   - component: {fileID: 1391465386}
   - component: {fileID: 1391465388}
   - component: {fileID: 1391465387}
+  - component: {fileID: 1391465390}
   m_Layer: 0
   m_Name: "\u5168\u90E8\u8ABF\u5F8B\u3067\u304D\u305F\u3068\u304D\uFF08\u4F1A\u8A71\uFF09"
   m_TagString: Untagged
@@ -36982,6 +36983,20 @@ Transform:
   - {fileID: 1222745098}
   m_Father: {fileID: 1544503360}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1391465390
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1391465385}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 61aab4fcd6cd3cc42aea1e8ac2d159d6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AutoSaveEventAction
+  where: 0
+  customPoint: {fileID: 0}
 --- !u!1 &1415275341
 GameObject:
   m_ObjectHideFlags: 0
@@ -39656,6 +39671,7 @@ MonoBehaviour:
     markCompleted: 1
   otherwise: {fileID: 0}
   afterCompleted: {fileID: 0}
+  promptLabel: "\u8ABF\u3079\u308B"
   saveId: Stage_1_3_LeftExit
   saveCompleted: 1
 --- !u!61 &1895892118

@@ -51,7 +51,8 @@ public class SaveSlotButton : MonoBehaviour
     {
         Info = info;
 
-        if(titleText != null) { titleText.text = isCurrent ? $"スロット {info.Slot}　<size=75%><color=#9fd0ff>プレイ中</color></size>" : $"スロット {info.Slot}"; }
+        string slotName = info.Slot == Save.AutoSlot ? "オートセーブ" : $"スロット {info.Slot}";
+        if(titleText != null) { titleText.text = isCurrent ? $"{slotName}　<size=75%><color=#9fd0ff>プレイ中</color></size>" : slotName; }
 
         if(detailText != null)
         {

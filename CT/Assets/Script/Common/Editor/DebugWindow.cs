@@ -629,43 +629,49 @@ public class DebugWindow : EditorWindow
         {
             if(Application.isPlaying)
             {
-                EditorGUILayout.LabelField("使っているスロット", Save.HasSlot ? $"スロット{Save.CurrentSlot}" : "なし（ファイルに保存されない）");
+                EditorGUILayout.LabelField("読み込んだスロット", Save.HasSlot ? (Save.CurrentSlot == Save.AutoSlot ? "オートセーブ" : $"スロット{Save.CurrentSlot}") : "なし（ファイルに保存されない）");
+                EditorGUILayout.LabelField("自動で書く先", Save.HasSlot ? "オートセーブ枠（手動の枠はセーブポイントでだけ書く）" : "なし");
                 EditorGUILayout.LabelField("プレイ時間", SaveSlotInfo.FormatPlayTime(GameSession.PlayTime));
             }
 
             // ステージから直接再生するときに使うスロット
-            var options = new string[Save.SlotCount + 1];
+            // 0 = 使わない、1〜3 = 手動の枠、最後 = オートセーブ枠（EditorPrefs には Save.AutoSlot を入れる）
+            var options = new string[Save.SlotCount + 2];
             options[0] = "使わない（保存もしない）";
             for(int i = 1; i <= Save.SlotCount; i++) { options[i] = $"スロット{i}"; }
-            int slotOnPlay = Mathf.Clamp(EditorPrefs.GetInt(AutoSave.EditorSlotOnPlayKey, 0), 0, Save.SlotCount);
+            options[Save.SlotCount + 1] = "オートセーブ";
+            int stored = EditorPrefs.GetInt(AutoSave.EditorSlotOnPlayKey, 0);
+            int slotOnPlay = stored == Save.AutoSlot ? Save.SlotCount + 1 : Mathf.Clamp(stored, 0, Save.SlotCount);
             int nextSlot = EditorGUILayout.Popup(new GUIContent("ステージから再生するとき", "タイトル以外のシーンで再生したときに読み込むスロット。タイトルから再生したときは、タイトル画面で選んだスロットを使う"), slotOnPlay, options);
-            if(nextSlot != slotOnPlay) { EditorPrefs.SetInt(AutoSave.EditorSlotOnPlayKey, nextSlot); }
+            if(nextSlot != slotOnPlay) { EditorPrefs.SetInt(AutoSave.EditorSlotOnPlayKey, nextSlot == Save.SlotCount + 1 ? Save.AutoSlot : nextSlot); }
 
             using(new EditorGUI.DisabledScope(!Application.isPlaying || !Save.HasSlot))
             {
-                if(GUILayout.Button("今の状態をセーブ（チェックポイントと同じ）"))
+                if(GUILayout.Button(new GUIContent("今の場所でオートセーブ", "操作しているキャラの位置を再開する場所にして、オートセーブ枠に書く")))
                 {
-                    Save.Commit();
-                    Save.Write();
+                    GameObject current = PlayerSwitchManager.Instance != null ? PlayerSwitchManager.Instance.CurrentPlayer : null;
+                    if(current != null) { GameSession.AutoSaveAt(current.scene.name, current.transform.position); }
                 }
             }
 
             EditorGUILayout.Space();
             EditorGUILayout.LabelField("スロット", EditorStyles.boldLabel);
-            for(int slot = 1; slot <= Save.SlotCount; slot++)
+            for(int slot = Save.AutoSlot; slot <= Save.SlotCount; slot++)
             {
+                if(slot == 0) { continue; }
                 SaveSlotInfo info = SaveSlotInfo.Load(slot);
                 using(new EditorGUILayout.HorizontalScope())
                 {
+                    string label = slot == Save.AutoSlot ? "オート" : slot.ToString();
                     string text = info.Exists
-                        ? $"{slot}: {(string.IsNullOrEmpty(info.SceneName) ? "場所不明" : info.SceneName)}  {SaveSlotInfo.FormatPlayTime(info.PlayTime)}  {(info.SavedAt.HasValue ? info.SavedAt.Value.ToString("yyyy/MM/dd HH:mm") : "")}"
-                        : $"{slot}: データなし";
+                        ? $"{label}: {(string.IsNullOrEmpty(info.SceneName) ? "場所不明" : info.SceneName)}  {SaveSlotInfo.FormatPlayTime(info.PlayTime)}  {(info.SavedAt.HasValue ? info.SavedAt.Value.ToString("yyyy/MM/dd HH:mm") : "")}"
+                        : $"{label}: データなし";
                     EditorGUILayout.LabelField(text);
 
                     using(new EditorGUI.DisabledScope(!info.Exists))
                     {
                         if(GUILayout.Button("消す", GUILayout.Width(44)) &&
-                           EditorUtility.DisplayDialog("セーブデータを消す", $"スロット{slot}のセーブデータを削除します。元に戻せません。", "消す", "やめる"))
+                           EditorUtility.DisplayDialog("セーブデータを消す", $"{(slot == Save.AutoSlot ? "オートセーブ" : $"スロット{slot}")}のセーブデータを削除します。元に戻せません。", "消す", "やめる"))
                         {
                             Save.DeleteSlot(slot);
                         }

@@ -52,6 +52,7 @@ public static class GameSession
     {
         PlayTime = 0f;
         FallbackScene = "Stage1_1";
+        AutoSaved = null;
     }
 
     // Save の ResetOnPlay（SubsystemRegistration）より後に登録する
@@ -82,13 +83,14 @@ public static class GameSession
     //=====================================================================
 
     /// <summary>
-    /// はじめから：スロットを空にして、最初のシーンから始める（スロットのデータは最初のセーブで上書きされる）
+    /// はじめから：空の状態で、最初のシーンから始める（オートセーブ枠は、最初のシーンに着いたときに上書きされる）
     /// </summary>
+    /// <param name="slot"> 使わない（以前はスロットを選んでいた。今はオートセーブ枠） </param>
     public static void StartNewGame(int slot, string firstScene, string firstSpawnPointId)
     {
         if(SceneFader.IsBusy) { return; }
 
-        Save.StartNewSlot(slot);
+        Save.StartNewGame();
         PlayTime = 0f;
         ResetRuntimeState();
 
@@ -128,13 +130,13 @@ public static class GameSession
     }
 
     /// <summary>
-    /// タイトルに戻る（確定済みのデータは保存してから、スロットを閉じる）
+    /// タイトルに戻る（ファイルには書かない。最後のオートセーブ・手動セーブ以降の進み具合は残らない）
+    /// ・書いてしまうと「進み具合は新しいのに、再開する場所は古い」セーブになり、ロードで詰まることがある
     /// </summary>
     public static void ReturnToTitle()
     {
         if(SceneFader.IsBusy) { return; }
 
-        Save.Write();
         Save.CloseSlot();
         ResetRuntimeState();
         PlayTime = 0f;
@@ -145,14 +147,41 @@ public static class GameSession
     }
 
     /// <summary>
-    /// セーブポイントでセーブする：再開する場所をこの位置にして、選んだスロットに書き込む
-    /// （ほかのスロットを選んだ場合は、以後そのスロットでプレイを続ける）
+    /// セーブポイントでセーブする：再開する場所をこの位置にして、選んだ手動の枠に書き込む
     /// </summary>
     public static void SaveAt(int slot, string sceneName, Vector2 position)
     {
         RecordResumePosition(sceneName, position);
         Save.SaveToSlot(slot);
         Debug.Log($"[セーブ] スロット{slot}にセーブしました（{sceneName} {position}）");
+    }
+
+    /// <summary>
+    /// オートセーブしたとき（画面の隅の表示などに使う）
+    /// </summary>
+    public static event Action AutoSaved;
+
+    /// <summary>
+    /// オートセーブ：再開する場所をこの位置にして、オートセーブ枠に書き込む（イベントの部品「オートセーブ」から）
+    /// プレイしていないとき（エディタでステージから直接再生したとき）は、確定だけしてファイルには書かない
+    /// </summary>
+    public static void AutoSaveAt(string sceneName, Vector2 position)
+    {
+        RecordResumePosition(sceneName, position);
+        Save.Commit();
+        Save.WriteAsync();
+        Debug.Log($"[セーブ] オートセーブしました（{sceneName} {position}）");
+        AutoSaved?.Invoke();
+    }
+
+    /// <summary>
+    /// シーンに着いたときのオートセーブ（出現位置で再開する。PlayerPartySpawner から）
+    /// </summary>
+    public static void AutoSaveOnArrival()
+    {
+        Save.Commit();
+        Save.WriteAsync();
+        AutoSaved?.Invoke();
     }
 
     //=====================================================================

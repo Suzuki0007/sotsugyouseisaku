@@ -451,11 +451,8 @@ public class GameMenu : MonoBehaviour
 
     private static bool AnySlotExists()
     {
-        for(int slot = 1; slot <= Save.SlotCount; slot++)
-        {
-            if(Save.SlotExists(slot)) { return true; }
-        }
-        return false;
+        // オートセーブ枠か手動の枠のどれかにデータがあるか
+        return SaveSlotPanel.AnySaveExists();
     }
 
     private static void SetActive(GameObject target, bool active)
