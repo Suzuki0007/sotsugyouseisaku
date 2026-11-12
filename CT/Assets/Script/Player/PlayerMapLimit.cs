@@ -95,14 +95,15 @@ public class PlayerMapLimit : CharaBase
     /// </summary>
     public Vector2 ClampToMap(Vector2 position)
     {
-        if(mapBounds == null) { return position; }
+        // 歩ける範囲（WalkArea）があるシーンでは、その中にも収める（ないシーンでは何もしない）
+        if(mapBounds == null) { return WalkArea.Clamp(position); }
 
         Bounds bounds = mapBounds.WorldBounds;
         Vector2 half = BodyHalfSize();
 
         position.x = Mathf.Clamp(position.x, bounds.min.x + half.x, bounds.max.x - half.x);
         position.y = Mathf.Clamp(position.y, bounds.min.y + half.y, bounds.max.y - half.y);
-        return position;
+        return WalkArea.Clamp(position);
     }
 
     /// <summary>

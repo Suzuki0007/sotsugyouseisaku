@@ -16,7 +16,7 @@ paths:
 手順書は `Docs/タイトル画面とセーブの仕組み.md`。ファイルごとの役割は `Docs/code-map.md` の「2. 起動とシーン開始時の流れ」と「3. > イベント・アイテム・フラグ・会話・セーブ」を読む。
 
 ## タイトル・セーブ（`Assets/Script/Title/`、`Assets/Script/Save/`）
-- ゲームは **`Title.unity`** から始まる（Build Settings：Title → Stage1_1 → Stage1_2 → SceneGameOver）。`TitleMenu`：はじめから（スロット選択、使用中なら上書き確認）／つづきから／ゲーム終了。`TitleSceneBuilder`（Tools > タイトル画面）でシーンを作り直せる。
+- ゲームは **`Title.unity`** から始まる（Build Settings：Title → Stage1_1 → Stage1_2 → Stage_1_3 → SceneGameOver）。`TitleMenu`：はじめから（スロット選択、使用中なら上書き確認）／つづきから／ゲーム終了。`TitleSceneBuilder`（Tools > タイトル画面）でシーンを作り直せる。
 - **スロット3つ**：`save_1.json`〜`save_3.json`（`Application.persistentDataPath`）。`Save.CurrentSlot`（0 = 使わない → ファイルに書かない）、`LoadSlot` / `StartNewSlot` / `CloseSlot` / `PeekSlot` / `DeleteSlot`。旧 `save.json` は起動時にスロット1へ移す（`MigrateLegacy`）。
 - `Save`：`SetPending` で仮置き → `Commit` で確定（`BeforeCommit` イベントでプレイ時間・保存日時・2人の状態を記録）→ `Write` / `WriteAsync`。`Save.SaveToSlot` で別スロットへ全部書き込み。
 - **確定のタイミング**：シーンに着いたとき（`PlayerPartySpawner.Start` で再開場所を記録して Commit + WriteAsync）、シーンを出るとき（`SceneChange`）、`CheckPoint`、終了時。
