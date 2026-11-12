@@ -16,7 +16,7 @@ paths:
 手順書は `Docs/タイトル画面とセーブの仕組み.md`。ファイルごとの役割は `Docs/code-map.md` の「2. 起動とシーン開始時の流れ」と「3. > イベント・アイテム・フラグ・会話・セーブ」を読む。
 
 ## タイトル・セーブ（`Assets/Script/Title/`、`Assets/Script/Save/`）
-- ゲームは **`Title.unity`** から始まる（Build Settings：Title → Stage1_1 → Stage1_2 → Stage_1_3 → SceneGameOver）。`TitleMenu`：はじめから（スロット選択、使用中なら上書き確認）／つづきから／ゲーム終了。`TitleSceneBuilder`（Tools > タイトル画面）でシーンを作り直せる。
+- ゲームは **`Title.unity`** から始まる（Build Settings：Title → Stage1_1 → Stage1_2 → Stage_1_3 → SceneGameOver）。`TitleMenu`：はじめから（スロット選択、使用中なら上書き確認）／つづきから／ゲーム終了。`TitleSceneBuilder`（Tools > タイトル画面）でシーンを作り直せる。背景は `Images/UI/UI_TitleImage.PNG`（Single・最大 4096）を AspectRatioFitter（Envelope Parent）で画面いっぱいに。
 - **セーブの枠（11-13 に変更）**：**オートセーブ枠** `save_auto.json`（`Save.AutoSlot` = -1、画面では一番上の「オートセーブ」）＋ **手動の枠** `save_1.json`〜`save_3.json`（`Application.persistentDataPath`）。
   - **自動で書く（`Save.Write` / `WriteAsync`）のはいつもオートセーブ枠**。手動の枠を書くのは `Save.SaveToSlot`（セーブポイントの手動セーブ）だけ。ユーザーの指示：「手動の枠が上書きされるのは手動セーブだけ、オートセーブが上書きするのはオートセーブ枠だけ」。
   - `Save.HasSlot`（セーブを使っているか。直接再生でスロットを選んでいなければ false → ファイルに書かない）、`Save.CurrentSlot`（最後に読んだ・手動でセーブした枠。表示用）、`LoadSlot` / `StartNewGame`（オートセーブ枠を空にして始める）/ `CloseSlot` / `PeekSlot` / `DeleteSlot` / `SlotPath`。旧 `save.json` は起動時にスロット1へ移す（`MigrateLegacy`）。
