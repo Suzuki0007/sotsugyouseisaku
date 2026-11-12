@@ -69,6 +69,10 @@
 | `Player/Player_Sigle/SigleShooter.cs` | Sigle の射撃（プール・SE・エフェクト） | ◎ |
 | `Player/FocusPlayer.cs`、`Player_Noah/NoahMapLimit.cs`、`Player_Noah/NoahHistory.cs` | 古い仕組み（Stage1 / Stage2 で使われている） | △ |
 | `CharaBase/CharacterSorting.cs` | Sigle の描画順を Noah との上下で切り替え | ○ |
+| `Camera/CameraShake.cs`、`ShakeEventAction.cs` | （11-13）画面を揺らす。描画の間だけカメラの位置をずらす（`RenderPipelineManager.begin/endCameraRendering`）ので、FocusCamera の追従とぶつからない。イベントの部品「画面を揺らす」 | ◎ |
+| `StageDarkness/DarknessEventAction.cs` | （11-13）イベントの部品「暗さ・視界を変える」（暗さとプレイヤーの明かりの半径を同時に、時間をかけて。セーブから戻るときは最後の値） | ◎ |
+| `Event/Actions/FaceDirectionEventAction.cs`、`MoveObjectEventAction.cs` | （11-13）イベントの部品「キャラの向きを変える」「物を動かす」（ずらした位置から／へ・目的の物へ〔動いていても追う〕。敵が降ってくる・岩がどく・弾が飛ぶ。動かすもの・向かう先にノア／シグルも選べる〔再生中に探す。待機・別行動のときに使う〕） | ◎ |
+| `Party/Bark/Bark.cs`（11-13 の変更） | シグルが仲間になる前（`PlayerSwitchManager.IsPartnerAbsent`）は、自動の一言（`Fire`）だけ出さない。イベントから出す一言（`Play`・`PlayLines`）は出せる（Stage1_2 のノアの「逃げなきゃ！」） | ◎ |
 | `Camera/MapCameraAspect.cs` | （11-13）マップを写すカメラを画面の中央の 4:3 にし（`Camera.rect`）、左右（上下）に帯（並び順 -1000 の Overlay Canvas）を出す。FocusCamera の付いたカメラにシーン読み込み時に自動で付く。比率・帯の色は Inspector。UI は画面全体（16:9）を使う | ◎ |
 | `Camera/FocusCamera.cs` | プレイヤーを追い、Tilemap の範囲で止める。**カメラの範囲**（`CameraArea`）の中ならその範囲で止める。`BeginBlend`（なめらかに移る。範囲が変わったとき・`SetTarget(t, true)`）、`LookAt`（決めた場所を映す）（謎解き段階4） | ◎ |
 | `Camera/CameraArea.cs` | カメラの範囲（Is Trigger の BoxCollider2D。`Find` で位置を含む範囲〔優先度〕） | ◎ |
@@ -254,7 +258,11 @@
 | Stage1_1 / Stage1_2 / SampleScene の `MapEntity/OB_TRbox` | 宝箱の Id が空（シーンチェックでエラー。ほかの宝箱と開いた記録が混ざる） |
 | 同じ3シーンの `Event`（ルート） | 中身が空の EventZone / EventSequence。Is Trigger の Collider2D もない（シーンチェックでエラー・注意が出るが、動作上の害はない。不要なら消す） |
 | 🆕 Stage1_1 の `Event/DialogueEventZone` | 入ると古い会話（非表示の `OB_Text` の Dialogue）を出す EventZone が、マップの右側（-106.8, 17.3）に残っている。OP とは別。要らなければ消す |
-| 🆕 Stage1_2 のシグルの合流 | Stage1_1 は「シグルが仲間になったフラグ」でノア1人。**Stage1_2 の PlayerSwitchManager にはまだフラグを入れていない**（今は Stage1_2 に入るとシグルが一緒に出る）。出会いのイベント（F1_05〜F1_07）を作るときに、フラグを入れてイベントの最後で立てる |
+| 🆕 Stage1_2 の追跡の敵（`Stage1_2_イベント/塔の化け物`） | 見た目が仮（敵の共通プレハブの絵＝シグルに似た絵）。敵の画像ができたら `EnemyData_Stage1_2_Chaser` の Sprite / Animation に入れる。ランタンも仮の丸（`見た目（仮）`） |
+| 🆕 シグルのアニメのデータ（`Anim_Sample_Sigle`） | 「Walk」の動きがないので、歩いても立ち姿のまま動く（ついてくるとき・Stage1_2 の助けの場面で歩いてくるとき）。ノアのデータには Walk がある |
+| 🆕 Stage1_2 のガレキ・シグルの攻撃 | 仮の絵（四角を並べたガレキ、プレイヤーの弾の絵）。絵ができたら差し替える |
+| 🆕 Stage1_2 の演出の音 | 「キーーーン」「ドスン」「バン！」の SeEventAction は空欄（音のファイルがない）。音ができたら入れる |
+| 🆕 Stage1_2 で非表示にした物 | アイテムのサンプル一式（`ItemInteractionSample`）・`Itm_Key`・`OB_TRbox`・古い `EnemySpawner`・`Event/DialogueEventZone` は話の邪魔なので非表示（消してはいない）。壁の明かり `Light`〜`Light (2)` は最初非表示でランタンを拾うと点く。StageDarkness の値（0.813・半径 2 → 0.97・半径 1）とカメラの背景色（灰 → 黒）も変えた |
 | Stage1_2 | 会話 UI がシーンの Canvas に直接組まれている（他のシーンは DialogueSystem.prefab）。揃えるなら置き換え |
 | 🆕 Stage1_2 のルートの `Player` | Transform と FootstepSe だけの動かないオブジェクト（上の「FootstepSe が付いていない」を参照）。プレハブに移したら消す |
 | Stage1_1 / Stage1_2 の `OtherSystem/SceneChange`、SceneGameOver の SceneChange | 遷移先が空（シーンチェックで「参考」）。死亡時・リトライでコードから `ChangeScene` を呼ぶためのもので、問題なし |

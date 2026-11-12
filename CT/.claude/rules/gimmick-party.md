@@ -17,7 +17,7 @@ paths:
 段階 0〜5 完了、段階6 は相棒の一言だけ（ユーザーの指示：ヒント・待っている相棒の振る舞い・絆の段階・通信・ピンチの助けは作らない）、段階7 は一言のツール・仕掛けの一覧・サンプルの部屋。
 
 ## 2人の状態・体力（段階0）
-- **相棒の合流**：`PlayerSwitchManager.sigleJoinedFlag`（`Flag_Sigle_Joined`）が立つまでシグルは非表示でノア1人（`PartnerAbsent`。体力はノアの分、C・F・SetMode は効かない、相棒の一言〔`Bark.CanSpeak`〕も出ない）。`GameFlags.OnChanged` でフラグが立つとノアの位置に出て一緒になる。空ならいつも2人。今入っているのは Stage1_1 だけ（Stage1_2 は出会いのイベントを作るときに）。
+- **相棒の合流**：`PlayerSwitchManager.sigleJoinedFlag`（`Flag_Sigle_Joined`）が立つまでシグルは非表示でノア1人（`PartnerAbsent`。体力はノアの分、C・F・SetMode は効かない、相棒の一言〔`Bark.CanSpeak`〕も出ない）。`GameFlags.OnChanged` でフラグが立つとノアの位置に出て一緒になる。空ならいつも2人。相棒の一言は、自動のもの（`Bark.Fire`）だけ止める（イベントから出す一言はノアが話せる）。Stage1_1・Stage1_2 に入っている（Stage1_2 の追跡の後の助けの場面で立つ）。イベントでフラグを立てた直後に別の場所へ移すときは、先に「待機」にする（一緒のままだと、ついてくる動きでノアの所へ戻る）。
 - 攻撃は操作中のキャラだけ。2人の状態 `PartyMode`（一緒／待機／別行動）。体力は一緒＝シグルの体力を共有（`Health.ShareWith`）、離れる＝別々（シグル 6・ノア 3）。`PartyHealth`・`HealthOf`。
 - **ノアとシグルの体どうしはすり抜ける**（`PlayerSwitchManager.IgnorePartnerCollision`。当たり判定を有効にし直すと無視が消えることがあるので ApplyFollow のたびにかけ直す）。プレイヤーは物理の速さを使わない（`PlayerMovement.FixedUpdate` が毎回 0 にする。操作できなくなったら向きも消す）。
 - **プレイヤーの LateUpdate の順番は固定**：PlayerFollower（0）→ PlayerMapLimit（100）→ PlayerHistory（200）→ CharacterAnimLink（300）。履歴は位置が決まってから記録する（崩れると、ついてくる相棒が震える）。マップの端は動く前に止める（`CharacterMovement.LimitNextPosition` → `PlayerMapLimit.ClampToMap`）。ノア・シグルのプレハブの Rigidbody2D は Interpolate をオン（オフだと 6 フレームに 1 回止まる）。

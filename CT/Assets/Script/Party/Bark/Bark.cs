@@ -128,6 +128,9 @@ public static class Bark
     public static bool Fire(BarkTrigger trigger, BarkContext context)
     {
         if(trigger == BarkTrigger.Manual || !CanSpeak()) { return false; }
+
+        // 相棒（シグル）がまだ仲間になっていない間は、自動の一言は出さない（イベントから出す一言は出せる）
+        if(PlayerSwitchManager.IsPartnerAbsent) { return false; }
         Load();
         if(!byTrigger.TryGetValue(trigger, out List<BarkData> list)) { return false; }
 
@@ -187,8 +190,7 @@ public static class Bark
     public static bool CanSpeak()
     {
         BarkSettings s = Settings;
-        // 相棒（シグル）がまだ仲間になっていない間は、相棒の一言は出さない
-        return s.enabled && !Muted && !PlayerSwitchManager.IsPartnerAbsent;
+        return s.enabled && !Muted;
     }
 
     private static bool Start(BarkData data, BarkContext context, bool fromEvent)

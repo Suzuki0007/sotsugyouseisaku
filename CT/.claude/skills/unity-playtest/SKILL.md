@@ -37,6 +37,28 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .claude/skills/unity-playtes
 キー名は `UnityEngine.InputSystem.Key`（`E`・`C`・`F`・`Space`・`Tab`・`Escape`・`UpArrow` など）。
 **注意**：Input System の設定が `PointersAndKeyboardsRespectGameViewFocus` なので、ゲームビューにフォーカスがないとアクション経由の入力（UI の決定・移動など）は届かず、結果が安定しない。UI のキー操作は結果を断定せず、ユーザーに手元での確認を頼む。UI のボタンは `button.onClick.Invoke()` で押す。
 
+## イベントを確かめる（`event.ps1`）
+
+会話・演出・追跡などのイベントを再生で確かめるときの道具。1回に1つの操作。
+
+```powershell
+$ev = ".claude/skills/unity-playtest/scripts/event.ps1"
+powershell -NoProfile -ExecutionPolicy Bypass -File $ev -State              # 1行で状態（会話の文・入力停止・2人・暗さ・敵・戦闘エリア）
+powershell -NoProfile -ExecutionPolicy Bypass -File $ev -Advance 3          # 会話を3文進める（表示途中なら全文→次へ）
+powershell -NoProfile -ExecutionPolicy Bypass -File $ev -UntilIdle          # 会話・イベントが終わるまで進め続ける
+powershell -NoProfile -ExecutionPolicy Bypass -File $ev -Warp "-128.6,13.0" # ノアとシグルをワープ
+powershell -NoProfile -ExecutionPolicy Bypass -File $ev -Run "Stage1_2_イベント/ランタン（調べると拾う）"  # 調べる・エリアに入る の代わり
+powershell -NoProfile -ExecutionPolicy Bypass -File $ev -Flag Flag_Sigle_Joined -Value 1   # フラグを ON/OFF
+powershell -NoProfile -ExecutionPolicy Bypass -File $ev -Capture s1         # ゲームビューを撮る（%TEMP%\ct_playtest_capture\s1.png を Read で見る）
+```
+
+- **キー入力（press.ps1）は届かないことが多い**（ゲームビューのフォーカス）。歩く・調べるは `-Warp`・`-Run` で代わりにする。キーで確かめられなかったことは報告に書く。
+- `-Run` は**表示されている**オブジェクトだけ（`GameObject.Find`）。ItemInteraction は操作中のキャラが調べた扱い、EventSequence はそのまま再生。
+- **eval は 1 回 1.5 秒ほどかかる**。それより短い演出（フラッシュ・弾・吹き出しの出始め）は撮れない・状態で見逃す。撮れなかったら「確かめられなかった」と書く。撮りたいときは、進める操作の直後に間を入れずに `-Capture`。
+- **追跡（BattleArea の「捕まる → やり直す」）の落とし穴**：ノアを動かさないと、捕まる → 暗転 → 読み直し を繰り返す（その間に出した吹き出しも消える・ワープも戻される）。確かめるときは、追跡が始まったら**すぐ** `-Warp` でゴールへ。止めたいときは `BattleArea.Cancel()` でも、やり直しの予約が残っていることがあるので `end.ps1` で再生ごと止める。
+- 向きを確かめるときは `-State` の `noah=… Right` などを見る（CharacterAnimLink は、止まっている間は向きを変えない。走り込んだ直後は勢いで向きが上書きされる）。
+- 長い組み立て（シーンにイベントを置くなど）は C# をスクラッチパッドに書いて `Invoke-UnityEval -File`。作り直すときは、ルートのオブジェクトを消してから作る形にしておくと、何度でもやり直せる。
+
 ## よく使う C#（`Invoke-UnityEval`）
 
 ```powershell
@@ -45,7 +67,7 @@ Invoke-UnityEval -Code 'var m = UnityEngine.Object.FindAnyObjectByType<PlayerSwi
 ```
 
 - 長いものは `Assets/` の外（例：スクラッチパッド）に .cs を書いて `Invoke-UnityEval -File <パス>`。**Assets の中に置くとインポート・再コンパイルが走る。**テストで作るアセットだけ `Assets/__ClaudeTest/` に置く。
-- 最後の式が結果として返る（`return` は書かない）。
+- 最後の式が結果として返る（`return 式;` と書いてもよい）。
 - 時間を進めるには eval を分けて間に `Start-Sleep` を入れる（1回の eval の中ではフレームは進まない）。
 
 | 確かめたいこと | 式 |
