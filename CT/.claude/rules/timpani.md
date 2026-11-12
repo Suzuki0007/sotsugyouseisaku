@@ -33,7 +33,12 @@ paths:
    - 攻撃：`Attack_Timpani_Ring`（予兆＝黄色い輪が点滅 1 秒 → 12 方向。弾消しで消せる）・`Ring_Hard`・`Spiral`（予兆ピンク）・`Rock`（足元に影 1.3 秒 → 落ちる・画面が揺れる＝AttackData に足した「発動したときの画面の揺れ」0.15）。
    - 弾の絵：Stage_1_3 の EnemyBulletPool だけ `Prefab/Bullet/EnemyBullet_TimpaniNote`（丸い弾・仮）。ほかのシーンは今までの EnemyBullet。
    - 守りのゲージ `Party/GuardGauge`（`ティンパニ部屋/守りのゲージ`）：弾消し（ノアの Q のまま）を出している間減る（2 秒）、空になると 5 割たまるまで出せない、空から満タン 6 秒、やめて 0.4 秒でたまり始める。表示「シグルの守り（Q）」（HP の下・空のとき「回復中…」）。`Refill(割合)`・`BoostRecharge(倍率, 秒)`（段階4 のアイテム）・`ResetGauge`、`Emptied`・`Ready`（一言のきっかけ）。`NoahBulletDeleteAreaController.Update` が `GuardGauge.Use` を呼ぶ（ゲージがないシーンはいつでも出せる）。
-4. アイテム（拾うとすぐ効く：リチャージ短縮・回復。落石と一緒に落ちる）、ペグ成功で周囲の攻撃が消える、1台そろうとおとなしくなる＋回復＋残りの敵の段階が進む。
+4. **アイテムと連動（完了）**：
+   - `Item/InstantPickup`（触れるとすぐ効く。持ち物に入らない・セーブしない。回復／守りのゲージ〔すぐためる 0.3＋2 倍速 10 秒〕。12 秒で点滅して消える。拾えるまで 0.3 秒。`Picked`・`Appeared`）。プレハブ `Prefab/Gimmicks/Timpani/Item_Heal`（ハート・仮）・`Item_GuardBoost`（青い菱形・仮）。
+   - `AttackData.spawnOnActive`／`spawnChance`（発動したときに出す物。弾以外。歩ける範囲の中だけ）。`Attack_Timpani_Rock` は 35% で `Item_GuardBoost`。
+   - `Timpani/TimpaniUnit`（各 `ティンパニ_○`）：子のペグ・敵を自動で見つける。ペグが締まるたびに半径 9 の弾を消し、敵の攻撃をやめさせて 1 秒止める（`AttacksCleared`）。全部締まると敵を `Kill`（おとなしくなる）→ 絵を `calmSprite`（`Images/Enemy/Enemy_Timpani_Creature_calm_kari.png`）に差し替え・♪ の印・エフェクト・`Item_Heal` を出す（`Calmed`）。
+   - `Timpani/TimpaniRoom`（`ティンパニ部屋`）：調律できた数で `Flag_Timpani_Calmed1`・`Calmed2` を立てる（Awake で OFF に戻す）。全部で `Flag_Timpani_Cleared`（セーブする）・残りの弾を消す・`AllCalmed`・「全部調律できたときのイベント」。
+   - ペグの「成功」は締まりきったとき（1回押せたときではない）。
 5. 会話と流れ（戦闘前 F1_09・F1_10＋ペグの説明、クリア後 F1_11、ゲームオーバーで戦闘前から）、戦闘中の一言。
 6. 調整と手順書。
 
@@ -44,6 +49,8 @@ paths:
 - リズムゲームは E で始めて E でタイミング。ペグから離れる・キャラを切り替えると中断（進んだ分は残る）。音楽生物は動かない。
 - ペグの調整項目（Inspector）：成功する回数 3・輪が縮む時間 1.3 秒・成功するたびに速くなる割合 0.1・判定の甘さ 0.16・失敗で戻る回数 0・失敗のあと押せない時間 0.35 秒・輪の大きさ・色・音・エフェクト・締まったときのイベント。
 - 確かめ方：タイミングは eval では合わせられないので、private の `ringTime` を 0.766（重なる瞬間）や 0.1（外れ）にしてから `Interact` を呼ぶ（`event.ps1 -Run` は Intaractable の Interact も呼べる）。
+- ペグを一気に締めて確かめるときは、private の `Tighten()` をリフレクションで呼ぶ（イベントがすべて出る）。アイテムは出たそばからシグル（ついてくる）が拾うことがあるので、離れた所に出して確かめる。
+- シーンの配置は eval の C#（`setup_13_stage1`〜`4`・`calmsprite`）で作った。作り直すときは、作ったあとで参照（特にフラグ）が入っているかを確かめる（`setup_13_stage4` で TimpaniRoom のクリアのフラグが空になったことがある）。
 - 守りのゲージは Q キーがテストで届かないので、`PlayerInput` を無効にしてから `NoahBulletDeleteAreaController.SetBulletDeleteAreaActive(true)` で確かめる（終わったら戻す）。段階の切り替えは `event.ps1 -Flag Flag_Timpani_Calmed1 -Value 1`。
 - 今は戦闘エリアがないので、再生するとすぐ敵が攻撃してくる（段階5 で戦闘前の会話・始まりを足す）。
 - Stage_1_3 を直接再生すると `Flag_Sigle_Joined` が立っていないのでノア1人で始まる。2人で確かめるときは `event.ps1 -Flag Flag_Sigle_Joined -Value 1`。

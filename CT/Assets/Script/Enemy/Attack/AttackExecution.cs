@@ -113,6 +113,13 @@ public class AttackExecution
         if(data.activeShake > 0.0f) { CameraShake.Shake(data.activeShake, 0.4f); }
 
         Vector2 center = data.shape.CenterOf(PlacedOrigin, direction, length);
+
+        // 発動したときに出す物（落石と一緒に落ちてくるアイテムなど）。歩ける範囲があるシーンでは、その中のときだけ
+        if(data.spawnOnActive != null && data.activation != AttackActivation.Bullet &&
+           Random.value < data.spawnChance && WalkArea.Contains(center))
+        {
+            Object.Instantiate(data.spawnOnActive, new Vector3(center.x, center.y, 0.0f), Quaternion.identity);
+        }
         if(data.activation != AttackActivation.Place && data.activation != AttackActivation.Bullet)
         {
             EffectManager.Play(data.activeEffect, center, Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg);

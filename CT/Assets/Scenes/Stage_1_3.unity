@@ -30830,6 +30830,17 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 7133230897921936796, guid: bc8190676571ea74b8f9253b4f2e56da, type: 3}
   m_PrefabInstance: {fileID: 220036832}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &220036834 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2073921130145614034, guid: bc8190676571ea74b8f9253b4f2e56da, type: 3}
+  m_PrefabInstance: {fileID: 220036832}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 68ebacb8453e9684c9ad8ef772e01320, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TimpaniPeg
 --- !u!1 &263784363
 GameObject:
   m_ObjectHideFlags: 0
@@ -31134,6 +31145,17 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 7133230897921936796, guid: bc8190676571ea74b8f9253b4f2e56da, type: 3}
   m_PrefabInstance: {fileID: 313474727}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &313474729 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2073921130145614034, guid: bc8190676571ea74b8f9253b4f2e56da, type: 3}
+  m_PrefabInstance: {fileID: 313474727}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 68ebacb8453e9684c9ad8ef772e01320, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TimpaniPeg
 --- !u!1 &333844881
 GameObject:
   m_ObjectHideFlags: 0
@@ -31143,6 +31165,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 333844882}
+  - component: {fileID: 333844883}
   m_Layer: 0
   m_Name: "\u30C6\u30A3\u30F3\u30D1\u30CB_\u53F3\u4E0B"
   m_TagString: Untagged
@@ -31169,6 +31192,33 @@ Transform:
   - {fileID: 1202509294}
   m_Father: {fileID: 1544503360}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &333844883
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 333844881}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 893c39be3b1a61d489501309fad6ef21, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TimpaniUnit
+  creature: {fileID: 1202509295}
+  pegs:
+  - {fileID: 978483437}
+  - {fileID: 1989027158}
+  - {fileID: 1589674202}
+  clearRadius: 9
+  stunSeconds: 1
+  clearEffect: {fileID: 11400000, guid: 72ed6a75d9afa7244abd3462f96b37ac, type: 2}
+  healItem: {fileID: 1543206714305803811, guid: f88f820f0c5be004db0f13319d94af87, type: 3}
+  healItemOffset: {x: 0, y: -1.6}
+  calmSprite: {fileID: 21300000, guid: b71965bfafe25b643bae8abe5be82af3, type: 3}
+  calmEffect: {fileID: 11400000, guid: 2b8ee5c766226a542a4604126bd420e2, type: 2}
+  calmSe: {fileID: 0}
+  calmMarkColor: {r: 0.4, g: 1, b: 0.7, a: 1}
+  onCalmed: {fileID: 0}
 --- !u!1 &339297783
 GameObject:
   m_ObjectHideFlags: 0
@@ -31178,6 +31228,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 339297784}
+  - component: {fileID: 339297785}
   m_Layer: 0
   m_Name: "\u30C6\u30A3\u30F3\u30D1\u30CB_\u5DE6\u4E0B"
   m_TagString: Untagged
@@ -31204,6 +31255,33 @@ Transform:
   - {fileID: 2134961248}
   m_Father: {fileID: 1544503360}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &339297785
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 339297783}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 893c39be3b1a61d489501309fad6ef21, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TimpaniUnit
+  creature: {fileID: 2134961249}
+  pegs:
+  - {fileID: 1334870703}
+  - {fileID: 1219734124}
+  - {fileID: 313474729}
+  clearRadius: 9
+  stunSeconds: 1
+  clearEffect: {fileID: 11400000, guid: 72ed6a75d9afa7244abd3462f96b37ac, type: 2}
+  healItem: {fileID: 1543206714305803811, guid: f88f820f0c5be004db0f13319d94af87, type: 3}
+  healItemOffset: {x: 0, y: -1.6}
+  calmSprite: {fileID: 21300000, guid: b71965bfafe25b643bae8abe5be82af3, type: 3}
+  calmEffect: {fileID: 11400000, guid: 2b8ee5c766226a542a4604126bd420e2, type: 2}
+  calmSe: {fileID: 0}
+  calmMarkColor: {r: 0.4, g: 1, b: 0.7, a: 1}
+  onCalmed: {fileID: 0}
 --- !u!1 &348674307
 GameObject:
   m_ObjectHideFlags: 0
@@ -34804,6 +34882,17 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 7133230897921936796, guid: bc8190676571ea74b8f9253b4f2e56da, type: 3}
   m_PrefabInstance: {fileID: 978483435}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &978483437 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2073921130145614034, guid: bc8190676571ea74b8f9253b4f2e56da, type: 3}
+  m_PrefabInstance: {fileID: 978483435}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 68ebacb8453e9684c9ad8ef772e01320, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TimpaniPeg
 --- !u!1 &993645945
 GameObject:
   m_ObjectHideFlags: 0
@@ -35557,6 +35646,17 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 2460512957874500895, guid: ea50e4ed0d5101547be0630a09749094, type: 3}
   m_PrefabInstance: {fileID: 1202509293}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1202509295 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 6148231572384520106, guid: ea50e4ed0d5101547be0630a09749094, type: 3}
+  m_PrefabInstance: {fileID: 1202509293}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 155238611773867469966f48dbcfb815, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Enemy
 --- !u!1 &1206976741
 GameObject:
   m_ObjectHideFlags: 0
@@ -35698,6 +35798,17 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 7133230897921936796, guid: bc8190676571ea74b8f9253b4f2e56da, type: 3}
   m_PrefabInstance: {fileID: 1219734122}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1219734124 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2073921130145614034, guid: bc8190676571ea74b8f9253b4f2e56da, type: 3}
+  m_PrefabInstance: {fileID: 1219734122}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 68ebacb8453e9684c9ad8ef772e01320, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TimpaniPeg
 --- !u!1 &1287557233
 GameObject:
   m_ObjectHideFlags: 0
@@ -35842,6 +35953,17 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 7133230897921936796, guid: bc8190676571ea74b8f9253b4f2e56da, type: 3}
   m_PrefabInstance: {fileID: 1334870701}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1334870703 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2073921130145614034, guid: bc8190676571ea74b8f9253b4f2e56da, type: 3}
+  m_PrefabInstance: {fileID: 1334870701}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 68ebacb8453e9684c9ad8ef772e01320, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TimpaniPeg
 --- !u!1 &1338695969
 GameObject:
   m_ObjectHideFlags: 0
@@ -36548,6 +36670,17 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 7133230897921936796, guid: bc8190676571ea74b8f9253b4f2e56da, type: 3}
   m_PrefabInstance: {fileID: 1479046611}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1479046613 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2073921130145614034, guid: bc8190676571ea74b8f9253b4f2e56da, type: 3}
+  m_PrefabInstance: {fileID: 1479046611}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 68ebacb8453e9684c9ad8ef772e01320, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TimpaniPeg
 --- !u!1 &1503902674
 GameObject:
   m_ObjectHideFlags: 0
@@ -37012,6 +37145,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1544503360}
+  - component: {fileID: 1544503361}
   m_Layer: 0
   m_Name: "\u30C6\u30A3\u30F3\u30D1\u30CB\u90E8\u5C4B"
   m_TagString: Untagged
@@ -37041,6 +37175,28 @@ Transform:
   - {fileID: 263784364}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1544503361
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1544503359}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e296662f61067b44b97a8640b3a6c4f2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TimpaniRoom
+  units:
+  - {fileID: 1924518896}
+  - {fileID: 339297785}
+  - {fileID: 333844883}
+  escalationFlags:
+  - {fileID: 11400000, guid: 396b910cf166e78498b133343c374f5d, type: 2}
+  - {fileID: 11400000, guid: 25247aa014e35894392f59047579796a, type: 2}
+  clearedFlag: {fileID: 11400000, guid: 6e4049289b427674eb70cde732807245, type: 2}
+  onAllCalmed: {fileID: 0}
+  clearBulletsOnFinish: 1
 --- !u!1 &1550258429
 GameObject:
   m_ObjectHideFlags: 0
@@ -37301,6 +37457,17 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 7133230897921936796, guid: bc8190676571ea74b8f9253b4f2e56da, type: 3}
   m_PrefabInstance: {fileID: 1589674200}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1589674202 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2073921130145614034, guid: bc8190676571ea74b8f9253b4f2e56da, type: 3}
+  m_PrefabInstance: {fileID: 1589674200}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 68ebacb8453e9684c9ad8ef772e01320, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TimpaniPeg
 --- !u!1 &1614921300
 GameObject:
   m_ObjectHideFlags: 0
@@ -37928,6 +38095,17 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 7133230897921936796, guid: bc8190676571ea74b8f9253b4f2e56da, type: 3}
   m_PrefabInstance: {fileID: 1722560148}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1722560150 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2073921130145614034, guid: bc8190676571ea74b8f9253b4f2e56da, type: 3}
+  m_PrefabInstance: {fileID: 1722560148}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 68ebacb8453e9684c9ad8ef772e01320, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TimpaniPeg
 --- !u!1 &1723348671
 GameObject:
   m_ObjectHideFlags: 0
@@ -38593,6 +38771,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1924518895}
+  - component: {fileID: 1924518896}
   m_Layer: 0
   m_Name: "\u30C6\u30A3\u30F3\u30D1\u30CB_\u4E0A"
   m_TagString: Untagged
@@ -38619,6 +38798,33 @@ Transform:
   - {fileID: 1969359263}
   m_Father: {fileID: 1544503360}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1924518896
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1924518894}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 893c39be3b1a61d489501309fad6ef21, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TimpaniUnit
+  creature: {fileID: 1969359264}
+  pegs:
+  - {fileID: 1479046613}
+  - {fileID: 220036834}
+  - {fileID: 1722560150}
+  clearRadius: 9
+  stunSeconds: 1
+  clearEffect: {fileID: 11400000, guid: 72ed6a75d9afa7244abd3462f96b37ac, type: 2}
+  healItem: {fileID: 1543206714305803811, guid: f88f820f0c5be004db0f13319d94af87, type: 3}
+  healItemOffset: {x: 0, y: -1.6}
+  calmSprite: {fileID: 21300000, guid: b71965bfafe25b643bae8abe5be82af3, type: 3}
+  calmEffect: {fileID: 11400000, guid: 2b8ee5c766226a542a4604126bd420e2, type: 2}
+  calmSe: {fileID: 0}
+  calmMarkColor: {r: 0.4, g: 1, b: 0.7, a: 1}
+  onCalmed: {fileID: 0}
 --- !u!1 &1967259076
 GameObject:
   m_ObjectHideFlags: 0
@@ -38847,6 +39053,17 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 2460512957874500895, guid: ea50e4ed0d5101547be0630a09749094, type: 3}
   m_PrefabInstance: {fileID: 1969359262}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1969359264 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 6148231572384520106, guid: ea50e4ed0d5101547be0630a09749094, type: 3}
+  m_PrefabInstance: {fileID: 1969359262}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 155238611773867469966f48dbcfb815, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Enemy
 --- !u!1 &1971730580
 GameObject:
   m_ObjectHideFlags: 0
@@ -38962,6 +39179,17 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 7133230897921936796, guid: bc8190676571ea74b8f9253b4f2e56da, type: 3}
   m_PrefabInstance: {fileID: 1989027156}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1989027158 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2073921130145614034, guid: bc8190676571ea74b8f9253b4f2e56da, type: 3}
+  m_PrefabInstance: {fileID: 1989027156}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 68ebacb8453e9684c9ad8ef772e01320, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TimpaniPeg
 --- !u!1 &1997557904
 GameObject:
   m_ObjectHideFlags: 0
@@ -39748,6 +39976,17 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 2460512957874500895, guid: ea50e4ed0d5101547be0630a09749094, type: 3}
   m_PrefabInstance: {fileID: 2134961247}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &2134961249 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 6148231572384520106, guid: ea50e4ed0d5101547be0630a09749094, type: 3}
+  m_PrefabInstance: {fileID: 2134961247}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 155238611773867469966f48dbcfb815, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Enemy
 --- !u!1001 &7613632181593805640
 PrefabInstance:
   m_ObjectHideFlags: 0

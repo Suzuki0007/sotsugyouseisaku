@@ -363,6 +363,14 @@ public class AttackData : ScriptableObject
     [Tooltip("地響き・落石などで画面を揺らす大きさ（0.1 で小さく、0.3 で大きく）。0 なら揺らさない")]
     public float activeShake = 0.0f;
 
+    [Label("発動したときに出す物")]
+    [Tooltip("範囲の真ん中に出す物（落石と一緒に落ちてくるアイテムなど。InstantPickup のプレハブ）。空なら出さない。弾を撃つ攻撃では出さない")]
+    public GameObject spawnOnActive;
+
+    [Label("出す確率", 0.0f, 1.0f)]
+    [Tooltip("発動するたびに、この確率で出す（1 なら毎回）")]
+    public float spawnChance = 0.3f;
+
     [Label("発動中の敵のアニメ")]
     public string activeAnimation = "Attack";
 
