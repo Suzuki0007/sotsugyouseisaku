@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(powershell -NoProfile -ExecutionPolicy Bypass -File .claude/skills/unity-check/scripts/check.ps1:*)",
+      "Read(.claude/**)",
+      "Read(Docs/**)"
+    ]
+  }
+}

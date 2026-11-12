@@ -1,6 +1,6 @@
 # コード構成と問題点（開発者・Claude 向け）
 
-最終更新：2026-11-09。CLAUDE.md から読み込まれる。コードを変えたら、この表も更新すること。
+最終更新：2026-11-12。**毎回は自動で読み込まない**（2026-11-12 から。機能ごとの説明は `.claude/rules/`）。コードを触る前に関係する節を読み、コードを変えたら、この表も更新すること。
 ファイルの参照は `Assets/Script/` からの相対パス。行番号は目安。
 
 ---
@@ -18,6 +18,7 @@
 | `Assets/res_kari/` | 仮素材（マップタイル約2000枚、仮プレイヤー画像など） |
 | `Assets/_Recovery/0.unity` | Unity のクラッシュ復旧で作られたシーン（不要なら削除してよい） |
 | `Docs/` | プランナー向け手順書（通しの手順書は `プランナー向け作業手順書.md`）、この文書、プログラマー向けの引き継ぎ資料（`引き継ぎ_アイテム画面以降の変更.md`） |
+| `.claude/` | Claude の作業環境。`skills/`（`unity-check`：再コンパイルとコンソールの要約・シーンチェック、`unity-playtest`：再生テストの準備と後片付け〔セーブのバックアップと復元〕・キー入力、`finish-task`：作業の締め）、`rules/`（機能ごとの説明。`paths:` で対象のファイルを触ったときに読み込まれる）、`settings.json`（確認なしで実行してよいコマンド）。スクリプトは PowerShell 5.1 用で ASCII のみ |
 
 ---
 
@@ -226,6 +227,7 @@
 | 低 | `Player/PlayerMapLimit.cs`、`PlayerFollower.cs` | Rigidbody2D を使っているのに transform.position を直接書き換えている（物理と位置がずれることがある） |
 | 低 | `StateMachine/StateMachine.cs` Update | 状態が変わったフレームしか `Current.Update` を呼ばない（括弧の位置の誤り）。今は未使用 |
 | 低 | `Data/NoahData.cs` / `NoahInventory.GetKey(null)` | `hasKey` はセーブされない。ItemData なしで鍵を拾うと、シーン遷移後に鍵が消える |
+| 低 | 🆕 `Gimmick/Note/NoteData.cs:41` | 警告 CS0414「`memo` は代入されているが使われていない」（2026-11-12 の再コンパイルで確認。メモ欄として Inspector 用なら `#pragma warning disable 0414` か、どこかで読む） |
 | 低 | 🆕 `Title.unity` の `System`（SceneBgm） | Default Clip が空なので、タイトルで BGM が鳴らない（ステージの曲はタイトルで止まる）。曲が決まったら入れる |
 
 ### 提出前に整理したいもの
@@ -259,3 +261,23 @@
 - 倒れたときは、その時点までの進行を確定してからゲームオーバーへ移る（倒れても拾ったものは残る）。
 - 出口のそばの出現位置へワープすると、そのまま遷移する。
 - シグルの体の当たり判定は、プレハブ（Player_Sigle.prefab）では無効。ついてきている間だけプレハブのまま、操作中・待機中・別行動のときは `PlayerSwitchManager.ApplyBodyCollision` が有効にする（謎解き段階3）。プレハブの設定を変えるときはここも見る。
+
+---
+
+## 5. 解決済み（参考。2026-11-12 に CLAUDE.md から移した）
+- `Save.Read()` 未呼び出し → 起動時に読み込み（AutoSave）。
+- `EnemySpawner` のシーン遷移時の MissingReferenceException → ObjectSpawner で防止。
+- Stage1_1 / SampleScene に DialogueManager がない → DialogueSystem.prefab を配置。
+- デバッグの無敵がシーン遷移で切れる → `Health.PlayerInvincible`。
+- Space キーの重複（範囲攻撃とゲージ判定）→ 判定待ちの間は通常攻撃を出さない（`TimingGaugeUI.IsJudging`）。
+- タイミングゲージが最初の1回目に出ない／会話・イベント中も進む → 修正。
+- `AreaAttack` の倍率の切り捨て → 四捨五入（最低1）。
+- 弾がトリガー範囲や味方に当たって消える → 通り抜ける。
+- `BulletPoolBase` が上限超えの弾の GameObject を消さない／`PlayerBulletPool` が弾にプールを渡しておらず弾が増え続ける → 修正。
+- 出現位置の Sigle 用の位置が効かない → 効くように（そこから歩いて付いてくる）。
+- 「続きから」がない・セーブが1つ・再開位置を記録しない → タイトル画面とスロット3つ（再開位置・プレイ時間・保存日時つき）。
+- 会話フォントの文字が足りない（アトラスが満杯）→ NotoSansJP-Regular SDF の Multi Atlas Textures をオン。
+- シグルが撃てない（SigleShooter なし・OnShot 未接続・Target Camera が空）→ プレハブに SigleShooter、`PlayerInput.Update` で左クリックを直接読む、カメラが空ならメインカメラ。
+- シグルに Health がない（ダメージなし・BGM の HP 条件が効かない）→ **2人で体力を共有**（`Health.ShareWith`）。謎解き段階0で「一緒＝シグルの体力を共有、離れる＝別々」に変更。
+- シグル操作中も Space / R でノアの攻撃が出る → 操作中のキャラだけが攻撃する（謎解き段階0）。
+- `Stage1` / `Stage2` / `SampleScene` が Build Settings に入っていた → 外した。ゲームオーバー画面のリトライ先・SceneChange の SampleScene 参照も修正。
