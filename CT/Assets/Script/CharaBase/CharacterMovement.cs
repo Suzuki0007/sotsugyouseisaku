@@ -59,7 +59,15 @@ public class CharacterMovement : CharaBase
         Vector2 nextPosition =
             rb.position + moveDirection * moveSpeed * Time.fixedDeltaTime;
 
-        rb.MovePosition(nextPosition);
+        rb.MovePosition(LimitNextPosition(nextPosition));
+    }
+
+    /// <summary>
+    /// 動く前に行き先を制限する（プレイヤーはマップの範囲内に収める。PlayerMovement がオーバーライド）
+    /// </summary>
+    protected virtual Vector2 LimitNextPosition(Vector2 nextPosition)
+    {
+        return nextPosition;
     }
 
     /// <summary>

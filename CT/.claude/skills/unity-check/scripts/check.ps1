@@ -4,7 +4,8 @@
 param(
     [switch]$SceneCheck,
     [switch]$Strict,
-    [int]$Tail = 30
+    [int]$Tail = 30,
+    [int]$Timeout = 300
 )
 
 . (Join-Path $PSScriptRoot "lib.ps1")
@@ -13,10 +14,18 @@ Write-Output "== wait for editor"
 if (-not (Wait-UnityReady)) { exit 2 }
 
 Write-Output "== recompile"
-$rcArgs = @("recompile")
+$rcArgs = @("recompile", "--timeout", "$Timeout")
 if ($Strict) { $rcArgs += "--strict" }
 & unity @rcArgs
 $compileExit = $LASTEXITCODE
+# The Editor may already be compiling on its own (HTTP 400). Wait and try once more.
+if ($compileExit -ne 0) {
+    Write-Output "[INFO] recompile failed once (Editor busy?). Waiting and retrying."
+    Start-Sleep -Seconds 5
+    if (-not (Wait-UnityReady)) { exit 2 }
+    & unity @rcArgs
+    $compileExit = $LASTEXITCODE
+}
 
 # The domain may reload after compiling; wait again before asking for the console.
 if (-not (Wait-UnityReady)) { exit 2 }

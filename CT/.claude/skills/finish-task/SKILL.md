@@ -6,7 +6,19 @@ description: CT プロジェクトで1つの作業（機能の追加・修正・
 # finish-task：作業の締め
 
 ユーザーとの約束（CLAUDE.md「作業のルール」）を、毎回同じ順番で守るためのチェックリスト。
-**コミット・push はしない**（ユーザーが自分で行う。git は PATH にない）。
+**コミット・push はしない**（ユーザーが Fork で行う）。変更する Git の操作（commit・push・ブランチの切り替え・stash・reset など）は頼まれたときだけ。
+
+## 0. 変更したファイルを確かめる（読むだけの Git）
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .claude/skills/finish-task/scripts/changes.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File .claude/skills/finish-task/scripts/changes.ps1 -Diff -Path Assets/Script/Gimmick
+```
+
+- Fork に同梱の Git（`%LOCALAPPDATA%\Fork\gitInstance\<版>\cmd\git.exe`）を使う。status・log・diff だけ。
+- **ユーザーが触るブランチは `ueeyama_home` と `Uh_School` だけ。**今のブランチがそれ以外なら `[WARN]` が出る → ユーザーに伝える。頼まれて Git を操作するときも、この2つ以外には切り替え・コミット・マージ・push をしない。
+- 一覧に**意図しないファイル**（シーン・プレハブ・`ProjectSettings`・フォント・`Assets/__ClaudeTest`）があれば、理由を確かめて報告に書く（ユーザーのテストプレイによる変更のこともある。勝手に戻さない）。
+- コミットメッセージは、この一覧に合わせて書く（ユーザーの変更が混ざっているなら、自分の分だけを書き、そのことを伝える）。
 
 ## 1. 確認
 - [ ] `unity-check` を実行した（エラー・自分の書いたコードの警告なし）。シーンに置く物を変えたなら `-SceneCheck` も。
@@ -33,6 +45,7 @@ description: CT プロジェクトで1つの作業（機能の追加・修正・
 - 日本語。1行目は 50 字くらいまでの要約、空行、本文は箇条書き（何を・なぜ）。
 - 複数の作業をまとめて頼まれたら、最後にまとめて1つ。
 - コードブロックで渡す（ユーザーがそのままコピーできるように）。
+- **ほかの人が書いたコードを変えたときは、本文の最後に「〇〇さんへ」の段落を足す**：変えたファイルと場所、何を・なぜ変えたか、その人の作業で気をつけること（動きが変わる点・マージで重なりそうな所）。書いた人はファイル先頭の `\author` か、`git log --format="%an" -- <ファイル>` で確かめる（ユーザー＝uh / uh41 以外が対象）。
 
 ```text
 謎解き：押せる箱を2人で押せるようにする

@@ -25,8 +25,11 @@
 
 ## 作業のルール（ユーザーとの約束）
 
+- **やり取りはすべて日本語**。返事の本文だけでなく、作業の終わりの要約・確認の質問・選択肢のボタン・作業の一覧の項目も日本語で書く。
+
 - **1つ作り終えるたびに、コミットメッセージ（日本語）を作って渡す。** 複数まとめて頼まれたら、最後にまとめて1つ。
-- **コミットはユーザーが自分で行う。** こちらからは commit / push しない。
+- **ほかの人が書いたコードを変えたときは、コミットメッセージにその人への説明を書く**（どのファイルの何を・なぜ変えたか・その人の作業への影響）。書いた人はファイル先頭の `\author`、または Git の履歴（`changes.ps1` / `git log -- <ファイル>`）で確かめる。私（uh）以外が書いた部分が対象。
+- **コミット・push はユーザーが自分で行う**（Fork を使っている）。こちらからは commit / push しない。**変更する Git の操作（commit・push・ブランチの切り替え・stash・reset など）は頼まれたときだけ行う。**読むだけの操作（status・diff・log）はいつでもしてよい。
 - プランナー向けの機能には、**Inspector の項目名・Tooltip を日本語で付け**、`Docs/` に手順書を書く（または追記する）。
 - 実装したら、**Unity CLI で実際のエディタを操作して動作確認する**。確認できなかった項目ははっきり伝える。
 - 既存のコードの問題を見つけたら、勝手に直さずに報告する（頼まれたら直す）。そして `Docs/code-map.md` の問題点に追記する。
@@ -50,7 +53,7 @@
 |---|---|---|
 | スキル | `unity-check` | C# を変えたら毎回（再コンパイル → コンソールの警告・エラー要約、`-SceneCheck` でシーンチェック）。`scripts/lib.ps1` の `Invoke-UnityEval` で単発の C# も |
 | スキル | `unity-playtest` | 再生して確かめるとき（セーブのバックアップと復元・run_in_background・無敵・シーンを開く・キー入力・後片付け） |
-| スキル | `finish-task` | 作業を終えるとき（文書の更新・報告・コミットメッセージ） |
+| スキル | `finish-task` | 作業を終えるとき（変更したファイルの確認〔`scripts/changes.ps1`＝読むだけの Git〕・文書の更新・報告・コミットメッセージ） |
 | ルール | `coding-style.md` | `Assets/Script/**`：書き方・Inspector・プランナー向け機能のチェックリスト |
 | ルール | `enemy.md` | 敵・攻撃・ダメージ・スポナー・体力 |
 | ルール | `gimmick-party.md` | 仕掛け・2人・カメラ・調べる・プレイヤー・相棒の一言 |
@@ -61,7 +64,7 @@
 
 ## 環境
 
-- git は PATH にない（コミット状況・差分は確認できない）。
+- **Git**：PATH にはないが、Fork に同梱の Git が使える：`C:\Users\uhiro\AppData\Local\Fork\gitInstance\2.50.1\cmd\git.exe`（Fork を更新すると版のフォルダ名が変わることがある → `Fork\gitInstance\` の下を探す）。今の変更の一覧と差分の要約は `finish-task` スキルの `scripts/changes.ps1`。リポジトリは GitHub。**リポジトリの一番上は CT の1つ上**（`C:\tokeitou\sotsugyouseisaku`。Git の表示は `CT/...`）。**ユーザーが触るブランチは `ueeyama_home` と `Uh_School` の2つだけ。**ほかのブランチ（`narita` など、他の人のもの）は触らない。頼まれて Git を操作するときも、この2つ以外への切り替え・コミット・マージ・push はしない（頼まれた内容がほかのブランチに及ぶなら、実行せずに確かめる）。今どのブランチかは決めつけずに `changes.ps1` で確かめる。
 - **Unity CLI**：`C:\Users\uhiro\AppData\Local\Unity\bin\unity.exe`（PowerShell では `$env:Path = "C:\Users\uhiro\AppData\Local\Unity\bin;" + $env:Path` を先に。スキルのスクリプトは自分で設定する）。`com.unity.pipeline`（0.10.0-exp.1）。エディタが開いていれば `unity command ...` で操作できる。起動していなければ `unity open .`（ユーザーに断ってから）。
 - **ユーザーも同じエディタでテストプレイしていることがある。** スロット1〜3（`persistentDataPath/save_*.json`）はすべてユーザーのデータ。再生テストは `unity-playtest` で（バックアップ・復元をする）。
 - テストで作るアセットは `Assets/__ClaudeTest/` に置き、最後に削除する。eval 用の .cs は `Assets/` の外に置く（中だとインポートが走る）。**シーンは勝手に保存しない**（必要なときは理由を伝える）。
@@ -83,6 +86,7 @@
 
 ## 問題点の要約（優先度の高いもの）
 全体は `Docs/code-map.md` の「4. 問題点」と、引き継ぎ資料の「8. 既知の問題（すべて）」。
+- 🆕 プレイヤーの歩ける範囲（`MapBounds`）と、カメラ・敵のナビメッシュ・相棒の道の範囲（Tilemap）が別々（11-10 の変更から）。
 - **ノア・シグルのプレハブに FootstepSe がない**（足音が鳴らない。FootstepSe は Stage1_2 の動かない `Player` オブジェクトに付いている）。
 - `BgmProgress`（BGM の進行度）が再生ごとにリセットされず、セーブもされない。
 - `StageDarkness` の明かりが操作キャラに付いていかないことがある。

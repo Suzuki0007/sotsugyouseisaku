@@ -18,7 +18,7 @@
 | `Assets/res_kari/` | 仮素材（マップタイル約2000枚、仮プレイヤー画像など） |
 | `Assets/_Recovery/0.unity` | Unity のクラッシュ復旧で作られたシーン（不要なら削除してよい） |
 | `Docs/` | プランナー向け手順書（通しの手順書は `プランナー向け作業手順書.md`）、この文書、プログラマー向けの引き継ぎ資料（`引き継ぎ_アイテム画面以降の変更.md`） |
-| `.claude/` | Claude の作業環境。`skills/`（`unity-check`：再コンパイルとコンソールの要約・シーンチェック、`unity-playtest`：再生テストの準備と後片付け〔セーブのバックアップと復元〕・キー入力、`finish-task`：作業の締め）、`rules/`（機能ごとの説明。`paths:` で対象のファイルを触ったときに読み込まれる）、`settings.json`（確認なしで実行してよいコマンド）。スクリプトは PowerShell 5.1 用で ASCII のみ |
+| `.claude/` | Claude の作業環境。`skills/`（`unity-check`：再コンパイルとコンソールの要約・シーンチェック、`unity-playtest`：再生テストの準備と後片付け〔セーブのバックアップと復元〕・キー入力、`finish-task`：作業の締め・`scripts/changes.ps1`〔Fork 同梱の Git で変更の一覧と差分の要約。読むだけ〕）、`rules/`（機能ごとの説明。`paths:` で対象のファイルを触ったときに読み込まれる）、`settings.json`（確認なしで実行してよいコマンド）。スクリプトは PowerShell 5.1 用で ASCII のみ |
 
 ---
 
@@ -53,8 +53,9 @@
 | ファイル | 役割 | 状態 |
 |---|---|---|
 | `ObjectBase/ObjectBase.cs` → `CharaBase/CharaBase.cs` | 共通の基底（中身は空の Start / Update） | ○ |
-| `CharaBase/CharacterMovement.cs` | Rigidbody2D.MovePosition で移動。`LastDirection`（最後に動いた向き。見ていない間に動く像が使う） | ◎ |
-| `Player/PlayerMovement.cs` | 操作できるかのフラグを追加 | ◎ |
+| `CharaBase/CharacterMovement.cs` | Rigidbody2D.MovePosition で移動。`LastDirection`（最後に動いた向き。見ていない間に動く像が使う）。`LimitNextPosition`（動く前に行き先を制限。PlayerMovement がマップの範囲に収める） | ◎ |
+| `Player/PlayerMapLimit.cs` | マップの範囲（`MapBounds`）に収める。`ClampToMap`（体の大きさの分だけ内側。当たり判定が無効でも形から大きさを出す）を PlayerMovement が動く前に使い、LateUpdate でも念のため戻す（物理の位置も合わせる）。**LateUpdate の順番**：PlayerFollower（0）→ PlayerMapLimit（100）→ PlayerHistory（200）→ CharacterAnimLink（300）。`DefaultExecutionOrder` で決めている（順番が崩れると、ついてくる相棒が端で震える） | ◎ |
+| `Player/PlayerMovement.cs` | 操作できるかのフラグを追加。操作できなくなったら向きと速さを消す。FixedUpdate で毎回速さを 0 にしてから動かす（押されて滑らない） | ◎ |
 | `Player/PlayerInput.cs` | キー入力 → 操作中キャラの移動、Q で弾消し、**マウスの左クリックで射撃**（操作中のキャラに SigleShooter があれば。Update で直接読む。Target Camera が空ならメインカメラ。`OnShot` は Input System のイベント用に残しているが未使用） | ◎ |
 | `Manager/PlayerSwitchManager.cs` | Noah / Sigle の切り替え（位置の入れ替え、追従、カメラ）、`Warp`。**2人の状態** `PartyMode`（一緒／待機／別行動。`SetMode`、`ModeChanged`・`Switched` イベント）：一緒のときだけ位置を入れ替え・相棒がついてくる（待機・別行動は `PlayerFollower.Hold`、カメラだけ移る）。一緒に戻ると相棒が合流（道があれば歩く）。**待て／ついてこい**（F キー、`ToggleWait`・`TrySetMode(..., requireRoute)`・`CanPartnerReach`・`WaitCommandLocked`）。体の当たり判定（`ApplyBodyCollision`：ついてきている間だけプレハブのまま＝シグルは無効）。体力の共有（一緒＝ノア → シグル、離れる＝別々）、`PartyHealth`（一緒＝シグル、離れる＝操作中のキャラ）、`HealthOf` | ◎ |
 | `Party/PartyModeEventAction.cs` | イベントの部品「2人の状態を変える」（状態〔変えないも可〕・操作するキャラ・待て／ついてこいのキーを使えなくする）。まだセーブしない | ◎ |
@@ -195,6 +196,7 @@
 | 優先度 | 場所 | 内容 |
 |---|---|---|
 | **高** | `Prefab/Players/Player_Noah.prefab`、`Player_Sigle.prefab` | **FootstepSe が付いていない**ため足音が鳴らない。FootstepSe は Stage1_2 のルートの `Player`（Transform と FootstepSe だけの動かないオブジェクト）に付いている。11-06 の SE 手順書は「プレハブの FootstepSe に設定」と書いていた |
+| 中 | 🆕 `Player/PlayerMapLimit.cs`（11-10 の変更） | 歩ける範囲が `MapBounds`（絵の大きさ）になったが、カメラ（`FocusCamera`）・敵のナビメッシュ（`NavMesh2D`）・相棒の道（`PartyRoute`）は今も `PlayerSceneContext` の Tilemap の範囲を使う。2つの範囲が違うと、プレイヤーは行けるのに敵・カメラが付いてこない場所ができる |
 | 中 | `Bgm/Effects/BgmProgress.cs` | 進行度（static）が `SubsystemRegistration` でリセットされない（ドメインリロード無効のエディタで前回の値が残る）。セーブもされず、はじめから・つづきからでも戻らない |
 | 中 | `StageDarkness/StageDarkness.cs` FindTarget | 明かりの追従先を `FindWithTag("Player")` の最初の1人で決めるため、キャラ切り替えで操作キャラに付いていかないことがある |
 | 中 | **古い作りの敵**の移動（`Behavior/Enemy/Behavior Graph.asset` の SetPositionToTarget、`Prefab/Enemies/Enemy.prefab`） | 「6秒撃つ → 3秒かけてプレイヤーの位置へ移動」の繰り返し。移動は transform を直接動かし、Rigidbody2D は Static なので**壁をすり抜け、プレイヤーと重なる**。会話・イベント中も移動は続く（撃つのは止まるようにした）。同じ動きの新しい敵（サンプル「撃つ」）はできたが、**Stage1_2 のスポナーはまだ古い Enemy.prefab**（置き換えはシーンの変更が要るので未実施） |
@@ -224,7 +226,7 @@
 | 低 | `Prefab/Players/Player_Sigle.prefab` の SigleShooter | Shot Se が空（射撃の音が鳴らない。撃ったときのエフェクトは仮で Fx_Sample_Muzzle）。音が決まったら入れる |
 | 低 | `CharaBase/CharacterSorting.cs` | `SetPlayer` が Start より後に呼ばれると `spriteRenderer` が null のまま |
 | 低 | `Player/PlayerFollower.cs`、`PlayerHistory.cs` | 追従の距離が「フレーム数」なので、fps が変わると距離が変わる。`RemoveAt(0)` を毎フレーム（1000件のリスト） |
-| 低 | `Player/PlayerMapLimit.cs`、`PlayerFollower.cs` | Rigidbody2D を使っているのに transform.position を直接書き換えている（物理と位置がずれることがある） |
+| 低 | `Player/PlayerFollower.cs` | Rigidbody2D を使っているのに transform.position を直接書き換えている（物理と位置がずれることがある。PlayerMapLimit は 11-13 に物理の位置も合わせるようにした） |
 | 低 | `StateMachine/StateMachine.cs` Update | 状態が変わったフレームしか `Current.Update` を呼ばない（括弧の位置の誤り）。今は未使用 |
 | 低 | `Data/NoahData.cs` / `NoahInventory.GetKey(null)` | `hasKey` はセーブされない。ItemData なしで鍵を拾うと、シーン遷移後に鍵が消える |
 | 低 | 🆕 `Gimmick/Note/NoteData.cs:41` | 警告 CS0414「`memo` は代入されているが使われていない」（2026-11-12 の再コンパイルで確認。メモ欄として Inspector 用なら `#pragma warning disable 0414` か、どこかで読む） |
@@ -260,11 +262,15 @@
 - 最後のセーブ以降に手に入れたものは、タイトルに戻る・終了すると失われる（セーブはシーンに着いたとき・チェックポイント）。
 - 倒れたときは、その時点までの進行を確定してからゲームオーバーへ移る（倒れても拾ったものは残る）。
 - 出口のそばの出現位置へワープすると、そのまま遷移する。
+- **ノアとシグルの体どうしは当たらない**（すり抜ける。`PlayerSwitchManager.IgnorePartnerCollision` が `Physics2D.IgnoreCollision` を ApplyFollow のたびにかけ直す。2026-11-12）。プレイヤーは物理の速さを使わない（`PlayerMovement.FixedUpdate` が毎回 0 にしてから `MovePosition`。操作できなくなったら向きも消す）。プレイヤーに速さで動きを付ける処理（ノックバックなど）を作るときは、ここを変える必要がある。
 - シグルの体の当たり判定は、プレハブ（Player_Sigle.prefab）では無効。ついてきている間だけプレハブのまま、操作中・待機中・別行動のときは `PlayerSwitchManager.ApplyBodyCollision` が有効にする（謎解き段階3）。プレハブの設定を変えるときはここも見る。
 
 ---
 
 ## 5. 解決済み（参考。2026-11-12 に CLAUDE.md から移した）
+- （2026-11-13）ついてくる相棒の絵が震える（シグルが先頭のとき目立つ）→ ①マップの端：動く前に範囲内に収める（`CharacterMovement.LimitNextPosition` → `PlayerMapLimit.ClampToMap`）、LateUpdate の順番を `DefaultExecutionOrder` で固定（相棒が写す履歴が「外」と「戻した位置」を交互に記録していた）。②シグルのプレハブの Interpolate をオン（物理 50 回/秒・描画 60 回/秒で 6 フレームに 1 回止まっていた）。
+- （2026-11-12）離れているときに切り替えると前のキャラが歩き続ける → `PlayerMovement.SetControlEnabled(false)` で向きと速さを消す。
+- （2026-11-12）2人が押し合い、押された方が滑り続ける・一緒でシグルを操作するとついてくるノアとぶつかって押し出される → 2人の体はすり抜ける（`PlayerSwitchManager.IgnorePartnerCollision`）、プレイヤーは毎回速さを 0 に（`PlayerMovement.FixedUpdate`）。
 - `Save.Read()` 未呼び出し → 起動時に読み込み（AutoSave）。
 - `EnemySpawner` のシーン遷移時の MissingReferenceException → ObjectSpawner で防止。
 - Stage1_1 / SampleScene に DialogueManager がない → DialogueSystem.prefab を配置。

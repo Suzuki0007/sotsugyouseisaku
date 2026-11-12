@@ -519,6 +519,27 @@ public class PlayerSwitchManager : Singleton<PlayerSwitchManager>
 
         ApplyBodyCollision(noah);
         ApplyBodyCollision(sigle);
+        IgnorePartnerCollision();
+    }
+
+    /// <summary>
+    /// ノアとシグルの体どうしは当たらない（すり抜ける）
+    /// （当たると押し合って、押された方が飛ばされる。ついてくる相棒が先頭にぶつかることもある）
+    /// 当たり判定を無効→有効にすると、無視の設定が消えることがあるので、ApplyBodyCollision の後に毎回かけ直す
+    /// </summary>
+    private void IgnorePartnerCollision()
+    {
+        if(noah == null || sigle == null) { return; }
+
+        foreach(Collider2D a in noah.GetComponentsInChildren<Collider2D>(true))
+        {
+            if(a.isTrigger) { continue; }
+            foreach(Collider2D b in sigle.GetComponentsInChildren<Collider2D>(true))
+            {
+                if(b.isTrigger) { continue; }
+                Physics2D.IgnoreCollision(a, b, true);
+            }
+        }
     }
 
     // プレハブでの当たり判定の有効・無効（シグルはプレハブで無効になっている＝ついてくるときにノアに引っかからないため）

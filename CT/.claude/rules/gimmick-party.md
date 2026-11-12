@@ -18,6 +18,8 @@ paths:
 
 ## 2人の状態・体力（段階0）
 - 攻撃は操作中のキャラだけ。2人の状態 `PartyMode`（一緒／待機／別行動）。体力は一緒＝シグルの体力を共有（`Health.ShareWith`）、離れる＝別々（シグル 6・ノア 3）。`PartyHealth`・`HealthOf`。
+- **ノアとシグルの体どうしはすり抜ける**（`PlayerSwitchManager.IgnorePartnerCollision`。当たり判定を有効にし直すと無視が消えることがあるので ApplyFollow のたびにかけ直す）。プレイヤーは物理の速さを使わない（`PlayerMovement.FixedUpdate` が毎回 0 にする。操作できなくなったら向きも消す）。
+- **プレイヤーの LateUpdate の順番は固定**：PlayerFollower（0）→ PlayerMapLimit（100）→ PlayerHistory（200）→ CharacterAnimLink（300）。履歴は位置が決まってから記録する（崩れると、ついてくる相棒が震える）。マップの端は動く前に止める（`CharacterMovement.LimitNextPosition` → `PlayerMapLimit.ClampToMap`）。ノア・シグルのプレハブの Rigidbody2D は Interpolate をオン（オフだと 6 フレームに 1 回止まる）。
 - `PlayerSwitchManager.ApplyBodyCollision`：シグルの体の当たり判定は、ついてきている間だけプレハブのまま（無効）・操作中／待機／別行動は有効。
 - **`Intaractable`（調べる）は操作中のキャラだけに反応**（範囲の中のプレイヤーを覚え、操作中のキャラだけを player にする。`OnPlayerEnter` も操作中のキャラだけ）。
 - 使えるキャラ `CharacterRestriction`（両方／ノアだけ／シグルだけ）。`GimmickSwitch` は範囲の中の**操作中のキャラ**だけ（`Intaractable` の player はついてくる相棒のこともあるため、自分で確かめる）。
