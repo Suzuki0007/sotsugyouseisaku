@@ -4,7 +4,7 @@
 主人公は **ノア（Noah）** と **シグル（Sigle）** の2人で、C キーで操作を切り替える。F キーで相棒を待たせる・呼び戻す。
 目標は「**プランナーがコードを書かずに Inspector だけで制作を進められる**」こと。
 
-最終更新：2026-11-12（Claude の作業環境を整備：`.claude/skills`・`.claude/rules`・`.claude/settings.json`。機能ごとの細かい説明は CLAUDE.md から rules へ移した）
+最終更新：2026-11-13（シナリオの会話〔一層・二層〕を CSV にして取り込み：`Assets/Data/Dialogue/Scenario_F1`・`Scenario_F2`）
 
 ## 進み具合
 - **完了：敵の仕組み**（段階0〜7）。→ `.claude/rules/enemy.md`

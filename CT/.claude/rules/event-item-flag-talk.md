@@ -39,6 +39,7 @@ paths:
 - `DialogueManager`（シーンごとのシングルトン）。`Assets/Prefab/UI/DialogueSystem.prefab` を置けば使える。Stage1_1 / SampleScene に配置済み。Stage1_2 はシーンの Canvas に直接組んだもの。
 - `Dialogue`：DialogueManager がないシーンでは旧方式。
 - `DialogueCsv`（エディタ）：CSV（会話ID, キャラ, 表情, 名前, 本文）⇄ DialogueData。UTF-8 / Shift-JIS、同名は上書き（GUID 維持）。`DialogueCsv.Import(path, showDialog:false)`。Parse などは internal にして `BarkCsv` が使い回す。
+- シナリオの会話：`Assets/Data/Dialogue/Scenario_F1.csv`（一層）・`Scenario_F2.csv`（二層）が元（台本 `セリフ.xlsx` から変換。演出は「#」のメモ行）。会話ID は `F<層>_<番号>_<場面>`。**直すときは CSV を直して取り込み直す**（DialogueData を直接直さない）。ノア・シグル以外は CharacterProfile がなく「名前」の列だけ（ティンパニ・ヴェルツィー・カイロス・？？？）。正体を隠すシグルは キャラ=Sigle・名前=？？？。
 
 ## プランナー用ツール（`Assets/Script/Common/`）
 - `[SceneName]` / `[SpawnPointId(nameof(sceneField))]`：string をドロップダウンに。`SceneLookup` が Build Settings と閉じたシーンのファイルから出現位置 ID を読む（プレハブ内のものは読めない）。

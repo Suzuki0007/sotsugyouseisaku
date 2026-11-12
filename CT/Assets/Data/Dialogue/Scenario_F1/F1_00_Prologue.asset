@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eac73eb13381b184b8a3fd1f6643eddc, type: 3}
+  m_Name: F1_00_Prologue
+  m_EditorClassIdentifier: Assembly-CSharp::DialogueData
+  lines:
+  - character: {fileID: 0}
+    expression: 0
+    speakerName: "\uFF1F\uFF1F\uFF1F"
+    text: "(\u3053\u30FC\u5CF6\u304B\u3089\u30FC\u30FC\u3093\u3060\u3002\u4FFA\u306F\u30FC\u30FC\u30FC\u6B8B\u308B)"
+  - character: {fileID: 0}
+    expression: 0
+    speakerName: "\uFF1F\uFF1F\uFF1F"
+    text: "(\u305B\u3081\u3066\u30FC\u30FC\u30FC\u3060\u3051\u3067\u30FC\u3002"
+  - character: {fileID: 0}
+    expression: 0
+    speakerName: "\uFF1F\uFF1F\uFF1F"
+    text: "(\u30FC\u30FC\u30FC\u3001\u3059\u307E\u306A\u30FC\u3001\u541B\u30FC\u751F\u304D\u3066\u30FC\u30FC\u30FC\u3093\u3060\u3002)"
