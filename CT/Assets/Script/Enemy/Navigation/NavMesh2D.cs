@@ -31,7 +31,8 @@ public enum EnemySize
 /// ・シーンに置かなくてよい。敵が経路を聞いたときに自動で作られ、シーンを出ると消える
 /// ・壁：当たり判定のある（Is Trigger でない）2D コライダーのうち、動かないもの（Rigidbody2D がないか Static）。
 ///   プレイヤー・敵・弾は含めない。扉などの表示が切り替わったら、0.5 秒以内に作り直す
-/// ・歩ける範囲：PlayerSceneContext の Tilemap の範囲（プレイヤーが動ける範囲と同じ）
+/// ・歩ける範囲：MapArea（歩ける範囲 WalkArea の形 → マップの絵 MapBounds → Tilemap。プレイヤーが動ける範囲と同じ）。
+///   WalkArea があるシーンでは、その形どおりの床（升目 0.2 マス）を作る。WalkArea の形が変わると作り直す
 /// ・EnemyNavArea（敵の通行設定エリア）で「入れない」「通りにくい」場所を作れる
 ///
 /// しくみ：Unity の NavMesh は 3D（XZ 平面）用なので、ナビメッシュを X 軸で -90 度回して XY 平面に重ねる。
@@ -380,6 +381,7 @@ public class NavMesh2D : MonoBehaviour
 
             Rect rect = ComputeWorldRect(null);
             hash = hash * 31 + rect.GetHashCode();
+            hash = hash * 31 + WalkArea.Signature;
             return hash;
         }
     }
@@ -455,13 +457,15 @@ public class NavMesh2D : MonoBehaviour
 
         // 床（歩ける範囲）
         worldRect = ComputeWorldRect(obstacleBounds);
-        newSources.Add(new NavMeshBuildSource
+        if(MapArea.HasWalkShape)
         {
-            shape = NavMeshBuildSourceShape.Box,
-            transform = Matrix4x4.TRS(new Vector3(worldRect.center.x, worldRect.center.y, FloorThickness * 0.5f), Quaternion.identity, Vector3.one),
-            size = new Vector3(worldRect.width, worldRect.height, FloorThickness),
-            area = 0,
-        });
+            // 歩ける範囲（WalkArea）の形どおりの床：細かい升目で塗り、横に続く所を1本の細長い箱にまとめる
+            AddShapedFloor(newSources, worldRect);
+        }
+        else
+        {
+            newSources.Add(FloorBox(worldRect.center, worldRect.size));
+        }
 
         // ナビメッシュの中での範囲（回す前の XZ 平面で考える：ワールドの X → X、Y → Z）
         localBounds = new Bounds(
@@ -488,21 +492,52 @@ public class NavMesh2D : MonoBehaviour
         return mesh;
     }
 
+    // 形どおりの床を作るときの升目の大きさ（マス）
+    private const float FloorCell = 0.2f;
+
+    private static NavMeshBuildSource FloorBox(Vector2 center, Vector2 size)
+    {
+        return new NavMeshBuildSource
+        {
+            shape = NavMeshBuildSourceShape.Box,
+            transform = Matrix4x4.TRS(new Vector3(center.x, center.y, FloorThickness * 0.5f), Quaternion.identity, Vector3.one),
+            size = new Vector3(size.x, size.y, FloorThickness),
+            area = 0,
+        };
+    }
+
     /// <summary>
-    /// 歩ける範囲（Tilemap の範囲。なければ壁の範囲を少し広げたもの）
+    /// 歩ける範囲の形どおりの床（升目の中心が範囲の中なら床。横に続く升目は1つの箱にまとめる）
+    /// </summary>
+    private static void AddShapedFloor(List<NavMeshBuildSource> sources, Rect rect)
+    {
+        int cols = Mathf.CeilToInt(rect.width / FloorCell);
+        int rows = Mathf.CeilToInt(rect.height / FloorCell);
+        for(int r = 0; r < rows; r++)
+        {
+            float y = rect.yMin + (r + 0.5f) * FloorCell;
+            int start = -1;
+            for(int c = 0; c <= cols; c++)
+            {
+                bool inside = c < cols && WalkArea.Contains(new Vector2(rect.xMin + (c + 0.5f) * FloorCell, y));
+                if(inside && start < 0) { start = c; }
+                if(!inside && start >= 0)
+                {
+                    float x0 = rect.xMin + start * FloorCell;
+                    float x1 = rect.xMin + c * FloorCell;
+                    sources.Add(FloorBox(new Vector2((x0 + x1) * 0.5f, y), new Vector2(x1 - x0, FloorCell)));
+                    start = -1;
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// 歩ける範囲を囲む四角（MapArea：歩ける範囲 → マップの絵 → Tilemap。なければ壁の範囲を少し広げたもの）
     /// </summary>
     private static Rect ComputeWorldRect(List<Bounds> obstacleBounds)
     {
-        PlayerSceneContext context = FindAnyObjectByType<PlayerSceneContext>();
-        UnityEngine.Tilemaps.Tilemap tilemap = context != null ? context.PlayerLimitTilemap : null;
-
-        if(tilemap != null)
-        {
-            BoundsInt cells = tilemap.cellBounds;
-            Vector3 min = tilemap.CellToWorld(cells.min);
-            Vector3 max = tilemap.CellToWorld(cells.max);
-            return Rect.MinMaxRect(Mathf.Min(min.x, max.x), Mathf.Min(min.y, max.y), Mathf.Max(min.x, max.x), Mathf.Max(min.y, max.y));
-        }
+        if(MapArea.TryGetWalkRect(out Rect walk)) { return walk; }
 
         if(obstacleBounds != null && obstacleBounds.Count > 0)
         {

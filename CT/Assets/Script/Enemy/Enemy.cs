@@ -91,7 +91,6 @@ public class Enemy : MonoBehaviour
     private Rigidbody2D rb;
     private Health health;
     private SpriteAnimator anim;
-    private Tilemap limitTilemap;
 
     private bool hasDestination;
     private Vector2 destination;
@@ -535,9 +534,7 @@ public class Enemy : MonoBehaviour
             return;
         }
 
-        // マップの外に出ないように、プレイヤーと同じ範囲を使う
-        PlayerSceneContext context = FindAnyObjectByType<PlayerSceneContext>();
-        if(context != null) { limitTilemap = context.PlayerLimitTilemap; }
+        // マップの外に出ないようにする範囲は MapArea（プレイヤーと同じ範囲。ClampToMap）
 
         // 最初はプレイヤーの方を向く
         GameObject target = Target;
@@ -747,22 +744,16 @@ public class Enemy : MonoBehaviour
     }
 
     /// <summary>
-    /// マップ（Tilemap の範囲）の外に出ないようにする（PlayerMapLimit と同じ範囲）
+    /// 歩ける範囲（MapArea：歩ける範囲 → マップの絵 → Tilemap。プレイヤーと同じ範囲）の外に出ないようにする
     /// </summary>
     private void ClampToMap()
     {
-        if(limitTilemap == null) { return; }
-
-        BoundsInt cells = limitTilemap.cellBounds;
-        Vector3 min = limitTilemap.CellToWorld(cells.min);
-        Vector3 max = limitTilemap.CellToWorld(cells.max);
+        // 止められている間（イベントで上から降らせる・画面の外から入れる など）は収めない
+        if(Paused) { return; }
 
         Vector2 position = rb.position;
-        Vector2 clamped = new Vector2(
-            Mathf.Clamp(position.x, Mathf.Min(min.x, max.x), Mathf.Max(min.x, max.x)),
-            Mathf.Clamp(position.y, Mathf.Min(min.y, max.y), Mathf.Max(min.y, max.y)));
-
-        if(clamped != position) { rb.position = clamped; }
+        Vector2 clamped = MapArea.Clamp(position);
+        if((clamped - position).sqrMagnitude > 0.000001f) { rb.position = clamped; }
     }
 
     //=====================================================================

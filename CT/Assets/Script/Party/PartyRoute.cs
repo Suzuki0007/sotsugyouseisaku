@@ -58,6 +58,16 @@ public static class PartyRoute
         Collider2D body = walker != null ? walker.GetComponent<Collider2D>() : null;
         float radius = body != null ? Mathf.Max(0.05f, Mathf.Min(body.bounds.extents.x, body.bounds.extents.y) * 0.8f) : 0.3f;
 
+        // 歩ける範囲（WalkArea）があるシーンでは、まっすぐの線が範囲の外を通らないか（0.25 マスごとに確かめる）
+        if(MapArea.HasWalkShape)
+        {
+            int steps = Mathf.CeilToInt(distance / 0.25f);
+            for(int i = 1; i < steps; i++)
+            {
+                if(!WalkArea.Contains(Vector2.Lerp(from, to, (float)i / steps))) { return false; }
+            }
+        }
+
         foreach(RaycastHit2D hit in Physics2D.CircleCastAll(from, radius, delta / distance, distance))
         {
             Collider2D c = hit.collider;

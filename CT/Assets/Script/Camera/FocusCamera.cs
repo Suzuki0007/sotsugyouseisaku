@@ -123,6 +123,12 @@ public class FocusCamera : MonoBehaviour
             minWorld = area.Bounds.min;
             maxWorld = area.Bounds.max;
         }
+        else if(MapArea.TryGetViewRect(out Rect view))
+        {
+            // マップの絵（MapBounds）の範囲。なければ Tilemap の範囲（MapArea が決める。プレイヤー・敵と同じ範囲）
+            minWorld = view.min;
+            maxWorld = view.max;
+        }
         else if(tilemap != null)
         {
             // Tilemapが使用しているセルの範囲をワールド座標へ変換
