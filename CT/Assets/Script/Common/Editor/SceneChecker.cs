@@ -74,6 +74,40 @@ public static class SceneChecker
         CheckEnemies(ctx);
         CheckGimmicks(ctx);
         CheckWalkAreaAndTimpani(ctx);
+        CheckRooms(ctx);
+    }
+
+    //=====================================================================
+    // 部屋（Room）・カメラの範囲
+    //=====================================================================
+
+    private static void CheckRooms(Context ctx)
+    {
+        foreach(Room room in ctx.Find<Room>())
+        {
+            foreach(RoomChecks.Result r in RoomChecks.Check(room))
+            {
+                if(r.level == RoomChecks.Level.Ok) { continue; }
+                if(r.target is PlayerSpawnPoint) { continue; }   // 出現位置が範囲の外かは「歩ける範囲」の点検で出す（同じ指摘を2回出さない）
+                Level level = r.level == RoomChecks.Level.Error ? Level.Error : r.level == RoomChecks.Level.Warning ? Level.Warning : Level.Info;
+                ctx.Add(level, r.target, $"部屋「{room.name}」：{r.text}");
+            }
+        }
+
+        // 部屋に入っていないカメラの範囲も、画面より小さければ知らせる
+        Vector2 view = RoomChecks.ViewSize();
+        if(view.x <= 0.0f) { return; }
+        foreach(CameraArea area in ctx.Find<CameraArea>())
+        {
+            if(area.GetComponentInParent<Room>() != null) { continue; }
+            BoxCollider2D box = area.GetComponent<BoxCollider2D>();
+            if(box == null) { continue; }
+            Vector2 size = Vector2.Scale(box.size, area.transform.lossyScale);
+            if(size.x + 0.01f < view.x || size.y + 0.01f < view.y)
+            {
+                ctx.Add(Level.Info, area, $"カメラの範囲（{size.x:0.#}×{size.y:0.#}）が画面（{view.x:0.#}×{view.y:0.#}）より小さいので、その向きには動かず真ん中に止まります");
+            }
+        }
     }
 
     //=====================================================================
@@ -866,9 +900,9 @@ public static class SceneChecker
     {
         foreach(DialogueEventAction action in ctx.Find<DialogueEventAction>())
         {
-            if(new SerializedObject(action).FindProperty("dialogue").objectReferenceValue == null)
+            if(!action.HasDialogue)
             {
-                ctx.Add(Level.Error, action, "DialogueEventAction の Dialogue が空です（会話が出ません）");
+                ctx.Add(Level.Error, action, "DialogueEventAction の「会話データ」が空です（会話が出ません）");
             }
         }
 

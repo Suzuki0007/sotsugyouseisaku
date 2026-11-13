@@ -5,9 +5,12 @@
 // Flag("Flag_xxx")                    … Assets/Data/Flags/ の GameFlag
 // Dlg("Scenario_F1", "F1_07_SigleIntro") … Assets/Data/Dialogue/<フォルダ>/<ID>.asset の DialogueData
 // MakeSeq(go, lockPlayer)             … EventSequence を付ける（Actions は空＝同じオブジェクトの部品を上から順に）
-// AddTalk(go, dialogueData)           … 子の「会話」に Dialogue を作り、DialogueEventAction を足す（閉じるまで待つ）
+// AddTalk(go, dialogueData)           … DialogueEventAction を足して会話データを直接入れる（閉じるまで待つ）
 // AddWait(go, 秒)                     … WaitEventAction を足す
 // OpenSceneSafe("Assets/Scenes/x.unity") … 開いているシーンに保存していない変更があれば止める
+// RoomMenu.Build(RoomKind.Battle, 絵の SpriteRenderer, "部屋ID") … 部屋の型を作る（歩ける範囲・カメラ・出現位置・戦闘エリアなど。Map/Editor/RoomMenu）
+// RoomChecks.Check(room)              … 部屋の点検（OK も含む一覧）
+// WalkAreaMask.Build(walkArea)        … マスク画像から歩ける範囲を作る（WalkArea にマスク画像・合わせる絵を入れてから）
 // Log                                 … 最後に return Log.ToString(); で結果を返す
 
 var Log = new System.Text.StringBuilder();
@@ -49,10 +52,9 @@ System.Func<string, string, DialogueData> Dlg = (folder, id) => {
 System.Func<UnityEngine.GameObject, bool, EventSequence> MakeSeq = (go, lockPlayer) => {
   var s = go.AddComponent<EventSequence>(); SetProp(s, "lockPlayer", lockPlayer); return s; };
 
+// 会話：DialogueEventAction に会話データを直接入れる（11-13 から。子の「会話」オブジェクトは要らない）
 System.Action<UnityEngine.GameObject, DialogueData> AddTalk = (go, data) => {
-  var holder = go.transform.Find("会話"); if (holder == null) holder = NewGO(go.transform, "会話", go.transform.position).transform;
-  var h = NewGO(holder, "会話_" + data.name, go.transform.position); var dlg = h.AddComponent<Dialogue>(); SetProp(dlg, "dialogueData", data);
-  var a = go.AddComponent<DialogueEventAction>(); SetProp(a, "dialogue", dlg); SetProp(a, "closeMode", 0); SetProp(a, "waitUntilClosed", true); };
+  var a = go.AddComponent<DialogueEventAction>(); SetProp(a, "dialogueData", data); SetProp(a, "closeMode", 0); SetProp(a, "waitUntilClosed", true); };
 
 System.Action<UnityEngine.GameObject, float> AddWait = (go, s) => { var a = go.AddComponent<WaitEventAction>(); SetProp(a, "seconds", s); };
 
