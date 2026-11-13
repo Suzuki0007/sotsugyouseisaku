@@ -60,6 +60,8 @@ powershell -NoProfile -ExecutionPolicy Bypass -File $ev -AutoSave        # 今�
 powershell -NoProfile -ExecutionPolicy Bypass -File $ev -Reload          # タイトルへ → つづきから（オートセーブ）→ 状態を表示
 powershell -NoProfile -ExecutionPolicy Bypass -File $ev -CheckInteract   # 範囲の中の調べる物に、E キーの経路（Intaractable.Update）が生きているか
 powershell -NoProfile -ExecutionPolicy Bypass -File $ev -Prompt          # キーの案内（[E] 〜）が今何を出しているか
+powershell -NoProfile -ExecutionPolicy Bypass -File $ev -Reach           # 今いる場所から、調べる物・出口・出現位置へ歩いて行けるか（MapReach）
+powershell -NoProfile -ExecutionPolicy Bypass -File $ev -ShowArea -Value 1  # 歩ける範囲の線をゲーム画面に出す（0 で消す）→ -Capture で見る
 ```
 
 - **ロードの確かめ（ユーザーの指示：ときどき行う）**：イベントの前・途中・後で `-Reload`。見ること：出た場所から先へ進めるか（入口側に戻されていないか）・イベントが繰り返さないか・拾った物やフラグが残っているか。

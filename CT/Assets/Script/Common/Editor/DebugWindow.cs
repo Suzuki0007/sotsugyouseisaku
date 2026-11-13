@@ -93,6 +93,8 @@ public class DebugWindow : EditorWindow
             DrawEnemies();
             DrawGimmicks();
             DrawTimpani();
+            DrawEvents();
+            DrawMapArea();
         }
 
         DrawStartState();
@@ -411,6 +413,109 @@ public class DebugWindow : EditorWindow
     //=====================================================================
     // 仕掛け（謎解き）
     //=====================================================================
+
+    private bool foldMap = false;
+    private List<MapReach.Entry> reachResults;
+
+    /// <summary>
+    /// マップの範囲：歩ける範囲を画面に表示・届くかの確認
+    /// </summary>
+    private void DrawMapArea()
+    {
+        foldMap = EditorGUILayout.BeginFoldoutHeaderGroup(foldMap, "マップの範囲（歩ける範囲・届くか）");
+        if(foldMap)
+        {
+            MapDebugView.Show = EditorGUILayout.ToggleLeft(new GUIContent("歩ける範囲を表示（緑＝歩ける・赤＝歩けない形・水色＝マップの範囲）", "ゲーム画面に線で出す"), MapDebugView.Show);
+            NavMesh2D.ShowDebug = EditorGUILayout.ToggleLeft(new GUIContent("敵と相棒の道を表示（水色の網・黄色の経路）", "ナビメッシュと敵の経路"), NavMesh2D.ShowDebug);
+
+            Rect walk;
+            string kind = MapArea.HasWalkShape ? "歩ける範囲（WalkArea）" : "マップの絵（MapBounds）か Tilemap";
+            if(MapArea.TryGetWalkRect(out walk)) { EditorGUILayout.LabelField("歩ける範囲の決め方", kind); }
+
+            if(GUILayout.Button(new GUIContent("届くかの確認（今いる場所から）", "操作中のキャラの場所から、調べる物・出口・出現位置まで歩いて行けるか（今の扉・通路の状態で）")))
+            {
+                PlayerSwitchManager m = PlayerSwitchManager.Instance;
+                Vector2 from = m != null && m.CurrentPlayer != null ? (Vector2)m.CurrentPlayer.transform.position : Vector2.zero;
+                reachResults = MapReach.Check(from);
+            }
+
+            if(reachResults != null)
+            {
+                int ok = 0;
+                foreach(MapReach.Entry e in reachResults) { if(e.reachable) { ok++; } }
+                EditorGUILayout.LabelField($"行ける {ok} / {reachResults.Count}（行けない物が上）");
+                foreach(MapReach.Entry e in reachResults)
+                {
+                    using(new EditorGUILayout.HorizontalScope())
+                    {
+                        Color old = GUI.color;
+                        GUI.color = e.reachable ? new Color(0.6f, 1.0f, 0.6f) : new Color(1.0f, 0.6f, 0.6f);
+                        EditorGUILayout.LabelField(new GUIContent((e.reachable ? "✓ " : "✖ ") + e.kind + "　" + e.name, e.reachable ? "" : e.reason));
+                        GUI.color = old;
+                        if(e.target != null && GUILayout.Button("選ぶ", EditorStyles.miniButton, GUILayout.Width(40))) { Selection.activeObject = e.target is Component c ? c.gameObject : e.target; }
+                        if(GUILayout.Button("ワープ", EditorStyles.miniButton, GUILayout.Width(44)))
+                        {
+                            PlayerSwitchManager m = PlayerSwitchManager.Instance;
+                            if(m != null) { Vector3 p = new Vector3(e.position.x, e.position.y, 0.0f); m.Warp(p, p); }
+                        }
+                    }
+                    if(!e.reachable) { EditorGUILayout.LabelField("　　" + e.reason, EditorStyles.miniLabel); }
+                }
+            }
+        }
+        EditorGUILayout.EndFoldoutHeaderGroup();
+    }
+
+    private bool foldEvents = false;
+    private string eventFilter = "";
+
+    /// <summary>
+    /// シーンのイベント（EventSequence）：名前で絞り込み、その場で実行・止める
+    /// </summary>
+    private void DrawEvents()
+    {
+        foldEvents = EditorGUILayout.BeginFoldoutHeaderGroup(foldEvents, "イベント（その場で試す）");
+        if(foldEvents)
+        {
+            eventFilter = EditorGUILayout.TextField(new GUIContent("名前で絞り込み", "オブジェクトか親の名前に含まれる文字"), eventFilter);
+
+            var all = new List<EventSequence>(FindObjectsByType<EventSequence>(FindObjectsInactive.Include));
+            all.Sort((a, b) => string.CompareOrdinal(PathOf(a.transform), PathOf(b.transform)));
+
+            int shown = 0;
+            foreach(EventSequence seq in all)
+            {
+                string path = PathOf(seq.transform);
+                if(eventFilter.Length > 0 && path.IndexOf(eventFilter, System.StringComparison.OrdinalIgnoreCase) < 0) { continue; }
+                if(++shown > 40) { EditorGUILayout.LabelField("…（多いので絞り込んでください）"); break; }
+
+                using(new EditorGUILayout.HorizontalScope())
+                {
+                    string label = (seq.IsPlaying ? "▶ " : "") + path + (seq.isActiveAndEnabled ? "" : "（非表示）");
+                    if(GUILayout.Button(new GUIContent(label, path), EditorStyles.label)) { Selection.activeObject = seq.gameObject; EditorGUIUtility.PingObject(seq.gameObject); }
+
+                    GUI.enabled = seq.isActiveAndEnabled && !seq.IsPlaying;
+                    if(GUILayout.Button(new GUIContent("実行", "操作中のキャラで、このイベントをその場で実行する（きっかけなしで）"), EditorStyles.miniButton, GUILayout.Width(44)))
+                    {
+                        PlayerSwitchManager m = PlayerSwitchManager.Instance;
+                        seq.Play(m != null ? m.CurrentPlayer : null);
+                    }
+                    GUI.enabled = seq.IsPlaying;
+                    if(GUILayout.Button("止める", EditorStyles.miniButton, GUILayout.Width(44))) { seq.Stop(); }
+                    GUI.enabled = true;
+                }
+            }
+            if(shown == 0) { EditorGUILayout.LabelField("見つかりません"); }
+        }
+        EditorGUILayout.EndFoldoutHeaderGroup();
+    }
+
+    private static string PathOf(Transform t)
+    {
+        string path = t.name;
+        for(Transform p = t.parent; p != null; p = p.parent) { path = p.name + "/" + path; }
+        return path;
+    }
 
     private bool foldTimpani = true;
 

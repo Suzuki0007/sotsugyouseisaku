@@ -14,6 +14,8 @@
 #   event.ps1 -CheckInteract               for every interactable around the current player: is the E-key path alive?
 #                                          (clears the base 'player' field and checks that Intaractable.Update restores it)
 #   event.ps1 -Prompt                      what the key prompt ([E] ...) is showing now
+#   event.ps1 -Reach                       from the current player: can it walk to every interactable / exit / spawn point? (MapReach)
+#   event.ps1 -ShowArea -Value 1           draw the walk area outline in the Game view (0 = hide); combine with -Capture
 # Each eval round trip takes ~1.5 s, so effects shorter than that (flash, shot) cannot be captured.
 # ASCII only.
 param(
@@ -30,6 +32,8 @@ param(
     [switch]$Reload,
     [switch]$CheckInteract,
     [switch]$Prompt,
+    [switch]$Reach,
+    [switch]$ShowArea,
     [int]$MaxSteps = 200
 )
 
@@ -193,4 +197,15 @@ if ($Prompt) {
     return
 }
 
-Write-Output "Specify one of -State, -Advance N, -UntilIdle, -Warp x,y, -Run path, -Flag name, -Capture name, -SaveOn, -AutoSave, -Reload, -CheckInteract, -Prompt"
+if ($Reach) {
+    Invoke-UnityEval -Code 'var m = PlayerSwitchManager.Instance; if (m == null || m.CurrentPlayer == null) return "no player"; return MapReach.Report(m.CurrentPlayer.transform.position);' -Timeout 60
+    return
+}
+
+if ($ShowArea) {
+    $on = if ($Value -ne 0) { "true" } else { "false" }
+    Invoke-UnityEval -Code "MapDebugView.Show = $on; return `"walk area view = `" + MapDebugView.Show;"
+    return
+}
+
+Write-Output "Specify one of -State, -Advance N, -UntilIdle, -Warp x,y, -Run path, -Flag name, -Capture name, -SaveOn, -AutoSave, -Reload, -CheckInteract, -Prompt, -Reach, -ShowArea"

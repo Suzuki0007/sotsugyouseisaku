@@ -61,7 +61,7 @@
 | `Manager/PlayerSwitchManager.cs` | Noah / Sigle の切り替え（位置の入れ替え、追従、カメラ）、`Warp`。**2人の状態** `PartyMode`（一緒／待機／別行動。`SetMode`、`ModeChanged`・`Switched` イベント）：一緒のときだけ位置を入れ替え・相棒がついてくる（待機・別行動は `PlayerFollower.Hold`、カメラだけ移る）。一緒に戻ると相棒が合流（道があれば歩く）。**待て／ついてこい**（F キー、`ToggleWait`・`TrySetMode(..., requireRoute)`・`CanPartnerReach`・`WaitCommandLocked`）。体の当たり判定（`ApplyBodyCollision`：ついてきている間だけプレハブのまま＝シグルは無効）。体力の共有（一緒＝ノア → シグル、離れる＝別々）、`PartyHealth`（一緒＝シグル、離れる＝操作中のキャラ）、`HealthOf`。**相棒の合流**（11-13）：「シグルが仲間になったフラグ」（`sigleJoinedFlag`、空なら最初から2人）が立つまでシグルを非表示にしてノア1人（`PartnerAbsent` / `IsPartnerAbsent`。体力はノアの分、C・F・`SetMode` は効かない）。`GameFlags.OnChanged` を見て、フラグが立つとノアの位置にシグルを出して一緒にする | ◎ |
 | `Party/PartyModeEventAction.cs` | イベントの部品「2人の状態を変える」（状態〔変えないも可〕・操作するキャラ・待て／ついてこいのキーを使えなくする）。まだセーブしない | ◎ |
 | `Player/PlayerHistory.cs`（`SeedPolyline`：曲がり角のある道を歩いてきた履歴にする）、`Player/PlayerFollower.cs` | 位置の履歴と、操作していない側の追従（何フレーム前の位置か） | ◎ |
-| `Player/PlayerMapLimit.cs` | Tilemap の範囲内に収める | ◎ |
+| `Player/PlayerMapLimit.cs` | （古い行。下の PlayerMapLimit の行が新しい）マップの絵（MapBounds）と歩ける範囲の中に収める | ◎ |
 | `Player/PlayerRuntimeInitializer.cs`、`Player/PlayerSceneContext.cs` | 生成したプレイヤーにシーンの参照を渡す | ◎ |
 | `Player/Player_Noah/NoahMovement.cs`、`NoahAnimation.cs` / `Player_Sigle/SigleMovement.cs`、`SigleAnimation.cs` | 古い向き切り替え（SpriteAnimator があれば何もしない） | △ |
 | `Player/Player_Noah/NoahDead.cs` | 死亡 → 死亡アニメ → `SceneGameOver` へ。相棒（シグル）の体力も見て、どちらが倒れてもゲームオーバー（倒れたキャラの死亡アニメ。`SetPartner`） | ◎ |
@@ -70,7 +70,11 @@
 | `Player/Player_Sigle/SigleShooter.cs` | Sigle の射撃（プール・SE・エフェクト） | ◎ |
 | `Player/FocusPlayer.cs`、`Player_Noah/NoahMapLimit.cs`、`Player_Noah/NoahHistory.cs` | 古い仕組み（Stage1 / Stage2 で使われている） | △ |
 | `CharaBase/CharacterSorting.cs` | Sigle の描画順を Noah との上下で切り替え | ○ |
-| `Gimmick/WalkArea.cs` | （11-13）歩ける範囲を円・四角・多角形の組み合わせで決める（子の Collider2D を形として読み、再生中は無効にする）。`Clamp`・`Contains`・`TryRandomPoint`（範囲の中のでたらめな位置。落石のばらまき）・`ContainsPoint`／`ShapeCount`（エディタでも使える。シーンチェック用）。`PlayerMapLimit.ClampToMap` が最後に呼ぶ（置いていないシーンは今までどおり）。Stage_1_3 のティンパニ部屋で使用 | ◎ |
+| `Gimmick/WalkArea.cs`、`WalkAreaExclude.cs` | （11-13）歩ける範囲を円・四角・多角形の組み合わせで決める（子の Collider2D を形として読み、再生中は無効にする）。**シーンに何個置いてもよい（全部を合わせた範囲）**。多角形の輪郭が2つ以上なら内側は穴（偶奇判定）、子に `WalkAreaExclude`（歩けない形）を付けるとその形は抜ける（⋮「歩けない形を追加（円／四角）」）。`Clamp`（外・歩けない形の中なら一番近い歩ける所へ）・`Contains`・`TryGetBounds`・`TryRandomPoint`・`Signature`（形が変わったかの目印）・`ContainsPoint`／`ShapeCount`（エディタでも使える。シーンチェック用）。プレイヤー（`PlayerMapLimit.ClampToMap` の最後）・敵の移動・敵と相棒の道（`MapArea` 経由）が使う。Stage_1_3 のティンパニ部屋で使用 | ◎ |
+| 🛠`Gimmick/Editor/WalkAreaEditor.cs`、`WalkAreaMask.cs` | （11-13 D 段階2）WalkArea の Inspector：「マスク画像から作る」（白い所の輪郭をマーチングスクエアでなぞり、ダグラス・ポイカーで間引いて、子「マスクから作った範囲」の PolygonCollider2D に。内側の輪郭は穴）・「今の形をマスク画像に書き出す」（白黒 PNG）・形を足すボタン。WalkArea にマスク画像・合わせるマップの絵・線の細かさ・白とみなす明るさの欄と `BuildTester`（エディタ用の速い判定） | ◎ |
+| `Map/Room.cs`、🛠`Map/Editor/RoomMenu.cs`・`RoomChecks.cs`・`RoomEditor.cs` | （11-13 D 段階3）**部屋**：`Room`（名前・ID・種類・部屋の絵・メモ。目印と点検）。Hierarchy 右クリック > 部屋 > 普通／戦闘／謎解きの部屋（選んだ絵に合わせて、歩ける範囲・カメラの範囲・出現位置・着いたとき〔非表示〕、戦闘エリア＋勝ったときのオートセーブ、スイッチ→答え合わせ→扉＋オートセーブを作る。`RoomMenu.Build`）。Inspector に点検の一覧（`RoomChecks`。シーンチェックの `CheckRooms` も同じ）と「カメラの範囲を部屋の絵に合わせる」 | ◎ |
+| `Map/MapDebugView.cs`、`Map/MapReach.cs` | （11-13 D 段階4）デバッグ用：ゲーム画面に範囲の線（緑＝歩ける範囲・赤＝歩けない形・水色＝マップの範囲。`MapDebugView.Show`）／今いる場所から調べる物・出口・出現位置へ歩いて行けるか（NavMesh2D の小さい体。`MapReach.Check`・`Report`）。デバッグウィンドウ「マップの範囲」と `event.ps1 -ShowArea` / `-Reach` から使う | ◎ |
+| `Map/MapArea.cs` | （11-13 D 段階1）**マップの範囲の窓口**。歩ける範囲＝WalkArea → マップの絵（`MapBounds`）→ Tilemap（`PlayerSceneContext`）、映す範囲＝マップの絵 → Tilemap。`TryGetViewRect`（カメラ）・`TryGetWalkRect`・`HasWalkShape`・`Contains`・`Clamp`。FocusCamera（CameraArea がない所）・Enemy の `ClampToMap`（止められている間は収めない）・NavMesh2D（床：WalkArea があればその形どおりに 0.2 マスの升目で作る）・PartyRoute（まっすぐの線が範囲の外を通らないか）が使う | ◎ |
 | `Party/GuardGauge.cs` | （11-13）守り（弾消し）のゲージ。置いたシーンだけ、弾消しを出せる時間とリチャージを決める（空になると決めた量までたまるまで出せない）。画面の HP の下に「シグルの守り（Q）」のゲージ。`Use`（`NoahBulletDeleteAreaController` が呼ぶ）・`Refill`・`BoostRecharge`・`ResetGauge`・`Emptied`・`Ready`。Stage_1_3 で使用 | ◎ |
 | `Item/InstantPickup.cs` | （11-13）触れるとすぐ効くアイテム（回復／守りのゲージ）。持ち物に入らない・セーブしない。決めた時間で点滅して消える。`Spawn`・`Picked`・`Appeared`。プレハブ `Prefab/Gimmicks/Timpani/Item_Heal`・`Item_GuardBoost` | ◎ |
 | `Timpani/TimpaniUnit.cs` | （11-13）ティンパニ1台。ペグが締まるたびに周りの弾を消し敵を止める、全部締まると敵をおとなしくする（`Kill`・絵の差し替え・♪・回復アイテム）。`Calmed`・`AttacksCleared` | ◎ |
@@ -83,7 +87,7 @@
 | `Event/Actions/FaceDirectionEventAction.cs`、`MoveObjectEventAction.cs` | （11-13）イベントの部品「キャラの向きを変える」「物を動かす」（ずらした位置から／へ・目的の物へ〔動いていても追う〕。敵が降ってくる・岩がどく・弾が飛ぶ。動かすもの・向かう先にノア／シグルも選べる〔再生中に探す。待機・別行動のときに使う〕） | ◎ |
 | `Party/Bark/Bark.cs`（11-13 の変更） | シグルが仲間になる前（`PlayerSwitchManager.IsPartnerAbsent`）は、自動の一言（`Fire`）だけ出さない。イベントから出す一言（`Play`・`PlayLines`）は出せる（Stage1_2 のノアの「逃げなきゃ！」） | ◎ |
 | `Camera/MapCameraAspect.cs` | （11-13）マップを写すカメラを画面の中央の 4:3 にし（`Camera.rect`）、左右（上下）に帯（並び順 -1000 の Overlay Canvas）を出す。FocusCamera の付いたカメラにシーン読み込み時に自動で付く。比率・帯の色は Inspector。UI は画面全体（16:9）を使う | ◎ |
-| `Camera/FocusCamera.cs` | プレイヤーを追い、Tilemap の範囲で止める。**カメラの範囲**（`CameraArea`）の中ならその範囲で止める。`BeginBlend`（なめらかに移る。範囲が変わったとき・`SetTarget(t, true)`）、`LookAt`（決めた場所を映す）（謎解き段階4） | ◎ |
+| `Camera/FocusCamera.cs` | プレイヤーを追い、マップの範囲で止める（11-13 から `MapArea.TryGetViewRect`＝マップの絵 → Tilemap。前は Tilemap で、絵の外が映っていた）。**カメラの範囲**（`CameraArea`）の中ならその範囲で止める。`BeginBlend`（なめらかに移る。範囲が変わったとき・`SetTarget(t, true)`）、`LookAt`（決めた場所を映す）（謎解き段階4） | ◎ |
 | `Camera/CameraArea.cs` | カメラの範囲（Is Trigger の BoxCollider2D。`Find` で位置を含む範囲〔優先度〕） | ◎ |
 | `Camera/CameraLookEventAction.cs` | イベントの部品「カメラを向ける」（見せる場所・動く時間・見せる時間・戻す） | ◎ |
 
@@ -128,7 +132,7 @@
 | `Event/` | `EventProcess/EventSequence.cs`、`EventAction.cs`、`EventZone.cs`、`Actions/`（SetActive / SpriteChange / Wait / **ScreenFade**＝画面の暗転。会話の画面〔並び順 100〕より奥の黒い幕 `ScreenCurtain`〔90、シーンごと〕なので、暗いまま会話できる）、**`SceneStartEvent.cs`**（シーンが始まったときに条件〔GameCondition〕を満たせば EventSequence を実行。「最初から暗転しておく」。OP で使用） |
 | `Item/` | `ItemData.cs`、`ItemPickup.cs`、`Interaction/`（ItemInteraction / ItemCondition / ItemPossessionSwitch / ItemGive / ItemTake） |
 | `Flag/` | `GameFlag.cs`、`GameFlags.cs`、`FlagCondition.cs`、`SetFlagEventAction.cs`、`FlagSwitch.cs` |
-| `Talk/` | `DialogueManager.cs`（11-13：送りは E・Space・Enter、枠の右下の下にキーの説明 `showKeyHint`）、`Dialogue.cs`、`DialogueData.cs`、`DialogueEventAction.cs`、`CharacterProfile.cs`、`Expression.cs`、🛠`Editor/DialogueCsv.cs` |
+| `Talk/` | `DialogueManager.cs`（11-13：送りは E・Space・Enter、枠の右下の下にキーの説明 `showKeyHint`）、`Dialogue.cs`、`DialogueData.cs`、`DialogueEventAction.cs`（11-13：「会話データ」に DialogueData を直接入れられる。空なら前の作り方＝Dialogue）、`CharacterProfile.cs`、`Expression.cs`、🛠`Editor/DialogueCsv.cs` |
 | `Save/` | `Save.cs`（スロット・仮置き・確定・書き込み。`AutoSlot`＝オートセーブ枠、`Write` はいつもオートセーブ枠へ、手動は `SaveToSlot`）、`AutoSave.cs`（旧ファイルの引き継ぎ・エディタでの直接再生。**終了時・シーン読み込み時の書き込みはやめた**）、`GameSession.cs`（はじめから・つづきから・タイトルへ・プレイ時間・再開場所の記録・`AutoSaveAt`／`AutoSaveOnArrival`・`AutoSaved` イベント）、`AutoSaveEventAction.cs`（イベントの部品「オートセーブ」：今の位置か指定した場所を再開位置にしてオートセーブ枠へ書く）、`AutoSaveIndicator.cs`（オートセーブしたとき右上に「オートセーブしました」。自動生成）、`SaveSlotInfo.cs`（Meta キーとスロットの概要）、`PlayTimeCounter.cs` |
 | `Title/` | `TitleMenu.cs`（タイトル画面）、`SaveSlotButton.cs`（スロット1つ分の表示。オートセーブ枠は「オートセーブ」）、`ReturnToTitleButton.cs`（ボタンからタイトルへ）、🛠`Editor/TitleSceneBuilder.cs`（Title.unity を作る） |
 | `UI/GameMenu/`（メニューに「メモ」：`noteButton`、`NoteBook.OpenList`）  | `GameMenu.cs`（Tab のメニュー：アイテム・ロード・タイトルへ、セーブポイントからのセーブの流れ、メッセージ）、🛠`Editor/GameMenuBuilder.cs`（`Resources/UI/GameMenu.prefab` を作る） |
@@ -156,7 +160,7 @@
 ### プランナー用ツール・その他
 | ファイル | 役割 |
 |---|---|
-| 🛠`Common/Editor/`（SceneChecker / SceneCheckWindow / DebugWindow / SceneLookup / PickerDrawers）、`Common/Attributes/PickerAttributes.cs` | ③④⑤（デバッグウィンドウに「敵」：止める・経路の表示・倒す・**攻撃を出させる**・スポナー／グループの状態。シーンチェックに敵・敵の通行設定エリア・倒した記録のキーの重なり・グループ・ウェーブ・スポナー） |
+| 🛠`Common/Editor/`（SceneChecker / SceneCheckWindow / DebugWindow / SceneLookup / PickerDrawers）、`Common/Attributes/PickerAttributes.cs` | ③④⑤（デバッグウィンドウに「イベント（その場で試す）」〔EventSequence を名前で絞り込んで実行・止める、11-13〕、「敵」：止める・経路の表示・倒す・**攻撃を出させる**・スポナー／グループの状態。シーンチェックに敵・敵の通行設定エリア・倒した記録のキーの重なり・グループ・ウェーブ・スポナー） |
 | `Common/Attributes/LabelAttribute.cs`（`[SerializeReference]` の部品はクラス名を変えるとデータが消える。変えるときは `[MovedFrom]`）、🛠`Common/Editor/LabelDrawer.cs` | `[Label("日本語")]`：Inspector の項目名（InspectorName は enum の値にしか効かないため）。`[Label("名前", min)]` / `[Label("名前", min, max)]` で最小値・スライダー。リストには付けない |
 | `Common/GameCondition.cs` | 条件のまとめ（フラグ・アイテム〔既存の FlagCondition / ItemCondition をそのまま中に持つ〕・操作中のキャラ・パーティーの体力・プレイヤーがいる範囲・**仕掛けの状態** `gimmicks`・**2人の状態** `party`）。`IsMet` / `AllMet` / `AnyMet` |
 | `Gimmick/GimmickState.cs` | **仕掛けの状態**（謎解き段階1）。**時間で戻る**（段階2：戻るまでの秒数・残り時間の音・戻ったときの音、`RemainingTime`。InputBlock の間は進まない、入り直したら最初から）。ON/OFF か 0〜n の段階、最後の次は最初へ、変わったときのイベント、`Changed` イベント、セーブ（`Gimmick/<シーン>/<ID か階層パス>`、固定は `/Locked`）、`Set`（固定中は force のときだけ）/`TurnOn`/`TurnOff`/`Toggle`/`Advance`/`ResetValue`/`SetLocked`、`All` |
@@ -191,7 +195,7 @@
 | 🛠`Gimmick/Editor/GimmickListWindow.cs` | **仕掛けの一覧**（Tools > 仕掛け > 仕掛けの一覧。段階7）：シーンの GimmickState ごとに種類・使えるキャラ（部品の user / passable / breaker）・段階・最初／今の値・つながっている先（`GimmickWiring.Collect`）。つながっていない物はオレンジ（壊せる壁・穴は除く）。2人の仕掛け・演出の部品の一覧。再生中は切り替え・戻す |
 | 🛠`Gimmick/Editor/GimmickSampleBuilder.cs`、`Gimmick/GimmickSampleMemo.cs` | **サンプルの部屋**（Tools > 仕掛け > サンプルの部屋を作る。段階7）：`Assets/Prefab/Gimmicks/Sample/` に壁つきの部屋のプレハブ 6 つ（押せる箱と床スイッチ・燭台の順番・番号錠とメモ〔`Resources/Notes/Note_Sample_金庫の番号`〕・同時押し・狭い通路とお互いの扉・像の部屋）。GimmickMenu の `BuildSwitch` / `BuildDoor` / `BuildPuzzle` / `BuildFloor` / `BuildBlock` / `BuildBrazier` を使う。GimmickSampleMemo は部屋の説明（Inspector 用・ゲームでは何もしない） |
 | 🛠`Gimmick/Editor/GimmickWiring.cs`、`GimmickMenu.cs` | 配線の表示（シーンの全 MonoBehaviour の GimmickState への参照を矢印で。選んだ物につながる線だけ／Tools > 仕掛け > 配線をいつも全部表示）。Hierarchy 右クリック > 仕掛け > …（選んだスイッチを条件・入力に入れる。`FirstCallThisClick` で複数選択でも 1 回） |
-| 🛠`Flag/Editor/`、`Item/Interaction/Editor/`、`UI/ItemMenu/Editor/`、`Event/EventProcess/Editor/` | ひな形・一覧・Inspector |
+| 🛠`Flag/Editor/`、`Item/Interaction/Editor/`、`UI/ItemMenu/Editor/`、`Event/EventProcess/Editor/` | ひな形・一覧・Inspector。（11-13）`EventSequenceEditor`＝「流れ」（部品を番号・日本語名・一言要約で並べ、▶ でその場で編集・↑↓・×・＋ 部品を追加〔分類メニュー〕）、再生中の「今すぐ実行」「止める」・実行中の部品を緑（`EventSequence.CurrentAction`）。`EventActionCatalog`＝部品の日本語名・分類・要約（新しい EventAction は表に1行足す） |
 | `Singleton/Singleton.cs` | `Singleton<T>`（`persistAcrossScenes` でシーンをまたぐ） |
 | `Fps/Fps.cs` | 60fps 固定（各シーンに配置） |
 | `Debug/CircleDebugRenderer.cs` | 円のデバッグ表示 |
@@ -211,7 +215,6 @@
 | 優先度 | 場所 | 内容 |
 |---|---|---|
 | **高** | `Prefab/Players/Player_Noah.prefab`、`Player_Sigle.prefab` | **FootstepSe が付いていない**ため足音が鳴らない。FootstepSe は Stage1_2 のルートの `Player`（Transform と FootstepSe だけの動かないオブジェクト）に付いている。11-06 の SE 手順書は「プレハブの FootstepSe に設定」と書いていた |
-| 中 | 🆕 `Player/PlayerMapLimit.cs`（11-10 の変更） | 歩ける範囲が `MapBounds`（絵の大きさ）になったが、カメラ（`FocusCamera`）・敵のナビメッシュ（`NavMesh2D`）・相棒の道（`PartyRoute`）は今も `PlayerSceneContext` の Tilemap の範囲を使う。2つの範囲が違うと、プレイヤーは行けるのに敵・カメラが付いてこない場所ができる。**カメラがマップの絵の外まで写る**（11-13 の 4:3 化の確認で、Stage1_1 は左に黒、Stage1_2 は右下に灰色の何もない所が見えた。Stage1_1 の Tilemap `Jimen` の範囲がマップの絵より大きく広い）。カメラを `MapBounds` で止めるか、CameraArea を置くと直る |
 | 中 | `Bgm/Effects/BgmProgress.cs` | 進行度（static）が `SubsystemRegistration` でリセットされない（ドメインリロード無効のエディタで前回の値が残る）。セーブもされず、はじめから・つづきからでも戻らない |
 | 中 | `StageDarkness/StageDarkness.cs` FindTarget | 明かりの追従先を `FindWithTag("Player")` の最初の1人で決めるため、キャラ切り替えで操作キャラに付いていかないことがある |
 | 中 | **古い作りの敵**の移動（`Behavior/Enemy/Behavior Graph.asset` の SetPositionToTarget、`Prefab/Enemies/Enemy.prefab`） | 「6秒撃つ → 3秒かけてプレイヤーの位置へ移動」の繰り返し。移動は transform を直接動かし、Rigidbody2D は Static なので**壁をすり抜け、プレイヤーと重なる**。会話・イベント中も移動は続く（撃つのは止まるようにした）。同じ動きの新しい敵（サンプル「撃つ」）はできたが、**Stage1_2 のスポナーはまだ古い Enemy.prefab**（置き換えはシーンの変更が要るので未実施） |
