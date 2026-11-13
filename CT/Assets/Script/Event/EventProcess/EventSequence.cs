@@ -61,6 +61,11 @@ public class EventSequence : MonoBehaviour
     public bool IsPlaying => running != null;
 
     /// <summary>
+    /// 順番に実行しているとき、今実行している部品（Inspector の表示用。実行していなければ null）
+    /// </summary>
+    public EventAction CurrentAction { get; private set; }
+
+    /// <summary>
     /// プレイヤーを止めるシーケンスが実行中か（プレイヤーの操作側はこれを見て入力を止める）
     /// </summary>
     public static bool IsBusy => lockCount > 0;
@@ -106,9 +111,11 @@ public class EventSequence : MonoBehaviour
         foreach(EventAction action in list)
         {
             if(action == null) { continue; }
+            CurrentAction = action;
             yield return action.Run(gameObject);
         }
 
+        CurrentAction = null;
         SetLock(false);
         running = null;
     }
@@ -145,6 +152,7 @@ public class EventSequence : MonoBehaviour
     public void Stop()
     {
         if(running != null) { StopCoroutine(running); running = null; }
+        CurrentAction = null;
         SetLock(false);
     }
 
@@ -164,7 +172,7 @@ public class EventSequence : MonoBehaviour
     /// <summary>
     /// 実行する部品（Actions が空なら同じオブジェクトの部品）
     /// </summary>
-    private IList<EventAction> GetActions()
+    public IList<EventAction> GetActions()
     {
         if(actions.Count > 0) { return actions; }
 
@@ -184,6 +192,7 @@ public class EventSequence : MonoBehaviour
     private void OnDisable()
     {
         running = null;
+        CurrentAction = null;
         SetLock(false);
     }
 

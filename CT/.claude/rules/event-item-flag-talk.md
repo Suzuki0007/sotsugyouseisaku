@@ -19,6 +19,9 @@ paths:
 - `EventAction`：`Execute` / `Run`（コルーチン。待つ部品がオーバーライド）/ `OnExit` / `Restore`（セーブからの復元。見た目だけ）。
 - 部品：Dialogue / Se / SetActive / SpriteChange / Anim（終わるまで待てる）/ Effect / Bgm系 / ItemGive / ItemTake / SetFlag / Wait、ほか各機能のイベントの部品（敵・仕掛け・2人・カメラ・一言）。
 - 注意：順番に実行中に、自分（か親）を非表示にすると途中で止まる（シーンチェックで検出）。
+- **Inspector（`EventSequenceEditor`、11-13）**：「流れ」＝部品を番号・日本語名・一言要約で並べる（▶ で部品の設定をその場で編集、↑↓・×、「＋ 部品を追加」は分類メニュー）。再生中は「今すぐ実行」「止める」・実行中の部品を緑に（`EventSequence.CurrentAction`）。名前・分類・要約は **`EventActionCatalog`**（エディタ）。**新しい EventAction を作ったら `EventActionCatalog` の表に1行足す**（なければクラス名・「その他」で出る）。要約は Label の付いた項目の値を3つまで（会話・待つ・効果音は専用）。`EventSequence.GetActions()` は public にした。
+- **会話の部品は DialogueData を直接持てる**（`DialogueEventAction.dialogueData`「会話データ」。DialogueManager があるシーンだけ。空なら前の作り方＝`dialogue` の Dialogue）。新しく作るイベントは直接入れる（子の「会話」オブジェクトは要らない）。今あるイベントは前の形のまま動く。
+- デバッグウィンドウの「イベント（その場で試す）」：シーンの EventSequence を名前で絞り込んで実行・止める。
 - `ScreenFadeEventAction`（画面の暗転）：`ScreenCurtain`（シーンごとの Canvas、並び順 90 = 会話 100 より奥・HUD より手前）。`SceneFader`（全 UI より手前）とは別。
 - 演出の部品（11-13）：`ShakeEventAction`（画面を揺らす。`Camera/CameraShake` が描画の間だけカメラをずらす＝FocusCamera とぶつからない・UI は揺れない）、`FaceDirectionEventAction`（キャラの向き。SpriteAnimator.SetDirection。止まっている間はそのまま）、`MoveObjectEventAction`（ずらした位置から／へ・目的の物へ〔動いていても追う。目的はノア／シグルも選べる＋ずらし＝その横に止まる〕。動かすもの＝物／ノア／シグル〔再生中に探す。待機・別行動のときに使う。一緒だとついてくる動きに戻される〕。Restore で最後の位置〔ノア・シグルは戻さない〕）、`DarknessEventAction`（StageDarkness の暗さと視界の半径を同時に。Restore で最後の値。SetDarkness・SetRadius は続けて呼ぶと前の変化を止めるので自前で補間）。
 - **シーンごとのイベント**（Stage1_1 の OP・Stage1_2 の一層の序盤と出口・テストの注意）は `.claude/rules/scenes.md`。シーンにまとめて置くのは `scene-recipe` スキルのレシピで。

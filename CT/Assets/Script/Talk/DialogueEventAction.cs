@@ -34,7 +34,12 @@ public class DialogueEventAction : EventAction
     // 変数
     //=====================================================================
 
+    [SerializeField, Label("会話データ")]
+    [Tooltip("出す会話（Assets/Data/Dialogue/ の DialogueData）。ここに入れれば、下の Dialogue（子の「会話」オブジェクト）は要りません")]
+    private DialogueData dialogueData;
+
     [SerializeField]
+    [Tooltip("（前の作り方）会話を持つ Dialogue。上の「会話データ」が空のときだけ使う")]
     private Dialogue dialogue;
 
     [SerializeField]
@@ -53,6 +58,24 @@ public class DialogueEventAction : EventAction
 
     // 旧方式で表示したフレーム（同じフレームで閉じないため）
     private int shownFrame = -1;
+
+    // 会話データを直接出して、まだ閉じていないか（エリアから出たときに閉じるため）
+    private bool talkingDirect;
+
+    /// <summary> 直接入れた会話データ（エディタの表示用。前の作り方の Dialogue の中身はエディタ側で読む） </summary>
+    public DialogueData DirectData => dialogueData;
+
+    /// <summary> 前の作り方の Dialogue（エディタの表示用） </summary>
+    public Dialogue LegacyDialogue => dialogue;
+
+    /// <summary> 会話が設定されているか </summary>
+    public bool HasDialogue => dialogueData != null || dialogue != null;
+
+    /// <summary> エディタ・レシピ用：会話データを入れる </summary>
+    public void SetDialogueData(DialogueData data) { dialogueData = data; }
+
+    // 会話データを直接出すか（DialogueManager があるシーンだけ）
+    private bool UseDirect => dialogueData != null && DialogueManager.Instance != null;
 
     //=====================================================================
     // 更新関数
@@ -80,6 +103,17 @@ public class DialogueEventAction : EventAction
 
     public override void Execute(GameObject player)
     {
+        if(UseDirect)
+        {
+            talkingDirect = true;
+            DialogueManager.Instance.StartDialogue(dialogueData, () => talkingDirect = false);
+            return;
+        }
+        if(dialogueData != null && dialogue == null)
+        {
+            Debug.LogWarning($"{name}: このシーンには DialogueManager（会話の画面）がないので、会話データを出せません", this);
+            return;
+        }
         if(dialogue == null) { return; }
 
         dialogue.Talk();
@@ -97,7 +131,7 @@ public class DialogueEventAction : EventAction
     public override IEnumerator Run(GameObject player)
     {
         // 待たない設定・旧方式（閉じたことが分からない）なら、表示だけしてすぐ次へ
-        if(!waitUntilClosed || dialogue == null || dialogue.IsLegacy)
+        if(!waitUntilClosed || (!UseDirect && (dialogue == null || dialogue.IsLegacy)))
         {
             Execute(player);
             yield break;
@@ -108,7 +142,15 @@ public class DialogueEventAction : EventAction
         if(DialogueManager.Instance == null) { yield break; }
 
         bool closed = false;
-        dialogue.Talk(() => closed = true);
+        if(UseDirect)
+        {
+            talkingDirect = true;
+            DialogueManager.Instance.StartDialogue(dialogueData, () => { closed = true; talkingDirect = false; });
+        }
+        else
+        {
+            dialogue.Talk(() => closed = true);
+        }
 
         // 会話データが空などで始まらなかったときは待たない
         if(!DialogueManager.Instance.IsTalking) { yield break; }
@@ -122,6 +164,12 @@ public class DialogueEventAction : EventAction
     public override void OnExit(GameObject player)
     {
         if(closeMode != DialogueCloseMode.ExitArea) { return; }
+        if(talkingDirect)
+        {
+            if(DialogueManager.Instance != null) { DialogueManager.Instance.ForceClose(); }
+            talkingDirect = false;
+            return;
+        }
         if(dialogue == null) { return; }
 
         dialogue.Close();

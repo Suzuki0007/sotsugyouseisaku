@@ -14,7 +14,8 @@ paths:
 - `DialogueData`（文の配列 `lines`：`character`・`expression`・`speakerName`・`text`）、`CharacterProfile`（名前・色・左右・立ち絵の表情ごとの絵。`Data/Characters/Noah.asset`・`Sigle.asset`）、`Expression`（enum。**末尾にだけ追加**＝番号でセーブ・CSV に使う）。
 - `DialogueManager`（シーンごとのシングルトン）。`Assets/Prefab/UI/DialogueSystem.prefab` を置けば使える（Stage1_1 / SampleScene / Stage_1_3）。Stage1_2 はシーンの Canvas に直接組んだもの（**両方直す**：枠 1600×260・立ち絵 820×1040）。
   - 送りは E・Space・Enter（`extraAdvanceKeys`）。枠の右下の下にキーの説明（`showKeyHint`・`keyHintText`）。話していない方の立ち絵は暗くなる。
-- `Dialogue`：会話の中身を持つ部品（Intaractable。**作者は成田さん**）。DialogueManager がないシーンでは旧方式で表示。イベントからは `DialogueEventAction` が子の「会話」に置いた Dialogue を使う。
+- `Dialogue`：会話の中身を持つ部品（Intaractable。**作者は成田さん**）。DialogueManager がないシーンでは旧方式で表示。
+- イベントから会話を出すのは `DialogueEventAction`（会話）：**「会話データ」に DialogueData を直接入れる**（11-13〜。子の「会話」オブジェクトは要らない）。空なら前の作り方（子の「会話」に置いた Dialogue）を使う。OP・Stage1_2・Stage_1_3 の今のイベントは前の作り方のまま。
 - `DialogueCsv`（エディタ）：CSV（会話ID, キャラ, 表情, 名前, 本文）⇄ DialogueData。UTF-8 / Shift-JIS、同名は上書き（GUID 維持）。`DialogueCsv.Import(path, showDialog:false)`。Parse などは internal にして `BarkCsv`（相棒の一言）が使い回す。
 
 ## シナリオ
