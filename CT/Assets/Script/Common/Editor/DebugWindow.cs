@@ -94,6 +94,7 @@ public class DebugWindow : EditorWindow
             DrawGimmicks();
             DrawTimpani();
             DrawEvents();
+            DrawSignals();
             DrawMapArea();
         }
 
@@ -413,6 +414,54 @@ public class DebugWindow : EditorWindow
     //=====================================================================
     // 仕掛け（謎解き）
     //=====================================================================
+
+    private bool foldSignals = false;
+    private string signalFilter = "";
+    private List<GameSignal> signalAssets;
+
+    /// <summary>
+    /// 合図：最近の合図の記録（時刻・合図・出した物・反応した数）と、試しに送るボタン
+    /// </summary>
+    private void DrawSignals()
+    {
+        foldSignals = EditorGUILayout.BeginFoldoutHeaderGroup(foldSignals, "合図（記録・試しに送る）");
+        if(foldSignals)
+        {
+            EditorGUILayout.LabelField("最近の合図（新しい順。「反応」は合図を受けたら・一言が反応した数）", EditorStyles.miniBoldLabel);
+            var log = Signals.Log;
+            if(log.Count == 0) { EditorGUILayout.LabelField("（まだ合図が出ていません）"); }
+            for(int i = log.Count - 1; i >= 0 && i >= log.Count - 15; i--)
+            {
+                Signals.Entry e = log[i];
+                EditorGUILayout.LabelField($"{e.time,7:0.0}s  {e.id}", $"出した物 {e.source}　反応 {e.received}");
+            }
+
+            EditorGUILayout.Space();
+            if(signalAssets == null || GUILayout.Button("合図の一覧を読み直す", EditorStyles.miniButton))
+            {
+                signalAssets = LoadAll<GameSignal>();
+                signalAssets.Sort((a, b) => string.CompareOrdinal(a.Id, b.Id));
+            }
+            signalFilter = EditorGUILayout.TextField(new GUIContent("試しに送る（絞り込み）", "合図の名前・ID に含まれる文字"), signalFilter);
+            int shown = 0;
+            foreach(GameSignal s in signalAssets)
+            {
+                if(s == null) { continue; }
+                if(signalFilter.Length > 0 && s.name.IndexOf(signalFilter, System.StringComparison.OrdinalIgnoreCase) < 0 && s.Id.IndexOf(signalFilter, System.StringComparison.OrdinalIgnoreCase) < 0) { continue; }
+                if(++shown > 30) { EditorGUILayout.LabelField("…（多いので絞り込んでください）"); break; }
+                using(new EditorGUILayout.HorizontalScope())
+                {
+                    EditorGUILayout.LabelField(new GUIContent(s.name, s.Id + "\n" + s.Memo));
+                    if(GUILayout.Button("送る", EditorStyles.miniButton, GUILayout.Width(44)))
+                    {
+                        PlayerSwitchManager m = PlayerSwitchManager.Instance;
+                        Signals.Send(s, SignalContext.From(m != null ? m.CurrentPlayer : null));
+                    }
+                }
+            }
+        }
+        EditorGUILayout.EndFoldoutHeaderGroup();
+    }
 
     private bool foldMap = false;
     private List<MapReach.Entry> reachResults;

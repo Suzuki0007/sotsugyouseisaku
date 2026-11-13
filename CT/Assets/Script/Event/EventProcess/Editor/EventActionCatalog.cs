@@ -51,6 +51,7 @@ public static class EventActionCatalog
         { "ItemTakeEventAction",       ("進行", "アイテムを取る") },
         { "NoteEventAction",           ("進行", "メモを渡す") },
         { "AutoSaveEventAction",       ("進行", "オートセーブ") },
+        { "SendSignalEventAction",     ("進行", "合図を出す") },
         { "SceneChangeEventAction",    ("進行", "シーンを移る") },
         { "DeathEventAction",          ("進行", "即死") },
 
