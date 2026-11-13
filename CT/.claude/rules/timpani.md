@@ -30,6 +30,7 @@ paths:
 3. **敵とガードのリチャージ（完了）**：
    - 音楽生物：`Data/Enemies/Timpani/EnemyData_Timpani_Creature`（動かない・攻撃では倒れない＝すべての攻撃 ×0・倒されたあと「おとなしくなる」・絵は仮 `Images/Enemy/Enemy_Timpani_Creature_kari.png`）。各ティンパニの中心に `音楽生物`（Enemy_Base）。
    - 行動 `Pattern_Timpani_Creature`：通常（待つ 0.5〜2.5 → 弾の輪 → 待つ 2〜3 → 落石×2 → 待つ 2〜3）→ `Flag_Timpani_Calmed1` で「激しい」（16 方向×2・落石×3・待ち短め）→ `Flag_Timpani_Calmed2` で「もっと激しい」（うず巻きが増える）。フラグはセーブしない。**段階4 で、おとなしくなった数に合わせてフラグを立てる**。
+   - 落石（11-13 に変更。ユーザーの指示「プレイヤーを追いすぎない・同じ場所に重ならない・マップのあちこちにどんどん落ちる」）：`Attack_Timpani_Rock` は落とす数 5・0.3 秒おき・歩ける範囲全体にばらまく・15% だけプレイヤーの近く（ずれ 1.5）・影どうし 1.8 以上（全部の敵で共有）・アイテム 8%/個。行動の回数は 通常 1・激しい 2・もっと激しい 2。
    - 攻撃：`Attack_Timpani_Ring`（予兆＝黄色い輪が点滅 1 秒 → 12 方向。弾消しで消せる）・`Ring_Hard`・`Spiral`（予兆ピンク）・`Rock`（足元に影 1.3 秒 → 落ちる・画面が揺れる＝AttackData に足した「発動したときの画面の揺れ」0.15）。
    - 弾の絵：Stage_1_3 の EnemyBulletPool だけ `Prefab/Bullet/EnemyBullet_TimpaniNote`（丸い弾・仮）。ほかのシーンは今までの EnemyBullet。
    - 守りのゲージ `Party/GuardGauge`（`ティンパニ部屋/守りのゲージ`）：弾消し（ノアの Q のまま）を出している間減る（2 秒）、空になると 5 割たまるまで出せない、空から満タン 6 秒、やめて 0.4 秒でたまり始める。表示「シグルの守り（Q）」（HP の下・空のとき「回復中…」）。`Refill(割合)`・`BoostRecharge(倍率, 秒)`（段階4 のアイテム）・`ResetGauge`、`Emptied`・`Ready`（一言のきっかけ）。`NoahBulletDeleteAreaController.Update` が `GuardGauge.Use` を呼ぶ（ゲージがないシーンはいつでも出せる）。
@@ -59,6 +60,7 @@ paths:
 - ゲームオーバー：ゲームオーバー画面 → リトライで Stage_1_3 に着いた直後（戦闘前の会話の前）から。
 - リズムゲームは E で始めて E でタイミング。ペグから離れる・キャラを切り替えると中断（進んだ分は残る）。音楽生物は動かない。
 - ペグの調整項目（Inspector）：成功する回数 3・輪が縮む時間 1.3 秒・成功するたびに速くなる割合 0.1・判定の甘さ 0.16・失敗で戻る回数 0・失敗のあと押せない時間 0.35 秒・輪の大きさ・色・音・エフェクト・締まったときのイベント。
+- **ペグ（`TimpaniPeg`）に `Update()` を作らない**：土台の `Intaractable` の private な `Update`（E キーで調べる）が呼ばれなくなり、ペグを回せなくなった（11-13 の不具合）。毎フレームの処理は `LateUpdate` の override（`base.LateUpdate()` を呼ぶ）に書く。`Interact` を eval で直接呼ぶ確かめ方では見つからないので、player を null にして1フレーム後に戻るか（＝土台の Update が動いているか）も確かめる。
 - 確かめ方：タイミングは eval では合わせられないので、private の `ringTime` を 0.766（重なる瞬間）や 0.1（外れ）にしてから `Interact` を呼ぶ（`event.ps1 -Run` は Intaractable の Interact も呼べる）。
 - ペグを一気に締めて確かめるときは、private の `Tighten()` をリフレクションで呼ぶ（イベントがすべて出る）。アイテムは出たそばからシグル（ついてくる）が拾うことがあるので、離れた所に出して確かめる。
 - シーンの配置は eval の C#（`setup_13_stage1`〜`4`・`calmsprite`）で作った。作り直すときは、作ったあとで参照（特にフラグ）が入っているかを確かめる（`setup_13_stage4` で TimpaniRoom のクリアのフラグが空になったことがある）。

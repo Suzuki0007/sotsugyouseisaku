@@ -70,7 +70,7 @@
 | `Player/Player_Sigle/SigleShooter.cs` | Sigle の射撃（プール・SE・エフェクト） | ◎ |
 | `Player/FocusPlayer.cs`、`Player_Noah/NoahMapLimit.cs`、`Player_Noah/NoahHistory.cs` | 古い仕組み（Stage1 / Stage2 で使われている） | △ |
 | `CharaBase/CharacterSorting.cs` | Sigle の描画順を Noah との上下で切り替え | ○ |
-| `Gimmick/WalkArea.cs` | （11-13）歩ける範囲を円・四角・多角形の組み合わせで決める（子の Collider2D を形として読み、再生中は無効にする）。`Clamp`・`Contains`・`ContainsPoint`／`ShapeCount`（エディタでも使える。シーンチェック用）。`PlayerMapLimit.ClampToMap` が最後に呼ぶ（置いていないシーンは今までどおり）。Stage_1_3 のティンパニ部屋で使用 | ◎ |
+| `Gimmick/WalkArea.cs` | （11-13）歩ける範囲を円・四角・多角形の組み合わせで決める（子の Collider2D を形として読み、再生中は無効にする）。`Clamp`・`Contains`・`TryRandomPoint`（範囲の中のでたらめな位置。落石のばらまき）・`ContainsPoint`／`ShapeCount`（エディタでも使える。シーンチェック用）。`PlayerMapLimit.ClampToMap` が最後に呼ぶ（置いていないシーンは今までどおり）。Stage_1_3 のティンパニ部屋で使用 | ◎ |
 | `Party/GuardGauge.cs` | （11-13）守り（弾消し）のゲージ。置いたシーンだけ、弾消しを出せる時間とリチャージを決める（空になると決めた量までたまるまで出せない）。画面の HP の下に「シグルの守り（Q）」のゲージ。`Use`（`NoahBulletDeleteAreaController` が呼ぶ）・`Refill`・`BoostRecharge`・`ResetGauge`・`Emptied`・`Ready`。Stage_1_3 で使用 | ◎ |
 | `Item/InstantPickup.cs` | （11-13）触れるとすぐ効くアイテム（回復／守りのゲージ）。持ち物に入らない・セーブしない。決めた時間で点滅して消える。`Spawn`・`Picked`・`Appeared`。プレハブ `Prefab/Gimmicks/Timpani/Item_Heal`・`Item_GuardBoost` | ◎ |
 | `Timpani/TimpaniUnit.cs` | （11-13）ティンパニ1台。ペグが締まるたびに周りの弾を消し敵を止める、全部締まると敵をおとなしくする（`Kill`・絵の差し替え・♪・回復アイテム）。`Calmed`・`AttacksCleared` | ◎ |
@@ -108,7 +108,7 @@
 | `Enemy/AttackEmitter.cs` | **攻撃の発生源（見えない敵）**（段階3）。PatternRunner の、体のない版。動く条件（GameCondition。範囲など）・最初から動く・`SetStopped`／`StopFor`。ダメージエリアの一時的な発生源にも使う | ◎ |
 | `Enemy/EnemyEgg.cs` | 「仲間を呼ぶ」の卵（時間でかえる。体力があり壊せる。Enemies のタグ・レイヤー） | ◎ |
 | `Enemy/Gimmick/`（`EnemyCommandEventAction`、`EnemyDamageEventAction`、`DamageAreaEventAction`、`AttackSwitch`。AttackSwitch は作動したときに仕掛けの状態も変えられる〔謎解き段階1〕） | **ギミック連動**（段階3）。イベントの部品「敵に命令」（止める・○秒止める・動かす・行動をやめさせる・段階を変える・倒す・消す。Restore はずっと続く命令だけ）、「敵にダメージ」、「ダメージエリアを出す」（一時的な AttackEmitter で AttackData を出す。イベント中も止まらない）。AttackSwitch：DamageReceiver の OnHit を条件（DamageRule）で絞って EventSequence を実行、1回だけならセーブ（`Switch/<シーン>/<ID か階層パス>`） | ◎ |
-| `Enemy/Attack/AttackData.cs`、`AttackShape.cs`、`AttackExecution.cs`、`TelegraphView.cs` | **攻撃**（段階2）。AttackData（SO）＝予告（時間・表示・色・満ちる・点滅・順番・Unlit）→ 起点（敵／プレイヤー〔予告時・追う〕）・向き・形（円／長方形／扇形／リング、`AttackShape` が判定と表示のメッシュを両方作る）・壁で止める → 発動（一瞬／出し続ける〔回転〕／弾〔狙い・全方位・うず巻き・ばらまき。速さ・ダメージ・すり抜け・弾消し〕／**上から落ちる**／**下から突き出る**〔残す・当たり判定があれば壁〕／**設置して起爆**〔`PlacedBomb`〕）・突進（プレイヤーをすり抜け、壁で気絶）・当たる相手・効かないキャラ → 後隙。当てる処理は `AttackHits`（タグのない DamageReceiver はギミックとしていつも当てる。自分の子には当てない）。TelegraphView は使い回し（DontDestroyOnLoad のプール。`ShowShape` / `ShowCircle` で AttackData なしでも出せる）。`AttackExecution` は PatternRunner を相手に動く（体がなければ突進・アニメはしない） | ◎ |
+| `Enemy/Attack/AttackData.cs`、`AttackShape.cs`、`AttackExecution.cs`、`TelegraphView.cs` | **攻撃**（段階2）。（11-13）「上から落ちる」の**ばらまき**：`dropCount` が 2 以上なら `AttackExecution.Rain` が `dropInterval` おきに `DropScatter`（歩ける範囲全体／敵の周り／プレイヤーの周り）へ落とす。`dropAimChance` の割合だけプレイヤーの近く（`dropAimJitter`）、影どうし `dropMinSpacing` 以上（今出ている影を static で全部の敵と共有）。1つずつの影・落下・当たる・揺れ・出す物は `OneDrop`（runner のコルーチン。`Cleanup` で止める）。AttackData（SO）＝予告（時間・表示・色・満ちる・点滅・順番・Unlit）→ 起点（敵／プレイヤー〔予告時・追う〕）・向き・形（円／長方形／扇形／リング、`AttackShape` が判定と表示のメッシュを両方作る）・壁で止める → 発動（一瞬／出し続ける〔回転〕／弾〔狙い・全方位・うず巻き・ばらまき。速さ・ダメージ・すり抜け・弾消し〕／**上から落ちる**／**下から突き出る**〔残す・当たり判定があれば壁〕／**設置して起爆**〔`PlacedBomb`〕）・突進（プレイヤーをすり抜け、壁で気絶）・当たる相手・効かないキャラ → 後隙。当てる処理は `AttackHits`（タグのない DamageReceiver はギミックとしていつも当てる。自分の子には当てない）。TelegraphView は使い回し（DontDestroyOnLoad のプール。`ShowShape` / `ShowCircle` で AttackData なしでも出せる）。`AttackExecution` は PatternRunner を相手に動く（体がなければ突進・アニメはしない） | ◎ |
 | `Enemy/EnemyBlock.cs` | 敵を止める判定（`InputBlock.IsBlocked` + デバッグの「敵を止める」）。条件を足すときはここだけ | ◎ |
 | `Enemy/Navigation/NavMesh2D.cs`、`EnemyNavArea.cs` | 2D ナビメッシュ（自動生成・シーンごと）。標準の NavMesh API を -90° 回して XY に重ね、動かない 2D コライダーを `CreateMesh` で取り出して壁にする。大きさ（小中大）ごとに別のナビメッシュ。壁の変化を 0.5 秒ごとに見て作り直す。シーンを出るときにデータと設定を消す。デバッグ表示（線のメッシュ）。EnemyNavArea：敵だけ入れない／通りにくい | ◎ |
 | 🛠`Enemy/Editor/EnemyBaseBuilder.cs`、`EnemySampleBuilder.cs`、`EnemyPatternEditor.cs`、`AttackDataEditor.cs`、`AttackPreviewAnchor.cs`、`EnemyListWindow.cs` | Tools > 敵 > 共通プレハブとサンプルを作る／サンプルを作る（攻撃13・行動パターン11・敵のデータ11・部位ボスのプレハブ `Prefab/Enemies/Enemy_Sample_部位ボス`、段階6・7：倒れて残る・おとなしくなる、`Sample_順番に倒すグループ`・`Sample_スポナー` のプレハブ）、Hierarchy 右クリック > 敵 > 敵を置く／敵の通行設定エリア／攻撃の発生源（見えない敵）／攻撃で作動するスイッチ／戦闘エリア／部位を追加／グループ（全滅・撃破の順番）。共通プレハブは **`Resources/Enemies/Enemy_Base`**（`Enemy.Spawn` が実行中に読む）。行動パターンの Inspector（段階の折りたたみ・「＋」で行動の種類を選ぶ ReorderableList）、攻撃の Inspector（設定で使わない項目を隠す。**形のプレビュー**：Inspector の下に図、Scene ビューには最後に選んだ敵〔`AttackPreviewAnchor`〕の位置に形と弾の方向）。**敵の一覧**（`EnemyListWindow`、Tools > 敵 > 敵の一覧：全 EnemyData を表で編集・並べ替え・検索・新しく作る） | ◎ |
@@ -267,7 +267,8 @@
 ### シーンの設定
 | 場所 | 内容 |
 |---|---|
-| Stage1_1 / Stage1_2 / SampleScene の `MapEntity/OB_TRbox` | 宝箱の Id が空（シーンチェックでエラー。ほかの宝箱と開いた記録が混ざる） |
+| Stage1_1 / Stage1_2 / Stage_1_3 / SampleScene の `MapEntity/OB_TRbox` | 宝箱の Id が空（シーンチェックでエラー。ほかの宝箱と開いた記録が混ざる） |
+| 🆕 Stage_1_3 の `Event`（Stage1_1 のコピーの残り） | EventZone の中身が空・Is Trigger の Collider2D がない（シーンチェックでエラー。何も起きないので害はない。不要なら消してよい） |
 | 同じ3シーンの `Event`（ルート） | 中身が空の EventZone / EventSequence。Is Trigger の Collider2D もない（シーンチェックでエラー・注意が出るが、動作上の害はない。不要なら消す） |
 | 🆕 Stage1_1 の `Event/DialogueEventZone` | 入ると古い会話（非表示の `OB_Text` の Dialogue）を出す EventZone が、マップの右側（-106.8, 17.3）に残っている。OP とは別。要らなければ消す |
 | 🆕 Stage_1_3 の音楽生物・弾・アイテム | 絵は仮（紫の丸い生き物・調律後の水色の絵・丸い弾・ハート・青い菱形）。音は空欄。左の出口の先（台本 F1_13 の階段・二層）のシーンはまだない |

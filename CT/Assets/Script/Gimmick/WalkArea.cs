@@ -135,6 +135,57 @@ public class WalkArea : MonoBehaviour
     }
 
     /// <summary>
+    /// 歩ける範囲の中のでたらめな位置（落石をばらまく場所など）。歩ける範囲がないシーンでは false
+    /// </summary>
+    public static bool TryRandomPoint(out Vector2 point)
+    {
+        point = Vector2.zero;
+        if(!Exists) { return false; }
+
+        // 表示されている形を囲む四角を求め、その中から範囲の中に入る点を選ぶ
+        bool any = false;
+        Bounds bounds = new Bounds();
+        foreach(Shape shape in active.shapes)
+        {
+            if(shape.owner == null || !shape.owner.activeInHierarchy) { continue; }
+            foreach(Vector2 corner in LocalCorners(shape))
+            {
+                Vector3 world = shape.transform.TransformPoint(corner + shape.offset);
+                if(!any) { bounds = new Bounds(world, Vector3.zero); any = true; } else { bounds.Encapsulate(world); }
+            }
+        }
+        if(!any) { return false; }
+
+        for(int i = 0; i < 30; i++)
+        {
+            var p = new Vector2(Random.Range(bounds.min.x, bounds.max.x), Random.Range(bounds.min.y, bounds.max.y));
+            if(Contains(p)) { point = p; return true; }
+        }
+        return false;
+    }
+
+    // 形を囲む四角の角（形のローカル座標）
+    private static IEnumerable<Vector2> LocalCorners(Shape shape)
+    {
+        switch(shape.kind)
+        {
+            case 0:
+                yield return new Vector2(-shape.radius, -shape.radius);
+                yield return new Vector2(shape.radius, shape.radius);
+                break;
+            case 1:
+                yield return -shape.halfSize;
+                yield return shape.halfSize;
+                yield return new Vector2(-shape.halfSize.x, shape.halfSize.y);
+                yield return new Vector2(shape.halfSize.x, -shape.halfSize.y);
+                break;
+            default:
+                if(shape.points != null) { foreach(Vector2 p in shape.points) { yield return p; } }
+                break;
+        }
+    }
+
+    /// <summary>
     /// 位置がこの範囲の中か（エディタでも使える。シーンチェック用）
     /// </summary>
     public bool ContainsPoint(Vector2 position)

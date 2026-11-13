@@ -318,8 +318,12 @@ public class TimpaniPeg : GimmickInteractable
     // 更新
     //=====================================================================
 
-    private void Update()
+    // Update は使わない：Intaractable（土台）の private な Update が E キーを見ているので、
+    // ここで Update を作ると土台の Update が呼ばれず、調べられなくなる
+    protected override void LateUpdate()
     {
+        base.LateUpdate();
+
         if(pulse > 0.0f) { pulse = Mathf.Max(0.0f, pulse - Time.deltaTime * 3.0f); ApplyBodyLook(); }
 
         if(!playing) { return; }

@@ -56,6 +56,13 @@ MonoBehaviour:
   dropObject: {fileID: 0}
   dropHeight: 6
   dropTime: 0.35
+  dropCount: 5
+  dropInterval: 0.3
+  dropScatter: 0
+  dropScatterRadius: 8
+  dropAimChance: 0.15
+  dropAimJitter: 1.5
+  dropMinSpacing: 1.8
   riseObject: {fileID: 0}
   riseLinger: 1
   riseHitWhileLingering: 0
@@ -71,7 +78,7 @@ MonoBehaviour:
   activeSe: {fileID: 0}
   activeShake: 0.15
   spawnOnActive: {fileID: 74003795867570883, guid: 87b63e7265df5274bb1dd9e0ac7d2a3f, type: 3}
-  spawnChance: 0.35
+  spawnChance: 0.08
   activeAnimation: Attack
   recoveryTime: 0.2
   memo: "\u632F\u52D5\u3067\u5CA9\u3092\u964D\u3089\u305B\u308B\uFF1A\u30D7\u30EC\u30A4\u30E4\u30FC\u306E\u8DB3\u5143\u306B\u5F71\uFF08\u4E88\u5146\uFF09\u2192

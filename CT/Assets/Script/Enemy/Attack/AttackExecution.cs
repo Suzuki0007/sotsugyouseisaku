@@ -79,6 +79,15 @@ public class AttackExecution
 
         if(enemy != null) { enemy.Stop(); }
 
+        // 上から落ちる物を何個もばらまく（雨のように次々に落とす）
+        if(data.activation == AttackActivation.Drop && data.dropCount > 1)
+        {
+            yield return Rain();
+            phase = Phase.Recovery;
+            yield return runner.Wait(data.recoveryTime);
+            yield break;
+        }
+
         // ---- 予告 ----
         UpdatePose(true);
 
@@ -173,6 +182,7 @@ public class AttackExecution
     {
         HideView();
         DestroyVisual();
+        StopRain();
         if(charging && enemy != null)
         {
             enemy.ClearOverrideVelocity();
@@ -368,6 +378,157 @@ public class AttackExecution
 
         float t = 1.0f - Mathf.Clamp01(remaining / fall);
         spawnedVisual.transform.position = Vector2.Lerp(landing + Vector2.up * data.dropHeight, landing, t * t);
+    }
+
+    //=====================================================================
+    // 上から落ちる物をばらまく
+    //=====================================================================
+
+    // ばらまき中の1つ分（途中でやめるときに片づける）
+    private class RainDrop
+    {
+        public Coroutine routine;
+        public TelegraphView view;
+        public GameObject visual;
+        public Vector2 point;
+        public bool done;
+    }
+
+    private readonly List<RainDrop> rainDrops = new List<RainDrop>();
+
+    // 今出ている影の場所（ほかの敵の落石とも重ならないように、全部の攻撃で共有する）
+    private static readonly List<Vector2> activeDropPoints = new List<Vector2>();
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetStatics() { activeDropPoints.Clear(); }
+
+    /// <summary>
+    /// 決めた数を、間をあけて次々に落とす（それぞれ影 → 落下 → 当たる）。全部落ちたら終わり
+    /// </summary>
+    private IEnumerator Rain()
+    {
+        runner.PlayAction(data.telegraphAnimation);
+        SeManager.PlaySe(data.telegraphSe, runner.Position);
+
+        var used = new List<Vector2>();
+        for(int i = 0; i < data.dropCount; i++)
+        {
+            while(!runner.CanAct) { yield return null; }
+
+            Vector2 point = PickDropPoint(used);
+            used.Add(point);
+
+            var drop = new RainDrop { point = point };
+            rainDrops.Add(drop);
+            activeDropPoints.Add(point);
+            drop.routine = runner.StartCoroutine(OneDrop(drop, point));
+
+            if(i < data.dropCount - 1) { yield return runner.Wait(data.dropInterval); }
+        }
+
+        phase = Phase.Active;
+        while(rainDrops.Exists(d => !d.done)) { yield return null; }
+        rainDrops.Clear();
+    }
+
+    /// <summary>
+    /// 1つ落とす（影を出す → 最後に上から落ちる → 当たる）
+    /// </summary>
+    private IEnumerator OneDrop(RainDrop drop, Vector2 point)
+    {
+        Vector2 dir = Vector2.right;
+        float len = data.shape.length;
+        Vector2 landing = data.shape.CenterOf(point, dir, len);
+
+        if(data.telegraphTime > 0.0f && data.showTelegraph) { drop.view = TelegraphView.Show(data, point, dir, len); }
+
+        float fall = Mathf.Max(0.05f, data.dropTime);
+        float elapsed = 0.0f;
+        while(elapsed < data.telegraphTime)
+        {
+            if(runner.CanAct) { elapsed += Time.deltaTime; }
+            if(drop.view != null) { drop.view.SetProgress(elapsed / data.telegraphTime); }
+
+            float remaining = data.telegraphTime - elapsed;
+            if(data.dropObject != null && remaining <= fall)
+            {
+                if(drop.visual == null)
+                {
+                    drop.visual = Object.Instantiate(data.dropObject, landing + Vector2.up * data.dropHeight, Quaternion.identity);
+                    DisableColliders(drop.visual);
+                }
+                float t = 1.0f - Mathf.Clamp01(remaining / fall);
+                drop.visual.transform.position = Vector2.Lerp(landing + Vector2.up * data.dropHeight, landing, t * t);
+            }
+            yield return null;
+        }
+
+        if(drop.view != null) { drop.view.Hide(); drop.view = null; }
+        if(drop.visual != null) { Object.Destroy(drop.visual); drop.visual = null; }
+
+        SeManager.PlaySe(data.activeSe, landing);
+        if(data.activeShake > 0.0f) { CameraShake.Shake(data.activeShake, 0.4f); }
+        EffectManager.Play(data.activeEffect, landing, 0.0f);
+        if(data.spawnOnActive != null && Random.value < data.spawnChance && WalkArea.Contains(landing))
+        {
+            Object.Instantiate(data.spawnOnActive, new Vector3(landing.x, landing.y, 0.0f), Quaternion.identity);
+        }
+        AttackHits.Hit(data, point, dir, len, Attacker, null);
+
+        activeDropPoints.Remove(point);
+        drop.done = true;
+    }
+
+    /// <summary>
+    /// 落とす場所を選ぶ（ばらまく場所の中で、前に選んだ場所から離れた所。ときどきプレイヤーの近く）
+    /// </summary>
+    private Vector2 PickDropPoint(List<Vector2> used)
+    {
+        GameObject target = runner.Target;
+        Vector2 self = runner.Position;
+        Vector2 player = target != null ? (Vector2)target.transform.position : self;
+        bool aim = target != null && Random.value < data.dropAimChance;
+
+        Vector2 best = self;
+        float bestSpacing = -1.0f;
+        for(int tries = 0; tries < 12; tries++)
+        {
+            Vector2 p;
+            if(aim)
+            {
+                p = player + Random.insideUnitCircle * data.dropAimJitter;
+            }
+            else if(data.dropScatter == DropScatter.WalkArea && WalkArea.TryRandomPoint(out Vector2 inArea))
+            {
+                p = inArea;
+            }
+            else
+            {
+                Vector2 center = data.dropScatter == DropScatter.AroundPlayer ? player : self;
+                p = center + Random.insideUnitCircle * data.dropScatterRadius;
+            }
+            if(!WalkArea.Contains(p)) { p = WalkArea.Clamp(p); }
+
+            // 前の影から一番離れている候補を残す（最低の間を満たせばすぐ決める）
+            float spacing = float.MaxValue;
+            foreach(Vector2 u in used) { spacing = Mathf.Min(spacing, Vector2.Distance(u, p)); }
+            foreach(Vector2 u in activeDropPoints) { spacing = Mathf.Min(spacing, Vector2.Distance(u, p)); }
+            if(spacing >= data.dropMinSpacing) { return p; }
+            if(spacing > bestSpacing) { bestSpacing = spacing; best = p; }
+        }
+        return best;
+    }
+
+    private void StopRain()
+    {
+        foreach(RainDrop drop in rainDrops)
+        {
+            if(drop.routine != null && runner != null) { runner.StopCoroutine(drop.routine); }
+            if(drop.view != null) { drop.view.Hide(); }
+            if(drop.visual != null) { Object.Destroy(drop.visual); }
+            if(!drop.done) { activeDropPoints.Remove(drop.point); }
+        }
+        rainDrops.Clear();
     }
 
     //=====================================================================

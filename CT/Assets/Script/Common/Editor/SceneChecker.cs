@@ -1036,10 +1036,25 @@ public static class SceneChecker
         }
     }
 
+    /// <summary>
+    /// 調べる物（Intaractable）の子に Update があると、土台の Update（E キーで調べる）が呼ばれなくなる
+    /// </summary>
+    private static void CheckInteractableUpdate(List<Issue> issues)
+    {
+        const System.Reflection.BindingFlags Flags = System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public |
+                                                     System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.DeclaredOnly;
+        foreach(System.Type type in TypeCache.GetTypesDerivedFrom<Intaractable>())
+        {
+            if(type.GetMethod("Update", Flags, null, System.Type.EmptyTypes, null) == null) { continue; }
+            issues.Add(new Issue { level = Level.Error, message = $"プログラム：{type.Name} に Update があるため、E キーで調べられません（Intaractable の Update が呼ばれない）。毎フレームの処理は LateUpdate に書いてください" });
+        }
+    }
+
     public static void CheckProject(List<Issue> issues)
     {
         CheckEnemyAssets(issues);
         CheckBarkAssets(issues);
+        CheckInteractableUpdate(issues);
 
         // Build Settings
         foreach(EditorBuildSettingsScene scene in EditorBuildSettings.scenes)
