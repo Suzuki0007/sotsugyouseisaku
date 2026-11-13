@@ -163,7 +163,7 @@
 ### プランナー用ツール・その他
 | ファイル | 役割 |
 |---|---|
-| 🛠`Common/Editor/`（SceneChecker / SceneCheckWindow / DebugWindow / SceneLookup / PickerDrawers）、`Common/Attributes/PickerAttributes.cs` | ③④⑤（デバッグウィンドウに「イベント（その場で試す）」〔EventSequence を名前で絞り込んで実行・止める、11-13〕、「敵」：止める・経路の表示・倒す・**攻撃を出させる**・スポナー／グループの状態。シーンチェックに敵・敵の通行設定エリア・倒した記録のキーの重なり・グループ・ウェーブ・スポナー） |
+| 🛠`Common/Editor/`（SceneChecker / SceneCheckWindow / DebugWindow / SceneLookup / PickerDrawers）、`Common/Attributes/PickerAttributes.cs` | ③④⑤（デバッグウィンドウに「イベント（その場で試す）」〔EventSequence を名前で絞り込んで実行・止める、11-13〕、「敵」：止める・経路の表示・倒す・**攻撃を出させる**・スポナー／グループの状態。シーンチェックに敵・敵の通行設定エリア・倒した記録のキーの重なり・グループ・ウェーブ・スポナー。11-14：合図・オートセーブの置き忘れ・出現位置／やり直す位置が壁や範囲の外・キーの案内が出ない物・会話の長さ〔F2〕） |
 | `Common/Attributes/LabelAttribute.cs`（`[SerializeReference]` の部品はクラス名を変えるとデータが消える。変えるときは `[MovedFrom]`）、🛠`Common/Editor/LabelDrawer.cs` | `[Label("日本語")]`：Inspector の項目名（InspectorName は enum の値にしか効かないため）。`[Label("名前", min)]` / `[Label("名前", min, max)]` で最小値・スライダー。リストには付けない |
 | `Common/GameCondition.cs` | 条件のまとめ（フラグ・アイテム〔既存の FlagCondition / ItemCondition をそのまま中に持つ〕・操作中のキャラ・パーティーの体力・プレイヤーがいる範囲・**仕掛けの状態** `gimmicks`・**2人の状態** `party`）。`IsMet` / `AllMet` / `AnyMet` |
 | `Gimmick/GimmickState.cs` | **仕掛けの状態**（謎解き段階1）。**時間で戻る**（段階2：戻るまでの秒数・残り時間の音・戻ったときの音、`RemainingTime`。InputBlock の間は進まない、入り直したら最初から）。ON/OFF か 0〜n の段階、最後の次は最初へ、変わったときのイベント、`Changed` イベント、セーブ（`Gimmick/<シーン>/<ID か階層パス>`、固定は `/Locked`）、`Set`（固定中は force のときだけ）/`TurnOn`/`TurnOff`/`Toggle`/`Advance`/`ResetValue`/`SetLocked`、`All` |

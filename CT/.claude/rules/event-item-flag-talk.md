@@ -45,6 +45,6 @@ paths:
 
 ## プランナー用ツール（`Assets/Script/Common/`）
 - `[SceneName]` / `[SpawnPointId(nameof(sceneField))]`：string をドロップダウンに。`SceneLookup` が Build Settings と閉じたシーンのファイルから出現位置 ID を読む（プレハブ内のものは読めない）。
-- `SceneChecker` / `SceneCheckWindow`（Tools > シーンチェック）：設定ミスの一覧（11-13：歩ける範囲・ティンパニの確認を追加）。**チェックを増やすときは `SceneChecker.CheckScene` / `CheckProject` に足す。**
+- `SceneChecker` / `SceneCheckWindow`（Tools > シーンチェック）：設定ミスの一覧（11-13：歩ける範囲・ティンパニの確認を追加。11-14 F2：`CheckSignals`・`CheckAutoSave`〔PartyWarp／PartyMode の部品があって AutoSave／SceneChange がない EventSequence → 参考〕・`CheckStartPositions`〔出現位置・BattleArea のやり直す位置が壁＝トリガーでない動かない Collider2D〔WalkArea の形・Bullet・Enemies を除く。`Physics2D.SyncTransforms` してから `OverlapPointAll`〕・やり直す位置が WalkArea の外〕・`CheckPrompts`〔ItemInteraction の案内の文が空・`InteractPromptView.labels` にも IInteractPrompt にもない調べる物〕、プロジェクト：`CheckSignalAssets`・`CheckDialogueAssets`〔`DialogueMaxChars` 40・`DialogueMaxLines` 10・話し手が空。dialogue-csv の -Lint と同じ目安〕）。確かめ方：新しいシーンを重ねて開き（保存しない）、わざと間違えた物を置いて `CheckScene`。**チェックを増やすときは `SceneChecker.CheckScene` / `CheckProject` に足す。**
 - `DebugWindow`（Tools > デバッグ）：アイテム増減、フラグ、ワープ（`PlayerSwitchManager.Warp`）、シーン移動、回復、無敵（`Health.PlayerInvincible`）、再生開始時の状態（`DebugStartState`、EditorPrefs）、セーブ操作、敵、仕掛け、ティンパニ（TimpaniRoom があるときだけ）。
 - `GameCondition`：フラグ・アイテム・操作キャラ・パーティーの体力・範囲・仕掛けの状態・2人の状態。`IsMet` / `AllMet` / `AnyMet`。

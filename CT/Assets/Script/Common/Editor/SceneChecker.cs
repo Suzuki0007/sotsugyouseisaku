@@ -76,6 +76,109 @@ public static class SceneChecker
         CheckWalkAreaAndTimpani(ctx);
         CheckRooms(ctx);
         CheckSignals(ctx);
+        CheckAutoSave(ctx);
+        CheckStartPositions(ctx);
+        CheckPrompts(ctx);
+    }
+
+    //=====================================================================
+    // F2（11-14）：オートセーブの置き忘れ・始まる位置・キーの案内
+    //=====================================================================
+
+    /// <summary>
+    /// 2人を移す・2人の状態を変えるイベントの最後にオートセーブがない（ロードで「シーンに着いた位置」から始まり、進めなくなることがある）
+    /// </summary>
+    private static void CheckAutoSave(Context ctx)
+    {
+        foreach(EventSequence sequence in ctx.Find<EventSequence>())
+        {
+            bool moves = false;
+            bool saves = false;
+            foreach(EventAction action in sequence.GetActions())
+            {
+                if(action == null) { continue; }
+                if(action is PartyWarpEventAction || action is PartyModeEventAction) { moves = true; }
+                if(action is AutoSaveEventAction || action is SceneChangeEventAction) { saves = true; }
+            }
+            if(moves && !saves)
+            {
+                ctx.Add(Level.Info, sequence, "2人を移す・2人の状態を変えるイベントにオートセーブがありません。通り道が変わる（入口に戻れなくなる）なら、最後に部品「オートセーブ」を置いてください（ロードで進めなくなるのを防ぐ）");
+            }
+        }
+    }
+
+    /// <summary>
+    /// 出現位置・戦闘のやり直す位置が、壁（動かない当たり判定）に重なっている・歩ける範囲の外
+    /// </summary>
+    private static void CheckStartPositions(Context ctx)
+    {
+        Physics2D.SyncTransforms();
+        var areas = ctx.Find<WalkArea>();
+
+        foreach(PlayerSpawnPoint point in ctx.Find<PlayerSpawnPoint>())
+        {
+            Collider2D wall = FindWallAt(point.transform.position, point.transform);
+            if(wall != null) { ctx.Add(Level.Warning, point, $"出現位置「{point.SpawnPointId}」が壁「{wall.name}」に重なっています（出たとたんに押し出されるか、動けなくなります）"); }
+        }
+
+        foreach(BattleArea battle in ctx.Find<BattleArea>())
+        {
+            var restart = new SerializedObject(battle).FindProperty("restartPoint").objectReferenceValue as Transform;
+            if(restart == null) { continue; }
+
+            Collider2D wall = FindWallAt(restart.position, restart);
+            if(wall != null) { ctx.Add(Level.Warning, battle, $"戦闘エリアのやり直す位置「{restart.name}」が壁「{wall.name}」に重なっています"); }
+
+            if(areas.Count > 0 && !areas.Exists(a => a.isActiveAndEnabled && a.ContainsPoint(restart.position)))
+            {
+                ctx.Add(Level.Warning, battle, $"戦闘エリアのやり直す位置「{restart.name}」が歩ける範囲の外にあります（やり直しで範囲のふちへ動かされます）");
+            }
+        }
+    }
+
+    /// <summary> その点に重なっている壁（トリガーでない・動かない当たり判定。歩ける範囲の形・キャラ・弾は除く） </summary>
+    private static Collider2D FindWallAt(Vector2 point, Transform self)
+    {
+        foreach(Collider2D col in Physics2D.OverlapPointAll(point))
+        {
+            if(col == null || col.isTrigger || !col.enabled) { continue; }
+            if(col.transform.IsChildOf(self)) { continue; }
+            if(col.GetComponentInParent<WalkArea>() != null) { continue; }
+            if(col.attachedRigidbody != null && col.attachedRigidbody.bodyType != RigidbodyType2D.Static) { continue; }
+            string layer = LayerMask.LayerToName(col.gameObject.layer);
+            if(layer == "Bullet" || layer == "Enemies") { continue; }
+            return col;
+        }
+        return null;
+    }
+
+    /// <summary>
+    /// 調べる物の上にキーの案内（[E] 調べる）が出ない（文が空・案内のない種類）
+    /// </summary>
+    private static void CheckPrompts(Context ctx)
+    {
+        var labelsField = typeof(InteractPromptView).GetField("labels", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+        var labels = labelsField != null ? labelsField.GetValue(null) as System.Collections.IDictionary : null;
+
+        foreach(Intaractable target in ctx.Find<Intaractable>())
+        {
+            if(!HasTrigger(target.gameObject)) { continue; }   // 調べる範囲がない（イベントから使う会話など）
+
+            if(target is ItemInteraction item)
+            {
+                var so = new SerializedObject(item);
+                if(so.FindProperty("trigger").enumValueIndex == (int)ItemInteraction.TriggerType.Interact && string.IsNullOrEmpty(so.FindProperty("promptLabel").stringValue))
+                {
+                    ctx.Add(Level.Info, item, "「キーの案内の文」が空なので、近づいても [E] の案内が出ません（わざとならそのまま）");
+                }
+                continue;
+            }
+            if(target is IInteractPrompt) { continue; }
+            if(labels != null && !labels.Contains(target.GetType().Name))
+            {
+                ctx.Add(Level.Info, target, $"{target.GetType().Name} はキーの案内（[E] 調べる）が出ない種類です（調べられることに気づきにくい）。案内を出すなら InteractPromptView の表に足す（プログラマーに依頼）");
+            }
+        }
     }
 
     /// <summary>
@@ -1163,12 +1266,67 @@ public static class SceneChecker
         }
     }
 
+    /// <summary> 会話の1行（改行で区切った1つ）の文字数の目安 </summary>
+    public const int DialogueMaxChars = 40;
+
+    /// <summary> 1つの会話の文の数の目安 </summary>
+    public const int DialogueMaxLines = 10;
+
+    /// <summary>
+    /// 会話データ：文がない・話し手がいない文・長すぎる行・長い会話（dialogue-csv スキルの -Lint と同じ目安）
+    /// </summary>
+    private static void CheckDialogueAssets(List<Issue> issues)
+    {
+        foreach(string guid in AssetDatabase.FindAssets("t:DialogueData"))
+        {
+            DialogueData d = AssetDatabase.LoadAssetAtPath<DialogueData>(AssetDatabase.GUIDToAssetPath(guid));
+            if(d == null) { continue; }
+
+            DialogueData.Line[] lines = d.Lines;
+            if(lines == null || lines.Length == 0)
+            {
+                issues.Add(new Issue { level = Level.Warning, target = d, message = $"会話「{d.name}」に文がありません" });
+                continue;
+            }
+
+            int longCount = 0;
+            int noSpeaker = 0;
+            string firstLong = null;
+            foreach(DialogueData.Line line in lines)
+            {
+                if(line == null) { continue; }
+                if(line.character == null && string.IsNullOrEmpty(line.speakerName)) { noSpeaker++; }
+                if(string.IsNullOrEmpty(line.text)) { continue; }
+                foreach(string part in line.text.Split('\n'))
+                {
+                    if(part.Length <= DialogueMaxChars) { continue; }
+                    longCount++;
+                    if(firstLong == null) { firstLong = part.Length > 20 ? part.Substring(0, 20) + "…" : part; }
+                }
+            }
+
+            if(longCount > 0)
+            {
+                issues.Add(new Issue { level = Level.Info, target = d, message = $"会話「{d.name}」：{DialogueMaxChars} 字より長い行が {longCount} 個あります（例「{firstLong}」。文の窓からはみ出さないか、2つに分けるか）" });
+            }
+            if(lines.Length > DialogueMaxLines)
+            {
+                issues.Add(new Issue { level = Level.Info, target = d, message = $"会話「{d.name}」が {lines.Length} 文あります（{DialogueMaxLines} 文より長い会話は、途中で分けるか削ると読みやすい）" });
+            }
+            if(noSpeaker > 0)
+            {
+                issues.Add(new Issue { level = Level.Info, target = d, message = $"会話「{d.name}」：話し手（キャラ・名前）が空の文が {noSpeaker} 個あります（地の文ならそのまま）" });
+            }
+        }
+    }
+
     public static void CheckProject(List<Issue> issues)
     {
         CheckEnemyAssets(issues);
         CheckBarkAssets(issues);
         CheckInteractableUpdate(issues);
         CheckSignalAssets(issues);
+        CheckDialogueAssets(issues);
 
         // Build Settings
         foreach(EditorBuildSettingsScene scene in EditorBuildSettings.scenes)
