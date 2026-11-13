@@ -5,7 +5,8 @@
 // * \author 成田悠真
 /*********************************************************************/
 
-using Unity.AppUI.Redux;
+// 使っていない。Unity.AppUI はエディタだけのパッケージなので、ビルドでコンパイルエラーになる（2026-11-13 uh。Project Auditor で検出）
+//using Unity.AppUI.Redux;
 using UnityEngine;
 
 /// <summary>

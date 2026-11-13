@@ -1,6 +1,6 @@
 ---
 name: perf-review
-description: CT プロジェクトのコード・アセット・設定を性能の観点で点検する（『Unity パフォーマンスチューニング バイブル』『ティップス 2026』由来の 163 ルール＋この作品独自のルール）。scripts/scan.ps1 が全ルールの検索を機械的に行い、毎フレームの処理（Update など）の中かどうか・この作品の例外（rules-overrides.md）まで決めてから、ヒットした所だけルールの詳細を読んで誤検出を除き、ルール ID 付きで報告する。C# を書いた・直したあとの性能の確認、重い処理・GC の確保・アセットの設定（テクスチャ・音）の点検、性能のレビューを頼まれたときに使う。実際の重さを測るのは unity-playtest の perf.ps1。
+description: CT プロジェクトのコード・アセット・設定を性能の観点で点検する（『Unity パフォーマンスチューニング バイブル』『ティップス 2026』由来の 163 ルール＋この作品独自のルール、Unity の Project Auditor）。scripts/scan.ps1 が全ルールの検索を機械的に行い、毎フレームの処理（Update など）の中かどうか・この作品の例外（rules-overrides.md）まで決めてから、ヒットした所だけルールの詳細を読んで誤検出を除き、ルール ID 付きで報告する。C# を書いた・直したあとの性能の確認、重い処理・GC の確保・アセットの設定（テクスチャ・音）の点検、性能のレビュー、ビルドの前の確認（scripts/auditor.ps1 で Project Auditor：設定・アセット・static のリセット漏れ・ビルド用のコンパイルが通るか）を頼まれたときに使う。実際の重さを測るのは unity-playtest の perf.ps1。
 ---
 
 # perf-review：性能の点検（静的）
@@ -28,6 +28,20 @@ description: CT プロジェクトのコード・アセット・設定を性能�
    - `code` の中でも、Update から毎フレーム呼ばれるメソッドは実質 hot（scan.ps1 は呼び出し先を追わない）。気になる処理は呼び出し元を確かめる。
 4. **報告**：下の形。各指摘にルール ID。根拠はルールの理由欄（実測値）を引用。**直すのは頼まれたときだけ**。ほかの人のコード（`\author` が uh 以外）は報告だけにして `Docs/code-map.md` の問題点へ。
 5. **直したら計測で確かめる**：`unity-playtest` の `perf.ps1 -Measure -Label <同じ場面>` で前後を比べる（静的な点検は「疑い」。効いたかは測って決める。`rules/performance.md`）。
+
+## Project Auditor（Unity の静的解析。段階3、11-13）
+
+scan.ps1 が苦手な**アセットの設定・プロジェクトの設定・ドメインリロード（static のリセット漏れ）**と、**ビルド用のコンパイルが通るか**を見る。エディタの本体（6.4 から同梱）＋ルールのパッケージ `com.unity.project-auditor-rules` **1.0.3**（2.0.0 以降は 6.5 の本体と合わずコンパイルエラーになる。版を上げるのは Unity を 6.6 以降にしたとき）。
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .claude/skills/perf-review/scripts/auditor.ps1        # 解析（約 1 分）→ 要約 → 前回との差分 → PerfLog に記録
+powershell -NoProfile -ExecutionPolicy Bypass -File .claude/skills/perf-review/scripts/auditor.ps1 -Last  # 最後の解析をもう一度要約するだけ
+```
+- 再生中・コンパイル中は動かない。出力は **!! PLAYER BUILD COMPILE ERRORS**（あれば最優先。ビルドが失敗する）→ A. アセット・設定 → B. ゲームのコード → C. ドメインリロード。エディタのコードの指摘は数だけ（scan.ps1 の tooling と同じ考え）。
+- 外す指摘は `references/auditor-ignore.md`（理由つき。Project Auditor の Ignore は設定ファイルに残らないため、ここで管理）。
+- 記録：`PerfLog/auditor.csv`（数の推移）、`PerfLog/auditor_issues.tsv`（指摘の一覧。次の実行で「新しく増えた／消えた」を出す元）。レポートの全体は `%TEMP%\ct_auditor_report.json`（Window > Analysis > Project Auditor で開ける）。
+- 使いどころ：段階の区切り・アセットや設定を大きく変えたあと・ビルドの前。**ビルドの前は必ず**（エディタでは通るがビルドで落ちるコードを見つけられる。11-13 に `PlayerFollower` の using で実際に見つかった）。
+- B（ゲームのコード）は Project Auditor が「毎フレームの処理か」を見ないので、数が多い。毎フレームかどうかは scan.ps1 の hot で見る。
 
 ## 報告の形
 

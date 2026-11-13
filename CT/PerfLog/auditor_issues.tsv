@@ -1,0 +1,1244 @@
+id	severity	group	path	line	description
+PAA4000	Moderate	asset	Assets/BGM/BGM_Stage1.mp3	0	AudioClip 'BGM_Stage1' Load Type is not set to Streaming
+PAA4003	Moderate	asset	Assets/BGM/BGM_Stage1.mp3	0	AudioClip 'BGM_Stage1' is stereo
+PAA4004	Moderate	asset	Assets/BGM/BGM_Stage1.mp3	0	AudioClip 'BGM_Stage1' is set to Decompress On Load
+PAA4009	Moderate	asset	Assets/BGM/BGM_Stage1.mp3	0	AudioClip 'BGM_Stage1' Load In Background is not enabled
+PAA4000	Moderate	asset	Assets/BGM/PMH_Atmos_HospitalHall_01.wav	0	AudioClip 'PMH_Atmos_HospitalHall_01' Load Type is not set to Streaming
+PAA4003	Moderate	asset	Assets/BGM/PMH_Atmos_HospitalHall_01.wav	0	AudioClip 'PMH_Atmos_HospitalHall_01' is stereo
+PAA4004	Moderate	asset	Assets/BGM/PMH_Atmos_HospitalHall_01.wav	0	AudioClip 'PMH_Atmos_HospitalHall_01' is set to Decompress On Load
+PAA4009	Moderate	asset	Assets/BGM/PMH_Atmos_HospitalHall_01.wav	0	AudioClip 'PMH_Atmos_HospitalHall_01' Load In Background is not enabled
+PAA4000	Moderate	asset	Assets/SE/SE_Door_Close.mp3	0	AudioClip 'SE_Door_Close' Load Type is not set to Streaming
+PAA4003	Moderate	asset	Assets/SE/SE_Door_Close.mp3	0	AudioClip 'SE_Door_Close' is stereo
+PAA4004	Moderate	asset	Assets/SE/SE_Door_Close.mp3	0	AudioClip 'SE_Door_Close' is set to Decompress On Load
+PAA4000	Moderate	asset	Assets/SE/SE_Door_OP.mp3	0	AudioClip 'SE_Door_OP' Load Type is not set to Streaming
+PAA4003	Moderate	asset	Assets/SE/SE_Door_OP.mp3	0	AudioClip 'SE_Door_OP' is stereo
+PAA4004	Moderate	asset	Assets/SE/SE_Door_OP.mp3	0	AudioClip 'SE_Door_OP' is set to Decompress On Load
+PAA4000	Moderate	asset	Assets/SE/SE_KeyOP.mp3	0	AudioClip 'SE_KeyOP' Load Type is not set to Streaming
+PAA4003	Moderate	asset	Assets/SE/SE_KeyOP.mp3	0	AudioClip 'SE_KeyOP' is stereo
+PAA4004	Moderate	asset	Assets/SE/SE_KeyOP.mp3	0	AudioClip 'SE_KeyOP' is set to Decompress On Load
+PAA4000	Moderate	asset	Assets/SE/SE_Walk_sabaku.mp3	0	AudioClip 'SE_Walk_sabaku' Load Type is not set to Streaming
+PAA4003	Moderate	asset	Assets/SE/SE_Walk_sabaku.mp3	0	AudioClip 'SE_Walk_sabaku' is stereo
+PAA4004	Moderate	asset	Assets/SE/SE_Walk_sabaku.mp3	0	AudioClip 'SE_Walk_sabaku' is set to Decompress On Load
+PAS0013	Moderate	asset	Project/Physics/Settings	0	Physics: Layer Collision Matrix has all boxes ticked
+PAS0018	Moderate	asset	Project/Quality	0	Quality: Using default Quality Levels
+PAS0027	Moderate	asset	Project/Player	0	Player: Mipmap Stripping is disabled
+PAS0029	Moderate	asset	Project/Player	0	Player: Splash Screen is enabled
+UDR0001	Moderate	reload	Assets/Script/Bgm/BgmManager.cs	26	No method with RuntimeInitializeOnLoadMethod attribute
+UDR0002	Moderate	reload	Assets/Script/Camera/CameraShake.cs	23	Static field/property is not assigned in a method with the RuntimeInitializeOnLoadMethod attribute
+UDR0002	Moderate	reload	Assets/Script/Camera/CameraShake.cs	21	Static field/property is not assigned in a method with the RuntimeInitializeOnLoadMethod attribute
+UDR0002	Moderate	reload	Assets/Script/Camera/CameraShake.cs	20	Static field/property is not assigned in a method with the RuntimeInitializeOnLoadMethod attribute
+UDR0001	Moderate	reload	Assets/Script/Bgm/Effects/BgmProgress.cs	18	No method with RuntimeInitializeOnLoadMethod attribute
+UDR0002	Moderate	reload	Assets/Script/Enemy/Battle/BattleArea.cs	285	Static field/property is not assigned in a method with the RuntimeInitializeOnLoadMethod attribute
+UDR0002	Moderate	reload	Assets/Script/Enemy/Enemy.cs	222	Static field/property is not assigned in a method with the RuntimeInitializeOnLoadMethod attribute
+UDR0002	Moderate	reload	Assets/Script/Gimmick/Death/RetryPoint.cs	39	Static field/property is not assigned in a method with the RuntimeInitializeOnLoadMethod attribute
+UDR0001	Moderate	reload	Assets/Script/Party/PartyHintView.cs	24	No method with RuntimeInitializeOnLoadMethod attribute
+UDR0002	Moderate	reload	Assets/Script/Map/MapArea.cs	25	Static field/property is not assigned in a method with the RuntimeInitializeOnLoadMethod attribute
+UDR0001	Moderate	reload	Assets/Script/Party/Bark/BarkView.cs	276	No method with RuntimeInitializeOnLoadMethod attribute
+UDR0001	Moderate	reload	Assets/Script/Party/Bark/BarkView.cs	23	No method with RuntimeInitializeOnLoadMethod attribute
+UDR0002	Moderate	reload	Assets/Script/Map/MapDebugView.cs	23	Static field/property is not assigned in a method with the RuntimeInitializeOnLoadMethod attribute
+UDR0001	Moderate	reload	Assets/Script/Scene/SceneFader.cs	19	No method with RuntimeInitializeOnLoadMethod attribute
+UDR0002	Moderate	reload	Assets/Script/Save/AutoSaveIndicator.cs	25	Static field/property is not assigned in a method with the RuntimeInitializeOnLoadMethod attribute
+UDR0001	Moderate	reload	Assets/Script/StageDarkness/LightSource.cs	79	No method with RuntimeInitializeOnLoadMethod attribute
+UDR0001	Moderate	reload	Assets/Script/StageDarkness/StageDarkness.cs	69	No method with RuntimeInitializeOnLoadMethod attribute
+UDR0001	Moderate	reload	Assets/Script/Singleton/Singleton.cs	12	No method with RuntimeInitializeOnLoadMethod attribute
+UDR0002	Moderate	reload	Assets/Script/UI/ItemMenu/ItemMenuUI.cs	104	Static field/property is not assigned in a method with the RuntimeInitializeOnLoadMethod attribute
+UDR0004	Moderate	reload	Assets/Script/Flag/FlagSwitch.cs	56	Non-static method subscribed to static event in Start is not deregistered. Deregister it in OnDisable.
+UDR0001	Moderate	reload	Assets/Script/Bgm/BgmManager.cs	26	No method with RuntimeInitializeOnLoadMethod attribute
+UDR0001	Moderate	reload	Assets/Script/Bgm/Effects/BgmProgress.cs	18	No method with RuntimeInitializeOnLoadMethod attribute
+UDR0002	Moderate	reload	Assets/Script/Camera/CameraShake.cs	23	Static field/property is not assigned in a method with the RuntimeInitializeOnLoadMethod attribute
+UDR0002	Moderate	reload	Assets/Script/Camera/CameraShake.cs	20	Static field/property is not assigned in a method with the RuntimeInitializeOnLoadMethod attribute
+UDR0002	Moderate	reload	Assets/Script/Camera/CameraShake.cs	21	Static field/property is not assigned in a method with the RuntimeInitializeOnLoadMethod attribute
+UDR0002	Moderate	reload	Assets/Script/Gimmick/Death/RetryPoint.cs	39	Static field/property is not assigned in a method with the RuntimeInitializeOnLoadMethod attribute
+UDR0002	Moderate	reload	Assets/Script/Enemy/Battle/BattleArea.cs	285	Static field/property is not assigned in a method with the RuntimeInitializeOnLoadMethod attribute
+UDR0002	Moderate	reload	Assets/Script/Enemy/Enemy.cs	222	Static field/property is not assigned in a method with the RuntimeInitializeOnLoadMethod attribute
+UDR0002	Moderate	reload	Assets/Script/Map/MapDebugView.cs	23	Static field/property is not assigned in a method with the RuntimeInitializeOnLoadMethod attribute
+UDR0001	Moderate	reload	Assets/Script/Party/PartyHintView.cs	24	No method with RuntimeInitializeOnLoadMethod attribute
+UDR0001	Moderate	reload	Assets/Script/Singleton/Singleton.cs	12	No method with RuntimeInitializeOnLoadMethod attribute
+UDR0002	Moderate	reload	Assets/Script/Map/MapArea.cs	25	Static field/property is not assigned in a method with the RuntimeInitializeOnLoadMethod attribute
+UDR0002	Moderate	reload	Assets/Script/Save/AutoSaveIndicator.cs	25	Static field/property is not assigned in a method with the RuntimeInitializeOnLoadMethod attribute
+UDR0001	Moderate	reload	Assets/Script/Party/Bark/BarkView.cs	276	No method with RuntimeInitializeOnLoadMethod attribute
+UDR0001	Moderate	reload	Assets/Script/Party/Bark/BarkView.cs	23	No method with RuntimeInitializeOnLoadMethod attribute
+UDR0001	Moderate	reload	Assets/Script/Scene/SceneFader.cs	19	No method with RuntimeInitializeOnLoadMethod attribute
+UDR0001	Moderate	reload	Assets/Script/StageDarkness/LightSource.cs	79	No method with RuntimeInitializeOnLoadMethod attribute
+UDR0001	Moderate	reload	Assets/Script/StageDarkness/StageDarkness.cs	69	No method with RuntimeInitializeOnLoadMethod attribute
+UDR0002	Moderate	reload	Assets/Script/UI/ItemMenu/ItemMenuUI.cs	104	Static field/property is not assigned in a method with the RuntimeInitializeOnLoadMethod attribute
+UDR0004	Moderate	reload	Assets/Script/Flag/FlagSwitch.cs	56	Non-static method subscribed to static event in Start is not deregistered. Deregister it in OnDisable.
+PAC0192	Info	code	Assets/Behavior/Enemy/AbcdefuckAction.cs	23	Use of Debug.Log in 'OnStart'
+PAC0192	Info	code	Assets/Behavior/Enemy/EnemyShotAction.cs	34	Use of Debug.Log in 'OnStart'
+PAC0192	Info	code	Assets/Behavior/Enemy/SampleAction.cs	19	Use of Debug.Log in 'OnStart'
+PAC0022	Moderate	code	Assets/Script/Attack/AreaAttack.cs	142	'UnityEngine.Physics2D.OverlapCircleAll' usage
+PAC0192	Info	code	Assets/Script/Attack/AreaAttack.cs	161	Use of Debug.Log in 'CheckAttackTargets'
+PAC1002	Info	code	Assets/Script/Attack/AreaAttack.cs	178	'System.String.Concat' usage
+PAC0192	Info	code	Assets/Script/Attack/AreaAttack.cs	178	Use of Debug.Log in 'CheckAttackTargets'
+PAC2002	Info	code	Assets/Script/Attack/AreaAttack.cs	49	'System.Collections.Generic.HashSet`1<UnityEngine.Object>' allocation
+PAC2002	Moderate	code	Assets/Script/Bgm/BgmManager.cs	37	'UnityEngine.GameObject' allocation
+PAC0225	Major	code	Assets/Script/Bgm/BgmManager.cs	37	'UnityEngine.GameObject.AddComponent<BgmManager>' usage
+PAC2004	Info	code	Assets/Script/Bgm/BgmManager.cs	121	'BgmChannel' array allocation
+PAC2000	Moderate	code	Assets/Script/Bgm/BgmManager.cs	124	Conversion from value type 'Int32' to ref type
+PAC2002	Info	code	Assets/Script/Bgm/BgmManager.cs	71	'System.Collections.Generic.Dictionary`2<UnityEngine.AudioClip,System.Single>' allocation
+PAC2002	Info	code	Assets/Script/Bgm/BgmManager.cs	78	'BgmEffectSettings' allocation
+PAC2002	Info	code	Assets/Script/Bgm/BgmManager.cs	79	'BgmEffectSettings' allocation
+PAC2002	Info	code	Assets/Script/Bgm/Conditions/BgmConditionArea.cs	29	'System.Predicate`1<UnityEngine.GameObject>' allocation
+PAC2002	Info	code	Assets/Script/Bgm/Conditions/BgmConditionArea.cs	25	'System.Collections.Generic.HashSet`1<UnityEngine.GameObject>' allocation
+PAC2002	Info	code	Assets/Script/Bgm/Effects/BgmChannel.cs	67	'UnityEngine.GameObject' allocation
+PAC0225	Moderate	code	Assets/Script/Bgm/Effects/BgmChannel.cs	70	'UnityEngine.GameObject.AddComponent<BgmChannel>' usage
+PAC0225	Moderate	code	Assets/Script/Bgm/Effects/BgmChannel.cs	77	'UnityEngine.GameObject.AddComponent<UnityEngine.AudioSource>' usage
+PAC0225	Moderate	code	Assets/Script/Bgm/Effects/BgmChannel.cs	84	'UnityEngine.GameObject.AddComponent<UnityEngine.AudioHighPassFilter>' usage
+PAC0225	Moderate	code	Assets/Script/Bgm/Effects/BgmChannel.cs	85	'UnityEngine.GameObject.AddComponent<UnityEngine.AudioDistortionFilter>' usage
+PAC0225	Moderate	code	Assets/Script/Bgm/Effects/BgmChannel.cs	86	'UnityEngine.GameObject.AddComponent<UnityEngine.AudioLowPassFilter>' usage
+PAC0225	Moderate	code	Assets/Script/Bgm/Effects/BgmChannel.cs	87	'UnityEngine.GameObject.AddComponent<UnityEngine.AudioChorusFilter>' usage
+PAC0225	Moderate	code	Assets/Script/Bgm/Effects/BgmChannel.cs	88	'UnityEngine.GameObject.AddComponent<UnityEngine.AudioEchoFilter>' usage
+PAC0225	Moderate	code	Assets/Script/Bgm/Effects/BgmChannel.cs	89	'UnityEngine.GameObject.AddComponent<UnityEngine.AudioReverbFilter>' usage
+PAC2002	Info	code	Assets/Script/Bgm/Effects/BgmEffectProfile.cs	41	'System.Collections.Generic.List`1<BgmEffectProfile/Key>' allocation
+PAC2002	Info	code	Assets/Script/Bgm/Effects/BgmEffectSettings.cs	135	'BgmEffectSettings' allocation
+PAC2002	Info	code	Assets/Script/Bgm/SceneBgm.cs	104	'System.Collections.Generic.List`1<SceneBgm/Rule>' allocation
+PAC0231	Moderate	code	Assets/Script/Bullet/BulletDeleteArea.cs	38	'UnityEngine.Object.name' usage
+PAC1002	Info	code	Assets/Script/Bullet/BulletDeleteArea.cs	38	'System.String.Concat' usage
+PAC0192	Info	code	Assets/Script/Bullet/BulletDeleteArea.cs	88	Use of Debug.Log in 'OnTriggerEnter2D'
+PAC0231	Moderate	code	Assets/Script/Bullet/Enemy/EnemyBullet.cs	110	'UnityEngine.Object.name' usage
+PAC1002	Info	code	Assets/Script/Bullet/Enemy/EnemyBullet.cs	110	'System.String.Concat' usage
+PAC0193	Info	code	Assets/Script/Bullet/Enemy/EnemyBullet.cs	110	Use of Debug.LogWarning in 'ReturnToPool'
+PAC0231	Moderate	code	Assets/Script/Bullet/Player/PlayerBullet.cs	69	'UnityEngine.Object.name' usage
+PAC1002	Info	code	Assets/Script/Bullet/Player/PlayerBullet.cs	69	'System.String.Concat' usage
+PAC0193	Info	code	Assets/Script/Bullet/Player/PlayerBullet.cs	69	Use of Debug.LogWarning in 'ReturnToPool'
+PAC2002	Info	code	Assets/Script/Camera/CameraArea.cs	29	'System.Collections.Generic.List`1<CameraArea>' allocation
+PAC2002	Info	code	Assets/Script/Camera/CameraShake.cs	40	'System.Action`2<UnityEngine.Rendering.ScriptableRenderContext,UnityEngine.Camera>' allocation
+PAC2002	Info	code	Assets/Script/Camera/CameraShake.cs	41	'System.Action`2<UnityEngine.Rendering.ScriptableRenderContext,UnityEngine.Camera>' allocation
+PAC2002	Info	code	Assets/Script/Camera/CameraShake.cs	66	'System.Action`2<UnityEngine.Rendering.ScriptableRenderContext,UnityEngine.Camera>' allocation
+PAC2002	Info	code	Assets/Script/Camera/CameraShake.cs	67	'System.Action`2<UnityEngine.Rendering.ScriptableRenderContext,UnityEngine.Camera>' allocation
+PAC2002	Info	code	Assets/Script/Camera/MapCameraAspect.cs	58	'UnityEngine.Events.UnityAction`2<UnityEngine.SceneManagement.Scene,UnityEngine.SceneManagement.LoadSceneMode>' allocation
+PAC2002	Info	code	Assets/Script/Camera/MapCameraAspect.cs	59	'UnityEngine.Events.UnityAction`2<UnityEngine.SceneManagement.Scene,UnityEngine.SceneManagement.LoadSceneMode>' allocation
+PAC0225	Moderate	code	Assets/Script/Camera/MapCameraAspect.cs	76	'UnityEngine.GameObject.AddComponent<MapCameraAspect>' usage
+PAC2002	Info	code	Assets/Script/Camera/MapCameraAspect.cs	160	'UnityEngine.GameObject' allocation
+PAC0225	Moderate	code	Assets/Script/Camera/MapCameraAspect.cs	163	'UnityEngine.GameObject.AddComponent<UnityEngine.Canvas>' usage
+PAC2002	Info	code	Assets/Script/Camera/MapCameraAspect.cs	175	'UnityEngine.GameObject' allocation
+PAC0225	Moderate	code	Assets/Script/Camera/MapCameraAspect.cs	178	'UnityEngine.GameObject.AddComponent<UnityEngine.UI.Image>' usage
+PAC2001	Moderate	code	Assets/Script/CharaBase/CharaBase.cs	15	MonoBehaviour method 'Start' is empty
+PAC2001	Major	code	Assets/Script/CharaBase/CharaBase.cs	21	MonoBehaviour method 'Update' is empty
+PAC0192	Info	code	Assets/Script/CheckPoint/CheckPoint.cs	29	Use of Debug.Log in 'OnTriggerEnter2D'
+PAC2002	Info	code	Assets/Script/Common/GameCondition.cs	68	'System.Collections.Generic.List`1<FlagCondition>' allocation
+PAC2002	Info	code	Assets/Script/Common/GameCondition.cs	71	'System.Collections.Generic.List`1<ItemCondition>' allocation
+PAC2002	Info	code	Assets/Script/Common/GameCondition.cs	90	'System.Collections.Generic.List`1<GimmickCondition>' allocation
+PAC2002	Moderate	code	Assets/Script/Damage/DamageReceiver.cs	132	'System.Comparison`1<UnityEngine.Collider2D>' allocation
+PAC1002	Info	code	Assets/Script/Debug/PerfMonitor.cs	109	'System.String.Concat' usage
+PAC2002	Info	code	Assets/Script/Debug/PerfMonitor.cs	129	'System.Text.StringBuilder' allocation
+PAC0004	Moderate	code	Assets/Script/Debug/PerfMonitor.cs	134	'UnityEngine.Resources.FindObjectsOfTypeAll<UnityEngine.Texture>' usage
+PAC0004	Moderate	code	Assets/Script/Debug/PerfMonitor.cs	135	'UnityEngine.Resources.FindObjectsOfTypeAll<UnityEngine.AudioClip>' usage
+PAC0004	Moderate	code	Assets/Script/Debug/PerfMonitor.cs	136	'UnityEngine.Resources.FindObjectsOfTypeAll<UnityEngine.Material>' usage
+PAC2002	Info	code	Assets/Script/Debug/PerfMonitor.cs	168	'UnityEngine.GameObject' allocation
+PAC0225	Moderate	code	Assets/Script/Debug/PerfMonitor.cs	170	'UnityEngine.GameObject.AddComponent<PerfMonitor>' usage
+PAC2002	Info	code	Assets/Script/Debug/PerfMonitor.cs	236	'UnityEngine.GameObject' allocation
+PAC0225	Moderate	code	Assets/Script/Debug/PerfMonitor.cs	239	'UnityEngine.GameObject.AddComponent<UnityEngine.Canvas>' usage
+PAC0225	Moderate	code	Assets/Script/Debug/PerfMonitor.cs	242	'UnityEngine.GameObject.AddComponent<UnityEngine.UI.CanvasScaler>' usage
+PAC2002	Info	code	Assets/Script/Debug/PerfMonitor.cs	247	'UnityEngine.GameObject' allocation
+PAC0225	Moderate	code	Assets/Script/Debug/PerfMonitor.cs	249	'UnityEngine.GameObject.AddComponent<UnityEngine.UI.Image>' usage
+PAC2002	Info	code	Assets/Script/Debug/PerfMonitor.cs	257	'UnityEngine.GameObject' allocation
+PAC0225	Moderate	code	Assets/Script/Debug/PerfMonitor.cs	259	'UnityEngine.GameObject.AddComponent<TMPro.TextMeshProUGUI>' usage
+PAC2004	Info	code	Assets/Script/Debug/PerfMonitor.cs	356	'Single' array allocation
+PAC2004	Info	code	Assets/Script/Debug/PerfMonitor.cs	357	'Single' array allocation
+PAC2004	Info	code	Assets/Script/Debug/PerfMonitor.cs	358	'Single' array allocation
+PAC2004	Info	code	Assets/Script/Debug/PerfMonitor.cs	359	'Int64' array allocation
+PAC2004	Info	code	Assets/Script/Debug/PerfMonitor.cs	360	'Int32' array allocation
+PAC2002	Info	code	Assets/Script/Debug/PerfMonitor.cs	373	'System.Text.StringBuilder' allocation
+PAC2004	Info	code	Assets/Script/Debug/PerfMonitor.cs	384	'Single' array allocation
+PAC2004	Info	code	Assets/Script/Debug/PerfMonitor.cs	385	'Single' array allocation
+PAC2004	Info	code	Assets/Script/Debug/PerfMonitor.cs	386	'Single' array allocation
+PAC2002	Info	code	Assets/Script/Debug/PerfMonitor.cs	78	'System.Text.StringBuilder' allocation
+PAC2004	Info	code	Assets/Script/Effect/EffectData.cs	65	'Sprite' array allocation
+PAC2004	Info	code	Assets/Script/Effect/EffectInstance.cs	82	'Renderer' array allocation
+PAC0026	Moderate	code	Assets/Script/Effect/EffectInstance.cs	86	'UnityEngine.Component.GetComponentsInChildren<UnityEngine.ParticleSystem>' usage
+PAC0026	Moderate	code	Assets/Script/Effect/EffectInstance.cs	87	'UnityEngine.Component.GetComponentsInChildren<UnityEngine.Animator>' usage
+PAC0026	Moderate	code	Assets/Script/Effect/EffectInstance.cs	88	'UnityEngine.Component.GetComponentsInChildren<IEffectFinishable>' usage
+PAC0026	Moderate	code	Assets/Script/Effect/EffectInstance.cs	89	'UnityEngine.Component.GetComponentsInChildren<UnityEngine.Renderer>' usage
+PAC2004	Info	code	Assets/Script/Effect/EffectInstance.cs	92	'Int32' array allocation
+PAC2004	Info	code	Assets/Script/Effect/EffectInstance.cs	93	'Int32' array allocation
+PAC2004	Info	code	Assets/Script/Effect/EffectInstance.cs	30	'ParticleSystem' array allocation
+PAC2004	Info	code	Assets/Script/Effect/EffectInstance.cs	31	'Animator' array allocation
+PAC2004	Info	code	Assets/Script/Effect/EffectInstance.cs	32	'IEffectFinishable' array allocation
+PAC2004	Info	code	Assets/Script/Effect/EffectInstance.cs	33	'Renderer' array allocation
+PAC2004	Info	code	Assets/Script/Effect/EffectInstance.cs	34	'Int32' array allocation
+PAC2004	Info	code	Assets/Script/Effect/EffectInstance.cs	35	'Int32' array allocation
+PAC2002	Moderate	code	Assets/Script/Effect/EffectManager.cs	46	'UnityEngine.GameObject' allocation
+PAC0225	Major	code	Assets/Script/Effect/EffectManager.cs	46	'UnityEngine.GameObject.AddComponent<EffectManager>' usage
+PAC2002	Info	code	Assets/Script/Effect/EffectManager.cs	64	'System.Action' allocation
+PAC2002	Info	code	Assets/Script/Effect/EffectManager.cs	65	'System.Action' allocation
+PAC2002	Info	code	Assets/Script/Effect/EffectManager.cs	211	'UnityEngine.Events.UnityAction`2<UnityEngine.SceneManagement.Scene,UnityEngine.SceneManagement.LoadSceneMode>' allocation
+PAC2002	Info	code	Assets/Script/Effect/EffectManager.cs	221	'UnityEngine.Events.UnityAction`2<UnityEngine.SceneManagement.Scene,UnityEngine.SceneManagement.LoadSceneMode>' allocation
+PAC0231	Major	code	Assets/Script/Effect/EffectManager.cs	266	'UnityEngine.Object.name' usage
+PAC1002	Moderate	code	Assets/Script/Effect/EffectManager.cs	266	'System.String.Concat' usage
+PAC0193	Moderate	code	Assets/Script/Effect/EffectManager.cs	266	Use of Debug.LogWarning in 'PlayInternal'
+PAC2002	Info	code	Assets/Script/Effect/EffectManager.cs	350	'System.Predicate`1<EffectInstance>' allocation
+PAC2002	Moderate	code	Assets/Script/Effect/EffectManager.cs	362	'System.Collections.Generic.List`1<EffectInstance>' allocation
+PAC2003	Moderate	code	Assets/Script/Effect/EffectManager.cs	0	Closure allocation in 'EffectManager.CreatePool'
+PAC2002	Moderate	code	Assets/Script/Effect/EffectManager.cs	386	'System.Func`1<EffectInstance>' allocation
+PAC2002	Moderate	code	Assets/Script/Effect/EffectManager.cs	386	'System.Action`1<EffectInstance>' allocation
+PAC2002	Moderate	code	Assets/Script/Effect/EffectManager.cs	386	'System.Action`1<EffectInstance>' allocation
+PAC2002	Moderate	code	Assets/Script/Effect/EffectManager.cs	386	'System.Action`1<EffectInstance>' allocation
+PAC2002	Moderate	code	Assets/Script/Effect/EffectManager.cs	386	'UnityEngine.Pool.ObjectPool`1<EffectInstance>' allocation
+PAC2002	Info	code	Assets/Script/Effect/EffectManager.cs	401	'UnityEngine.GameObject' allocation
+PAC0225	Moderate	code	Assets/Script/Effect/EffectManager.cs	402	'UnityEngine.GameObject.AddComponent<UnityEngine.SpriteRenderer>' usage
+PAC0224	Moderate	code	Assets/Script/Effect/EffectManager.cs	406	'UnityEngine.Object.Instantiate<UnityEngine.GameObject>' usage
+PAC0231	Moderate	code	Assets/Script/Effect/EffectManager.cs	407	'UnityEngine.Object.name' usage
+PAC0225	Moderate	code	Assets/Script/Effect/EffectManager.cs	414	'UnityEngine.GameObject.AddComponent<EffectInstance>' usage
+PAC2002	Info	code	Assets/Script/Effect/EffectManager.cs	87	'System.Collections.Generic.Dictionary`2<UnityEngine.GameObject,UnityEngine.Pool.ObjectPool`1<EffectInstance>>' allocation
+PAC2002	Info	code	Assets/Script/Effect/EffectManager.cs	91	'System.Collections.Generic.List`1<EffectInstance>' allocation
+PAC2002	Info	code	Assets/Script/Effect/EffectManager.cs	94	'System.Collections.Generic.Dictionary`2<EffectData,System.Single>' allocation
+PAC2002	Info	code	Assets/Script/Effect/EffectManager.cs	97	'System.Collections.Generic.HashSet`1<EffectData>' allocation
+PAC2002	Info	code	Assets/Script/Effect/EffectTrigger.cs	99	'System.Collections.Generic.List`1<EffectHandle>' allocation
+PAC2002	Info	code	Assets/Script/Effect/EffectTrigger.cs	144	'System.Func`2<EffectTiming,System.Boolean>' allocation
+PAC0231	Moderate	code	Assets/Script/Effect/EffectTrigger.cs	149	'UnityEngine.Object.name' usage
+PAC1002	Info	code	Assets/Script/Effect/EffectTrigger.cs	149	'System.String.Concat' usage
+PAC0193	Info	code	Assets/Script/Effect/EffectTrigger.cs	149	Use of Debug.LogWarning in 'Awake'
+PAC2002	Info	code	Assets/Script/Effect/EffectTrigger.cs	163	'System.Action`1<System.Int32>' allocation
+PAC2002	Info	code	Assets/Script/Effect/EffectTrigger.cs	164	'System.Action`1<System.Int32>' allocation
+PAC2002	Info	code	Assets/Script/Effect/EffectTrigger.cs	165	'System.Action' allocation
+PAC2002	Info	code	Assets/Script/Effect/EffectTrigger.cs	176	'System.Action`1<System.Int32>' allocation
+PAC2002	Info	code	Assets/Script/Effect/EffectTrigger.cs	177	'System.Action`1<System.Int32>' allocation
+PAC2002	Info	code	Assets/Script/Effect/EffectTrigger.cs	178	'System.Action' allocation
+PAC0231	Major	code	Assets/Script/Effect/EffectTrigger.cs	253	'UnityEngine.Object.name' usage
+PAC1002	Moderate	code	Assets/Script/Effect/EffectTrigger.cs	253	'System.String.Concat' usage
+PAC0193	Moderate	code	Assets/Script/Effect/EffectTrigger.cs	253	Use of Debug.LogWarning in 'Play'
+PAC2002	Moderate	code	Assets/Script/Effect/EffectTrigger.cs	347	'System.Predicate`1<EffectHandle>' allocation
+PAC2002	Info	code	Assets/Script/Effect/EffectTrigger.cs	131	'System.Collections.Generic.List`1<EffectTriggerEntry>' allocation
+PAC2002	Info	code	Assets/Script/Enemy/Attack/AttackData.cs	238	'AttackShape' allocation
+PAC2002	Info	code	Assets/Script/Enemy/Attack/AttackExecution.cs	38	'System.Collections.Generic.Dictionary`2<UnityEngine.Object,System.Single>' allocation
+PAC2002	Info	code	Assets/Script/Enemy/Attack/AttackExecution.cs	397	'System.Collections.Generic.List`1<AttackExecution/RainDrop>' allocation
+PAC0016	Moderate	code	Assets/Script/Enemy/Attack/AttackExecution.cs	298	'UnityEngine.Physics2D.RaycastAll' usage
+PAC0224	Moderate	code	Assets/Script/Enemy/Attack/AttackExecution.cs	375	'UnityEngine.Object.Instantiate<UnityEngine.GameObject>' usage
+PAC0028	Moderate	code	Assets/Script/Enemy/Attack/AttackExecution.cs	567	'UnityEngine.GameObject.GetComponentsInChildren<UnityEngine.Collider2D>' usage
+PAC0026	Major	code	Assets/Script/Enemy/Attack/AttackExecution.cs	636	'UnityEngine.Component.GetComponentsInChildren<UnityEngine.Collider2D>' usage
+PAC2004	Moderate	code	Assets/Script/Enemy/Attack/AttackExecution.cs	637	'PlayerCharacter' array allocation
+PAC0028	Major	code	Assets/Script/Enemy/Attack/AttackExecution.cs	641	'UnityEngine.GameObject.GetComponentsInChildren<UnityEngine.Collider2D>' usage
+PAC0026	Moderate	code	Assets/Script/Enemy/Attack/AttackExecution.cs	650	'UnityEngine.Component.GetComponentsInChildren<UnityEngine.Collider2D>' usage
+PAC2004	Info	code	Assets/Script/Enemy/Attack/AttackExecution.cs	651	'PlayerCharacter' array allocation
+PAC0028	Moderate	code	Assets/Script/Enemy/Attack/AttackExecution.cs	655	'UnityEngine.GameObject.GetComponentsInChildren<UnityEngine.Collider2D>' usage
+PAC2002	Info	code	Assets/Script/Enemy/Attack/AttackExecution.cs	400	'System.Collections.Generic.List`1<UnityEngine.Vector2>' allocation
+PAC0022	Major	code	Assets/Script/Enemy/Attack/AttackHits.cs	32	'UnityEngine.Physics2D.OverlapCircleAll' usage
+PAC2002	Moderate	code	Assets/Script/Enemy/Attack/AttackHits.cs	37	'System.Collections.Generic.HashSet`1<UnityEngine.Object>' allocation
+PAC0022	Moderate	code	Assets/Script/Enemy/Attack/AttackHits.cs	62	'UnityEngine.Physics2D.OverlapCircleAll' usage
+PAC2002	Info	code	Assets/Script/Enemy/Attack/AttackHits.cs	16	'System.Collections.Generic.List`1<UnityEngine.Collider2D>' allocation
+PAC2004	Moderate	code	Assets/Script/Enemy/Attack/AttackShape.cs	192	'Int32' array allocation
+PAC2002	Moderate	code	Assets/Script/Enemy/Attack/AttackShape.cs	205	'System.Collections.Generic.List`1<UnityEngine.Vector2>' allocation
+PAC2004	Moderate	code	Assets/Script/Enemy/Attack/AttackShape.cs	269	'Int32' array allocation
+PAC2004	Moderate	code	Assets/Script/Enemy/Attack/AttackShape.cs	307	'Int32' array allocation
+PAC2002	Info	code	Assets/Script/Enemy/Attack/PlacedBomb.cs	45	'UnityEngine.GameObject' allocation
+PAC0224	Moderate	code	Assets/Script/Enemy/Attack/PlacedBomb.cs	45	'UnityEngine.Object.Instantiate<UnityEngine.GameObject>' usage
+PAC0225	Moderate	code	Assets/Script/Enemy/Attack/PlacedBomb.cs	50	'UnityEngine.GameObject.AddComponent<PlacedBomb>' usage
+PAC0225	Moderate	code	Assets/Script/Enemy/Attack/PlacedBomb.cs	62	'UnityEngine.GameObject.AddComponent<UnityEngine.CircleCollider2D>' usage
+PAC0225	Moderate	code	Assets/Script/Enemy/Attack/PlacedBomb.cs	69	'UnityEngine.GameObject.AddComponent<DamageReceiver>' usage
+PAC2002	Info	code	Assets/Script/Enemy/Attack/PlacedBomb.cs	70	'System.Action`1<DamageInfo>' allocation
+PAC2002	Moderate	code	Assets/Script/Enemy/Attack/TelegraphView.cs	76	'AttackShape' allocation
+PAC2002	Moderate	code	Assets/Script/Enemy/Attack/TelegraphView.cs	92	'UnityEngine.GameObject' allocation
+PAC0225	Major	code	Assets/Script/Enemy/Attack/TelegraphView.cs	94	'UnityEngine.GameObject.AddComponent<TelegraphView>' usage
+PAC2002	Moderate	code	Assets/Script/Enemy/Attack/TelegraphView.cs	103	'UnityEngine.GameObject' allocation
+PAC2002	Moderate	code	Assets/Script/Enemy/Attack/TelegraphView.cs	105	'TelegraphView/Part' allocation
+PAC2002	Moderate	code	Assets/Script/Enemy/Attack/TelegraphView.cs	105	'UnityEngine.Mesh' allocation
+PAC0225	Major	code	Assets/Script/Enemy/Attack/TelegraphView.cs	105	'UnityEngine.GameObject.AddComponent<UnityEngine.MeshRenderer>' usage
+PAC0225	Major	code	Assets/Script/Enemy/Attack/TelegraphView.cs	112	'UnityEngine.GameObject.AddComponent<UnityEngine.MeshFilter>' usage
+PAC2002	Moderate	code	Assets/Script/Enemy/Attack/TelegraphView.cs	124	'UnityEngine.Material' allocation
+PAC2002	Moderate	code	Assets/Script/Enemy/Attack/TelegraphView.cs	133	'UnityEngine.Material' allocation
+PAC2002	Info	code	Assets/Script/Enemy/Attack/TelegraphView.cs	24	'System.Collections.Generic.Stack`1<TelegraphView>' allocation
+PAC2002	Info	code	Assets/Script/Enemy/Attack/TelegraphView.cs	158	'System.Collections.Generic.List`1<UnityEngine.Vector3>' allocation
+PAC2002	Info	code	Assets/Script/Enemy/Attack/TelegraphView.cs	159	'System.Collections.Generic.List`1<System.Int32>' allocation
+PAC2002	Info	code	Assets/Script/Enemy/Attack/TelegraphView.cs	160	'System.Collections.Generic.List`1<UnityEngine.Color>' allocation
+PAC2002	Info	code	Assets/Script/Enemy/AttackEmitter.cs	36	'GameCondition' allocation
+PAC2002	Info	code	Assets/Script/Enemy/Battle/BattleArea.cs	103	'System.Collections.Generic.List`1<Enemy>' allocation
+PAC2002	Info	code	Assets/Script/Enemy/Battle/BattleArea.cs	106	'System.Collections.Generic.List`1<WaveSpawn>' allocation
+PAC2000	Moderate	code	Assets/Script/Enemy/Battle/BattleArea.cs	316	Conversion from value type 'float' to ref type
+PAC2000	Moderate	code	Assets/Script/Enemy/Battle/BattleArea.cs	317	Conversion from value type 'float' to ref type
+PAC1002	Info	code	Assets/Script/Enemy/Battle/BattleArea.cs	317	'System.String.Concat' usage
+PAC2000	Moderate	code	Assets/Script/Enemy/Battle/BattleArea.cs	318	Conversion from value type 'float' to ref type
+PAC1002	Info	code	Assets/Script/Enemy/Battle/BattleArea.cs	318	'System.String.Concat' usage
+PAC2000	Moderate	code	Assets/Script/Enemy/Battle/BattleArea.cs	319	Conversion from value type 'Int32' to ref type
+PAC1002	Info	code	Assets/Script/Enemy/Battle/BattleArea.cs	319	'System.String.Concat' usage
+PAC2000	Moderate	code	Assets/Script/Enemy/Battle/BattleArea.cs	320	Conversion from value type 'Int32' to ref type
+PAC2000	Moderate	code	Assets/Script/Enemy/Battle/BattleArea.cs	320	Conversion from value type 'Int32' to ref type
+PAC1002	Info	code	Assets/Script/Enemy/Battle/BattleArea.cs	320	'System.String.Concat' usage
+PAC2002	Moderate	code	Assets/Script/Enemy/Battle/BattleArea.cs	481	'System.Collections.Generic.List`1<System.String>' allocation
+PAC2000	Major	code	Assets/Script/Enemy/Battle/BattleArea.cs	489	Conversion from value type 'Int32' to ref type
+PAC2000	Major	code	Assets/Script/Enemy/Battle/BattleArea.cs	494	Conversion from value type 'Int32' to ref type
+PAC2000	Major	code	Assets/Script/Enemy/Battle/BattleArea.cs	499	Conversion from value type 'Int32' to ref type
+PAC2000	Major	code	Assets/Script/Enemy/Battle/BattleArea.cs	499	Conversion from value type 'Int32' to ref type
+PAC2000	Major	code	Assets/Script/Enemy/Battle/BattleArea.cs	500	Conversion from value type 'Int32' to ref type
+PAC0231	Moderate	code	Assets/Script/Enemy/Battle/BattleArea.cs	783	'UnityEngine.Object.name' usage
+PAC0231	Moderate	code	Assets/Script/Enemy/Battle/BattleArea.cs	784	'UnityEngine.Object.name' usage
+PAC1002	Info	code	Assets/Script/Enemy/Battle/BattleArea.cs	784	'System.String.Concat' usage
+PAC1002	Info	code	Assets/Script/Enemy/Battle/BattleArea.cs	786	'System.String.Concat' usage
+PAC2002	Info	code	Assets/Script/Enemy/Battle/BattleArea.cs	159	'System.Collections.Generic.List`1<Enemy>' allocation
+PAC2002	Info	code	Assets/Script/Enemy/Battle/BattleArea.cs	163	'System.Collections.Generic.List`1<AttackEmitter>' allocation
+PAC2002	Info	code	Assets/Script/Enemy/Battle/BattleArea.cs	170	'System.Collections.Generic.List`1<BattleWave>' allocation
+PAC2002	Info	code	Assets/Script/Enemy/Battle/BattleArea.cs	330	'System.Collections.Generic.List`1<Enemy>' allocation
+PAC2002	Info	code	Assets/Script/Enemy/Battle/BattleArea.cs	331	'System.Collections.Generic.List`1<Enemy>' allocation
+PAC2002	Info	code	Assets/Script/Enemy/Battle/BattleArea.cs	275	'System.Collections.Generic.List`1<BattleArea>' allocation
+PAC0193	Moderate	code	Assets/Script/Enemy/Battle/BattleHud.cs	71	Use of Debug.LogWarning in 'Get'
+PAC0224	Major	code	Assets/Script/Enemy/Battle/BattleHud.cs	76	'UnityEngine.Object.Instantiate<UnityEngine.GameObject>' usage
+PAC0231	Major	code	Assets/Script/Enemy/Battle/BattleHud.cs	77	'UnityEngine.Object.name' usage
+PAC2000	Moderate	code	Assets/Script/Enemy/Battle/EnemyGroup.cs	146	Conversion from value type 'Int32' to ref type
+PAC2000	Moderate	code	Assets/Script/Enemy/Battle/EnemyGroup.cs	146	Conversion from value type 'Int32' to ref type
+PAC0231	Moderate	code	Assets/Script/Enemy/Battle/EnemyGroup.cs	147	'UnityEngine.Object.name' usage
+PAC1002	Info	code	Assets/Script/Enemy/Battle/EnemyGroup.cs	147	'System.String.Concat' usage
+PAC2003	Info	code	Assets/Script/Enemy/Battle/EnemyGroup.cs	0	Closure allocation in 'EnemyGroup.Start'
+PAC2002	Info	code	Assets/Script/Enemy/Battle/EnemyGroup.cs	176	'System.Func`2<DamageInfo,DamageInfo>' allocation
+PAC2002	Info	code	Assets/Script/Enemy/Battle/EnemyGroup.cs	186	'System.Action`1<DamageInfo>' allocation
+PAC2002	Moderate	code	Assets/Script/Enemy/Battle/EnemyGroup.cs	265	'AttackShape' allocation
+PAC0231	Moderate	code	Assets/Script/Enemy/Battle/EnemyGroup.cs	346	'UnityEngine.Object.name' usage
+PAC0231	Moderate	code	Assets/Script/Enemy/Battle/EnemyGroup.cs	347	'UnityEngine.Object.name' usage
+PAC1002	Info	code	Assets/Script/Enemy/Battle/EnemyGroup.cs	347	'System.String.Concat' usage
+PAC1002	Info	code	Assets/Script/Enemy/Battle/EnemyGroup.cs	349	'System.String.Concat' usage
+PAC2002	Info	code	Assets/Script/Enemy/Battle/EnemyGroup.cs	55	'System.Collections.Generic.List`1<Enemy>' allocation
+PAC2002	Info	code	Assets/Script/Enemy/Battle/EnemyGroup.cs	112	'System.Collections.Generic.Dictionary`2<Enemy,TelegraphView>' allocation
+PAC2002	Info	code	Assets/Script/Enemy/Battle/EnemyGroup.cs	113	'System.Collections.Generic.HashSet`1<Enemy>' allocation
+PAC2002	Info	code	Assets/Script/Enemy/Defeat/DefeatedTalk.cs	22	'UnityEngine.GameObject' allocation
+PAC0225	Moderate	code	Assets/Script/Enemy/Defeat/DefeatedTalk.cs	25	'UnityEngine.GameObject.AddComponent<UnityEngine.CircleCollider2D>' usage
+PAC0225	Moderate	code	Assets/Script/Enemy/Defeat/DefeatedTalk.cs	29	'UnityEngine.GameObject.AddComponent<DefeatedTalk>' usage
+PAC1002	Info	code	Assets/Script/Enemy/Defeat/DroppedItem.cs	27	'System.String.Concat' usage
+PAC2002	Info	code	Assets/Script/Enemy/Defeat/DroppedItem.cs	27	'UnityEngine.GameObject' allocation
+PAC0225	Moderate	code	Assets/Script/Enemy/Defeat/DroppedItem.cs	30	'UnityEngine.GameObject.AddComponent<UnityEngine.SpriteRenderer>' usage
+PAC0225	Moderate	code	Assets/Script/Enemy/Defeat/DroppedItem.cs	40	'UnityEngine.GameObject.AddComponent<UnityEngine.CircleCollider2D>' usage
+PAC0225	Moderate	code	Assets/Script/Enemy/Defeat/DroppedItem.cs	44	'UnityEngine.GameObject.AddComponent<DroppedItem>' usage
+PAC0033	Moderate	code	Assets/Script/Enemy/Defeat/DroppedItem.cs	74	'UnityEngine.MonoBehaviour.OnTriggerStay2D' usage
+PAC0224	Major	code	Assets/Script/Enemy/Enemy.cs	233	'UnityEngine.Object.Instantiate<UnityEngine.GameObject>' usage
+PAC0231	Moderate	code	Assets/Script/Enemy/Enemy.cs	427	'UnityEngine.Object.name' usage
+PAC1002	Info	code	Assets/Script/Enemy/Enemy.cs	427	'System.String.Concat' usage
+PAC2002	Info	code	Assets/Script/Enemy/Enemy.cs	432	'System.Func`2<DamageInfo,DamageInfo>' allocation
+PAC2002	Info	code	Assets/Script/Enemy/Enemy.cs	435	'System.Action`1<DamageInfo>' allocation
+PAC0225	Moderate	code	Assets/Script/Enemy/Enemy.cs	438	'UnityEngine.GameObject.AddComponent<EnemyLook>' usage
+PAC0231	Moderate	code	Assets/Script/Enemy/Enemy.cs	455	'UnityEngine.Object.name' usage
+PAC0231	Moderate	code	Assets/Script/Enemy/Enemy.cs	456	'UnityEngine.Object.name' usage
+PAC1002	Info	code	Assets/Script/Enemy/Enemy.cs	456	'System.String.Concat' usage
+PAC1002	Info	code	Assets/Script/Enemy/Enemy.cs	458	'System.String.Concat' usage
+PAC2002	Info	code	Assets/Script/Enemy/Enemy.cs	518	'System.Action' allocation
+PAC2002	Info	code	Assets/Script/Enemy/Enemy.cs	524	'System.Action' allocation
+PAC0026	Moderate	code	Assets/Script/Enemy/Enemy.cs	801	'UnityEngine.Component.GetComponentsInChildren<UnityEngine.Collider2D>' usage
+PAC0026	Moderate	code	Assets/Script/Enemy/Enemy.cs	876	'UnityEngine.Component.GetComponentsInChildren<UnityEngine.Collider2D>' usage
+PAC0026	Moderate	code	Assets/Script/Enemy/Enemy.cs	880	'UnityEngine.Component.GetComponentsInChildren<EnemyPart>' usage
+PAC0026	Moderate	code	Assets/Script/Enemy/Enemy.cs	882	'UnityEngine.Component.GetComponentsInChildren<UnityEngine.Renderer>' usage
+PAC2002	Info	code	Assets/Script/Enemy/Enemy.cs	100	'System.Collections.Generic.List`1<UnityEngine.Vector2>' allocation
+PAC2002	Info	code	Assets/Script/Enemy/Enemy.cs	157	'System.Collections.Generic.HashSet`1<System.String>' allocation
+PAC2002	Info	code	Assets/Script/Enemy/Enemy.cs	158	'System.Collections.Generic.HashSet`1<AttackData>' allocation
+PAC2002	Info	code	Assets/Script/Enemy/Enemy.cs	89	'System.Collections.Generic.List`1<Enemy>' allocation
+PAC0231	Moderate	code	Assets/Script/Enemy/EnemyData.cs	152	'UnityEngine.Object.name' usage
+PAC2002	Info	code	Assets/Script/Enemy/EnemyData.cs	62	'System.Collections.Generic.List`1<DamageRule>' allocation
+PAC2002	Info	code	Assets/Script/Enemy/EnemyData.cs	79	'System.Collections.Generic.List`1<DamageRule>' allocation
+PAC2002	Info	code	Assets/Script/Enemy/EnemyData.cs	94	'System.Collections.Generic.List`1<EnemyLookRule>' allocation
+PAC2002	Info	code	Assets/Script/Enemy/EnemyData.cs	140	'System.Collections.Generic.List`1<EnemyDrop>' allocation
+PAC0192	Info	code	Assets/Script/Enemy/EnemyDead.cs	40	Use of Debug.Log in 'Awake'
+PAC2002	Info	code	Assets/Script/Enemy/EnemyDead.cs	45	'System.Action' allocation
+PAC2002	Info	code	Assets/Script/Enemy/EnemyDead.cs	50	'System.Action' allocation
+PAC0192	Info	code	Assets/Script/Enemy/EnemyDead.cs	58	Use of Debug.Log in 'OnEnemyDied'
+PAC0026	Moderate	code	Assets/Script/Enemy/EnemyDead.cs	83	'UnityEngine.Component.GetComponentsInChildren<UnityEngine.Collider2D>' usage
+PAC2003	Info	code	Assets/Script/Enemy/EnemyEgg.cs	0	Closure allocation in 'EnemyEgg.Create'
+PAC1002	Info	code	Assets/Script/Enemy/EnemyEgg.cs	34	'System.String.Concat' usage
+PAC2002	Info	code	Assets/Script/Enemy/EnemyEgg.cs	34	'UnityEngine.GameObject' allocation
+PAC0225	Moderate	code	Assets/Script/Enemy/EnemyEgg.cs	39	'UnityEngine.GameObject.AddComponent<UnityEngine.CircleCollider2D>' usage
+PAC0225	Moderate	code	Assets/Script/Enemy/EnemyEgg.cs	41	'UnityEngine.GameObject.AddComponent<UnityEngine.Rigidbody2D>' usage
+PAC0225	Moderate	code	Assets/Script/Enemy/EnemyEgg.cs	44	'UnityEngine.GameObject.AddComponent<EnemyEgg>' usage
+PAC0225	Moderate	code	Assets/Script/Enemy/EnemyEgg.cs	51	'UnityEngine.GameObject.AddComponent<Health>' usage
+PAC2002	Info	code	Assets/Script/Enemy/EnemyEgg.cs	53	'System.Action' allocation
+PAC2002	Info	code	Assets/Script/Enemy/EnemyEgg.cs	54	'System.Action`1<System.Int32>' allocation
+PAC0225	Moderate	code	Assets/Script/Enemy/EnemyEgg.cs	58	'UnityEngine.GameObject.AddComponent<UnityEngine.SpriteRenderer>' usage
+PAC2002	Info	code	Assets/Script/Enemy/EnemyLook.cs	100	'DamageRule' allocation
+PAC2002	Info	code	Assets/Script/Enemy/EnemyLook.cs	73	'GameCondition' allocation
+PAC2002	Info	code	Assets/Script/Enemy/EnemyLook.cs	136	'System.Action`1<DamageInfo>' allocation
+PAC2002	Info	code	Assets/Script/Enemy/EnemyLook.cs	142	'System.Action`1<DamageInfo>' allocation
+PAC2004	Moderate	code	Assets/Script/Enemy/EnemyLook.cs	150	'Boolean' array allocation
+PAC2004	Moderate	code	Assets/Script/Enemy/EnemyLook.cs	151	'Single' array allocation
+PAC2004	Info	code	Assets/Script/Enemy/EnemyLook.cs	119	'Boolean' array allocation
+PAC2004	Info	code	Assets/Script/Enemy/EnemyLook.cs	120	'Single' array allocation
+PAC2002	Info	code	Assets/Script/Enemy/Gimmick/AttackSwitch.cs	94	'System.Action`1<DamageInfo>' allocation
+PAC2002	Info	code	Assets/Script/Enemy/Gimmick/AttackSwitch.cs	109	'System.Action`1<DamageInfo>' allocation
+PAC2002	Info	code	Assets/Script/Enemy/Gimmick/AttackSwitch.cs	116	'DamageRule' allocation
+PAC1002	Info	code	Assets/Script/Enemy/Gimmick/AttackSwitch.cs	154	'System.String.Concat' usage
+PAC0231	Moderate	code	Assets/Script/Enemy/Gimmick/AttackSwitch.cs	159	'UnityEngine.Object.name' usage
+PAC0231	Moderate	code	Assets/Script/Enemy/Gimmick/AttackSwitch.cs	160	'UnityEngine.Object.name' usage
+PAC1002	Info	code	Assets/Script/Enemy/Gimmick/AttackSwitch.cs	160	'System.String.Concat' usage
+PAC2002	Info	code	Assets/Script/Enemy/Gimmick/EnemyCommandEventAction.cs	49	'System.Collections.Generic.List`1<Enemy>' allocation
+PAC2002	Info	code	Assets/Script/Enemy/Gimmick/EnemyCommandEventAction.cs	53	'System.Collections.Generic.List`1<AttackEmitter>' allocation
+PAC2002	Info	code	Assets/Script/Enemy/Gimmick/EnemyDamageEventAction.cs	22	'System.Collections.Generic.List`1<Enemy>' allocation
+PAC2002	Info	code	Assets/Script/Enemy/Gimmick/EnemyDamageEventAction.cs	26	'System.Collections.Generic.List`1<DamageReceiver>' allocation
+PAC2002	Moderate	code	Assets/Script/Enemy/Navigation/NavMesh2D.cs	99	'UnityEngine.GameObject' allocation
+PAC0225	Major	code	Assets/Script/Enemy/Navigation/NavMesh2D.cs	100	'UnityEngine.GameObject.AddComponent<NavMesh2D>' usage
+PAC2002	Info	code	Assets/Script/Enemy/Navigation/NavMesh2D.cs	164	'UnityEngine.AI.NavMeshPath' allocation
+PAC2002	Moderate	code	Assets/Script/Enemy/Navigation/NavMesh2D.cs	220	'System.Action`1<UnityEngine.AsyncOperation>' allocation
+PAC2002	Info	code	Assets/Script/Enemy/Navigation/NavMesh2D.cs	287	'System.Collections.Generic.List`1<UnityEngine.Vector2>' allocation
+PAC2002	Moderate	code	Assets/Script/Enemy/Navigation/NavMesh2D.cs	323	'NavMesh2D/Layer' allocation
+PAC2002	Moderate	code	Assets/Script/Enemy/Navigation/NavMesh2D.cs	408	'System.Collections.Generic.List`1<UnityEngine.AI.NavMeshBuildSource>' allocation
+PAC2002	Moderate	code	Assets/Script/Enemy/Navigation/NavMesh2D.cs	409	'System.Collections.Generic.HashSet`1<UnityEngine.Collider2D>' allocation
+PAC2002	Moderate	code	Assets/Script/Enemy/Navigation/NavMesh2D.cs	410	'System.Collections.Generic.List`1<UnityEngine.Bounds>' allocation
+PAC2002	Moderate	code	Assets/Script/Enemy/Navigation/NavMesh2D.cs	450	'System.Collections.Generic.List`1<UnityEngine.Collider2D>' allocation
+PAC2002	Moderate	code	Assets/Script/Enemy/Navigation/NavMesh2D.cs	636	'UnityEngine.GameObject' allocation
+PAC2002	Moderate	code	Assets/Script/Enemy/Navigation/NavMesh2D.cs	639	'UnityEngine.Mesh' allocation
+PAC0225	Major	code	Assets/Script/Enemy/Navigation/NavMesh2D.cs	641	'UnityEngine.GameObject.AddComponent<UnityEngine.MeshFilter>' usage
+PAC0225	Major	code	Assets/Script/Enemy/Navigation/NavMesh2D.cs	643	'UnityEngine.GameObject.AddComponent<UnityEngine.MeshRenderer>' usage
+PAC2002	Moderate	code	Assets/Script/Enemy/Navigation/NavMesh2D.cs	646	'UnityEngine.Material' allocation
+PAC2004	Info	code	Assets/Script/Enemy/Navigation/NavMesh2D.cs	122	'Layer' array allocation
+PAC2002	Info	code	Assets/Script/Enemy/Navigation/NavMesh2D.cs	125	'System.Collections.Generic.List`1<UnityEngine.AI.NavMeshBuildSource>' allocation
+PAC2002	Info	code	Assets/Script/Enemy/Navigation/NavMesh2D.cs	127	'System.Collections.Generic.Dictionary`2<UnityEngine.Collider2D,NavMesh2D/CachedMesh>' allocation
+PAC2004	Info	code	Assets/Script/Enemy/Navigation/NavMesh2D.cs	143	'Vector3' array allocation
+PAC2002	Info	code	Assets/Script/Enemy/Navigation/NavMesh2D.cs	560	'System.Collections.Generic.List`1<UnityEngine.Vector3>' allocation
+PAC2002	Info	code	Assets/Script/Enemy/Navigation/NavMesh2D.cs	561	'System.Collections.Generic.List`1<UnityEngine.Vector3>' allocation
+PAC2002	Info	code	Assets/Script/Enemy/Navigation/NavMesh2D.cs	562	'System.Collections.Generic.List`1<UnityEngine.Color>' allocation
+PAC2002	Info	code	Assets/Script/Enemy/Navigation/NavMesh2D.cs	563	'System.Collections.Generic.List`1<System.Int32>' allocation
+PAC2004	Info	code	Assets/Script/Enemy/Navigation/NavMesh2D.cs	53	'Single' array allocation
+PAC2002	Info	code	Assets/Script/Enemy/Parts/EnemyPart.cs	144	'System.Func`2<DamageInfo,System.Boolean>' allocation
+PAC0231	Moderate	code	Assets/Script/Enemy/Parts/EnemyPart.cs	152	'UnityEngine.Object.name' usage
+PAC1002	Info	code	Assets/Script/Enemy/Parts/EnemyPart.cs	152	'System.String.Concat' usage
+PAC0193	Info	code	Assets/Script/Enemy/Parts/EnemyPart.cs	152	Use of Debug.LogWarning in 'Awake'
+PAC0026	Moderate	code	Assets/Script/Enemy/Parts/EnemyPart.cs	238	'UnityEngine.Component.GetComponentsInChildren<UnityEngine.Collider2D>' usage
+PAC0026	Moderate	code	Assets/Script/Enemy/Parts/EnemyPart.cs	239	'UnityEngine.Component.GetComponentsInChildren<UnityEngine.Renderer>' usage
+PAC2002	Info	code	Assets/Script/Enemy/Parts/EnemyPart.cs	61	'System.Collections.Generic.List`1<DamageRule>' allocation
+PAC2002	Info	code	Assets/Script/Enemy/Parts/EnemyPart.cs	83	'System.Collections.Generic.List`1<AttackData>' allocation
+PAC2002	Info	code	Assets/Script/Enemy/Parts/EnemyPart.cs	106	'GameCondition' allocation
+PAC2000	Moderate	code	Assets/Script/Enemy/Pattern/EnemyActions.cs	130	Conversion from value type 'float' to ref type
+PAC2000	Moderate	code	Assets/Script/Enemy/Pattern/EnemyActions.cs	130	Conversion from value type 'float' to ref type
+PAC2000	Moderate	code	Assets/Script/Enemy/Pattern/EnemyActions.cs	130	Conversion from value type 'float' to ref type
+PAC2000	Moderate	code	Assets/Script/Enemy/Pattern/EnemyActions.cs	158	Conversion from value type 'float' to ref type
+PAC2000	Moderate	code	Assets/Script/Enemy/Pattern/EnemyActions.cs	158	Conversion from value type 'float' to ref type
+PAC2000	Moderate	code	Assets/Script/Enemy/Pattern/EnemyActions.cs	201	Conversion from value type 'float' to ref type
+PAC2000	Moderate	code	Assets/Script/Enemy/Pattern/EnemyActions.cs	201	Conversion from value type 'float' to ref type
+PAC2000	Moderate	code	Assets/Script/Enemy/Pattern/EnemyActions.cs	305	Conversion from value type 'float' to ref type
+PAC2000	Moderate	code	Assets/Script/Enemy/Pattern/EnemyActions.cs	305	Conversion from value type 'Int32' to ref type
+PAC0231	Moderate	code	Assets/Script/Enemy/Pattern/EnemyActions.cs	354	'UnityEngine.Object.name' usage
+PAC2000	Moderate	code	Assets/Script/Enemy/Pattern/EnemyActions.cs	354	Conversion from value type 'Int32' to ref type
+PAC1002	Info	code	Assets/Script/Enemy/Pattern/EnemyActions.cs	354	'System.String.Concat' usage
+PAC2000	Moderate	code	Assets/Script/Enemy/Pattern/EnemyActions.cs	426	Conversion from value type 'float' to ref type
+PAC2000	Moderate	code	Assets/Script/Enemy/Pattern/EnemyActions.cs	702	Conversion from value type 'Int32' to ref type
+PAC2002	Info	code	Assets/Script/Enemy/Pattern/EnemyBrain.cs	72	'System.Action' allocation
+PAC2002	Info	code	Assets/Script/Enemy/Pattern/EnemyBrain.cs	79	'System.Action' allocation
+PAC2002	Info	code	Assets/Script/Enemy/Pattern/EnemyBrain.cs	32	'System.Collections.Generic.List`1<UnityEngine.Transform>' allocation
+PAC2002	Info	code	Assets/Script/Enemy/Pattern/EnemyPattern.cs	60	'System.Collections.Generic.List`1<EnemyAction>' allocation
+PAC2002	Info	code	Assets/Script/Enemy/Pattern/EnemyPattern.cs	74	'GameCondition' allocation
+PAC2002	Info	code	Assets/Script/Enemy/Pattern/EnemyPattern.cs	108	'System.Collections.Generic.List`1<EnemyPhase>' allocation
+PAC2002	Info	code	Assets/Script/Enemy/Pattern/EnemyPattern.cs	108	'EnemyPhase' allocation
+PAC1002	Info	code	Assets/Script/Enemy/Pattern/PatternRunner.cs	127	'System.String.Concat' usage
+PAC1002	Info	code	Assets/Script/Enemy/Pattern/PatternRunner.cs	133	'System.String.Concat' usage
+PAC2002	Info	code	Assets/Script/Enemy/Pattern/PatternRunner.cs	310	'System.Collections.Generic.List`1<EnemyAction>' allocation
+PAC2002	Info	code	Assets/Script/Enemy/Pattern/PatternRunner.cs	409	'AttackExecution' allocation
+PAC2002	Info	code	Assets/Script/Enemy/Pattern/PatternRunner.cs	429	'AttackAction' allocation
+PAC2002	Info	code	Assets/Script/Enemy/Pattern/PatternRunner.cs	458	'System.Predicate`1<Enemy>' allocation
+PAC0015	Moderate	code	Assets/Script/Enemy/Pattern/PatternRunner.cs	556	'UnityEngine.Physics2D.LinecastAll' usage
+PAC2002	Info	code	Assets/Script/Enemy/Pattern/PatternRunner.cs	43	'System.Collections.Generic.List`1<Enemy>' allocation
+PAC2002	Info	code	Assets/Script/Event/Actions/ScreenFadeEventAction.cs	109	'UnityEngine.GameObject' allocation
+PAC0225	Moderate	code	Assets/Script/Event/Actions/ScreenFadeEventAction.cs	110	'UnityEngine.GameObject.AddComponent<ScreenCurtain>' usage
+PAC0225	Moderate	code	Assets/Script/Event/Actions/ScreenFadeEventAction.cs	112	'UnityEngine.GameObject.AddComponent<UnityEngine.Canvas>' usage
+PAC2002	Info	code	Assets/Script/Event/Actions/ScreenFadeEventAction.cs	116	'UnityEngine.GameObject' allocation
+PAC0225	Moderate	code	Assets/Script/Event/Actions/ScreenFadeEventAction.cs	118	'UnityEngine.GameObject.AddComponent<UnityEngine.UI.Image>' usage
+PAC0231	Moderate	code	Assets/Script/Event/Actions/SetActiveEventAction.cs	67	'UnityEngine.Object.name' usage
+PAC1002	Info	code	Assets/Script/Event/Actions/SetActiveEventAction.cs	67	'System.String.Concat' usage
+PAC0193	Info	code	Assets/Script/Event/Actions/SetActiveEventAction.cs	67	Use of Debug.LogWarning in 'SetAll'
+PAC2002	Info	code	Assets/Script/Event/Actions/SetActiveEventAction.cs	21	'System.Collections.Generic.List`1<UnityEngine.GameObject>' allocation
+PAC2002	Info	code	Assets/Script/Event/Actions/SetActiveEventAction.cs	24	'System.Collections.Generic.List`1<UnityEngine.GameObject>' allocation
+PAC0231	Moderate	code	Assets/Script/Event/Actions/SpriteChangeEventAction.cs	55	'UnityEngine.Object.name' usage
+PAC1002	Info	code	Assets/Script/Event/Actions/SpriteChangeEventAction.cs	55	'System.String.Concat' usage
+PAC0193	Info	code	Assets/Script/Event/Actions/SpriteChangeEventAction.cs	55	Use of Debug.LogWarning in 'Change'
+PAC0231	Major	code	Assets/Script/Event/EventProcess/EventSequence.cs	98	'UnityEngine.Object.name' usage
+PAC1002	Moderate	code	Assets/Script/Event/EventProcess/EventSequence.cs	98	'System.String.Concat' usage
+PAC0193	Moderate	code	Assets/Script/Event/EventProcess/EventSequence.cs	98	Use of Debug.LogWarning in 'Play'
+PAC2002	Info	code	Assets/Script/Event/EventProcess/EventSequence.cs	45	'System.Collections.Generic.List`1<EventAction>' allocation
+PAC0231	Moderate	code	Assets/Script/Event/SceneStartEvent.cs	47	'UnityEngine.Object.name' usage
+PAC1002	Info	code	Assets/Script/Event/SceneStartEvent.cs	47	'System.String.Concat' usage
+PAC0193	Info	code	Assets/Script/Event/SceneStartEvent.cs	47	Use of Debug.LogWarning in 'Awake'
+PAC2002	Info	code	Assets/Script/Event/SceneStartEvent.cs	28	'GameCondition' allocation
+PAC0231	Moderate	code	Assets/Script/Flag/FlagSwitch.cs	53	'UnityEngine.Object.name' usage
+PAC1002	Info	code	Assets/Script/Flag/FlagSwitch.cs	53	'System.String.Concat' usage
+PAC0193	Info	code	Assets/Script/Flag/FlagSwitch.cs	53	Use of Debug.LogWarning in 'Start'
+PAC2002	Info	code	Assets/Script/Flag/FlagSwitch.cs	56	'System.Action' allocation
+PAC2002	Info	code	Assets/Script/Flag/FlagSwitch.cs	59	'System.Action' allocation
+PAC2002	Info	code	Assets/Script/Flag/FlagSwitch.cs	66	'System.Action' allocation
+PAC2002	Info	code	Assets/Script/Flag/FlagSwitch.cs	67	'System.Action' allocation
+PAC2002	Info	code	Assets/Script/Flag/FlagSwitch.cs	29	'System.Collections.Generic.List`1<FlagCondition>' allocation
+PAC2002	Info	code	Assets/Script/Flag/FlagSwitch.cs	32	'System.Collections.Generic.List`1<ItemCondition>' allocation
+PAC2002	Info	code	Assets/Script/Flag/FlagSwitch.cs	37	'System.Collections.Generic.List`1<UnityEngine.GameObject>' allocation
+PAC2002	Info	code	Assets/Script/Flag/FlagSwitch.cs	40	'System.Collections.Generic.List`1<UnityEngine.GameObject>' allocation
+PAC0231	Major	code	Assets/Script/Flag/GameFlag.cs	43	'UnityEngine.Object.name' usage
+PAC1002	Moderate	code	Assets/Script/Flag/GameFlags.cs	58	'System.String.Concat' usage
+PAC1002	Moderate	code	Assets/Script/Flag/GameFlags.cs	71	'System.String.Concat' usage
+PAC1002	Moderate	code	Assets/Script/Flag/GameFlags.cs	76	'System.String.Concat' usage
+PAC0192	Moderate	code	Assets/Script/Flag/GameFlags.cs	76	Use of Debug.Log in 'Set'
+PAC2002	Moderate	code	Assets/Script/Flag/GameFlags.cs	102	'System.Collections.Generic.HashSet`1<System.String>' allocation
+PAC2002	Info	code	Assets/Script/Flag/GameFlags.cs	36	'System.Collections.Generic.HashSet`1<System.String>' allocation
+PAC2002	Info	code	Assets/Script/Flag/SetFlagEventAction.cs	81	'SetFlagEventAction/Entry' allocation
+PAC2002	Info	code	Assets/Script/Flag/SetFlagEventAction.cs	38	'System.Collections.Generic.List`1<SetFlagEventAction/Entry>' allocation
+PAC2001	Major	code	Assets/Script/Fps/Fps.cs	27	MonoBehaviour method 'Update' is empty
+PAC2004	Info	code	Assets/Script/Gimmick/CodeLock.cs	95	'Int32' array allocation
+PAC2002	Info	code	Assets/Script/Gimmick/CodeLock.cs	96	'System.Action`1<System.Int32[]>' allocation
+PAC2002	Info	code	Assets/Script/Gimmick/Death/DeathTrap.cs	26	'GameCondition' allocation
+PAC1002	Info	code	Assets/Script/Gimmick/ExamineSequence.cs	72	'System.String.Concat' usage
+PAC0231	Moderate	code	Assets/Script/Gimmick/ExamineSequence.cs	107	'UnityEngine.Object.name' usage
+PAC0231	Moderate	code	Assets/Script/Gimmick/ExamineSequence.cs	108	'UnityEngine.Object.name' usage
+PAC1002	Info	code	Assets/Script/Gimmick/ExamineSequence.cs	108	'System.String.Concat' usage
+PAC2002	Info	code	Assets/Script/Gimmick/ExamineSequence.cs	39	'System.Collections.Generic.List`1<EventSequence>' allocation
+PAC2002	Moderate	code	Assets/Script/Gimmick/FloorSwitch.cs	137	'System.Collections.Generic.HashSet`1<UnityEngine.GameObject>' allocation
+PAC2002	Info	code	Assets/Script/Gimmick/FloorSwitch.cs	74	'System.Collections.Generic.List`1<UnityEngine.Collider2D>' allocation
+PAC1002	Info	code	Assets/Script/Gimmick/GimmickCondition.cs	78	'System.String.Concat' usage
+PAC1002	Info	code	Assets/Script/Gimmick/GimmickCondition.cs	79	'System.String.Concat' usage
+PAC2000	Moderate	code	Assets/Script/Gimmick/GimmickCondition.cs	80	Conversion from value type 'Int32' to ref type
+PAC2000	Moderate	code	Assets/Script/Gimmick/GimmickCondition.cs	81	Conversion from value type 'Int32' to ref type
+PAC2000	Moderate	code	Assets/Script/Gimmick/GimmickCondition.cs	82	Conversion from value type 'Int32' to ref type
+PAC2000	Moderate	code	Assets/Script/Gimmick/GimmickCondition.cs	83	Conversion from value type 'Int32' to ref type
+PAC0231	Moderate	code	Assets/Script/Gimmick/GimmickEventAction.cs	94	'UnityEngine.Object.name' usage
+PAC1002	Info	code	Assets/Script/Gimmick/GimmickEventAction.cs	94	'System.String.Concat' usage
+PAC0193	Info	code	Assets/Script/Gimmick/GimmickEventAction.cs	94	Use of Debug.LogWarning in 'Execute'
+PAC2002	Info	code	Assets/Script/Gimmick/GimmickHole.cs	57	'System.Action`2<GimmickState,System.Int32>' allocation
+PAC1002	Info	code	Assets/Script/Gimmick/GimmickReaction.cs	109	'System.String.Concat' usage
+PAC0231	Moderate	code	Assets/Script/Gimmick/GimmickReaction.cs	194	'UnityEngine.Object.name' usage
+PAC0231	Moderate	code	Assets/Script/Gimmick/GimmickReaction.cs	195	'UnityEngine.Object.name' usage
+PAC1002	Info	code	Assets/Script/Gimmick/GimmickReaction.cs	195	'System.String.Concat' usage
+PAC2002	Info	code	Assets/Script/Gimmick/GimmickReaction.cs	49	'GameCondition' allocation
+PAC2002	Info	code	Assets/Script/Gimmick/GimmickReaction.cs	59	'System.Collections.Generic.List`1<UnityEngine.GameObject>' allocation
+PAC2002	Info	code	Assets/Script/Gimmick/GimmickReaction.cs	63	'System.Collections.Generic.List`1<UnityEngine.GameObject>' allocation
+PAC2002	Info	code	Assets/Script/Gimmick/GimmickReaction.cs	67	'System.Collections.Generic.List`1<ReactionMove>' allocation
+PAC0231	Moderate	code	Assets/Script/Gimmick/GimmickState.cs	100	'UnityEngine.Object.name' usage
+PAC1002	Info	code	Assets/Script/Gimmick/GimmickState.cs	123	'System.String.Concat' usage
+PAC1002	Info	code	Assets/Script/Gimmick/GimmickState.cs	207	'System.String.Concat' usage
+PAC1002	Info	code	Assets/Script/Gimmick/GimmickState.cs	219	'System.String.Concat' usage
+PAC0231	Moderate	code	Assets/Script/Gimmick/GimmickState.cs	224	'UnityEngine.Object.name' usage
+PAC0231	Moderate	code	Assets/Script/Gimmick/GimmickState.cs	225	'UnityEngine.Object.name' usage
+PAC1002	Info	code	Assets/Script/Gimmick/GimmickState.cs	225	'System.String.Concat' usage
+PAC2002	Info	code	Assets/Script/Gimmick/GimmickState.cs	75	'System.Collections.Generic.List`1<GimmickState>' allocation
+PAC2002	Info	code	Assets/Script/Gimmick/GimmickSwitch.cs	52	'GameCondition' allocation
+PAC2002	Info	code	Assets/Script/Gimmick/GimmickVisual.cs	33	'System.Collections.Generic.List`1<UnityEngine.GameObject>' allocation
+PAC2002	Info	code	Assets/Script/Gimmick/GimmickVisual.cs	36	'System.Collections.Generic.List`1<UnityEngine.Behaviour>' allocation
+PAC2002	Info	code	Assets/Script/Gimmick/GimmickVisual.cs	78	'System.Action`2<GimmickState,System.Int32>' allocation
+PAC2002	Info	code	Assets/Script/Gimmick/GimmickVisual.cs	83	'System.Action`2<GimmickState,System.Int32>' allocation
+PAC2002	Info	code	Assets/Script/Gimmick/GimmickVisual.cs	98	'System.Predicate`1<GimmickLook>' allocation
+PAC2002	Info	code	Assets/Script/Gimmick/GimmickVisual.cs	62	'System.Collections.Generic.List`1<GimmickLook>' allocation
+PAC2002	Info	code	Assets/Script/Gimmick/ItemSocket.cs	107	'System.Action`2<GimmickState,System.Int32>' allocation
+PAC2003	Info	code	Assets/Script/Gimmick/ItemSocket.cs	0	Closure allocation in 'ItemSocket.OpenChoice'
+PAC2002	Info	code	Assets/Script/Gimmick/ItemSocket.cs	148	'System.Collections.Generic.List`1<System.Int32>' allocation
+PAC2002	Info	code	Assets/Script/Gimmick/ItemSocket.cs	149	'System.Collections.Generic.List`1<System.String>' allocation
+PAC2002	Info	code	Assets/Script/Gimmick/ItemSocket.cs	150	'System.Collections.Generic.List`1<UnityEngine.Sprite>' allocation
+PAC2002	Info	code	Assets/Script/Gimmick/ItemSocket.cs	161	'System.Action`1<System.Int32>' allocation
+PAC2002	Info	code	Assets/Script/Gimmick/ItemSocket.cs	32	'System.Collections.Generic.List`1<ItemData>' allocation
+PAC1002	Info	code	Assets/Script/Gimmick/Note/NoteBook.cs	23	'System.String.Concat' usage
+PAC1002	Info	code	Assets/Script/Gimmick/Note/NoteBook.cs	29	'System.String.Concat' usage
+PAC2002	Info	code	Assets/Script/Gimmick/Note/NoteBook.cs	35	'System.Collections.Generic.List`1<NoteData>' allocation
+PAC0120	Moderate	code	Assets/Script/Gimmick/Note/NoteBook.cs	36	'UnityEngine.Resources.LoadAll<NoteData>' usage
+PAC2002	Info	code	Assets/Script/Gimmick/Note/NoteBook.cs	37	'System.Comparison`1<NoteData>' allocation
+PAC2003	Info	code	Assets/Script/Gimmick/Note/NoteBook.cs	0	Closure allocation in 'NoteBook.OpenList'
+PAC2002	Info	code	Assets/Script/Gimmick/Note/NoteBook.cs	54	'System.Collections.Generic.List`1<System.String>' allocation
+PAC2002	Info	code	Assets/Script/Gimmick/Note/NoteBook.cs	57	'System.Action`1<System.Int32>' allocation
+PAC0231	Moderate	code	Assets/Script/Gimmick/Note/NoteData.cs	43	'UnityEngine.Object.name' usage
+PAC0231	Moderate	code	Assets/Script/Gimmick/Note/NoteData.cs	44	'UnityEngine.Object.name' usage
+PAC2002	Info	code	Assets/Script/Gimmick/Note/NotePickup.cs	48	'System.Action' allocation
+PAC1002	Info	code	Assets/Script/Gimmick/PushBlock.cs	114	'System.String.Concat' usage
+PAC1002	Info	code	Assets/Script/Gimmick/PushBlock.cs	118	'System.String.Concat' usage
+PAC1002	Info	code	Assets/Script/Gimmick/PushBlock.cs	124	'System.String.Concat' usage
+PAC1002	Info	code	Assets/Script/Gimmick/PushBlock.cs	125	'System.String.Concat' usage
+PAC0023	Major	code	Assets/Script/Gimmick/PushBlock.cs	238	'UnityEngine.Physics2D.OverlapBoxAll' usage
+PAC1002	Info	code	Assets/Script/Gimmick/PushBlock.cs	321	'System.String.Concat' usage
+PAC1002	Info	code	Assets/Script/Gimmick/PushBlock.cs	322	'System.String.Concat' usage
+PAC0231	Moderate	code	Assets/Script/Gimmick/PushBlock.cs	334	'UnityEngine.Object.name' usage
+PAC0231	Moderate	code	Assets/Script/Gimmick/PushBlock.cs	335	'UnityEngine.Object.name' usage
+PAC1002	Info	code	Assets/Script/Gimmick/PushBlock.cs	335	'System.String.Concat' usage
+PAC2002	Info	code	Assets/Script/Gimmick/PushBlock.cs	80	'System.Collections.Generic.List`1<PushBlock>' allocation
+PAC2002	Info	code	Assets/Script/Gimmick/PushBlockResetEventAction.cs	25	'System.Collections.Generic.List`1<PushBlock>' allocation
+PAC2002	Info	code	Assets/Script/Gimmick/PushBlockResetEventAction.cs	21	'System.Collections.Generic.List`1<PushBlock>' allocation
+PAC2000	Moderate	code	Assets/Script/Gimmick/PuzzleCheck.cs	119	Conversion from value type 'Int32' to ref type
+PAC2000	Moderate	code	Assets/Script/Gimmick/PuzzleCheck.cs	119	Conversion from value type 'Int32' to ref type
+PAC2000	Moderate	code	Assets/Script/Gimmick/PuzzleCheck.cs	121	Conversion from value type 'Int32' to ref type
+PAC2000	Moderate	code	Assets/Script/Gimmick/PuzzleCheck.cs	121	Conversion from value type 'Int32' to ref type
+PAC2002	Info	code	Assets/Script/Gimmick/PuzzleCheck.cs	123	'System.Collections.Generic.List`1<System.String>' allocation
+PAC2004	Info	code	Assets/Script/Gimmick/PuzzleCheck.cs	125	'String' array allocation
+PAC1002	Info	code	Assets/Script/Gimmick/PuzzleCheck.cs	125	'System.String.Concat' usage
+PAC2002	Info	code	Assets/Script/Gimmick/PuzzleCheck.cs	141	'System.Action`2<GimmickState,System.Int32>' allocation
+PAC2002	Info	code	Assets/Script/Gimmick/PuzzleCheck.cs	157	'System.Action`2<GimmickState,System.Int32>' allocation
+PAC2002	Info	code	Assets/Script/Gimmick/PuzzleCheck.cs	55	'System.Collections.Generic.List`1<GimmickState>' allocation
+PAC2002	Info	code	Assets/Script/Gimmick/PuzzleCheck.cs	62	'System.Collections.Generic.List`1<System.Int32>' allocation
+PAC2002	Info	code	Assets/Script/Gimmick/UI/PuzzleUI.cs	83	'UnityEngine.GameObject' allocation
+PAC0225	Moderate	code	Assets/Script/Gimmick/UI/PuzzleUI.cs	85	'UnityEngine.GameObject.AddComponent<PuzzleUI>' usage
+PAC2000	Major	code	Assets/Script/Gimmick/UI/PuzzleUI.cs	313	Conversion from value type 'Int32' to ref type
+PAC2000	Major	code	Assets/Script/Gimmick/UI/PuzzleUI.cs	313	Conversion from value type 'Int32' to ref type
+PAC0225	Moderate	code	Assets/Script/Gimmick/UI/PuzzleUI.cs	328	'UnityEngine.GameObject.AddComponent<UnityEngine.Canvas>' usage
+PAC0225	Moderate	code	Assets/Script/Gimmick/UI/PuzzleUI.cs	331	'UnityEngine.GameObject.AddComponent<UnityEngine.UI.CanvasScaler>' usage
+PAC2004	Info	code	Assets/Script/Gimmick/UI/PuzzleUI.cs	336	'Type' array allocation
+PAC2002	Info	code	Assets/Script/Gimmick/UI/PuzzleUI.cs	336	'UnityEngine.GameObject' allocation
+PAC2004	Info	code	Assets/Script/Gimmick/UI/PuzzleUI.cs	356	'Type' array allocation
+PAC2002	Info	code	Assets/Script/Gimmick/UI/PuzzleUI.cs	356	'UnityEngine.GameObject' allocation
+PAC0225	Moderate	code	Assets/Script/Gimmick/UI/PuzzleUI.cs	359	'UnityEngine.GameObject.AddComponent<UnityEngine.UI.HorizontalLayoutGroup>' usage
+PAC2004	Info	code	Assets/Script/Gimmick/UI/PuzzleUI.cs	362	'Type' array allocation
+PAC2002	Info	code	Assets/Script/Gimmick/UI/PuzzleUI.cs	362	'UnityEngine.GameObject' allocation
+PAC0225	Moderate	code	Assets/Script/Gimmick/UI/PuzzleUI.cs	365	'UnityEngine.GameObject.AddComponent<UnityEngine.UI.VerticalLayoutGroup>' usage
+PAC1002	Info	code	Assets/Script/Gimmick/UI/PuzzleUI.cs	381	'System.String.Concat' usage
+PAC0225	Moderate	code	Assets/Script/Gimmick/UI/PuzzleUI.cs	382	'UnityEngine.GameObject.AddComponent<UnityEngine.UI.LayoutElement>' usage
+PAC1002	Info	code	Assets/Script/Gimmick/UI/PuzzleUI.cs	397	'System.String.Concat' usage
+PAC0225	Moderate	code	Assets/Script/Gimmick/UI/PuzzleUI.cs	398	'UnityEngine.GameObject.AddComponent<UnityEngine.UI.LayoutElement>' usage
+PAC0225	Moderate	code	Assets/Script/Gimmick/UI/PuzzleUI.cs	420	'UnityEngine.GameObject.AddComponent<UnityEngine.UI.LayoutElement>' usage
+PAC0026	Moderate	code	Assets/Script/Gimmick/UI/PuzzleUI.cs	429	'UnityEngine.Component.GetComponentsInChildren<TMPro.TextMeshProUGUI>' usage
+PAC2004	Info	code	Assets/Script/Gimmick/UI/PuzzleUI.cs	434	'Type' array allocation
+PAC2002	Info	code	Assets/Script/Gimmick/UI/PuzzleUI.cs	434	'UnityEngine.GameObject' allocation
+PAC0225	Moderate	code	Assets/Script/Gimmick/UI/PuzzleUI.cs	436	'UnityEngine.GameObject.AddComponent<TMPro.TextMeshProUGUI>' usage
+PAC2004	Info	code	Assets/Script/Gimmick/UI/PuzzleUI.cs	452	'Type' array allocation
+PAC2002	Info	code	Assets/Script/Gimmick/UI/PuzzleUI.cs	452	'UnityEngine.GameObject' allocation
+PAC0225	Moderate	code	Assets/Script/Gimmick/UI/PuzzleUI.cs	454	'UnityEngine.GameObject.AddComponent<UnityEngine.UI.Image>' usage
+PAC2002	Info	code	Assets/Script/Gimmick/UI/PuzzleUI.cs	53	'System.Collections.Generic.List`1<UnityEngine.UI.Image>' allocation
+PAC2002	Info	code	Assets/Script/Gimmick/UI/PuzzleUI.cs	54	'System.Collections.Generic.List`1<TMPro.TextMeshProUGUI>' allocation
+PAC2002	Info	code	Assets/Script/Gimmick/UI/PuzzleUI.cs	58	'System.Collections.Generic.List`1<UnityEngine.UI.Image>' allocation
+PAC2003	Info	code	Assets/Script/Gimmick/WalkArea.cs	0	Closure allocation in 'WalkArea.BuildTester'
+PAC2002	Info	code	Assets/Script/Gimmick/WalkArea.cs	103	'System.Collections.Generic.List`1<WalkArea/Shape>' allocation
+PAC2002	Info	code	Assets/Script/Gimmick/WalkArea.cs	105	'System.Func`2<UnityEngine.Vector2,System.Boolean>' allocation
+PAC0026	Moderate	code	Assets/Script/Gimmick/WalkArea.cs	148	'UnityEngine.Component.GetComponentsInChildren<UnityEngine.Collider2D>' usage
+PAC2002	Info	code	Assets/Script/Gimmick/WalkArea.cs	150	'WalkArea/Shape' allocation
+PAC2004	Info	code	Assets/Script/Gimmick/WalkArea.cs	171	'Vector2[]' array allocation
+PAC0231	Moderate	code	Assets/Script/Gimmick/WalkArea.cs	176	'UnityEngine.Object.name' usage
+PAC0231	Moderate	code	Assets/Script/Gimmick/WalkArea.cs	176	'UnityEngine.Object.name' usage
+PAC1002	Info	code	Assets/Script/Gimmick/WalkArea.cs	176	'System.String.Concat' usage
+PAC0193	Info	code	Assets/Script/Gimmick/WalkArea.cs	176	Use of Debug.LogWarning in 'Collect'
+PAC2004	Moderate	code	Assets/Script/Gimmick/WalkArea.cs	272	'Vector3' array allocation
+PAC2004	Moderate	code	Assets/Script/Gimmick/WalkArea.cs	284	'Vector3' array allocation
+PAC2004	Moderate	code	Assets/Script/Gimmick/WalkArea.cs	296	'Vector3' array allocation
+PAC2002	Info	code	Assets/Script/Gimmick/WalkArea.cs	313	'System.Collections.Generic.List`1<WalkArea/Shape>' allocation
+PAC2002	Moderate	code	Assets/Script/Gimmick/WalkArea.cs	336	'System.Collections.Generic.List`1<WalkArea/Shape>' allocation
+PAC2002	Info	code	Assets/Script/Gimmick/WalkArea.cs	518	'UnityEngine.GameObject' allocation
+PAC0225	Moderate	code	Assets/Script/Gimmick/WalkArea.cs	520	'UnityEngine.GameObject.AddComponent<UnityEngine.CircleCollider2D>' usage
+PAC2002	Info	code	Assets/Script/Gimmick/WalkArea.cs	528	'UnityEngine.GameObject' allocation
+PAC0225	Moderate	code	Assets/Script/Gimmick/WalkArea.cs	530	'UnityEngine.GameObject.AddComponent<UnityEngine.BoxCollider2D>' usage
+PAC2002	Info	code	Assets/Script/Gimmick/WalkArea.cs	538	'UnityEngine.GameObject' allocation
+PAC0225	Moderate	code	Assets/Script/Gimmick/WalkArea.cs	540	'UnityEngine.GameObject.AddComponent<UnityEngine.CircleCollider2D>' usage
+PAC0225	Moderate	code	Assets/Script/Gimmick/WalkArea.cs	543	'UnityEngine.GameObject.AddComponent<WalkAreaExclude>' usage
+PAC2002	Info	code	Assets/Script/Gimmick/WalkArea.cs	549	'UnityEngine.GameObject' allocation
+PAC0225	Moderate	code	Assets/Script/Gimmick/WalkArea.cs	551	'UnityEngine.GameObject.AddComponent<UnityEngine.BoxCollider2D>' usage
+PAC0225	Moderate	code	Assets/Script/Gimmick/WalkArea.cs	554	'UnityEngine.GameObject.AddComponent<WalkAreaExclude>' usage
+PAC2004	Info	code	Assets/Script/Gimmick/WalkArea.cs	592	'Vector2[]' array allocation
+PAC2004	Info	code	Assets/Script/Gimmick/WalkArea.cs	592	'Vector2' array allocation
+PAC2002	Info	code	Assets/Script/Gimmick/WalkArea.cs	110	'System.Collections.Generic.List`1<WalkArea/Shape>' allocation
+PAC2002	Info	code	Assets/Script/Gimmick/WalkArea.cs	108	'System.Collections.Generic.List`1<WalkArea>' allocation
+PAC0231	Moderate	code	Assets/Script/Health/Health.cs	100	'UnityEngine.Object.name' usage
+PAC1002	Info	code	Assets/Script/Health/Health.cs	100	'System.String.Concat' usage
+PAC0231	Major	code	Assets/Script/Health/Health.cs	145	'UnityEngine.Object.name' usage
+PAC1002	Moderate	code	Assets/Script/Health/Health.cs	145	'System.String.Concat' usage
+PAC0231	Moderate	code	Assets/Script/Intaract/Intaractable.cs	74	'UnityEngine.Object.name' usage
+PAC1002	Info	code	Assets/Script/Intaract/Intaractable.cs	74	'System.String.Concat' usage
+PAC0192	Info	code	Assets/Script/Intaract/Intaractable.cs	74	Use of Debug.Log in 'OnTriggerEnter2D'
+PAC2002	Moderate	code	Assets/Script/Intaract/Intaractable.cs	115	'System.Predicate`1<UnityEngine.GameObject>' allocation
+PAC2002	Info	code	Assets/Script/Intaract/Intaractable.cs	32	'System.Collections.Generic.HashSet`1<UnityEngine.GameObject>' allocation
+PAC2002	Info	code	Assets/Script/Intaract/InteractPrompt.cs	75	'UnityEngine.GameObject' allocation
+PAC0225	Moderate	code	Assets/Script/Intaract/InteractPrompt.cs	77	'UnityEngine.GameObject.AddComponent<InteractPromptView>' usage
+PAC2002	Info	code	Assets/Script/Intaract/InteractPrompt.cs	80	'UnityEngine.Events.UnityAction`2<UnityEngine.SceneManagement.Scene,UnityEngine.SceneManagement.LoadSceneMode>' allocation
+PAC2002	Info	code	Assets/Script/Intaract/InteractPrompt.cs	81	'UnityEngine.Events.UnityAction`2<UnityEngine.SceneManagement.Scene,UnityEngine.SceneManagement.LoadSceneMode>' allocation
+PAC2002	Info	code	Assets/Script/Intaract/InteractPrompt.cs	96	'UnityEngine.GameObject' allocation
+PAC0225	Moderate	code	Assets/Script/Intaract/InteractPrompt.cs	98	'UnityEngine.GameObject.AddComponent<TMPro.TextMeshPro>' usage
+PAC1002	Moderate	code	Assets/Script/Intaract/InteractPrompt.cs	150	'System.String.Concat' usage
+PAC1001	Major	code	Assets/Script/Intaract/InteractPrompt.cs	171	'System.Reflection.MemberInfo.get_Name' usage
+PAC1001	Major	code	Assets/Script/Intaract/InteractPrompt.cs	172	'System.Reflection.FieldInfo.op_Equality' usage
+PAC1001	Major	code	Assets/Script/Intaract/InteractPrompt.cs	173	'System.Reflection.FieldInfo.GetValue' usage
+PAC0026	Major	code	Assets/Script/Intaract/InteractPrompt.cs	182	'UnityEngine.Component.GetComponentsInChildren<UnityEngine.SpriteRenderer>' usage
+PAC2002	Info	code	Assets/Script/Intaract/InteractPrompt.cs	60	'System.Collections.Generic.List`1<Intaractable>' allocation
+PAC2002	Info	code	Assets/Script/Intaract/InteractPrompt.cs	47	'System.Collections.Generic.Dictionary`2<System.String,System.String>' allocation
+PAC0224	Moderate	code	Assets/Script/Item/InstantPickup.cs	101	'UnityEngine.Object.Instantiate<UnityEngine.GameObject>' usage
+PAC0026	Moderate	code	Assets/Script/Item/InstantPickup.cs	111	'UnityEngine.Component.GetComponentsInChildren<UnityEngine.SpriteRenderer>' usage
+PAC0033	Moderate	code	Assets/Script/Item/InstantPickup.cs	137	'UnityEngine.MonoBehaviour.OnTriggerStay2D' usage
+PAC0231	Moderate	code	Assets/Script/Item/Interaction/ItemGiveEventAction.cs	27	'UnityEngine.Object.name' usage
+PAC1002	Info	code	Assets/Script/Item/Interaction/ItemGiveEventAction.cs	27	'System.String.Concat' usage
+PAC0193	Info	code	Assets/Script/Item/Interaction/ItemGiveEventAction.cs	27	Use of Debug.LogWarning in 'Execute'
+PAC1002	Info	code	Assets/Script/Item/Interaction/ItemInteraction.cs	158	'System.String.Concat' usage
+PAC0231	Moderate	code	Assets/Script/Item/Interaction/ItemInteraction.cs	273	'UnityEngine.Object.name' usage
+PAC0231	Moderate	code	Assets/Script/Item/Interaction/ItemInteraction.cs	276	'UnityEngine.Object.name' usage
+PAC1002	Info	code	Assets/Script/Item/Interaction/ItemInteraction.cs	276	'System.String.Concat' usage
+PAC2002	Info	code	Assets/Script/Item/Interaction/ItemInteraction.cs	82	'System.Collections.Generic.List`1<ItemInteraction/Rule>' allocation
+PAC2002	Info	code	Assets/Script/Item/Interaction/ItemPossessionSwitch.cs	51	'System.Action' allocation
+PAC2002	Info	code	Assets/Script/Item/Interaction/ItemPossessionSwitch.cs	58	'System.Action' allocation
+PAC0231	Moderate	code	Assets/Script/Item/Interaction/ItemPossessionSwitch.cs	88	'UnityEngine.Object.name' usage
+PAC1002	Info	code	Assets/Script/Item/Interaction/ItemPossessionSwitch.cs	88	'System.String.Concat' usage
+PAC0193	Info	code	Assets/Script/Item/Interaction/ItemPossessionSwitch.cs	88	Use of Debug.LogWarning in 'WarnIfSelfTarget'
+PAC2002	Info	code	Assets/Script/Item/Interaction/ItemPossessionSwitch.cs	29	'System.Collections.Generic.List`1<ItemCondition>' allocation
+PAC2002	Info	code	Assets/Script/Item/Interaction/ItemPossessionSwitch.cs	34	'System.Collections.Generic.List`1<UnityEngine.GameObject>' allocation
+PAC2002	Info	code	Assets/Script/Item/Interaction/ItemPossessionSwitch.cs	37	'System.Collections.Generic.List`1<UnityEngine.GameObject>' allocation
+PAC0231	Moderate	code	Assets/Script/Item/Interaction/ItemTakeEventAction.cs	30	'UnityEngine.Object.name' usage
+PAC1002	Info	code	Assets/Script/Item/Interaction/ItemTakeEventAction.cs	30	'System.String.Concat' usage
+PAC0193	Info	code	Assets/Script/Item/Interaction/ItemTakeEventAction.cs	30	Use of Debug.LogWarning in 'Execute'
+PAC0231	Major	code	Assets/Script/Item/ItemData.cs	66	'UnityEngine.Object.name' usage
+PAC0231	Major	code	Assets/Script/Item/ItemData.cs	68	'UnityEngine.Object.name' usage
+PAC2002	Info	code	Assets/Script/Item/ItemData.cs	91	'System.Collections.Generic.Dictionary`2<System.String,ItemData>' allocation
+PAC0120	Moderate	code	Assets/Script/Item/ItemData.cs	93	'UnityEngine.Resources.LoadAll<ItemData>' usage
+PAC1002	Info	code	Assets/Script/Item/ItemData.cs	97	'System.String.Concat' usage
+PAC0193	Info	code	Assets/Script/Item/ItemData.cs	97	Use of Debug.LogWarning in 'Find'
+PAC0231	Moderate	code	Assets/Script/Item/ItemPickup.cs	49	'UnityEngine.Object.name' usage
+PAC1002	Info	code	Assets/Script/Item/ItemPickup.cs	49	'System.String.Concat' usage
+PAC1002	Info	code	Assets/Script/Item/ItemPickup.cs	94	'System.String.Concat' usage
+PAC0231	Moderate	code	Assets/Script/Item/ItemPickup.cs	102	'UnityEngine.Object.name' usage
+PAC0231	Moderate	code	Assets/Script/Item/ItemPickup.cs	105	'UnityEngine.Object.name' usage
+PAC1002	Info	code	Assets/Script/Item/ItemPickup.cs	105	'System.String.Concat' usage
+PAC0192	Info	code	Assets/Script/Manager/InventoryManager.cs	82	Use of Debug.Log in 'Awake'
+PAC2002	Info	code	Assets/Script/Manager/InventoryManager.cs	93	'NoahData' allocation
+PAC2002	Info	code	Assets/Script/Manager/InventoryManager.cs	109	'UnityEngine.GameObject' allocation
+PAC0225	Moderate	code	Assets/Script/Manager/InventoryManager.cs	109	'UnityEngine.GameObject.AddComponent<InventoryManager>' usage
+PAC0193	Info	code	Assets/Script/Manager/InventoryManager.cs	124	Use of Debug.LogWarning in 'AddItem'
+PAC2000	Moderate	code	Assets/Script/Manager/InventoryManager.cs	130	Conversion from value type 'Int32' to ref type
+PAC0192	Info	code	Assets/Script/Manager/InventoryManager.cs	130	Use of Debug.Log in 'AddItem'
+PAC2000	Moderate	code	Assets/Script/Manager/InventoryManager.cs	165	Conversion from value type 'Int32' to ref type
+PAC0192	Info	code	Assets/Script/Manager/InventoryManager.cs	165	Use of Debug.Log in 'RemoveItem'
+PAC0192	Info	code	Assets/Script/Manager/InventoryManager.cs	183	Use of Debug.Log in 'ConsumeKey'
+PAC2002	Info	code	Assets/Script/Manager/InventoryManager.cs	258	'System.Collections.Generic.List`1<System.String>' allocation
+PAC1002	Info	code	Assets/Script/Manager/InventoryManager.cs	259	'System.String.Concat' usage
+PAC1002	Info	code	Assets/Script/Manager/InventoryManager.cs	303	'System.String.Concat' usage
+PAC0193	Info	code	Assets/Script/Manager/InventoryManager.cs	303	Use of Debug.LogWarning in 'LoadItems'
+PAC2004	Info	code	Assets/Script/Manager/InventoryManager.cs	329	'String' array allocation
+PAC2000	Moderate	code	Assets/Script/Manager/InventoryManager.cs	329	Conversion from value type 'LoadSceneMode' to ref type
+PAC2000	Moderate	code	Assets/Script/Manager/InventoryManager.cs	329	Conversion from value type 'EntityId' to ref type
+PAC2000	Moderate	code	Assets/Script/Manager/InventoryManager.cs	329	Conversion from value type 'Int32' to ref type
+PAC2000	Moderate	code	Assets/Script/Manager/InventoryManager.cs	329	Conversion from value type 'Boolean' to ref type
+PAC1002	Info	code	Assets/Script/Manager/InventoryManager.cs	329	'System.String.Concat' usage
+PAC0192	Info	code	Assets/Script/Manager/InventoryManager.cs	329	Use of Debug.Log in 'OnSceneLoaded'
+PAC2002	Info	code	Assets/Script/Manager/InventoryManager.cs	343	'UnityEngine.Events.UnityAction`2<UnityEngine.SceneManagement.Scene,UnityEngine.SceneManagement.LoadSceneMode>' allocation
+PAC2002	Info	code	Assets/Script/Manager/InventoryManager.cs	34	'System.Collections.Generic.List`1<ItemData>' allocation
+PAC2002	Info	code	Assets/Script/Manager/InventoryManager.cs	37	'System.Collections.Generic.Dictionary`2<ItemData,System.Int32>' allocation
+PAC2002	Info	code	Assets/Script/Manager/PlayerSwitchManager.cs	292	'System.Action' allocation
+PAC2002	Info	code	Assets/Script/Manager/PlayerSwitchManager.cs	293	'System.Action' allocation
+PAC2002	Info	code	Assets/Script/Manager/PlayerSwitchManager.cs	298	'System.Action' allocation
+PAC0225	Moderate	code	Assets/Script/Manager/PlayerSwitchManager.cs	358	'UnityEngine.GameObject.AddComponent<Health>' usage
+PAC2003	Moderate	code	Assets/Script/Manager/PlayerSwitchManager.cs	0	Closure allocation in 'PlayerSwitchManager.SwitchPlayer'
+PAC2002	Moderate	code	Assets/Script/Manager/PlayerSwitchManager.cs	406	'System.Action' allocation
+PAC0028	Major	code	Assets/Script/Manager/PlayerSwitchManager.cs	608	'UnityEngine.GameObject.GetComponentsInChildren<UnityEngine.Collider2D>' usage
+PAC0028	Major	code	Assets/Script/Manager/PlayerSwitchManager.cs	611	'UnityEngine.GameObject.GetComponentsInChildren<UnityEngine.Collider2D>' usage
+PAC2002	Info	code	Assets/Script/Manager/PlayerSwitchManager.cs	156	'System.Collections.Generic.List`1<UnityEngine.Vector2>' allocation
+PAC2002	Info	code	Assets/Script/Manager/PlayerSwitchManager.cs	620	'System.Collections.Generic.Dictionary`2<UnityEngine.Collider2D,System.Boolean>' allocation
+PAC2002	Info	code	Assets/Script/Map/MapDebugView.cs	31	'UnityEngine.GameObject' allocation
+PAC0225	Moderate	code	Assets/Script/Map/MapDebugView.cs	32	'UnityEngine.GameObject.AddComponent<MapDebugView>' usage
+PAC2004	Moderate	code	Assets/Script/Map/MapDebugView.cs	81	'Vector3' array allocation
+PAC2002	Moderate	code	Assets/Script/Map/MapDebugView.cs	100	'UnityEngine.Material' allocation
+PAC2002	Moderate	code	Assets/Script/Map/MapDebugView.cs	102	'UnityEngine.GameObject' allocation
+PAC0225	Major	code	Assets/Script/Map/MapDebugView.cs	104	'UnityEngine.GameObject.AddComponent<UnityEngine.LineRenderer>' usage
+PAC2002	Info	code	Assets/Script/Map/MapDebugView.cs	49	'System.Collections.Generic.List`1<UnityEngine.LineRenderer>' allocation
+PAC2002	Info	code	Assets/Script/Map/MapDebugView.cs	50	'System.Collections.Generic.List`1<UnityEngine.Vector3[]>' allocation
+PAC2002	Info	code	Assets/Script/Map/MapDebugView.cs	51	'System.Collections.Generic.List`1<System.Boolean>' allocation
+PAC2002	Info	code	Assets/Script/Map/MapReach.cs	37	'System.Collections.Generic.List`1<MapReach/Entry>' allocation
+PAC2002	Info	code	Assets/Script/Map/MapReach.cs	58	'System.Comparison`1<MapReach/Entry>' allocation
+PAC2002	Info	code	Assets/Script/Map/MapReach.cs	89	'System.Text.StringBuilder' allocation
+PAC2006	Info	code	Assets/Script/Map/MapReach.cs	92	'Object' array allocation
+PAC2000	Moderate	code	Assets/Script/Map/MapReach.cs	92	Conversion from value type 'float' to ref type
+PAC2000	Moderate	code	Assets/Script/Map/MapReach.cs	92	Conversion from value type 'float' to ref type
+PAC2000	Moderate	code	Assets/Script/Map/MapReach.cs	92	Conversion from value type 'Int32' to ref type
+PAC2000	Moderate	code	Assets/Script/Map/MapReach.cs	92	Conversion from value type 'Int32' to ref type
+PAC2000	Moderate	code	Assets/Script/Map/MapReach.cs	95	Conversion from value type 'float' to ref type
+PAC2000	Moderate	code	Assets/Script/Map/MapReach.cs	95	Conversion from value type 'float' to ref type
+PAC0231	Moderate	code	Assets/Script/Map/MapReach.cs	105	'UnityEngine.Object.name' usage
+PAC0231	Moderate	code	Assets/Script/Map/MapReach.cs	106	'UnityEngine.Object.name' usage
+PAC1002	Info	code	Assets/Script/Map/MapReach.cs	106	'System.String.Concat' usage
+PAC2001	Moderate	code	Assets/Script/ObjectBase/ObjectBase.cs	16	MonoBehaviour method 'Start' is empty
+PAC2001	Major	code	Assets/Script/ObjectBase/ObjectBase.cs	22	MonoBehaviour method 'Update' is empty
+PAC2002	Moderate	code	Assets/Script/Party/Bark/Bark.cs	111	'System.Collections.Generic.Dictionary`2<BarkTrigger,System.Collections.Generic.List`1<BarkData>>' allocation
+PAC0120	Major	code	Assets/Script/Party/Bark/Bark.cs	112	'UnityEngine.Resources.LoadAll<BarkData>' usage
+PAC2002	Moderate	code	Assets/Script/Party/Bark/Bark.cs	116	'System.Collections.Generic.List`1<BarkData>' allocation
+PAC2002	Moderate	code	Assets/Script/Party/Bark/Bark.cs	143	'System.Collections.Generic.List`1<BarkData>' allocation
+PAC1002	Moderate	code	Assets/Script/Party/Bark/Bark.cs	185	'System.String.Concat' usage
+PAC0231	Major	code	Assets/Script/Party/Bark/Bark.cs	206	'UnityEngine.Object.name' usage
+PAC1002	Moderate	code	Assets/Script/Party/Bark/Bark.cs	206	'System.String.Concat' usage
+PAC1002	Info	code	Assets/Script/Party/Bark/Bark.cs	256	'System.String.Concat' usage
+PAC2002	Moderate	code	Assets/Script/Party/Bark/Bark.cs	321	'System.Collections.Generic.List`1<System.String>' allocation
+PAC1002	Moderate	code	Assets/Script/Party/Bark/Bark.cs	328	'System.String.Concat' usage
+PAC2002	Info	code	Assets/Script/Party/Bark/Bark.cs	50	'System.Collections.Generic.Dictionary`2<BarkData,System.Single>' allocation
+PAC2002	Info	code	Assets/Script/Party/Bark/Bark.cs	51	'System.Collections.Generic.HashSet`1<BarkData>' allocation
+PAC2002	Info	code	Assets/Script/Party/Bark/Bark.cs	52	'System.Collections.Generic.List`1<System.String>' allocation
+PAC2002	Info	code	Assets/Script/Party/Bark/BarkData.cs	144	'System.Collections.Generic.List`1<BarkLine>' allocation
+PAC0231	Major	code	Assets/Script/Party/Bark/BarkData.cs	211	'UnityEngine.Object.name' usage
+PAC1002	Moderate	code	Assets/Script/Party/Bark/BarkData.cs	211	'System.String.Concat' usage
+PAC2002	Info	code	Assets/Script/Party/Bark/BarkData.cs	182	'GameCondition' allocation
+PAC2002	Info	code	Assets/Script/Party/Bark/BarkData.cs	204	'System.Collections.Generic.List`1<BarkVariant>' allocation
+PAC2002	Info	code	Assets/Script/Party/Bark/BarkEventAction.cs	31	'System.Collections.Generic.List`1<BarkLine>' allocation
+PAC2002	Moderate	code	Assets/Script/Party/Bark/BarkView.cs	58	'UnityEngine.GameObject' allocation
+PAC0225	Major	code	Assets/Script/Party/Bark/BarkView.cs	59	'UnityEngine.GameObject.AddComponent<BarkView>' usage
+PAC2002	Moderate	code	Assets/Script/Party/Bark/BarkView.cs	80	'System.Collections.Generic.List`1<BarkLine>' allocation
+PAC2004	Info	code	Assets/Script/Party/Bark/BarkView.cs	172	'String' array allocation
+PAC1002	Info	code	Assets/Script/Party/Bark/BarkView.cs	172	'System.String.Concat' usage
+PAC2002	Info	code	Assets/Script/Party/Bark/BarkView.cs	242	'UnityEngine.GameObject' allocation
+PAC2002	Info	code	Assets/Script/Party/Bark/BarkView.cs	245	'UnityEngine.GameObject' allocation
+PAC0225	Moderate	code	Assets/Script/Party/Bark/BarkView.cs	247	'UnityEngine.GameObject.AddComponent<UnityEngine.SpriteRenderer>' usage
+PAC2002	Info	code	Assets/Script/Party/Bark/BarkView.cs	251	'UnityEngine.GameObject' allocation
+PAC0225	Moderate	code	Assets/Script/Party/Bark/BarkView.cs	253	'UnityEngine.GameObject.AddComponent<UnityEngine.SpriteRenderer>' usage
+PAC2002	Info	code	Assets/Script/Party/Bark/BarkView.cs	257	'UnityEngine.GameObject' allocation
+PAC0225	Moderate	code	Assets/Script/Party/Bark/BarkView.cs	259	'UnityEngine.GameObject.AddComponent<TMPro.TextMeshPro>' usage
+PAC2002	Info	code	Assets/Script/Party/Bark/BarkWatcher.cs	39	'UnityEngine.Events.UnityAction`2<UnityEngine.SceneManagement.Scene,UnityEngine.SceneManagement.LoadSceneMode>' allocation
+PAC2002	Info	code	Assets/Script/Party/Bark/BarkWatcher.cs	40	'UnityEngine.Events.UnityAction`2<UnityEngine.SceneManagement.Scene,UnityEngine.SceneManagement.LoadSceneMode>' allocation
+PAC0225	Moderate	code	Assets/Script/Party/Bark/BarkWatcher.cs	52	'UnityEngine.GameObject.AddComponent<BarkWatcher>' usage
+PAC2002	Info	code	Assets/Script/Party/Bark/BarkWatcher.cs	57	'System.Action`1<Enemy>' allocation
+PAC2002	Info	code	Assets/Script/Party/Bark/BarkWatcher.cs	62	'System.Action`1<Enemy>' allocation
+PAC2002	Moderate	code	Assets/Script/Party/Bark/BarkWatcher.cs	126	'System.Action`1<PartyMode>' allocation
+PAC2002	Moderate	code	Assets/Script/Party/Bark/BarkWatcher.cs	127	'System.Action`1<UnityEngine.GameObject>' allocation
+PAC2002	Moderate	code	Assets/Script/Party/Bark/BarkWatcher.cs	131	'System.Action`1<DamageInfo>' allocation
+PAC2002	Moderate	code	Assets/Script/Party/Bark/BarkWatcher.cs	132	'System.Action`1<DamageInfo>' allocation
+PAC2002	Info	code	Assets/Script/Party/Bark/BarkWatcher.cs	139	'System.Action`1<PartyMode>' allocation
+PAC2002	Info	code	Assets/Script/Party/Bark/BarkWatcher.cs	140	'System.Action`1<UnityEngine.GameObject>' allocation
+PAC2002	Info	code	Assets/Script/Party/Bark/BarkWatcher.cs	142	'System.Action`1<DamageInfo>' allocation
+PAC2002	Info	code	Assets/Script/Party/Bark/BarkWatcher.cs	143	'System.Action`1<DamageInfo>' allocation
+PAC2002	Info	code	Assets/Script/Party/BreakableWall.cs	93	'System.Action`1<DamageInfo>' allocation
+PAC2002	Info	code	Assets/Script/Party/BreakableWall.cs	94	'System.Action`2<GimmickState,System.Int32>' allocation
+PAC2002	Info	code	Assets/Script/Party/BreakableWall.cs	105	'System.Action`1<DamageInfo>' allocation
+PAC2002	Info	code	Assets/Script/Party/BreakableWall.cs	128	'DamageRule' allocation
+PAC0026	Moderate	code	Assets/Script/Party/CharacterBarrier.cs	49	'UnityEngine.Component.GetComponentsInChildren<UnityEngine.Collider2D>' usage
+PAC0028	Major	code	Assets/Script/Party/CharacterBarrier.cs	87	'UnityEngine.GameObject.GetComponentsInChildren<UnityEngine.Collider2D>' usage
+PAC0026	Moderate	code	Assets/Script/Party/ConditionalVisible.cs	71	'UnityEngine.Component.GetComponentsInChildren<UnityEngine.SpriteRenderer>' usage
+PAC0026	Moderate	code	Assets/Script/Party/ConditionalVisible.cs	72	'UnityEngine.Component.GetComponentsInChildren<UnityEngine.Tilemaps.Tilemap>' usage
+PAC0026	Moderate	code	Assets/Script/Party/ConditionalVisible.cs	73	'UnityEngine.Component.GetComponentsInChildren<UnityEngine.Collider2D>' usage
+PAC2002	Info	code	Assets/Script/Party/ConditionalVisible.cs	43	'GameCondition' allocation
+PAC2002	Info	code	Assets/Script/Party/ConditionalVisible.cs	56	'System.Collections.Generic.List`1<UnityEngine.SpriteRenderer>' allocation
+PAC2002	Info	code	Assets/Script/Party/ConditionalVisible.cs	57	'System.Collections.Generic.List`1<UnityEngine.Tilemaps.Tilemap>' allocation
+PAC2002	Info	code	Assets/Script/Party/ConditionalVisible.cs	58	'System.Collections.Generic.List`1<System.Single>' allocation
+PAC2002	Info	code	Assets/Script/Party/ConditionalVisible.cs	59	'System.Collections.Generic.List`1<System.Single>' allocation
+PAC2002	Info	code	Assets/Script/Party/GuardGauge.cs	227	'UnityEngine.GameObject' allocation
+PAC0225	Moderate	code	Assets/Script/Party/GuardGauge.cs	228	'UnityEngine.GameObject.AddComponent<UnityEngine.Canvas>' usage
+PAC0225	Moderate	code	Assets/Script/Party/GuardGauge.cs	231	'UnityEngine.GameObject.AddComponent<UnityEngine.UI.CanvasScaler>' usage
+PAC2004	Info	code	Assets/Script/Party/GuardGauge.cs	236	'Type' array allocation
+PAC2002	Info	code	Assets/Script/Party/GuardGauge.cs	236	'UnityEngine.GameObject' allocation
+PAC2004	Info	code	Assets/Script/Party/GuardGauge.cs	254	'Type' array allocation
+PAC2002	Info	code	Assets/Script/Party/GuardGauge.cs	254	'UnityEngine.GameObject' allocation
+PAC0225	Moderate	code	Assets/Script/Party/GuardGauge.cs	262	'UnityEngine.GameObject.AddComponent<TMPro.TextMeshProUGUI>' usage
+PAC2004	Info	code	Assets/Script/Party/GuardGauge.cs	271	'Type' array allocation
+PAC2002	Info	code	Assets/Script/Party/GuardGauge.cs	271	'UnityEngine.GameObject' allocation
+PAC0225	Moderate	code	Assets/Script/Party/GuardGauge.cs	279	'UnityEngine.GameObject.AddComponent<UnityEngine.UI.Image>' usage
+PAC1002	Moderate	code	Assets/Script/Party/GuardGauge.cs	291	'System.String.Concat' usage
+PAC2002	Moderate	code	Assets/Script/Party/PartyHintView.cs	35	'UnityEngine.GameObject' allocation
+PAC0225	Major	code	Assets/Script/Party/PartyHintView.cs	36	'UnityEngine.GameObject.AddComponent<PartyHintView>' usage
+PAC2002	Moderate	code	Assets/Script/Party/PartyHintView.cs	50	'System.Collections.Generic.List`1<UnityEngine.Transform>' allocation
+PAC2002	Moderate	code	Assets/Script/Party/PartyHintView.cs	88	'PartyHintView/Marker' allocation
+PAC2002	Moderate	code	Assets/Script/Party/PartyHintView.cs	89	'UnityEngine.GameObject' allocation
+PAC2002	Moderate	code	Assets/Script/Party/PartyHintView.cs	93	'UnityEngine.GameObject' allocation
+PAC0225	Major	code	Assets/Script/Party/PartyHintView.cs	95	'UnityEngine.GameObject.AddComponent<UnityEngine.SpriteRenderer>' usage
+PAC2002	Moderate	code	Assets/Script/Party/PartyHintView.cs	104	'UnityEngine.GameObject' allocation
+PAC0225	Major	code	Assets/Script/Party/PartyHintView.cs	106	'UnityEngine.GameObject.AddComponent<TMPro.TextMeshPro>' usage
+PAC2002	Info	code	Assets/Script/Party/PartyHintView.cs	26	'System.Collections.Generic.Dictionary`2<UnityEngine.Transform,CharacterRestriction>' allocation
+PAC2002	Info	code	Assets/Script/Party/PartyHintView.cs	27	'System.Collections.Generic.Dictionary`2<UnityEngine.Transform,PartyHintView/Marker>' allocation
+PAC2002	Info	code	Assets/Script/Party/PartyHintView.cs	28	'System.Collections.Generic.List`1<PartyHintView/Marker>' allocation
+PAC2002	Info	code	Assets/Script/Party/PartyPersistence.cs	37	'System.Action' allocation
+PAC2002	Info	code	Assets/Script/Party/PartyPersistence.cs	38	'System.Action' allocation
+PAC1002	Info	code	Assets/Script/Party/PartyRejoinArea.cs	53	'System.String.Concat' usage
+PAC0231	Moderate	code	Assets/Script/Party/PartyRejoinArea.cs	88	'UnityEngine.Object.name' usage
+PAC0231	Moderate	code	Assets/Script/Party/PartyRejoinArea.cs	89	'UnityEngine.Object.name' usage
+PAC1002	Info	code	Assets/Script/Party/PartyRejoinArea.cs	89	'System.String.Concat' usage
+PAC2002	Moderate	code	Assets/Script/Party/PartyRoute.cs	38	'System.Collections.Generic.List`1<UnityEngine.Vector2>' allocation
+PAC0017	Major	code	Assets/Script/Party/PartyRoute.cs	71	'UnityEngine.Physics2D.CircleCastAll' usage
+PAC0231	Moderate	code	Assets/Script/Player/FocusPlayer.cs	35	'UnityEngine.Object.name' usage
+PAC1002	Info	code	Assets/Script/Player/FocusPlayer.cs	35	'System.String.Concat' usage
+PAC0231	Moderate	code	Assets/Script/Player/PlayerFollower.cs	49	'UnityEngine.Object.name' usage
+PAC1002	Info	code	Assets/Script/Player/PlayerFollower.cs	49	'System.String.Concat' usage
+PAC0231	Moderate	code	Assets/Script/Player/PlayerFollower.cs	56	'UnityEngine.Object.name' usage
+PAC1002	Info	code	Assets/Script/Player/PlayerFollower.cs	56	'System.String.Concat' usage
+PAC0231	Major	code	Assets/Script/Player/PlayerFollower.cs	84	'UnityEngine.Object.name' usage
+PAC1002	Moderate	code	Assets/Script/Player/PlayerFollower.cs	84	'System.String.Concat' usage
+PAC0231	Major	code	Assets/Script/Player/PlayerFollower.cs	92	'UnityEngine.Object.name' usage
+PAC1002	Moderate	code	Assets/Script/Player/PlayerFollower.cs	92	'System.String.Concat' usage
+PAC0231	Major	code	Assets/Script/Player/PlayerFollower.cs	99	'UnityEngine.Object.name' usage
+PAC1002	Moderate	code	Assets/Script/Player/PlayerFollower.cs	99	'System.String.Concat' usage
+PAC2002	Info	code	Assets/Script/Player/PlayerHistory.cs	28	'System.Collections.Generic.List`1<UnityEngine.Vector3>' allocation
+PAC0231	Moderate	code	Assets/Script/Player/PlayerInput.cs	47	'UnityEngine.Object.name' usage
+PAC1002	Info	code	Assets/Script/Player/PlayerInput.cs	47	'System.String.Concat' usage
+PAC0231	Major	code	Assets/Script/Player/PlayerInput.cs	62	'UnityEngine.Object.name' usage
+PAC1002	Moderate	code	Assets/Script/Player/PlayerInput.cs	62	'System.String.Concat' usage
+PAC0231	Moderate	code	Assets/Script/Player/PlayerMapLimit.cs	45	'UnityEngine.Object.name' usage
+PAC1002	Info	code	Assets/Script/Player/PlayerMapLimit.cs	45	'System.String.Concat' usage
+PAC0231	Moderate	code	Assets/Script/Player/PlayerMapLimit.cs	49	'UnityEngine.Object.name' usage
+PAC1002	Info	code	Assets/Script/Player/PlayerMapLimit.cs	49	'System.String.Concat' usage
+PAC0231	Moderate	code	Assets/Script/Player/PlayerMapLimit.cs	137	'UnityEngine.Object.name' usage
+PAC1002	Info	code	Assets/Script/Player/PlayerMapLimit.cs	137	'System.String.Concat' usage
+PAC0231	Moderate	code	Assets/Script/Player/PlayerMapLimit.cs	149	'UnityEngine.Object.name' usage
+PAC1002	Info	code	Assets/Script/Player/PlayerMapLimit.cs	149	'System.String.Concat' usage
+PAC0231	Moderate	code	Assets/Script/Player/PlayerRuntimeInitializer.cs	58	'UnityEngine.Object.name' usage
+PAC1002	Info	code	Assets/Script/Player/PlayerRuntimeInitializer.cs	58	'System.String.Concat' usage
+PAC0231	Moderate	code	Assets/Script/Player/PlayerSceneContext.cs	110	'UnityEngine.Object.name' usage
+PAC1002	Info	code	Assets/Script/Player/PlayerSceneContext.cs	110	'System.String.Concat' usage
+PAC0231	Moderate	code	Assets/Script/Player/PlayerSceneContext.cs	118	'UnityEngine.Object.name' usage
+PAC1002	Info	code	Assets/Script/Player/PlayerSceneContext.cs	118	'System.String.Concat' usage
+PAC0192	Info	code	Assets/Script/Player/Player_Noah/NoahDead.cs	47	Use of Debug.Log in 'Awake'
+PAC2002	Info	code	Assets/Script/Player/Player_Noah/NoahDead.cs	55	'System.Action' allocation
+PAC2002	Info	code	Assets/Script/Player/Player_Noah/NoahDead.cs	56	'System.Action' allocation
+PAC2002	Info	code	Assets/Script/Player/Player_Noah/NoahDead.cs	66	'System.Action' allocation
+PAC2002	Info	code	Assets/Script/Player/Player_Noah/NoahDead.cs	67	'System.Action' allocation
+PAC2002	Info	code	Assets/Script/Player/Player_Noah/NoahDead.cs	83	'System.Action' allocation
+PAC2002	Info	code	Assets/Script/Player/Player_Noah/NoahDead.cs	87	'System.Action' allocation
+PAC0231	Moderate	code	Assets/Script/Player/Player_Noah/NoahDead.cs	102	'UnityEngine.Object.name' usage
+PAC1002	Info	code	Assets/Script/Player/Player_Noah/NoahDead.cs	102	'System.String.Concat' usage
+PAC0192	Info	code	Assets/Script/Player/Player_Noah/NoahDead.cs	102	Use of Debug.Log in 'BeginGameOver'
+PAC2002	Info	code	Assets/Script/Player/Player_Noah/NoahHistory.cs	16	'System.Collections.Generic.List`1<UnityEngine.Vector3>' allocation
+PAC0192	Info	code	Assets/Script/Player/Player_Noah/NoahInventory.cs	38	Use of Debug.Log in 'GetKey'
+PAC0231	Moderate	code	Assets/Script/Player/Player_Noah/NoahMapLimit.cs	27	'UnityEngine.Object.name' usage
+PAC1002	Info	code	Assets/Script/Player/Player_Noah/NoahMapLimit.cs	27	'System.String.Concat' usage
+PAC0231	Moderate	code	Assets/Script/Player/Player_Noah/NoahMovement.cs	37	'UnityEngine.Object.name' usage
+PAC1002	Info	code	Assets/Script/Player/Player_Noah/NoahMovement.cs	37	'System.String.Concat' usage
+PAC0231	Moderate	code	Assets/Script/Player/Player_Sigle/SigleShooter.cs	41	'UnityEngine.Object.name' usage
+PAC1002	Info	code	Assets/Script/Player/Player_Sigle/SigleShooter.cs	41	'System.String.Concat' usage
+PAC2002	Info	code	Assets/Script/Pool/BulletPoolBase.cs	52	'System.Func`1<TBullet>' allocation
+PAC2002	Info	code	Assets/Script/Pool/BulletPoolBase.cs	52	'System.Action`1<TBullet>' allocation
+PAC2002	Info	code	Assets/Script/Pool/BulletPoolBase.cs	52	'System.Action`1<TBullet>' allocation
+PAC2002	Info	code	Assets/Script/Pool/BulletPoolBase.cs	52	'System.Action`1<TBullet>' allocation
+PAC2002	Info	code	Assets/Script/Pool/BulletPoolBase.cs	52	'UnityEngine.Pool.ObjectPool`1<TBullet>' allocation
+PAC0224	Moderate	code	Assets/Script/Pool/BulletPoolBase.cs	69	'UnityEngine.Object.Instantiate<TBullet>' usage
+PAC2004	Info	code	Assets/Script/Pool/BulletPoolBase.cs	110	'TBullet' array allocation
+PAC1002	Info	code	Assets/Script/Save/AutoSave.cs	17	'System.String.Concat' usage
+PAC2002	Info	code	Assets/Script/Save/AutoSaveIndicator.cs	33	'System.Action' allocation
+PAC2002	Info	code	Assets/Script/Save/AutoSaveIndicator.cs	34	'System.Action' allocation
+PAC2002	Info	code	Assets/Script/Save/AutoSaveIndicator.cs	43	'UnityEngine.GameObject' allocation
+PAC0225	Moderate	code	Assets/Script/Save/AutoSaveIndicator.cs	45	'UnityEngine.GameObject.AddComponent<AutoSaveIndicator>' usage
+PAC0225	Moderate	code	Assets/Script/Save/AutoSaveIndicator.cs	53	'UnityEngine.GameObject.AddComponent<UnityEngine.Canvas>' usage
+PAC0225	Moderate	code	Assets/Script/Save/AutoSaveIndicator.cs	56	'UnityEngine.GameObject.AddComponent<UnityEngine.UI.CanvasScaler>' usage
+PAC2004	Info	code	Assets/Script/Save/AutoSaveIndicator.cs	61	'Type' array allocation
+PAC2002	Info	code	Assets/Script/Save/AutoSaveIndicator.cs	61	'UnityEngine.GameObject' allocation
+PAC0225	Moderate	code	Assets/Script/Save/AutoSaveIndicator.cs	69	'UnityEngine.GameObject.AddComponent<TMPro.TextMeshProUGUI>' usage
+PAC2002	Info	code	Assets/Script/Save/GameSession.cs	62	'System.Action' allocation
+PAC2002	Info	code	Assets/Script/Save/GameSession.cs	63	'System.Action' allocation
+PAC2002	Info	code	Assets/Script/Save/GameSession.cs	66	'UnityEngine.GameObject' allocation
+PAC0225	Moderate	code	Assets/Script/Save/GameSession.cs	69	'UnityEngine.GameObject.AddComponent<PlayTimeCounter>' usage
+PAC1003	Moderate	code	Assets/Script/Save/GameSession.cs	78	'System.DateTime.Now' usage
+PAC2000	Moderate	code	Assets/Script/Save/GameSession.cs	128	Conversion from value type 'Int32' to ref type
+PAC0192	Info	code	Assets/Script/Save/GameSession.cs	128	Use of Debug.Log in 'Continue'
+PAC2000	Moderate	code	Assets/Script/Save/GameSession.cs	156	Conversion from value type 'Int32' to ref type
+PAC2000	Moderate	code	Assets/Script/Save/GameSession.cs	156	Conversion from value type 'Vector2' to ref type
+PAC0192	Info	code	Assets/Script/Save/GameSession.cs	156	Use of Debug.Log in 'SaveAt'
+PAC2000	Moderate	code	Assets/Script/Save/GameSession.cs	173	Conversion from value type 'Vector2' to ref type
+PAC0192	Info	code	Assets/Script/Save/GameSession.cs	173	Use of Debug.Log in 'AutoSaveAt'
+PAC2000	Major	code	Assets/Script/Save/Save.cs	101	Conversion from value type 'Int32' to ref type
+PAC0192	Info	code	Assets/Script/Save/Save.cs	205	Use of Debug.Log in 'MigrateLegacy'
+PAC1002	Info	code	Assets/Script/Save/Save.cs	210	'System.String.Concat' usage
+PAC0193	Info	code	Assets/Script/Save/Save.cs	210	Use of Debug.LogWarning in 'MigrateLegacy'
+PAC2002	Info	code	Assets/Script/Save/Save.cs	228	'System.Collections.Generic.Dictionary`2<System.String,System.String>' allocation
+PAC2000	Moderate	code	Assets/Script/Save/Save.cs	246	Conversion from value type 'T' to ref type
+PAC2000	Moderate	code	Assets/Script/Save/Save.cs	252	Conversion from value type 'T' to ref type
+PAC1002	Info	code	Assets/Script/Save/Save.cs	350	'System.String.Concat' usage
+PAC0193	Info	code	Assets/Script/Save/Save.cs	350	Use of Debug.LogWarning in 'Read'
+PAC2002	Info	code	Assets/Script/Save/Save.cs	396	'Save/WriteJob' allocation
+PAC2002	Info	code	Assets/Script/Save/Save.cs	401	'System.Threading.WaitCallback' allocation
+PAC2002	Info	code	Assets/Script/Save/Save.cs	414	'Save/FileData' allocation
+PAC2002	Info	code	Assets/Script/Save/Save.cs	418	'Save/Entry' allocation
+PAC1002	Info	code	Assets/Script/Save/Save.cs	431	'System.String.Concat' usage
+PAC2002	Info	code	Assets/Script/Save/Save.cs	42	'System.Collections.Generic.Dictionary`2<System.String,System.String>' allocation
+PAC2002	Info	code	Assets/Script/Save/Save.cs	45	'System.Collections.Generic.Dictionary`2<System.String,System.String>' allocation
+PAC2002	Info	code	Assets/Script/Save/Save.cs	48	'System.Object' allocation
+PAC2002	Info	code	Assets/Script/Save/SaveSlotInfo.cs	54	'SaveSlotInfo' allocation
+PAC2002	Info	code	Assets/Script/Save/SaveSlotInfo.cs	79	'SaveSlotInfo' allocation
+PAC2000	Moderate	code	Assets/Script/Save/SaveSlotInfo.cs	101	Conversion from value type 'Int32' to ref type
+PAC2000	Moderate	code	Assets/Script/Save/SaveSlotInfo.cs	101	Conversion from value type 'Int32' to ref type
+PAC2000	Moderate	code	Assets/Script/Save/SaveSlotInfo.cs	101	Conversion from value type 'Int32' to ref type
+PAC0231	Moderate	code	Assets/Script/SavePoint/SavePoint.cs	57	'UnityEngine.Object.name' usage
+PAC1002	Info	code	Assets/Script/SavePoint/SavePoint.cs	57	'System.String.Concat' usage
+PAC0193	Info	code	Assets/Script/SavePoint/SavePoint.cs	57	Use of Debug.LogWarning in 'Interact'
+PAC0231	Moderate	code	Assets/Script/Scene/SceneChangeEventAction.cs	29	'UnityEngine.Object.name' usage
+PAC1002	Info	code	Assets/Script/Scene/SceneChangeEventAction.cs	29	'System.String.Concat' usage
+PAC0193	Info	code	Assets/Script/Scene/SceneChangeEventAction.cs	29	Use of Debug.LogWarning in 'Execute'
+PAC0231	Moderate	code	Assets/Script/Scene/SceneChangeEventAction.cs	36	'UnityEngine.Object.name' usage
+PAC1002	Info	code	Assets/Script/Scene/SceneChangeEventAction.cs	36	'System.String.Concat' usage
+PAC2002	Moderate	code	Assets/Script/Scene/SceneFader.cs	30	'UnityEngine.GameObject' allocation
+PAC0225	Major	code	Assets/Script/Scene/SceneFader.cs	30	'UnityEngine.GameObject.AddComponent<SceneFader>' usage
+PAC0225	Moderate	code	Assets/Script/Scene/SceneFader.cs	88	'UnityEngine.GameObject.AddComponent<UnityEngine.Canvas>' usage
+PAC0225	Moderate	code	Assets/Script/Scene/SceneFader.cs	92	'UnityEngine.GameObject.AddComponent<UnityEngine.UI.CanvasScaler>' usage
+PAC0225	Moderate	code	Assets/Script/Scene/SceneFader.cs	93	'UnityEngine.GameObject.AddComponent<UnityEngine.UI.GraphicRaycaster>' usage
+PAC2002	Info	code	Assets/Script/Scene/SceneFader.cs	95	'UnityEngine.GameObject' allocation
+PAC0225	Moderate	code	Assets/Script/Scene/SceneFader.cs	98	'UnityEngine.GameObject.AddComponent<UnityEngine.UI.Image>' usage
+PAC2002	Info	code	Assets/Script/Se/HealthSe.cs	36	'System.Action`1<System.Int32>' allocation
+PAC2002	Info	code	Assets/Script/Se/HealthSe.cs	37	'System.Action`1<System.Int32>' allocation
+PAC2002	Info	code	Assets/Script/Se/HealthSe.cs	38	'System.Action' allocation
+PAC2002	Info	code	Assets/Script/Se/HealthSe.cs	44	'System.Action`1<System.Int32>' allocation
+PAC2002	Info	code	Assets/Script/Se/HealthSe.cs	45	'System.Action`1<System.Int32>' allocation
+PAC2002	Info	code	Assets/Script/Se/HealthSe.cs	46	'System.Action' allocation
+PAC2004	Info	code	Assets/Script/Se/SeData.cs	29	'AudioClip' array allocation
+PAC2002	Moderate	code	Assets/Script/Se/SeManager.cs	63	'UnityEngine.GameObject' allocation
+PAC0225	Major	code	Assets/Script/Se/SeManager.cs	63	'UnityEngine.GameObject.AddComponent<SeManager>' usage
+PAC2004	Info	code	Assets/Script/Se/SeManager.cs	222	'Slot' array allocation
+PAC2000	Moderate	code	Assets/Script/Se/SeManager.cs	225	Conversion from value type 'Int32' to ref type
+PAC2002	Info	code	Assets/Script/Se/SeManager.cs	225	'UnityEngine.GameObject' allocation
+PAC0225	Moderate	code	Assets/Script/Se/SeManager.cs	228	'UnityEngine.GameObject.AddComponent<UnityEngine.AudioSource>' usage
+PAC2002	Info	code	Assets/Script/Se/SeManager.cs	232	'SeManager/Slot' allocation
+PAC0231	Major	code	Assets/Script/Se/SeManager.cs	291	'UnityEngine.Object.name' usage
+PAC1002	Moderate	code	Assets/Script/Se/SeManager.cs	291	'System.String.Concat' usage
+PAC0193	Moderate	code	Assets/Script/Se/SeManager.cs	291	Use of Debug.LogWarning in 'Play'
+PAC2002	Info	code	Assets/Script/Se/SeManager.cs	112	'System.Collections.Generic.Dictionary`2<SeData,System.Single>' allocation
+PAC1001	Moderate	code	Assets/Script/Singleton/Singleton.cs	21	'System.Reflection.MemberInfo.get_Name' usage
+PAC1002	Info	code	Assets/Script/Singleton/Singleton.cs	21	'System.String.Concat' usage
+PAC0192	Info	code	Assets/Script/Singleton/Singleton.cs	21	Use of Debug.Log in 'Awake'
+PAC2002	Moderate	code	Assets/Script/Spawner/Enemy/EnemyDataSpawner.cs	154	'System.Predicate`1<Enemy>' allocation
+PAC2000	Moderate	code	Assets/Script/Spawner/Enemy/EnemyDataSpawner.cs	164	Conversion from value type 'Int32' to ref type
+PAC2000	Moderate	code	Assets/Script/Spawner/Enemy/EnemyDataSpawner.cs	164	Conversion from value type 'Int32' to ref type
+PAC2000	Moderate	code	Assets/Script/Spawner/Enemy/EnemyDataSpawner.cs	164	Conversion from value type 'Int32' to ref type
+PAC2000	Moderate	code	Assets/Script/Spawner/Enemy/EnemyDataSpawner.cs	165	Conversion from value type 'float' to ref type
+PAC2006	Info	code	Assets/Script/Spawner/Enemy/EnemyDataSpawner.cs	166	'Object' array allocation
+PAC2000	Moderate	code	Assets/Script/Spawner/Enemy/EnemyDataSpawner.cs	166	Conversion from value type 'Int32' to ref type
+PAC2000	Moderate	code	Assets/Script/Spawner/Enemy/EnemyDataSpawner.cs	166	Conversion from value type 'Int32' to ref type
+PAC2002	Moderate	code	Assets/Script/Spawner/Enemy/EnemyDataSpawner.cs	217	'EnemyDataSpawner/PendingSpawn' allocation
+PAC2002	Moderate	code	Assets/Script/Spawner/Enemy/EnemyDataSpawner.cs	270	'System.Predicate`1<SpawnEntry>' allocation
+PAC2002	Moderate	code	Assets/Script/Spawner/Enemy/EnemyDataSpawner.cs	298	'System.Collections.Generic.List`1<UnityEngine.Vector2>' allocation
+PAC2002	Info	code	Assets/Script/Spawner/Enemy/EnemyDataSpawner.cs	54	'System.Collections.Generic.List`1<SpawnEntry>' allocation
+PAC2002	Info	code	Assets/Script/Spawner/Enemy/EnemyDataSpawner.cs	85	'System.Collections.Generic.List`1<UnityEngine.Transform>' allocation
+PAC2002	Info	code	Assets/Script/Spawner/Enemy/EnemyDataSpawner.cs	99	'GameCondition' allocation
+PAC2002	Info	code	Assets/Script/Spawner/Enemy/EnemyDataSpawner.cs	133	'System.Collections.Generic.List`1<Enemy>' allocation
+PAC2002	Info	code	Assets/Script/Spawner/Enemy/EnemyDataSpawner.cs	134	'System.Collections.Generic.List`1<EnemyDataSpawner/PendingSpawn>' allocation
+PAC0193	Moderate	code	Assets/Script/Spawner/Enemy/EnemySpawner.cs	102	Use of Debug.LogWarning in 'UpdateEnemyTarget'
+PAC0193	Info	code	Assets/Script/Spawner/ObjectSpawner.cs	59	Use of Debug.LogWarning in 'Awake'
+PAC0192	Info	code	Assets/Script/Spawner/ObjectSpawner.cs	78	Use of Debug.Log in 'SpawnObject'
+PAC0224	Moderate	code	Assets/Script/Spawner/ObjectSpawner.cs	83	'UnityEngine.Object.Instantiate<UnityEngine.GameObject>' usage
+PAC0225	Moderate	code	Assets/Script/Spawner/ObjectSpawner.cs	94	'UnityEngine.GameObject.AddComponent<SpawnedObject>' usage
+PAC2002	Info	code	Assets/Script/Spawner/ObjectSpawner.cs	98	'System.Action' allocation
+PAC2000	Moderate	code	Assets/Script/Spawner/ObjectSpawner.cs	100	Conversion from value type 'Int32' to ref type
+PAC0192	Info	code	Assets/Script/Spawner/ObjectSpawner.cs	100	Use of Debug.Log in 'SpawnObject'
+PAC0231	Moderate	code	Assets/Script/Spawner/ObjectSpawner.cs	130	'UnityEngine.Object.name' usage
+PAC1002	Info	code	Assets/Script/Spawner/ObjectSpawner.cs	130	'System.String.Concat' usage
+PAC0192	Info	code	Assets/Script/Spawner/ObjectSpawner.cs	130	Use of Debug.Log in 'OnObjectDestroyed'
+PAC0224	Moderate	code	Assets/Script/Spawner/Player/PlayerPartySpawner.cs	104	'UnityEngine.Object.Instantiate<UnityEngine.GameObject>' usage
+PAC0224	Moderate	code	Assets/Script/Spawner/Player/PlayerPartySpawner.cs	106	'UnityEngine.Object.Instantiate<UnityEngine.GameObject>' usage
+PAC0225	Moderate	code	Assets/Script/Spawner/Player/PlayerPartySpawner.cs	150	'UnityEngine.GameObject.AddComponent<Health>' usage
+PAC1002	Info	code	Assets/Script/Spawner/Player/PlayerSpawnPoint.cs	94	'System.String.Concat' usage
+PAC0193	Info	code	Assets/Script/Spawner/Player/PlayerSpawnPoint.cs	94	Use of Debug.LogWarning in 'ConsumePending'
+PAC0231	Moderate	code	Assets/Script/SpriteAnimation/AnimEventAction.cs	83	'UnityEngine.Object.name' usage
+PAC1002	Info	code	Assets/Script/SpriteAnimation/AnimEventAction.cs	83	'System.String.Concat' usage
+PAC0193	Info	code	Assets/Script/SpriteAnimation/AnimEventAction.cs	83	Use of Debug.LogWarning in 'GetTarget'
+PAC0231	Moderate	code	Assets/Script/SpriteAnimation/AnimEventAction.cs	89	'UnityEngine.Object.name' usage
+PAC1002	Info	code	Assets/Script/SpriteAnimation/AnimEventAction.cs	89	'System.String.Concat' usage
+PAC0193	Info	code	Assets/Script/SpriteAnimation/AnimEventAction.cs	89	Use of Debug.LogWarning in 'WarnMissing'
+PAC2002	Info	code	Assets/Script/SpriteAnimation/CharacterAnimLink.cs	86	'System.Action`1<System.Int32>' allocation
+PAC2002	Info	code	Assets/Script/SpriteAnimation/CharacterAnimLink.cs	91	'System.Action`1<System.Int32>' allocation
+PAC2004	Moderate	code	Assets/Script/SpriteAnimation/SpriteAnimData.cs	146	'Sprite[]' array allocation
+PAC2005	Major	code	Assets/Script/SpriteAnimation/SpriteAnimData.cs	146	Parameters array 'Sprite[][] lists' allocation
+PAC2004	Moderate	code	Assets/Script/SpriteAnimation/SpriteAnimData.cs	152	'Sprite[]' array allocation
+PAC2005	Major	code	Assets/Script/SpriteAnimation/SpriteAnimData.cs	152	Parameters array 'Sprite[][] lists' allocation
+PAC2004	Moderate	code	Assets/Script/SpriteAnimation/SpriteAnimData.cs	165	'Sprite[]' array allocation
+PAC2005	Major	code	Assets/Script/SpriteAnimation/SpriteAnimData.cs	165	Parameters array 'Sprite[][] lists' allocation
+PAC2004	Info	code	Assets/Script/SpriteAnimation/SpriteAnimData.cs	94	'Sprite' array allocation
+PAC2004	Info	code	Assets/Script/SpriteAnimation/SpriteAnimData.cs	97	'Sprite' array allocation
+PAC2004	Info	code	Assets/Script/SpriteAnimation/SpriteAnimData.cs	100	'Sprite' array allocation
+PAC2004	Info	code	Assets/Script/SpriteAnimation/SpriteAnimData.cs	103	'Sprite' array allocation
+PAC2002	Info	code	Assets/Script/SpriteAnimation/SpriteAnimData.cs	116	'System.Collections.Generic.List`1<System.Single>' allocation
+PAC2002	Info	code	Assets/Script/SpriteAnimation/SpriteAnimData.cs	119	'System.Collections.Generic.List`1<SpriteAnimFrameEvent>' allocation
+PAC2002	Info	code	Assets/Script/SpriteAnimation/SpriteAnimData.cs	239	'System.Collections.Generic.List`1<SpriteAnimClip>' allocation
+PAC0231	Major	code	Assets/Script/SpriteAnimation/SpriteAnimator.cs	373	'UnityEngine.Object.name' usage
+PAC1002	Moderate	code	Assets/Script/SpriteAnimation/SpriteAnimator.cs	373	'System.String.Concat' usage
+PAC0193	Moderate	code	Assets/Script/SpriteAnimation/SpriteAnimator.cs	373	Use of Debug.LogWarning in 'FireFrame'
+PAC2002	Info	code	Assets/Script/StageDarkness/LightSource.cs	90	'UnityEngine.GameObject' allocation
+PAC0225	Moderate	code	Assets/Script/StageDarkness/LightSource.cs	92	'UnityEngine.GameObject.AddComponent<UnityEngine.Rendering.Universal.Light2D>' usage
+PAC0193	Moderate	code	Assets/Script/StageDarkness/LightSource.cs	215	Use of Debug.LogWarning in 'GetSharedUnlitMaterial'
+PAC2002	Moderate	code	Assets/Script/StageDarkness/LightSource.cs	218	'UnityEngine.Material' allocation
+PAC0172	Moderate	code	Assets/Script/StageDarkness/LightSource.cs	225	'UnityEngine.SortingLayer.layers' usage
+PAC2004	Info	code	Assets/Script/StageDarkness/LightSource.cs	226	'Int32' array allocation
+PAC2002	Info	code	Assets/Script/StageDarkness/StageDarkness.cs	237	'UnityEngine.GameObject' allocation
+PAC0225	Moderate	code	Assets/Script/StageDarkness/StageDarkness.cs	238	'UnityEngine.GameObject.AddComponent<UnityEngine.Rendering.Universal.Light2D>' usage
+PAC2002	Info	code	Assets/Script/StageDarkness/StageDarkness.cs	251	'UnityEngine.GameObject' allocation
+PAC0225	Moderate	code	Assets/Script/StageDarkness/StageDarkness.cs	253	'UnityEngine.GameObject.AddComponent<UnityEngine.Rendering.Universal.Light2D>' usage
+PAC0172	Moderate	code	Assets/Script/StageDarkness/StageDarkness.cs	274	'UnityEngine.SortingLayer.layers' usage
+PAC2004	Info	code	Assets/Script/StageDarkness/StageDarkness.cs	275	'Int32' array allocation
+PAC2002	Info	code	Assets/Script/Talk/CharacterProfile.cs	68	'System.Collections.Generic.List`1<CharacterProfile/ExpressionSprite>' allocation
+PAC2004	Info	code	Assets/Script/Talk/Dialogue.cs	90	'Line' array allocation
+PAC2002	Info	code	Assets/Script/Talk/Dialogue.cs	90	'DialogueData/Line' allocation
+PAC2004	Info	code	Assets/Script/Talk/DialogueData.cs	88	'Line' array allocation
+PAC2004	Info	code	Assets/Script/Talk/DialogueData.cs	71	'Line' array allocation
+PAC2002	Info	code	Assets/Script/Talk/DialogueEventAction.cs	109	'System.Action' allocation
+PAC0231	Moderate	code	Assets/Script/Talk/DialogueEventAction.cs	114	'UnityEngine.Object.name' usage
+PAC1002	Info	code	Assets/Script/Talk/DialogueEventAction.cs	114	'System.String.Concat' usage
+PAC0193	Info	code	Assets/Script/Talk/DialogueEventAction.cs	114	Use of Debug.LogWarning in 'Execute'
+PAC0231	Moderate	code	Assets/Script/Talk/DialogueManager.cs	139	'UnityEngine.Object.name' usage
+PAC1002	Info	code	Assets/Script/Talk/DialogueManager.cs	139	'System.String.Concat' usage
+PAC0231	Moderate	code	Assets/Script/Talk/DialogueManager.cs	140	'UnityEngine.Object.name' usage
+PAC1002	Info	code	Assets/Script/Talk/DialogueManager.cs	140	'System.String.Concat' usage
+PAC0231	Moderate	code	Assets/Script/Talk/DialogueManager.cs	141	'UnityEngine.Object.name' usage
+PAC1002	Info	code	Assets/Script/Talk/DialogueManager.cs	141	'System.String.Concat' usage
+PAC0193	Info	code	Assets/Script/Talk/DialogueManager.cs	141	Use of Debug.LogWarning in 'Awake'
+PAC2004	Info	code	Assets/Script/Talk/DialogueManager.cs	162	'Type' array allocation
+PAC2002	Info	code	Assets/Script/Talk/DialogueManager.cs	162	'UnityEngine.GameObject' allocation
+PAC0225	Moderate	code	Assets/Script/Talk/DialogueManager.cs	170	'UnityEngine.GameObject.AddComponent<TMPro.TextMeshProUGUI>' usage
+PAC0193	Info	code	Assets/Script/Talk/DialogueManager.cs	203	Use of Debug.LogWarning in 'StartDialogue'
+PAC0231	Major	code	Assets/Script/Talk/DialogueManager.cs	414	'UnityEngine.Object.name' usage
+PAC2000	Major	code	Assets/Script/Talk/DialogueManager.cs	414	Conversion from value type 'Expression' to ref type
+PAC0193	Moderate	code	Assets/Script/Talk/DialogueManager.cs	414	Use of Debug.LogWarning in 'UpdatePortraits'
+PAC2004	Info	code	Assets/Script/Talk/DialogueManager.cs	69	'Key' array allocation
+PAC2002	Info	code	Assets/Script/Timpani/TimpaniBarks.cs	120	'System.Action`1<TimpaniPeg>' allocation
+PAC2002	Info	code	Assets/Script/Timpani/TimpaniBarks.cs	121	'System.Action`1<TimpaniPeg>' allocation
+PAC2002	Info	code	Assets/Script/Timpani/TimpaniBarks.cs	122	'System.Action`2<TimpaniUnit,TimpaniPeg>' allocation
+PAC2002	Info	code	Assets/Script/Timpani/TimpaniBarks.cs	123	'System.Action`1<TimpaniUnit>' allocation
+PAC2002	Info	code	Assets/Script/Timpani/TimpaniBarks.cs	124	'System.Action' allocation
+PAC2002	Info	code	Assets/Script/Timpani/TimpaniBarks.cs	125	'System.Action' allocation
+PAC2002	Info	code	Assets/Script/Timpani/TimpaniBarks.cs	126	'System.Action`1<InstantPickup>' allocation
+PAC2002	Info	code	Assets/Script/Timpani/TimpaniBarks.cs	127	'System.Action`2<InstantPickup,UnityEngine.GameObject>' allocation
+PAC2002	Info	code	Assets/Script/Timpani/TimpaniBarks.cs	132	'System.Action`1<TimpaniPeg>' allocation
+PAC2002	Info	code	Assets/Script/Timpani/TimpaniBarks.cs	133	'System.Action`1<TimpaniPeg>' allocation
+PAC2002	Info	code	Assets/Script/Timpani/TimpaniBarks.cs	134	'System.Action`2<TimpaniUnit,TimpaniPeg>' allocation
+PAC2002	Info	code	Assets/Script/Timpani/TimpaniBarks.cs	135	'System.Action`1<TimpaniUnit>' allocation
+PAC2002	Info	code	Assets/Script/Timpani/TimpaniBarks.cs	136	'System.Action' allocation
+PAC2002	Info	code	Assets/Script/Timpani/TimpaniBarks.cs	137	'System.Action' allocation
+PAC2002	Info	code	Assets/Script/Timpani/TimpaniBarks.cs	138	'System.Action`1<InstantPickup>' allocation
+PAC2002	Info	code	Assets/Script/Timpani/TimpaniBarks.cs	139	'System.Action`2<InstantPickup,UnityEngine.GameObject>' allocation
+PAC2002	Moderate	code	Assets/Script/Timpani/TimpaniBarks.cs	193	'System.Action`1<System.Int32>' allocation
+PAC2002	Moderate	code	Assets/Script/Timpani/TimpaniBarks.cs	194	'System.Action`1<System.Int32>' allocation
+PAC2002	Moderate	code	Assets/Script/Timpani/TimpaniBarks.cs	199	'System.Action`1<System.Int32>' allocation
+PAC2002	Moderate	code	Assets/Script/Timpani/TimpaniBarks.cs	200	'System.Action`1<System.Int32>' allocation
+PAC2002	Moderate	code	Assets/Script/Timpani/TimpaniBarks.cs	230	'System.Collections.Generic.List`1<BarkLine>' allocation
+PAC2002	Info	code	Assets/Script/Timpani/TimpaniBarks.cs	106	'System.Collections.Generic.List`1<TimpaniBarks/Entry>' allocation
+PAC2002	Info	code	Assets/Script/Timpani/TimpaniPeg.cs	379	'UnityEngine.GameObject' allocation
+PAC0225	Moderate	code	Assets/Script/Timpani/TimpaniPeg.cs	382	'UnityEngine.GameObject.AddComponent<TMPro.TextMeshPro>' usage
+PAC2002	Info	code	Assets/Script/Timpani/TimpaniPeg.cs	391	'UnityEngine.GameObject' allocation
+PAC0225	Moderate	code	Assets/Script/Timpani/TimpaniPeg.cs	394	'UnityEngine.GameObject.AddComponent<UnityEngine.LineRenderer>' usage
+PAC2002	Info	code	Assets/Script/Timpani/TimpaniPeg.cs	399	'UnityEngine.Material' allocation
+PAC2002	Moderate	code	Assets/Script/Timpani/TimpaniPeg.cs	433	'System.String' allocation
+PAC2002	Moderate	code	Assets/Script/Timpani/TimpaniPeg.cs	433	'System.String' allocation
+PAC1002	Moderate	code	Assets/Script/Timpani/TimpaniPeg.cs	433	'System.String.Concat' usage
+PAC0026	Moderate	code	Assets/Script/Timpani/TimpaniRoom.cs	85	'UnityEngine.Component.GetComponentsInChildren<TimpaniUnit>' usage
+PAC2002	Info	code	Assets/Script/Timpani/TimpaniRoom.cs	116	'System.Action`1<TimpaniUnit>' allocation
+PAC2002	Info	code	Assets/Script/Timpani/TimpaniRoom.cs	121	'System.Action`1<TimpaniUnit>' allocation
+PAC2002	Info	code	Assets/Script/Timpani/TimpaniRoom.cs	29	'System.Collections.Generic.List`1<TimpaniUnit>' allocation
+PAC2002	Info	code	Assets/Script/Timpani/TimpaniRoom.cs	33	'System.Collections.Generic.List`1<GameFlag>' allocation
+PAC2002	Info	code	Assets/Script/Timpani/TimpaniRoom.cs	48	'System.Collections.Generic.List`1<UnityEngine.GameObject>' allocation
+PAC0026	Moderate	code	Assets/Script/Timpani/TimpaniUnit.cs	122	'UnityEngine.Component.GetComponentsInChildren<TimpaniPeg>' usage
+PAC2002	Info	code	Assets/Script/Timpani/TimpaniUnit.cs	123	'System.Predicate`1<TimpaniPeg>' allocation
+PAC2002	Info	code	Assets/Script/Timpani/TimpaniUnit.cs	128	'System.Action`1<TimpaniPeg>' allocation
+PAC2002	Info	code	Assets/Script/Timpani/TimpaniUnit.cs	133	'System.Action`1<TimpaniPeg>' allocation
+PAC0026	Moderate	code	Assets/Script/Timpani/TimpaniUnit.cs	235	'UnityEngine.Component.GetComponentsInChildren<UnityEngine.SpriteRenderer>' usage
+PAC2002	Info	code	Assets/Script/Timpani/TimpaniUnit.cs	244	'UnityEngine.GameObject' allocation
+PAC0225	Moderate	code	Assets/Script/Timpani/TimpaniUnit.cs	248	'UnityEngine.GameObject.AddComponent<TMPro.TextMeshPro>' usage
+PAC2002	Info	code	Assets/Script/Timpani/TimpaniUnit.cs	34	'System.Collections.Generic.List`1<TimpaniPeg>' allocation
+PAC2000	Moderate	code	Assets/Script/Title/SaveSlotButton.cs	54	Conversion from value type 'Int32' to ref type
+PAC1002	Info	code	Assets/Script/Title/SaveSlotButton.cs	55	'System.String.Concat' usage
+PAC2004	Info	code	Assets/Script/Title/SaveSlotButton.cs	66	'String' array allocation
+PAC1002	Info	code	Assets/Script/Title/SaveSlotButton.cs	66	'System.String.Concat' usage
+PAC2003	Info	code	Assets/Script/Title/SaveSlotButton.cs	0	Closure allocation in 'SaveSlotButton.SetOnClick'
+PAC2002	Info	code	Assets/Script/Title/SaveSlotButton.cs	79	'UnityEngine.Events.UnityAction' allocation
+PAC2002	Info	code	Assets/Script/Title/TitleMenu.cs	72	'UnityEngine.Events.UnityAction' allocation
+PAC2002	Info	code	Assets/Script/Title/TitleMenu.cs	73	'UnityEngine.Events.UnityAction' allocation
+PAC2002	Info	code	Assets/Script/Title/TitleMenu.cs	74	'UnityEngine.Events.UnityAction' allocation
+PAC2002	Info	code	Assets/Script/Title/TitleMenu.cs	110	'System.Action`1<System.Int32>' allocation
+PAC2002	Info	code	Assets/Script/Title/TitleMenu.cs	110	'System.Action' allocation
+PAC2002	Info	code	Assets/Script/Title/TitleMenu.cs	124	'System.Action`1<System.Int32>' allocation
+PAC2002	Info	code	Assets/Script/Title/TitleMenu.cs	124	'System.Action' allocation
+PAC1002	Info	code	Assets/Script/Treasure/Treasure.cs	63	'System.String.Concat' usage
+PAC0192	Info	code	Assets/Script/Treasure/Treasure.cs	83	Use of Debug.Log in 'Interact'
+PAC0192	Info	code	Assets/Script/Treasure/Treasure.cs	89	Use of Debug.Log in 'Interact'
+PAC0193	Info	code	Assets/Script/UI/AttackArcGauge/TimingGaugeUI.cs	141	Use of Debug.LogWarning in 'Awake'
+PAC2000	Major	code	Assets/Script/UI/AttackArcGauge/TimingGaugeUI.cs	244	Conversion from value type 'JudgeResult' to ref type
+PAC2000	Major	code	Assets/Script/UI/AttackArcGauge/TimingGaugeUI.cs	244	Conversion from value type 'float' to ref type
+PAC0192	Moderate	code	Assets/Script/UI/AttackArcGauge/TimingGaugeUI.cs	244	Use of Debug.Log in 'JudgeFinish'
+PAC2002	Info	code	Assets/Script/UI/Common/ConfirmDialog.cs	63	'UnityEngine.Events.UnityAction' allocation
+PAC2002	Info	code	Assets/Script/UI/Common/ConfirmDialog.cs	64	'UnityEngine.Events.UnityAction' allocation
+PAC0026	Moderate	code	Assets/Script/UI/Common/MenuKeyboardNav.cs	55	'UnityEngine.Component.GetComponentsInChildren<UnityEngine.UI.Button>' usage
+PAC2002	Info	code	Assets/Script/UI/Common/MenuKeyboardNav.cs	86	'System.Predicate`1<UnityEngine.UI.Button>' allocation
+PAC2002	Info	code	Assets/Script/UI/Common/MenuKeyboardNav.cs	31	'System.Collections.Generic.List`1<UnityEngine.UI.Button>' allocation
+PAC2002	Info	code	Assets/Script/UI/Common/PlaceNameTable.cs	61	'PlaceNameTable/Entry' allocation
+PAC2002	Info	code	Assets/Script/UI/Common/PlaceNameTable.cs	34	'System.Collections.Generic.List`1<PlaceNameTable/Entry>' allocation
+PAC2002	Info	code	Assets/Script/UI/Common/SaveSlotPanel.cs	94	'UnityEngine.Events.UnityAction' allocation
+PAC2002	Info	code	Assets/Script/UI/Common/SaveSlotPanel.cs	162	'System.Action' allocation
+PAC2003	Info	code	Assets/Script/UI/Common/SaveSlotPanel.cs	0	Closure allocation in 'SaveSlotPanel.Refresh'
+PAC2002	Info	code	Assets/Script/UI/Common/SaveSlotPanel.cs	181	'System.Action' allocation
+PAC0224	Moderate	code	Assets/Script/UI/Common/SaveSlotPanel.cs	193	'UnityEngine.Object.Instantiate<SaveSlotButton>' usage
+PAC2003	Info	code	Assets/Script/UI/Common/SaveSlotPanel.cs	0	Closure allocation in 'SaveSlotPanel.OnSlotClicked'
+PAC2002	Info	code	Assets/Script/UI/Common/SaveSlotPanel.cs	239	'System.Action' allocation
+PAC2002	Info	code	Assets/Script/UI/Common/SaveSlotPanel.cs	239	'System.Action' allocation
+PAC2000	Moderate	code	Assets/Script/UI/Common/SaveSlotPanel.cs	286	Conversion from value type 'Int32' to ref type
+PAC2000	Moderate	code	Assets/Script/UI/Common/SaveSlotPanel.cs	290	Conversion from value type 'Int32' to ref type
+PAC1002	Info	code	Assets/Script/UI/Common/SaveSlotPanel.cs	293	'System.String.Concat' usage
+PAC2000	Moderate	code	Assets/Script/UI/Common/SaveSlotPanel.cs	297	Conversion from value type 'Int32' to ref type
+PAC2000	Moderate	code	Assets/Script/UI/Common/SaveSlotPanel.cs	297	Conversion from value type 'Int32' to ref type
+PAC2002	Info	code	Assets/Script/UI/Common/SaveSlotPanel.cs	325	'System.Collections.Generic.List`1<SaveSlotButton>' allocation
+PAC2002	Info	code	Assets/Script/UI/Common/SaveSlotPanel.cs	52	'System.Collections.Generic.List`1<SaveSlotButton>' allocation
+PAC2002	Info	code	Assets/Script/UI/Common/UIButtonSound.cs	28	'UnityEngine.Events.UnityAction' allocation
+PAC2002	Info	code	Assets/Script/UI/Common/UISubmitKeys.cs	41	'UnityEngine.GameObject' allocation
+PAC0225	Moderate	code	Assets/Script/UI/Common/UISubmitKeys.cs	44	'UnityEngine.GameObject.AddComponent<UISubmitKeys>' usage
+PAC2002	Moderate	code	Assets/Script/UI/Common/UISubmitKeys.cs	59	'System.Action`1<UnityEngine.InputSystem.InputAction/CallbackContext>' allocation
+PAC2002	Moderate	code	Assets/Script/UI/Common/UISubmitKeys.cs	61	'System.Action`1<UnityEngine.InputSystem.InputAction/CallbackContext>' allocation
+PAC2002	Info	code	Assets/Script/UI/Common/UISubmitKeys.cs	89	'System.Action`1<UnityEngine.InputSystem.InputAction/CallbackContext>' allocation
+PAC2004	Info	code	Assets/Script/UI/Common/UISubmitKeys.cs	28	'String' array allocation
+PAC0193	Info	code	Assets/Script/UI/GameMenu/GameMenu.cs	134	Use of Debug.LogWarning in 'CreateIfMissing'
+PAC0224	Moderate	code	Assets/Script/UI/GameMenu/GameMenu.cs	138	'UnityEngine.Object.Instantiate<UnityEngine.GameObject>' usage
+PAC0231	Moderate	code	Assets/Script/UI/GameMenu/GameMenu.cs	138	'UnityEngine.Object.name' usage
+PAC2002	Info	code	Assets/Script/UI/GameMenu/GameMenu.cs	157	'UnityEngine.Events.UnityAction' allocation
+PAC2002	Info	code	Assets/Script/UI/GameMenu/GameMenu.cs	158	'UnityEngine.Events.UnityAction' allocation
+PAC2002	Info	code	Assets/Script/UI/GameMenu/GameMenu.cs	159	'UnityEngine.Events.UnityAction' allocation
+PAC2002	Info	code	Assets/Script/UI/GameMenu/GameMenu.cs	160	'UnityEngine.Events.UnityAction' allocation
+PAC2002	Info	code	Assets/Script/UI/GameMenu/GameMenu.cs	161	'UnityEngine.Events.UnityAction' allocation
+PAC2002	Info	code	Assets/Script/UI/GameMenu/GameMenu.cs	168	'UnityEngine.Events.UnityAction`2<UnityEngine.SceneManagement.Scene,UnityEngine.SceneManagement.LoadSceneMode>' allocation
+PAC2002	Info	code	Assets/Script/UI/GameMenu/GameMenu.cs	173	'UnityEngine.Events.UnityAction`2<UnityEngine.SceneManagement.Scene,UnityEngine.SceneManagement.LoadSceneMode>' allocation
+PAC2002	Info	code	Assets/Script/UI/GameMenu/GameMenu.cs	271	'System.Action' allocation
+PAC2002	Info	code	Assets/Script/UI/GameMenu/GameMenu.cs	290	'System.Action' allocation
+PAC2002	Info	code	Assets/Script/UI/GameMenu/GameMenu.cs	304	'System.Action`1<System.Int32>' allocation
+PAC2002	Info	code	Assets/Script/UI/GameMenu/GameMenu.cs	304	'System.Action' allocation
+PAC2002	Info	code	Assets/Script/UI/GameMenu/GameMenu.cs	318	'System.Action' allocation
+PAC2002	Info	code	Assets/Script/UI/GameMenu/GameMenu.cs	318	'System.Action' allocation
+PAC2003	Info	code	Assets/Script/UI/GameMenu/GameMenu.cs	0	Closure allocation in 'GameMenu.OpenSave'
+PAC2002	Info	code	Assets/Script/UI/GameMenu/GameMenu.cs	347	'System.Action' allocation
+PAC2002	Info	code	Assets/Script/UI/GameMenu/GameMenu.cs	347	'System.Action' allocation
+PAC2004	Moderate	code	Assets/Script/UI/GameMenu/GameMenu.cs	443	'Type' array allocation
+PAC2002	Moderate	code	Assets/Script/UI/GameMenu/GameMenu.cs	443	'UnityEngine.GameObject' allocation
+PAC0193	Info	code	Assets/Script/UI/ItemMenu/ItemMenuUI.cs	153	Use of Debug.LogWarning in 'CreateIfMissing'
+PAC0224	Moderate	code	Assets/Script/UI/ItemMenu/ItemMenuUI.cs	159	'UnityEngine.Object.Instantiate<UnityEngine.GameObject>' usage
+PAC0231	Moderate	code	Assets/Script/UI/ItemMenu/ItemMenuUI.cs	159	'UnityEngine.Object.name' usage
+PAC0231	Moderate	code	Assets/Script/UI/ItemMenu/ItemMenuUI.cs	179	'UnityEngine.Object.name' usage
+PAC1002	Info	code	Assets/Script/UI/ItemMenu/ItemMenuUI.cs	179	'System.String.Concat' usage
+PAC0231	Moderate	code	Assets/Script/UI/ItemMenu/ItemMenuUI.cs	180	'UnityEngine.Object.name' usage
+PAC1002	Info	code	Assets/Script/UI/ItemMenu/ItemMenuUI.cs	180	'System.String.Concat' usage
+PAC0231	Moderate	code	Assets/Script/UI/ItemMenu/ItemMenuUI.cs	181	'UnityEngine.Object.name' usage
+PAC1002	Info	code	Assets/Script/UI/ItemMenu/ItemMenuUI.cs	181	'System.String.Concat' usage
+PAC2002	Info	code	Assets/Script/UI/ItemMenu/ItemMenuUI.cs	186	'UnityEngine.Events.UnityAction`2<UnityEngine.SceneManagement.Scene,UnityEngine.SceneManagement.LoadSceneMode>' allocation
+PAC2002	Info	code	Assets/Script/UI/ItemMenu/ItemMenuUI.cs	191	'UnityEngine.Events.UnityAction`2<UnityEngine.SceneManagement.Scene,UnityEngine.SceneManagement.LoadSceneMode>' allocation
+PAC2002	Moderate	code	Assets/Script/UI/ItemMenu/ItemMenuUI.cs	335	'System.Action' allocation
+PAC2002	Moderate	code	Assets/Script/UI/ItemMenu/ItemMenuUI.cs	371	'System.Action' allocation
+PAC2004	Moderate	code	Assets/Script/UI/ItemMenu/ItemMenuUI.cs	403	'Type' array allocation
+PAC2002	Moderate	code	Assets/Script/UI/ItemMenu/ItemMenuUI.cs	403	'UnityEngine.GameObject' allocation
+PAC2002	Moderate	code	Assets/Script/UI/ItemMenu/ItemMenuUI.cs	429	'System.Collections.Generic.List`1<ItemData>' allocation
+PAC0224	Major	code	Assets/Script/UI/ItemMenu/ItemMenuUI.cs	435	'UnityEngine.Object.Instantiate<ItemSlotUI>' usage
+PAC1002	Moderate	code	Assets/Script/UI/ItemMenu/ItemMenuUI.cs	437	'System.String.Concat' usage
+PAC2000	Major	code	Assets/Script/UI/ItemMenu/ItemMenuUI.cs	497	Conversion from value type 'Int32' to ref type
+PAC2002	Info	code	Assets/Script/UI/ItemMenu/ItemMenuUI.cs	106	'System.Collections.Generic.List`1<ItemSlotUI>' allocation
+PAC0224	Major	code	Assets/Script/UI/Life/LifeUIController.cs	137	'UnityEngine.Object.Instantiate<UnityEngine.UI.Image>' usage
+PAC0231	Major	code	Assets/Script/UI/Life/LifeUIController.cs	138	'UnityEngine.Object.name' usage
+PAC2000	Major	code	Assets/Script/UI/Life/LifeUIController.cs	138	Conversion from value type 'Int32' to ref type
+PAC0231	Moderate	code	Assets/Script/UI/Life/LifeUIController.cs	166	'UnityEngine.Object.name' usage
+PAC1002	Info	code	Assets/Script/UI/Life/LifeUIController.cs	166	'System.String.Concat' usage
+PAC2002	Info	code	Assets/Script/UI/Life/LifeUIController.cs	48	'System.Collections.Generic.List`1<UnityEngine.UI.Image>' allocation
+PAC2002	Info	code	Assets/Script/kari/player/kari_player.cs	30	'System.Collections.Generic.List`1<UnityEngine.Vector3>' allocation
+PAC2002	Info	code	Assets/Script/kari/player/kari_player_test.cs	13	'System.Collections.Generic.List`1<UnityEngine.Vector3>' allocation
+PAC2004	Info	code	Assets/Script/Bgm/BgmManager.cs	335	'Single' array allocation
+PAC2002	Info	code	Assets/Script/Bgm/Effects/BgmEffectProfile.cs	33	'BgmEffectSettings' allocation
+PAC2002	Info	code	Assets/Script/Camera/ShakeEventAction.cs	43	'UnityEngine.WaitForSeconds' allocation
+PAC2002	Info	code	Assets/Script/Enemy/Attack/AttackExecution.cs	581	'System.Collections.Generic.HashSet`1<UnityEngine.Object>' allocation
+PAC2002	Info	code	Assets/Script/Enemy/Attack/AttackExecution.cs	590	'UnityEngine.WaitForFixedUpdate' allocation
+PAC0231	Moderate	code	Assets/Script/Enemy/Attack/AttackExecution.cs	675	'UnityEngine.Object.name' usage
+PAC1002	Info	code	Assets/Script/Enemy/Attack/AttackExecution.cs	675	'System.String.Concat' usage
+PAC0193	Info	code	Assets/Script/Enemy/Attack/AttackExecution.cs	675	Use of Debug.LogWarning in 'MoveNext'
+PAC0224	Moderate	code	Assets/Script/Enemy/Attack/AttackExecution.cs	457	'UnityEngine.Object.Instantiate<UnityEngine.GameObject>' usage
+PAC0224	Moderate	code	Assets/Script/Enemy/Attack/AttackExecution.cs	474	'UnityEngine.Object.Instantiate<UnityEngine.GameObject>' usage
+PAC2002	Info	code	Assets/Script/Enemy/Attack/AttackExecution.cs	413	'System.Collections.Generic.List`1<UnityEngine.Vector2>' allocation
+PAC2002	Info	code	Assets/Script/Enemy/Attack/AttackExecution.cs	421	'AttackExecution/RainDrop' allocation
+PAC2002	Info	code	Assets/Script/Enemy/Attack/AttackExecution.cs	430	'System.Predicate`1<AttackExecution/RainDrop>' allocation
+PAC0224	Moderate	code	Assets/Script/Enemy/Attack/AttackExecution.cs	545	'UnityEngine.Object.Instantiate<UnityEngine.GameObject>' usage
+PAC0224	Moderate	code	Assets/Script/Enemy/Attack/AttackExecution.cs	130	'UnityEngine.Object.Instantiate<UnityEngine.GameObject>' usage
+PAC2002	Info	code	Assets/Script/Enemy/Gimmick/DamageAreaEventAction.cs	58	'UnityEngine.GameObject' allocation
+PAC0225	Moderate	code	Assets/Script/Enemy/Gimmick/DamageAreaEventAction.cs	60	'UnityEngine.GameObject.AddComponent<AttackEmitter>' usage
+PAC2003	Info	code	Assets/Script/Enemy/Pattern/EnemyActions.cs	0	Closure allocation in '<Run>d__5.MoveNext'
+PAC2002	Info	code	Assets/Script/Enemy/Pattern/EnemyActions.cs	163	'System.Func`1<System.Boolean>' allocation
+PAC2003	Info	code	Assets/Script/Enemy/Pattern/EnemyActions.cs	0	Closure allocation in '<Run>d__5.MoveNext'
+PAC2002	Info	code	Assets/Script/Enemy/Pattern/EnemyActions.cs	212	'System.Func`1<System.Boolean>' allocation
+PAC2003	Info	code	Assets/Script/Enemy/Pattern/EnemyActions.cs	0	Closure allocation in '<Run>d__5.MoveNext'
+PAC2002	Info	code	Assets/Script/Enemy/Pattern/EnemyActions.cs	268	'System.Func`1<System.Boolean>' allocation
+PAC2003	Info	code	Assets/Script/Enemy/Pattern/EnemyActions.cs	0	Closure allocation in '<Run>d__6.MoveNext'
+PAC2002	Info	code	Assets/Script/Enemy/Pattern/EnemyActions.cs	317	'System.Func`1<System.Boolean>' allocation
+PAC2002	Info	code	Assets/Script/Enemy/Pattern/EnemyActions.cs	365	'AttackExecution' allocation
+PAC2002	Info	code	Assets/Script/Enemy/Pattern/EnemyActions.cs	717	'System.Collections.Generic.List`1<UnityEngine.Vector2>' allocation
+PAC2002	Info	code	Assets/Script/Enemy/Pattern/EnemyActions.cs	728	'System.Collections.Generic.List`1<TelegraphView>' allocation
+PAC2002	Info	code	Assets/Script/Enemy/Pattern/PatternRunner.cs	245	'UnityEngine.WaitForSeconds' allocation
+PAC2003	Info	code	Assets/Script/Enemy/Pattern/PatternRunner.cs	0	Closure allocation in '<Loop>d__61.MoveNext'
+PAC2002	Info	code	Assets/Script/Enemy/Pattern/PatternRunner.cs	270	'System.Action' allocation
+PAC2002	Info	code	Assets/Script/Event/Actions/WaitEventAction.cs	33	'UnityEngine.WaitForSecondsRealtime' allocation
+PAC2002	Info	code	Assets/Script/Event/Actions/WaitEventAction.cs	34	'UnityEngine.WaitForSeconds' allocation
+PAC2002	Info	code	Assets/Script/Event/EventProcess/EventSequence.cs	110	'System.Collections.Generic.List`1<EventAction>' allocation
+PAC2002	Info	code	Assets/Script/Event/SceneStartEvent.cs	56	'UnityEngine.WaitForSeconds' allocation
+PAC0231	Moderate	code	Assets/Script/Gimmick/Note/NoteBook.cs	37	'UnityEngine.Object.name' usage
+PAC0231	Moderate	code	Assets/Script/Gimmick/Note/NoteBook.cs	37	'UnityEngine.Object.name' usage
+PAC2003	Info	code	Assets/Script/Gimmick/Note/NoteBook.cs	0	Closure allocation in '<>c__DisplayClass5_0.<OpenList>b__0'
+PAC2002	Info	code	Assets/Script/Gimmick/Note/NoteBook.cs	59	'System.Action' allocation
+PAC2003	Info	code	Assets/Script/Gimmick/Note/NoteEventAction.cs	0	Closure allocation in '<Run>d__5.MoveNext'
+PAC2002	Info	code	Assets/Script/Gimmick/Note/NoteEventAction.cs	40	'System.Action' allocation
+PAC1002	Info	code	Assets/Script/Gimmick/PushBlock.cs	288	'System.String.Concat' usage
+PAC2002	Info	code	Assets/Script/Gimmick/PushBlock.cs	266	'UnityEngine.WaitForFixedUpdate' allocation
+PAC1002	Info	code	Assets/Script/Gimmick/PushBlock.cs	275	'System.String.Concat' usage
+PAC1002	Info	code	Assets/Script/Gimmick/PushBlock.cs	276	'System.String.Concat' usage
+PAC2002	Info	code	Assets/Script/Item/Interaction/ItemInteraction.cs	55	'System.Collections.Generic.List`1<ItemCondition>' allocation
+PAC2002	Info	code	Assets/Script/Item/Interaction/ItemInteraction.cs	58	'System.Collections.Generic.List`1<FlagCondition>' allocation
+PAC2002	Info	code	Assets/Script/Party/Bark/BarkView.cs	97	'UnityEngine.WaitForSeconds' allocation
+PAC2002	Info	code	Assets/Script/Party/Bark/BarkView.cs	132	'UnityEngine.WaitForSeconds' allocation
+PAC2003	Info	code	Assets/Script/Party/PartyWarpEventAction.cs	0	Closure allocation in '<Run>d__5.MoveNext'
+PAC2002	Info	code	Assets/Script/Party/PartyWarpEventAction.cs	67	'System.Action' allocation
+PAC2002	Info	code	Assets/Script/Save/Save.cs	31	'System.Collections.Generic.List`1<Save/Entry>' allocation
+PAC1002	Info	code	Assets/Script/Scene/SceneFader.cs	138	'System.String.Concat' usage
+PAC2002	Info	code	Assets/Script/Scene/SceneFader.cs	147	'UnityEngine.WaitForSecondsRealtime' allocation
+PAC2002	Info	code	Assets/Script/Spawner/ObjectSpawner.cs	141	'UnityEngine.WaitForSeconds' allocation
+PAC2004	Info	code	Assets/Script/SpriteAnimation/SpriteAnimData.cs	183	'Sprite[]' array allocation
+PAC2003	Info	code	Assets/Script/Talk/DialogueEventAction.cs	0	Closure allocation in '<Run>d__20.MoveNext'
+PAC2002	Info	code	Assets/Script/Talk/DialogueEventAction.cs	148	'System.Action' allocation
+PAC2002	Info	code	Assets/Script/Talk/DialogueEventAction.cs	152	'System.Action' allocation
+PAC2002	Info	code	Assets/Script/Talk/DialogueManager.cs	331	'UnityEngine.WaitForSeconds' allocation
+PAC2002	Info	code	Assets/Script/Timpani/TimpaniBarks.cs	81	'System.Collections.Generic.List`1<BarkLine>' allocation
+PAC2002	Info	code	Assets/Script/UI/GameMenu/GameMenu.cs	348	'System.Action`1<System.Int32>' allocation
+PAC2002	Info	code	Assets/Script/UI/GameMenu/GameMenu.cs	348	'System.Action' allocation
+PAC2000	Moderate	code	Assets/Script/UI/GameMenu/GameMenu.cs	354	Conversion from value type 'Int32' to ref type
+PAC2002	Info	code	Assets/Script/UI/GameMenu/GameMenu.cs	412	'UnityEngine.WaitForSecondsRealtime' allocation

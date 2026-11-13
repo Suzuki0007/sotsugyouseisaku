@@ -152,6 +152,13 @@ public class PerfMonitor : MonoBehaviour
     // 自動で作る
     //=====================================================================
 
+    // ドメインリロード無効のエディタで、前の再生の値を持ち越さない
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetStatics()
+    {
+        instance = null;
+    }
+
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
     private static void Init()
     {

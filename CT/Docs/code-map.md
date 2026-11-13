@@ -1,6 +1,6 @@
 # コード構成と問題点（開発者・Claude 向け）
 
-最終更新：2026-11-13（性能の計測 PerfMonitor を追加。性能の点検スキル perf-review で全体を点検し、問題点に追記）。**毎回は自動で読み込まない**（2026-11-12 から。機能ごとの説明は `.claude/rules/`）。コードを触る前に関係する節を読み、コードを変えたら、この表も更新すること。
+最終更新：2026-11-13（性能の計測 PerfMonitor を追加。性能の点検スキル perf-review と Project Auditor で全体を点検し、問題点に追記：ビルドのコンパイル失敗〔PlayerFollower〕・品質レベル・static のリセット漏れの疑い など）。**毎回は自動で読み込まない**（2026-11-12 から。機能ごとの説明は `.claude/rules/`）。コードを触る前に関係する節を読み、コードを変えたら、この表も更新すること。
 ファイルの参照は `Assets/Script/` からの相対パス。行番号は目安。
 
 ---
@@ -215,6 +215,7 @@
 ### 不具合・不具合の可能性
 | 優先度 | 場所 | 内容 |
 |---|---|---|
+| 中 | 🆕 `ProjectSettings/QualitySettings.asset` | エディタの今の品質レベルが「Very Low」（テクスチャが半分の解像度〔Texture Quality = Half〕）。Windows のビルドの既定は「Ultra」。エディタで見た目・重さを確かめると、完成品と条件が違う（perf.ps1 の基準の値もこの条件）。使う品質レベルを決めて、使わないレベルを消すとよい（Project Auditor の PAS0018） |
 | **高** | `Prefab/Players/Player_Noah.prefab`、`Player_Sigle.prefab` | **FootstepSe が付いていない**ため足音が鳴らない。FootstepSe は Stage1_2 のルートの `Player`（Transform と FootstepSe だけの動かないオブジェクト）に付いている。11-06 の SE 手順書は「プレハブの FootstepSe に設定」と書いていた |
 | 中 | `Bgm/Effects/BgmProgress.cs` | 進行度（static）が `SubsystemRegistration` でリセットされない（ドメインリロード無効のエディタで前回の値が残る）。セーブもされず、はじめから・つづきからでも戻らない |
 | 中 | `StageDarkness/StageDarkness.cs` FindTarget | 明かりの追従先を `FindWithTag("Player")` の最初の1人で決めるため、キャラ切り替えで操作キャラに付いていかないことがある |
@@ -255,6 +256,8 @@
 | 低 | 🆕 `Fps/Fps.cs`、`ObjectBase/ObjectBase.cs`、`CharaBase/CharaBase.cs`（鈴木さん） | 中身のない `Update()`・`Start()` が残っている。ObjectBase・CharaBase は基底クラスなので、自分で Update を持たない子（CharacterSorting・NoahInventory・NoahDead など）でも毎フレーム空の Update が呼ばれる（perf-review の US01。1 回は小さいがキャラの数だけ増える） |
 | 中 | 🆕 `BGM/PMH_Atmos_HospitalHall_01.wav`（47MB）・`BGM/BGM_Stage1.mp3`（4.7MB） | Load Type が Decompress On Load（読み込み時に展開してまるごとメモリに乗る）。BGM・長い環境音は Streaming が普通（perf-review の CT08）。音の設定なのでプランナー・サウンド担当と相談して変える |
 | 低 | 🆕 `Images/UI/UI_TitleImage.PNG`、`Images/Player/playermotion_idle(192).png` の .meta | 機種別の設定に最大サイズ 4096／8192 がある（既定は 2048。perf-review の AS01）。PC で効いているかを確かめて、要らなければ下げる |
+| 低 | 🆕 ドメインリロードの点検（Project Auditor の UDR、11-13） | ゲームのコードも解析できるようになって、static をリセットしていない疑いは 40 件（UDR0005 の 12 件を外したあと。主なもの：`Camera/CameraShake`・`Enemy/Battle/BattleArea` など（UDR0002 11 件）、`Bgm/Effects/BgmProgress`（既知）・`Bgm/BgmManager`・`Party/PartyHintView`・`Scene/SceneFader` など（UDR0001 9 件）、`Flag/FlagSwitch.cs:56` の static なイベントの登録の解除がない（UDR0004）、`Save/GameSession`・`UI/GameMenu` に RuntimeInitializeOnLoadMethod が複数（UDR0005。このプロジェクトの書き方なので auditor-ignore.md で外した））。私（uh）の `InteractPrompt`・`PartyHintView` も入っている。機械の判定なので、OnDestroy で null に戻している物などは誤検出。1 件ずつ確かめる（一覧は `PerfLog/auditor_issues.tsv` の reload） |
+| 低 | 🆕 Project Auditor のルールのパッケージ 1.0.3 | ドメインリロードの点検（UDR）がふだんのコンパイルにも入り、コンソールに警告が約 60 件出る（エディタのコードの分も含む）。新しい版（2.0.0 以降）はふだんのコンパイルから外したが、Unity 6.5 のエディタの Project Auditor 本体と合わずコンパイルエラーになる（6.6 以降向け） |
 | 低 | 🆕 `ProjectSettings/Physics2DSettings.asset` | 2D の衝突の組み合わせ（Layer Collision Matrix）がほぼ全部オンのまま（perf-review の PH10）。当たる必要のないレイヤーの組を切ると判定が軽くなる。今は 60fps に余裕があるので急がない |
 | 低 | 🆕 `Title.unity` の `System`（SceneBgm） | Default Clip が空なので、タイトルで BGM が鳴らない（ステージの曲はタイトルで止まる）。曲が決まったら入れる |
 
@@ -264,7 +267,7 @@
 | `Behavior/Enemy/AbcdefuckAction.cs` | **クラス名とノードの文言に不適切な語が含まれている**（卒業制作として提出・公開する前に削除推奨。どのグラフでも未使用） |
 | `Behavior/Enemy/SampleAction.cs` | 練習用ノード（未使用。ブラックボードの値を書き換えて戻さない） |
 | `Intaract/Intaractable.cs:58` | Debug.Log「調べられるまする」（誤字、範囲に入るたびに出る） |
-| 不要な using | `PlayerFollower`（Unity.AppUI.Redux）、`PlayerInput` / `NoahDead`（Unity.VisualScripting）、`AbcdefuckAction`（RuleTile） |
+| 不要な using | `PlayerFollower` の `using Unity.AppUI.Redux` は 11-13 にコメントアウト済み（エディタだけのパッケージで、ビルドのコンパイルが失敗していた。成田さんに確認のうえ行ごと消してよい）、`PlayerInput` / `NoahDead`（Unity.VisualScripting）、`AbcdefuckAction`（RuleTile） |
 | 使われていないクラス | `StateMachine/*`、`ComponentBase`、`FocusPlayer`、`SpriteAnimation`（Animator 版）、`kari/player/*`、`BgmProgressDebug`、`SePlayer`、`HealthSe`（シーン・プレハブに未配置） |
 | `Player_Noah/NoahBulletDeleteAreaController.cs` | ヘッダーの説明が「ノアのアニメーションクラス」になっている |
 | `Attack/AreaAttack.cs` | 命中のたびに Debug.Log。Health がない相手（壁など）に当たるたびにも Log |

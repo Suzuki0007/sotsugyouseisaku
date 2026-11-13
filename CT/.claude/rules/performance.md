@@ -13,12 +13,19 @@ paths:
 ## 決めたこと（2026-11-13、ユーザーと合意）
 - **推測で直さない。計測して原因を決め、直したら前後を比べる**（バイブル 1章）。
 - 目標：**60fps**（`Fps.cs` が targetFrameRate 60・VSync なし）。重い場面の基準は **ティンパニ戦**（Stage_1_3、戦闘エリアが動いている間）。
-- 4段階で進める：①計測の道具（PerfMonitor・perf.ps1）**完了** → ②点検のスキル `perf-review` **完了**（ティップス 4部3章の公開ルール集〔MIT、163 ルール〕を `references/upstream/` に取り込み、独自ルール CT01〜08・例外 `rules-overrides.md`・環境 `tuning-env.md`。一次の点検は `scan.ps1`〔Python がないので PowerShell に移した。毎フレームの処理の中かどうか＝hot／code／tooling／asset を行ごとに決め、例外を機械的に当てる〕）→ ③ Project Auditor（`com.unity.project-auditor-rules` を入れるのは許可をもらってから）→ ④ 計測で重いとわかった所だけ直す（ほかの人のコードは報告だけ）。
+- 4段階で進める：①計測の道具（PerfMonitor・perf.ps1）**完了** → ②点検のスキル `perf-review` **完了**（ティップス 4部3章の公開ルール集〔MIT、163 ルール〕を `references/upstream/` に取り込み、独自ルール CT01〜08・例外 `rules-overrides.md`・環境 `tuning-env.md`。一次の点検は `scan.ps1`〔Python がないので PowerShell に移した。毎フレームの処理の中かどうか＝hot／code／tooling／asset を行ごとに決め、例外を機械的に当てる〕）→ ③ Project Auditor **完了**（ルールのパッケージ `com.unity.project-auditor-rules` 1.0.3 をユーザーの許可で追加。3.2.0〔Package Manager の既定〕と 2.0.0 は 6.5 のエディタの本体と API が合わずコンパイルエラー → 1.0.3。`perf-review/scripts/auditor.ps1` で解析・要約・差分・記録）→ ④ 計測で重いとわかった所だけ直す（ほかの人のコードは報告だけ）。
 
 ## 道具
 - `Debug/PerfMonitor.cs`：エディタと Development Build だけで自動で作られる。画面右上の表示（F3）、`BeginRecord`／`EndRecord`、`Snapshot`／`CollectNow`。
 - `unity-playtest/scripts/perf.ps1`：`-Measure -Label x -Seconds 20`（記録 → `PerfLog/perf.csv` に追記 → 同じラベルの前回と比べる → 3 秒プロファイラでゲームの分の確保と上位の処理）、`-Begin`／`-End`、`-Profile`、`-Snapshot`、`-LeakCheck -Times 3`（`event.ps1 -Reload` を繰り返して増え続けないか。先に `-SaveOn`・`-AutoSave`）、`-History`、`-Overlay`。
 - `perf_profile.cs`：プロファイラ（`ProfilerDriver`）の記録を読み、PlayerLoop の GC の確保・時間と、確保の多いスクリプト・時間の多い処理を出す。
+
+## Project Auditor で決めたこと・わかったこと（11-13）
+- 版を上げるのは Unity を 6.6 以降にしたとき（上げるなら Package Manager の既定の版を入れて unity-check、エラーなら戻す）。
+- 1.0.3 はドメインリロードの点検（UDR）をふだんのコンパイルにも入れるので、コンソールに警告が約 60 件出る（エディタのコードの分も含む）。unity-check の「前からある警告」に UDR*** が混ざるのは正常。
+- **エディタの品質レベルが Very Low（テクスチャ半分）**、Windows のビルドの既定は Ultra。perf.ps1 の基準の値はエディタ＝Very Low の条件（品質レベルを変えたら測り直す）。
+- 初回の解析で、エディタでは通るがビルドでは通らないコードが見つかった（`PlayerFollower` の `using Unity.AppUI.Redux`。ユーザーの指示でコメントアウト）。**ビルドの前は auditor.ps1** を。プレイヤー向けのコンパイルが通らないと、ゲームのコード（B）は 0 件に見えるので注意（出力の先頭に !! が出る）。
+- 2 回目以降は「前回との差分」を見る。基準：アセット・設定 24・ゲームのコード 1179・ドメインリロード 40（UDR0005 を外したあと）・エディタ 1819・外した 132（11-13）。
 
 ## 計測の落とし穴（エディタ）
 - **エディタでは「GC Allocated In Frame」にエディタ自身の確保（約 200KB/フレーム）が入る**。ゲームの分はプロファイラの PlayerLoop の値（`gameGcKBPerFrame`、11-13 のティンパニ戦で 約 1.3〜1.7KB）。`GC.GetAllocatedBytesForCurrentThread` はこの Mono では 0 を返すので使えない。
