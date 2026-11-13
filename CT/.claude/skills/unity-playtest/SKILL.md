@@ -52,6 +52,20 @@ powershell -NoProfile -ExecutionPolicy Bypass -File $ev -Flag Flag_Sigle_Joined 
 powershell -NoProfile -ExecutionPolicy Bypass -File $ev -Capture s1         # ゲームビューを撮る（%TEMP%\ct_playtest_capture\s1.png を Read で見る）
 ```
 
+### ロードの確かめ・調べるの確かめ（11-13 に追加）
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File $ev -SaveOn          # 直接再生のとき：セーブを有効に（書くのは save_auto.json。start.ps1 がバックアップ済み）
+powershell -NoProfile -ExecutionPolicy Bypass -File $ev -AutoSave        # 今の位置でオートセーブ
+powershell -NoProfile -ExecutionPolicy Bypass -File $ev -Reload          # タイトルへ → つづきから（オートセーブ）→ 状態を表示
+powershell -NoProfile -ExecutionPolicy Bypass -File $ev -CheckInteract   # 範囲の中の調べる物に、E キーの経路（Intaractable.Update）が生きているか
+powershell -NoProfile -ExecutionPolicy Bypass -File $ev -Prompt          # キーの案内（[E] 〜）が今何を出しているか
+```
+
+- **ロードの確かめ（ユーザーの指示：ときどき行う）**：イベントの前・途中・後で `-Reload`。見ること：出た場所から先へ進めるか（入口側に戻されていないか）・イベントが繰り返さないか・拾った物やフラグが残っているか。
+- `-Run` で `Interact` を直接呼ぶと、キー入力の経路が壊れていても動いてしまう（ペグの不具合を見逃した）。調べる物を足した・継承した物を変えたら `-CheckInteract` も。
+- **eval からのキー入力（`InputSystem.QueueStateEvent` も）はゲームビューに届かない**。キーの押し心地は「確かめられなかった」と報告する。
+
 - **キー入力（press.ps1）は届かないことが多い**（ゲームビューのフォーカス）。歩く・調べるは `-Warp`・`-Run` で代わりにする。キーで確かめられなかったことは報告に書く。
 - `-Run` は**表示されている**オブジェクトだけ（`GameObject.Find`）。ItemInteraction は操作中のキャラが調べた扱い、EventSequence はそのまま再生。
 - **eval は 1 回 1.5 秒ほどかかる**。それより短い演出（フラッシュ・弾・吹き出しの出始め）は撮れない・状態で見逃す。撮れなかったら「確かめられなかった」と書く。撮りたいときは、進める操作の直後に間を入れずに `-Capture`。

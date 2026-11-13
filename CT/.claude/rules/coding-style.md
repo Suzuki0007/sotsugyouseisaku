@@ -23,6 +23,9 @@ paths:
 - エディタのドメインリロードは無効。**static を持つクラスは `[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]` で再生ごとにリセット**する。
 - `FindObjectsByType` は `FindObjectsSortMode` 付きが非推奨（Unity 6.5）。引数なし版を使う。
 - `NavMeshPath` などフィールド初期化で作れない物は Awake で作る。
+- **土台のクラスが private な `Update`／`Awake` などを持っているとき、子で同じ名前のメソッドを作らない**（Unity は子のものだけを呼び、土台の処理が止まる）。特に `Intaractable` の子に `Update` を作ると E キーで調べられなくなる（11-13 のペグの不具合。シーンチェックのプロジェクトの確認で検出）。毎フレームの処理は `LateUpdate`、土台が virtual にしていればそれを override して `base.〜()` を呼ぶ。
+- **他の人のコード**（ファイル先頭の `\author` が uh 以外：`Intaractable`・`Dialogue`〔成田さん〕、`Save`・`AutoSave`・`CheckPoint`〔鈴木さん〕など）は、なるべく変えずに外側で対応する。変えたらコミットメッセージにその人への説明を書く（CLAUDE.md）。
+- **確かめるときに `Interact` などを eval で直接呼ぶだけで済ませない**：キー入力の経路（土台の Update）が動いているかは `unity-playtest` の `event.ps1 -CheckInteract` で見る（eval からのキー入力はゲームビューに届かない）。
 
 ## Inspector（プランナーが触る項目）
 - 項目名は **`[Label("日本語")]`**。最小値・スライダーは `[Label("名前", min)]` / `[Label("名前", min, max)]`。Range / Min と併用しない。リストには付けない。

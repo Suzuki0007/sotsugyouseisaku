@@ -8,6 +8,12 @@
 #                                          any other Intaractable (switch, peg...) gets its Interact() called (= pressing E in range)
 #   event.ps1 -Flag Flag_OP_Done -Value 1  set a GameFlag asset (Assets/Data/Flags/<name>.asset) on/off
 #   event.ps1 -Capture name                capture the Game view to %TEMP%\ct_playtest_capture\name.png
+#   event.ps1 -SaveOn                      direct play only: start a save session (writes go to save_auto.json; backed up by start.ps1)
+#   event.ps1 -AutoSave                    autosave now at the current player's position (needs a save session)
+#   event.ps1 -Reload                      load check: return to title -> continue from the autosave slot -> print state
+#   event.ps1 -CheckInteract               for every interactable around the current player: is the E-key path alive?
+#                                          (clears the base 'player' field and checks that Intaractable.Update restores it)
+#   event.ps1 -Prompt                      what the key prompt ([E] ...) is showing now
 # Each eval round trip takes ~1.5 s, so effects shorter than that (flash, shot) cannot be captured.
 # ASCII only.
 param(
@@ -19,6 +25,11 @@ param(
     [string]$Flag,
     [int]$Value = 1,
     [string]$Capture,
+    [switch]$SaveOn,
+    [switch]$AutoSave,
+    [switch]$Reload,
+    [switch]$CheckInteract,
+    [switch]$Prompt,
     [int]$MaxSteps = 200
 )
 
@@ -121,4 +132,65 @@ if ($Capture) {
     return
 }
 
-Write-Output "Specify one of -State, -Advance N, -UntilIdle, -Warp x,y, -Run path, -Flag name, -Capture name"
+if ($SaveOn) {
+    Invoke-UnityEval -Code 'if (!Save.HasSlot) Save.StartNewGame(); return "save session on (slot " + Save.CurrentSlot + ", writes to " + Save.SlotPath(Save.AutoSlot) + ")";'
+    return
+}
+
+if ($AutoSave) {
+    Invoke-UnityEval -Code 'if (!Save.HasSlot) return "no save session (use -SaveOn first)"; var p = PlayerSwitchManager.Instance.CurrentPlayer.transform.position; GameSession.AutoSaveAt(UnityEngine.SceneManagement.SceneManager.GetActiveScene().name, p); return "autosaved at " + p.ToString("F1");'
+    return
+}
+
+if ($Reload) {
+    $before = Invoke-UnityEval -Code 'if (!Save.HasSlot) return "NOSESSION"; return UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;'
+    if ($before -eq "NOSESSION") { Write-Output "no save session: run -SaveOn first (direct play does not save)"; return }
+    $meta = Invoke-UnityEval -Code 'var i = SaveSlotInfo.Load(Save.AutoSlot); return "autosave: scene=" + i.SceneName + " exists=" + i.Exists;'
+    Write-Output $meta
+    Invoke-UnityEval -Code 'GameSession.ReturnToTitle(); return "to title";' | Out-Null
+    for ($i = 0; $i -lt 20; $i++) { Start-Sleep -Milliseconds 500; $s = Invoke-UnityEval -Code 'return SceneFader.IsBusy ? "busy" : UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;' -Quiet; if ($s -eq "Title") { break } }
+    Invoke-UnityEval -Code 'GameSession.Continue(Save.AutoSlot, "Stage1_1"); return "continue";' | Out-Null
+    for ($i = 0; $i -lt 30; $i++) { Start-Sleep -Milliseconds 500; $s = Invoke-UnityEval -Code 'return (SceneFader.IsBusy || PlayerSwitchManager.Instance == null || PlayerSwitchManager.Instance.CurrentPlayer == null) ? "busy" : "ready";' -Quiet; if ($s -eq "ready") { break } }
+    Start-Sleep -Milliseconds 800
+    Write-Output "after reload (check: start position is reachable, no event replays, progress kept):"
+    Invoke-UnityEval -Code $stateCode
+    return
+}
+
+if ($CheckInteract) {
+    $clear = @'
+var f = typeof(Intaractable).GetField("player", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+var cur = PlayerSwitchManager.Instance != null ? PlayerSwitchManager.Instance.CurrentPlayer : null;
+if (cur == null) return "no current player";
+System.Func<UnityEngine.Component, string> Id = c => { var s = c.GetType().Name + ":" + c.name; for (var x = c.transform.parent; x != null; x = x.parent) s = x.name + "/" + s; return s; };
+var names = new System.Collections.Generic.List<string>();
+foreach (var it in UnityEngine.Object.FindObjectsByType<Intaractable>()) { if (f.GetValue(it) as UnityEngine.GameObject == cur) { f.SetValue(it, null); names.Add(Id(it)); } }
+UnityEditor.EditorPrefs.SetString("ct_check_interact", string.Join("\n", names));
+return names.Count + " in range";
+'@
+    # eval calls cannot share variables, so the ids go through EditorPrefs (deleted by the second call)
+    Write-Output (Invoke-UnityEval -Code $clear)
+    Start-Sleep -Milliseconds 500
+    $check = @'
+var f = typeof(Intaractable).GetField("player", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+System.Func<UnityEngine.Component, string> Id = c => { var s = c.GetType().Name + ":" + c.name; for (var x = c.transform.parent; x != null; x = x.parent) s = x.name + "/" + s; return s; };
+var ids = UnityEditor.EditorPrefs.GetString("ct_check_interact", "").Split('\n');
+var sb = new System.Text.StringBuilder();
+foreach (var it in UnityEngine.Object.FindObjectsByType<Intaractable>()) {
+  if (System.Array.IndexOf(ids, Id(it)) < 0) continue;
+  bool ok = f.GetValue(it) != null;
+  sb.Append(it.GetType().Name + " '" + it.name + "': " + (ok ? "OK (E key reaches Interact)" : "NG (Intaractable.Update is not running - a subclass declares Update?)") + "\n");
+}
+UnityEditor.EditorPrefs.DeleteKey("ct_check_interact");
+return sb.Length > 0 ? sb.ToString() : "nothing in range (walk/warp into the trigger first)";
+'@
+    Invoke-UnityEval -Code $check
+    return
+}
+
+if ($Prompt) {
+    Invoke-UnityEval -Code 'var v = UnityEngine.Object.FindAnyObjectByType<InteractPromptView>(); if (v == null) return "no prompt view"; var t = v.GetComponentInChildren<TMPro.TextMeshPro>(true); return t.gameObject.activeSelf ? "showing: " + t.text + " at " + t.transform.position.ToString("F1") : "hidden";'
+    return
+}
+
+Write-Output "Specify one of -State, -Advance N, -UntilIdle, -Warp x,y, -Run path, -Flag name, -Capture name, -SaveOn, -AutoSave, -Reload, -CheckInteract, -Prompt"

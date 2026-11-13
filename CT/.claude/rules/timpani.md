@@ -63,7 +63,7 @@ paths:
 - **ペグ（`TimpaniPeg`）に `Update()` を作らない**：土台の `Intaractable` の private な `Update`（E キーで調べる）が呼ばれなくなり、ペグを回せなくなった（11-13 の不具合）。毎フレームの処理は `LateUpdate` の override（`base.LateUpdate()` を呼ぶ）に書く。`Interact` を eval で直接呼ぶ確かめ方では見つからないので、player を null にして1フレーム後に戻るか（＝土台の Update が動いているか）も確かめる。
 - 確かめ方：タイミングは eval では合わせられないので、private の `ringTime` を 0.766（重なる瞬間）や 0.1（外れ）にしてから `Interact` を呼ぶ（`event.ps1 -Run` は Intaractable の Interact も呼べる）。
 - ペグを一気に締めて確かめるときは、private の `Tighten()` をリフレクションで呼ぶ（イベントがすべて出る）。アイテムは出たそばからシグル（ついてくる）が拾うことがあるので、離れた所に出して確かめる。
-- シーンの配置は eval の C#（`setup_13_stage1`〜`4`・`calmsprite`）で作った。作り直すときは、作ったあとで参照（特にフラグ）が入っているかを確かめる（`setup_13_stage4` で TimpaniRoom のクリアのフラグが空になったことがある）。
+- シーンの配置は `scene-recipe` スキルのレシピ（`stage1_3_1_room`〜`stage1_3_5_flow`・`autosave_points`。順番は SKILL.md）で作った。作り直すときは、作ったあとで参照（特にフラグ）が入っているかを確かめる（`stage1_3_4_link` で TimpaniRoom のクリアのフラグが空になったことがある）。`stage1_3_3a_enemydata` はアセットを上書きして、段階6・11-13 の調整が戻るので、ふだんは実行しない。
 - 守りのゲージは Q キーがテストで届かないので、`PlayerInput` を無効にしてから `NoahBulletDeleteAreaController.SetBulletDeleteAreaActive(true)` で確かめる（終わったら戻す）。段階の切り替えは `event.ps1 -Flag Flag_Timpani_Calmed1 -Value 1`。
 - 戦闘前の会話を最初から見るには、`Flag_Timpani_IntroSeen` と `Flag_Timpani_Cleared` が OFF の状態で始める。戦闘の「1回だけ」は勝ったときにセーブされるので、テストでクリアのフラグだけ戻しても戦闘は始まらない（再生し直す）。
 - Stage_1_3 を直接再生すると `Flag_Sigle_Joined` が立っていないのでノア1人で始まる。2人で確かめるときは `event.ps1 -Flag Flag_Sigle_Joined -Value 1`。
