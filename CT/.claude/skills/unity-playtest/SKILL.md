@@ -1,6 +1,6 @@
 ---
 name: unity-playtest
-description: CT プロジェクトを Unity エディタで実際に再生して動作確認するときの準備と後片付け。セーブ（save_*.json＝ユーザーのスロット1〜3）のバックアップと復元、run_in_background、無敵、シーンを開く、キー入力、C# での状態の確認・操作。再生して確かめるときは必ずこれを使う。
+description: CT プロジェクトを Unity エディタで実際に再生して動作確認するときの準備と後片付け。セーブ（save_*.json＝ユーザーのスロット1〜3）のバックアップと復元、run_in_background、無敵、シーンを開く、キー入力、C# での状態の確認・操作、性能の計測（perf.ps1：fps・処理時間・GC の確保・前回との比較・メモリの漏れ）。再生して確かめる・重さを測るときは必ずこれを使う。
 ---
 
 # unity-playtest：再生テストの準備と後片付け
@@ -74,6 +74,23 @@ powershell -NoProfile -ExecutionPolicy Bypass -File $ev -ShowArea -Value 1  # �
 - **追跡（BattleArea の「捕まる → やり直す」）の落とし穴**：ノアを動かさないと、捕まる → 暗転 → 読み直し を繰り返す（その間に出した吹き出しも消える・ワープも戻される）。確かめるときは、追跡が始まったら**すぐ** `-Warp` でゴールへ。止めたいときは `BattleArea.Cancel()` でも、やり直しの予約が残っていることがあるので `end.ps1` で再生ごと止める。
 - 向きを確かめるときは `-State` の `noah=… Right` などを見る（CharacterAnimLink は、止まっている間は向きを変えない。走り込んだ直後は勢いで向きが上書きされる）。
 - 長い組み立て（シーンにイベントを置くなど）は C# をスクラッチパッドに書いて `Invoke-UnityEval -File`。作り直すときは、ルートのオブジェクトを消してから作る形にしておくと、何度でもやり直せる。
+
+## 性能を測る（`perf.ps1`、11-13 に追加）
+
+```powershell
+$pf = ".claude/skills/unity-playtest/scripts/perf.ps1"
+powershell -NoProfile -ExecutionPolicy Bypass -File $pf -Measure -Label timpani_battle -Seconds 20   # 記録 → PerfLog/perf.csv → 前回と比べる → 3秒プロファイラ
+powershell -NoProfile -ExecutionPolicy Bypass -File $pf -Begin -Label op_event   # ここから記録（event.ps1 で進める）
+powershell -NoProfile -ExecutionPolicy Bypass -File $pf -End                     # 記録を止めて同じように出す
+powershell -NoProfile -ExecutionPolicy Bypass -File $pf -Profile                 # 3秒だけプロファイラ（ゲームの確保・確保の多いスクリプト・時間の多い処理）
+powershell -NoProfile -ExecutionPolicy Bypass -File $pf -LeakCheck -Times 3      # タイトル → つづきから を繰り返し、メモリ・物の数が増え続けないか（先に event.ps1 -SaveOn・-AutoSave）
+powershell -NoProfile -ExecutionPolicy Bypass -File $pf -History -Label timpani_battle
+```
+
+- **同じラベル＝同じ場面**。前回の同じラベルと比べて、悪くなった値に `!!`、良くなった値に `++`。`!!` が出たら、もう一度測ってから判断する（エディタの揺れ）。
+- 基準の場面：`timpani_battle`（Stage_1_3 を start → `event.ps1 -Flag Flag_Sigle_Joined -Value 1` → `-UntilIdle` で戦闘が始まる → `-Measure`）。
+- **エディタの落とし穴**（GC の確保にエディタの分が入る・メモリは回ごとに動く など）と基準の値は `rules/performance.md`。
+- `PerfLog/` はコミットしてよい（前回との比較の元になる）。テストで作った行は消してよい。
 
 ## よく使う C#（`Invoke-UnityEval`）
 

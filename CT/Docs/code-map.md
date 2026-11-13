@@ -1,6 +1,6 @@
 # コード構成と問題点（開発者・Claude 向け）
 
-最終更新：2026-11-13。**毎回は自動で読み込まない**（2026-11-12 から。機能ごとの説明は `.claude/rules/`）。コードを触る前に関係する節を読み、コードを変えたら、この表も更新すること。
+最終更新：2026-11-13（性能の計測 PerfMonitor を追加）。**毎回は自動で読み込まない**（2026-11-12 から。機能ごとの説明は `.claude/rules/`）。コードを触る前に関係する節を読み、コードを変えたら、この表も更新すること。
 ファイルの参照は `Assets/Script/` からの相対パス。行番号は目安。
 
 ---
@@ -199,6 +199,7 @@
 | `Singleton/Singleton.cs` | `Singleton<T>`（`persistAcrossScenes` でシーンをまたぐ） |
 | `Fps/Fps.cs` | 60fps 固定（各シーンに配置） |
 | `Debug/CircleDebugRenderer.cs` | 円のデバッグ表示 |
+| `Debug/PerfMonitor.cs` | （11-13）性能の計測。エディタと Development Build だけで自動で作られる（シーンをまたぐ）。画面右上に FPS・処理時間（PlayerLoop − 60fps の待ち）・スクリプトの時間・メモリ・1フレームの確保・ドローコール（F3 で切り替え、PlayerPrefs `Debug_PerfOverlay`）。`BeginRecord`／`EndRecord`（毎フレームの値を記録して中央値・p95・スパイクなどを1行に）・`Snapshot`／`CollectNow`（メモリと読み込まれている物の数）。Claude の `unity-playtest/scripts/perf.ps1` が使い、結果は `PerfLog/perf.csv`・`leak.csv`。**エディタでは GC の確保にエディタの分も入る**（ゲームの分だけは perf.ps1 がプロファイラの PlayerLoop で測る） |
 | `StateMachine/`（StateMachine / IState / State）、`ComponentBase/ComponentBase.cs` | △ どこからも使われていない |
 | `kari/player/`（kari_player / kari_player2 / kari_player_test） | △ 仮プレイヤー。シーンでは未使用（StageDarkness がプレイヤー探しの予備に kari_player_test を参照） |
 
@@ -250,6 +251,8 @@
 | 低 | `StateMachine/StateMachine.cs` Update | 状態が変わったフレームしか `Current.Update` を呼ばない（括弧の位置の誤り）。今は未使用 |
 | 低 | `Data/NoahData.cs` / `NoahInventory.GetKey(null)` | `hasKey` はセーブされない。ItemData なしで鍵を拾うと、シーン遷移後に鍵が消える |
 | 低 | 🆕 `Gimmick/Note/NoteData.cs:41` | 警告 CS0414「`memo` は代入されているが使われていない」（2026-11-12 の再コンパイルで確認。メモ欄として Inspector 用なら `#pragma warning disable 0414` か、どこかで読む） |
+| 低 | 🆕 毎フレームの小さな確保（11-13 の計測で確認。ティンパニ戦で合計 約 1.3〜1.7KB/フレーム、ほぼ全フレーム） | 多い順に `GetComponent` が null を返す所（エディタだけで確保される `GetComponentNullErrorMessage`。`TryGetComponent` にすると消える）、`Enemy.LateUpdate`、`InteractPromptView.LateUpdate`、`PlayerMapLimit.LateUpdate`、`BattleArea.Update`、`EnemyBrain` のコルーチン。60fps は保てていて（処理 約 2ms）今は困っていないが、GC の引っかかりの元になる。直すかは計測しながら（性能の段階4） |
+| 低 | 🆕 `Fps/Fps.cs`（鈴木さん） | 中身のない `Update()` が残っている（呼ばれるだけ少し無駄。性能の資料のルール） |
 | 低 | 🆕 `Title.unity` の `System`（SceneBgm） | Default Clip が空なので、タイトルで BGM が鳴らない（ステージの曲はタイトルで止まる）。曲が決まったら入れる |
 
 ### 提出前に整理したいもの
