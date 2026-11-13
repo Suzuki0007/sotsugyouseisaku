@@ -164,13 +164,14 @@ public static class Bark
         // 自動の一言は、一言どうしの間をあける（優先度で割り込むときは別）
         BarkView view = BarkView.Find();
         int currentPriority = view != null && view.Busy ? view.CurrentPriority : int.MinValue;
-        if(currentPriority == int.MinValue && Time.time < globalReadyTime) { return false; }
+        // 「一言どうしの間を待たない」の一言だけは、間の途中でも出せる
+        bool inGap = currentPriority == int.MinValue && Time.time < globalReadyTime;
 
         int best = int.MinValue;
         var picks = new List<BarkData>();
         foreach(BarkData d in list)
         {
-            if(d == null || !MatchesTrigger(d, context) || !CanPlay(d, true)) { continue; }
+            if(d == null || (inGap && !d.ignoreGap) || !MatchesTrigger(d, context) || !CanPlay(d, true)) { continue; }
             if(d.priority <= currentPriority) { continue; }
             if(d.priority > best) { best = d.priority; picks.Clear(); }
             if(d.priority == best) { picks.Add(d); }

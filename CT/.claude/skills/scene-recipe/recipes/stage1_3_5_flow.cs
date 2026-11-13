@@ -81,35 +81,10 @@ Talk(exit, "F1_12_Continue");
   r.FindPropertyRelative("conditions").arraySize = 0; r.FindPropertyRelative("flagConditions").arraySize = 0; so.ApplyModifiedPropertiesWithoutUndo(); }
 
 // ---- battle barks ----
-var barkGo = GO(root.transform, "戦闘中の一言", root.transform.position);
-var tb = barkGo.AddComponent<TimpaniBarks>();
-{
-  var so = new UnityEditor.SerializedObject(tb);
-  so.FindProperty("battle").objectReferenceValue = battle;
-  var entries = so.FindProperty("entries");
-  var data = new object[][] {
-    new object[]{ 11, 1f, 999f, new[]{ "3|来るぞ。ノア、ペグに走れ！" } },
-    new object[]{ 0, 0.35f, 6f, new[]{ "2|いい感じ！", "2|あと少し…！", "3|その調子だ" } },
-    new object[]{ 1, 0.6f, 5f, new[]{ "3|焦るな。輪が重なる瞬間だ", "2|(落ち着いて、音を聴くみたいに…)" } },
-    new object[]{ 2, 1f, 4f, new[]{ "2|ひとつ締まった！", "3|攻撃が止んだ。今のうちだ！" } },
-    new object[]{ 3, 1f, 3f, new[]{ "2|一台、静かになった！", "3|残りが荒れだした。気をつけろ" } },
-    new object[]{ 4, 1f, 6f, new[]{ "3|くっ、守りが切れた！少しもたせろ！", "3|防ぎきれない…しばらく自分でよけろ！" } },
-    new object[]{ 5, 0.7f, 8f, new[]{ "3|守りは戻った。いつでも呼べ" } },
-    new object[]{ 6, 0.6f, 10f, new[]{ "2|あ、何か光るものが落ちてきた！", "3|あの青い石…拾えば守りが早く戻る" } },
-    new object[]{ 7, 0.5f, 8f, new[]{ "3|力が戻ってくる…助かる", "2|よし、拾った！" } },
-    new object[]{ 8, 0.5f, 6f, new[]{ "3|下がれ、ノア！", "2|っ…！" } },
-    new object[]{ 9, 1f, 15f, new[]{ "3|無理をするな！ハートを拾え", "2|(まずい、このままじゃ…)" } },
-    new object[]{ 10, 1f, 25f, new[]{ "2|(ペグに近づいて E…輪が重なった瞬間にもう一度！)", "3|ノア、ペグだ。赤いペグを締めろ" } },
-  };
-  entries.arraySize = data.Length;
-  for (int i = 0; i < data.Length; i++) {
-    var e = entries.GetArrayElementAtIndex(i);
-    e.FindPropertyRelative("when").enumValueIndex = (int)data[i][0]; e.FindPropertyRelative("chance").floatValue = (float)data[i][1]; e.FindPropertyRelative("cooldown").floatValue = (float)data[i][2];
-    var lines = e.FindPropertyRelative("lines"); var arr = (string[])data[i][3]; lines.arraySize = arr.Length;
-    for (int k = 0; k < arr.Length; k++) { var parts = arr[k].Split('|'); var l = lines.GetArrayElementAtIndex(k); l.FindPropertyRelative("speaker").enumValueIndex = int.Parse(parts[0]); l.FindPropertyRelative("text").stringValue = parts[1]; l.FindPropertyRelative("seconds").floatValue = 0f; l.FindPropertyRelative("gap").floatValue = 0.2f; }
-  }
-  so.ApplyModifiedPropertiesWithoutUndo();
-}
+// 11-14 C3：戦闘中の一言は TimpaniBarks をやめ、合図をきっかけにした一言データ（Assets/Resources/Barks/Timpani/）にした。
+// 戦闘エリアの「戦闘中フラグ」に Flag_Timpani_InBattle を入れる（一言の条件で使う）
+{ var flagIn = UnityEditor.AssetDatabase.LoadAssetAtPath<GameFlag>("Assets/Data/Flags/Flag_Timpani_InBattle.asset");
+  var so = new UnityEditor.SerializedObject(battle); so.FindProperty("battleFlag").objectReferenceValue = flagIn; so.ApplyModifiedPropertiesWithoutUndo(); }
 
 UnityEditor.SceneManagement.EditorSceneManager.MarkSceneDirty(scene);
 sb.Append("saved=").Append(UnityEditor.SceneManagement.EditorSceneManager.SaveScene(scene)).Append("\n");

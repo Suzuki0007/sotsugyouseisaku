@@ -203,6 +203,10 @@ public class BarkData : ScriptableObject
     [Tooltip("一度出したら、この秒数は同じ一言を出さない")]
     public float cooldown = 30.0f;
 
+    [Label("一言どうしの間を待たない")]
+    [Tooltip("オンにすると、前の一言のすぐあとでも出す（一言の設定の「一言どうしの間」を待たない）。大事な一言（戦闘の始まり・体力が少ない・ヒントなど）に")]
+    public bool ignoreGap = false;
+
     [Label("出すまでの間（秒）", 0.0f)]
     [Tooltip("きっかけから少し間をおいて出す（間に会話などが始まったら出さない）")]
     public float delay = 0.3f;

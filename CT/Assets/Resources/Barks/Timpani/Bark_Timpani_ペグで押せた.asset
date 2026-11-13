@@ -1,0 +1,62 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d02dd72b1725da5478609a9671eae967, type: 3}
+  m_Name: "Bark_Timpani_\u30DA\u30B0\u3067\u62BC\u305B\u305F"
+  m_EditorClassIdentifier: Assembly-CSharp::BarkData
+  active: 1
+  trigger: 18
+  signal: {fileID: 11400000, guid: eff855791f83abe489acf0bec89b90d0, type: 2}
+  seconds: 20
+  healthRatio: 0.34
+  enemy: {fileID: 0}
+  condition:
+    flags:
+    - flag: {fileID: 11400000, guid: 0db9cfdb98b04b643a6812505b1b5f80, type: 2}
+      state: 0
+    items: []
+    character: 0
+    partyHealth: 0
+    partyHealthRatio: 0.5
+    area: {fileID: 0}
+    gimmicks: []
+    party: 0
+    partnerWithin: 0
+  priority: 50
+  chance: 0.35
+  repeat: 0
+  cooldown: 6
+  ignoreGap: 0
+  delay: 0
+  variants:
+  - lines:
+    - speaker: 2
+      text: "\u3044\u3044\u611F\u3058\uFF01"
+      seconds: 0
+      gap: 0.2
+      se: {fileID: 0}
+    weight: 1
+  - lines:
+    - speaker: 2
+      text: "\u3042\u3068\u5C11\u3057\u2026\uFF01"
+      seconds: 0
+      gap: 0.2
+      se: {fileID: 0}
+    weight: 1
+  - lines:
+    - speaker: 3
+      text: "\u305D\u306E\u8ABF\u5B50\u3060"
+      seconds: 0
+      gap: 0.2
+      se: {fileID: 0}
+    weight: 1
+  memo: "\u30C6\u30A3\u30F3\u30D1\u30CB\u6226\uFF08Stage_1_3\uFF09\u306E\u6226\u95D8\u4E2D\u3060\u3051\u3002\u3082\u3068\u306F
+    TimpaniBarks \u306E\u300C\u30DA\u30B0\u3067\u62BC\u305B\u305F\u300D"

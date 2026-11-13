@@ -75,6 +75,56 @@ public static class SceneChecker
         CheckGimmicks(ctx);
         CheckWalkAreaAndTimpani(ctx);
         CheckRooms(ctx);
+        CheckSignals(ctx);
+    }
+
+    /// <summary>
+    /// 合図：受ける側（合図を受けたら）・出す側（部品「合図を出す」）の設定
+    /// </summary>
+    private static void CheckSignals(Context ctx)
+    {
+        foreach(SignalListener listener in ctx.Find<SignalListener>())
+        {
+            SerializedProperty list = new SerializedObject(listener).FindProperty("reactions");
+            if(list.arraySize == 0) { ctx.Add(Level.Warning, listener, "「合図を受けたら」に反応がありません"); continue; }
+
+            for(int i = 0; i < list.arraySize; i++)
+            {
+                SerializedProperty r = list.GetArrayElementAtIndex(i);
+                string label = r.FindPropertyRelative("label").stringValue;
+                string name = string.IsNullOrEmpty(label) ? $"反応{i + 1}" : label;
+
+                if(r.FindPropertyRelative("signal").objectReferenceValue == null)
+                {
+                    ctx.Add(Level.Error, listener, $"「合図を受けたら」の「{name}」：合図が空です（反応しません）");
+                }
+                bool doesSomething = r.FindPropertyRelative("sequence").objectReferenceValue != null
+                                  || r.FindPropertyRelative("flag").objectReferenceValue != null
+                                  || r.FindPropertyRelative("bark").objectReferenceValue != null;
+                if(!doesSomething)
+                {
+                    ctx.Add(Level.Warning, listener, $"「合図を受けたら」の「{name}」：実行するイベント・フラグ・一言がどれも空です（反応しても何も起きません）");
+                }
+                if(r.FindPropertyRelative("from").enumValueIndex == (int)SignalListener.SourceFilter.Specific
+                   && r.FindPropertyRelative("sourceObject").objectReferenceValue == null)
+                {
+                    ctx.Add(Level.Error, listener, $"「合図を受けたら」の「{name}」：送り元が「決めた物」なのに、その物が空です（反応しません）");
+                }
+                var seq = r.FindPropertyRelative("sequence").objectReferenceValue as EventSequence;
+                if(seq != null && seq.transform.IsChildOf(listener.transform) && seq.gameObject != listener.gameObject && !seq.gameObject.activeSelf)
+                {
+                    ctx.Add(Level.Warning, listener, $"「合図を受けたら」の「{name}」：実行するイベント「{seq.name}」が非表示です");
+                }
+            }
+        }
+
+        foreach(SendSignalEventAction action in ctx.Find<SendSignalEventAction>())
+        {
+            if(new SerializedObject(action).FindProperty("signal").objectReferenceValue == null)
+            {
+                ctx.Add(Level.Error, action, "部品「合図を出す」の合図が空です（何も出ません）");
+            }
+        }
     }
 
     //=====================================================================
@@ -1088,11 +1138,37 @@ public static class SceneChecker
         }
     }
 
+    /// <summary>
+    /// 合図のアセット：同じ ID が2つ・標準の合図が足りない
+    /// </summary>
+    private static void CheckSignalAssets(List<Issue> issues)
+    {
+        var ids = new Dictionary<string, GameSignal>();
+        foreach(string guid in AssetDatabase.FindAssets("t:GameSignal"))
+        {
+            GameSignal s = AssetDatabase.LoadAssetAtPath<GameSignal>(AssetDatabase.GUIDToAssetPath(guid));
+            if(s == null) { continue; }
+            if(ids.TryGetValue(s.Id, out GameSignal other))
+            {
+                issues.Add(new Issue { level = Level.Warning, target = s, message = $"合図「{s.name}」と「{other.name}」の ID が同じ（{s.Id}）です（どちらを出しても両方に反応します）" });
+            }
+            else { ids.Add(s.Id, s); }
+        }
+
+        var missing = new List<string>();
+        foreach(StandardSignals.Info info in StandardSignals.All) { if(!ids.ContainsKey(info.id)) { missing.Add(info.name); } }
+        if(missing.Count > 0)
+        {
+            issues.Add(new Issue { level = Level.Info, message = $"標準の合図のアセットが {missing.Count} 個ありません（{string.Join("・", missing)}）。Tools > 合図 > 標準の合図を作る（足りない分）" });
+        }
+    }
+
     public static void CheckProject(List<Issue> issues)
     {
         CheckEnemyAssets(issues);
         CheckBarkAssets(issues);
         CheckInteractableUpdate(issues);
+        CheckSignalAssets(issues);
 
         // Build Settings
         foreach(EditorBuildSettingsScene scene in EditorBuildSettings.scenes)

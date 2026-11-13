@@ -82,7 +82,7 @@
 | `Item/InstantPickup.cs` | （11-13）触れるとすぐ効くアイテム（回復／守りのゲージ）。持ち物に入らない・セーブしない。決めた時間で点滅して消える。`Spawn`・`Picked`・`Appeared`。プレハブ `Prefab/Gimmicks/Timpani/Item_Heal`・`Item_GuardBoost` | ◎ |
 | `Timpani/TimpaniUnit.cs` | （11-13）ティンパニ1台。ペグが締まるたびに周りの弾を消し敵を止める、全部締まると敵をおとなしくする（`Kill`・絵の差し替え・♪・回復アイテム）。`Calmed`・`AttacksCleared` | ◎ |
 | `Timpani/TimpaniRoom.cs` | （11-13）ティンパニの部屋全体。調律できた数で敵の段階を進めるフラグを立てる、全部でクリアのフラグ・`AllCalmed`・イベント | ◎ |
-| `Timpani/TimpaniBarks.cs` | （11-13）ティンパニ戦の一言。戦闘エリアが動いている間、できごと（ペグ・調律・守り・アイテム・ダメージ・体力・進まない・始まった）ごとに候補の一言を確率と間隔で出す（`Bark.PlayLines`） | ◎ |
+| （削除）`Timpani/TimpaniBarks.cs` | 11-14 C3 で削除。ティンパニ戦の一言は一言データ `Resources/Barks/Timpani/`（きっかけ「合図が来た」、条件 `Flag_Timpani_InBattle`） | − |
 | `Timpani/TimpaniPeg.cs` | （11-13）ティンパニのペグ。調べるとリズムゲーム（縮む輪が中心の輪に重なるときに E）、決めた回数の成功で締まり GimmickState が ON。ゲームは止まらない・離れると中断・使えるキャラ（ノアだけ）。色と印（◆◇・♪）で進み具合。`Succeeded`・`Missed`・`Tightened`（static イベント）。プレハブ `Prefab/Gimmicks/Timpani/Peg.prefab` | ◎ |
 | `Scene/SceneChangeEventAction.cs` | （11-13）イベントの部品「シーンを移る」（シーンの `SceneChange.ChangeScene` を呼ぶ。イベントの最後に置く）。Stage1_2 の正面の扉 → Stage_1_3 | ◎ |
 | `Camera/CameraShake.cs`、`ShakeEventAction.cs` | （11-13）画面を揺らす。描画の間だけカメラの位置をずらす（`RenderPipelineManager.begin/endCameraRendering`）ので、FocusCamera の追従とぶつからない。イベントの部品「画面を揺らす」 | ◎ |

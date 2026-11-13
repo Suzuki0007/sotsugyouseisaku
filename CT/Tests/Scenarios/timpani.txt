@@ -1,8 +1,12 @@
 # Stage_1_3：戦闘前の会話 → ペグを E キーで回す → 全部調律 → クリアの会話 → ロードしても調律したまま
 scene Stage_1_3
 save on
+flag Flag_Sigle_Joined on       # 2人で（相棒の一言が出るように）
 advance all                     # 着いたとき（戦闘前の会話）→ 戦闘が始まる
 expect eval BattleArea.AnyActive
+expect flag Flag_Timpani_InBattle on
+wait 1
+expect eval System.Linq.Enumerable.Any(Bark.Log, l => l.Contains("Bark_Timpani_戦闘が始まった"))   # 合図「戦闘が始まった」で一言
 warp -113.14,15.1               # 右下のティンパニのペグ2の前
 wait 1
 expect prompt 締める
@@ -13,6 +17,8 @@ wait 2
 advance all                     # 全部調律できたとき（会話）
 expect flag Flag_Timpani_Cleared on
 expect eval !BattleArea.AnyActive
+expect flag Flag_Timpani_InBattle off
+expect eval System.Linq.Enumerable.Any(Signals.Log, e => e.id == "timpani/all_calmed")
 expect no-error
 reload
 expect scene Stage_1_3

@@ -34,7 +34,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File $r -Recipe stage1_2_door  # 
 |---|---|---|
 | Stage1_1 | `stage1_1_op` → `autosave_points` | ルート「OP」を消して作る |
 | Stage1_2 | `stage1_2_events` → `stage1_2_door` → `autosave_points` | events は「Stage1_2_イベント」を消して作るので、扉・オートセーブも消える |
-| Stage_1_3 | `stage1_3_1_room` → `2_pegs` → `3b_enemies` → `3c_bullet` → `4_link` → `4b_calmsprite` → `5_flow` → `autosave_points` | 1_room は「ティンパニ部屋」を消して作るので、**後の全部をやり直す**。`3a_enemydata` はアセット（EnemyData・行動・攻撃・フラグ）を作る/上書きするので、ふだんは実行しない |
+| Stage_1_3 | `stage1_3_1_room` → `2_pegs` → `3b_enemies` → `3c_bullet` → `4_link` → `4b_calmsprite` → `5_flow` → `autosave_points` | 1_room は「ティンパニ部屋」を消して作るので、**後の全部をやり直す**。`3a_enemydata` はアセット（EnemyData・行動・攻撃・フラグ）を作る/上書きするので、ふだんは実行しない。`6_barks`（11-14）は TimpaniBarks を一言データに移した一度きりのレシピ（スクリプトは削除済みなので、もう実行できない。`5_flow` は戦闘エリアの戦闘中フラグ `Flag_Timpani_InBattle` を入れる形に直した） |
 | SceneGameOver | `gameover_keyboard` | |
 | （アセット） | `portrait_and_title` | Sigle.asset・UI_TitleImage の取り込み設定・Title の背景 |
 
