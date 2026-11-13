@@ -1,0 +1,23 @@
+部品.欄	理由（-NewSlots の「どの行にも入っていない空き欄」に出さない）
+GameMenu.openSe	空なら共通の UI の音（UISounds）が鳴る
+GameMenu.closeSe	空なら共通の UI の音
+GameMenu.decideSe	空なら共通の UI の音
+ItemMenuUI.openSe	空なら共通の UI の音
+ItemMenuUI.closeSe	空なら共通の UI の音
+ItemMenuUI.selectSe	空なら共通の UI の音
+SaveSlotPanel.decideSe	空なら共通の UI の音
+SaveSlotPanel.cancelSe	空なら共通の UI の音
+TitleMenu.decideSe	空なら共通の UI の音
+UIButtonSound.overrideSe	空なら共通の UI の音
+SeEventAction.seOnExit	エリアから出たときの音。使うときだけ入れる
+EffectEventAction.effectOnExit	エリアから出たときのエフェクト。使うときだけ入れる
+GimmickState.resetSe	仕掛けが時間で戻るときの音。使うときだけ
+GimmickState.tickSe	仕掛けの残り時間の音。使うときだけ
+Treasure.openSe	古い宝箱（ItemInteraction に寄せる予定）
+Treasure.lockedSe	古い宝箱
+KeyItem.pickupSe	古い鍵（ItemInteraction に寄せる予定）
+SceneChange.leaveSe	空なら無音で移動（SE-26 と同じ扱い。必要なら行を足す）
+SceneChange.arriveSe	空なら無音で移動
+WalkArea.maskTexture	形を円・四角で作っている部屋は空でよい
+NoahDead.gameOverLeaveSe	ゲームオーバー画面から戻るときの音。SE-13 と合わせて任意
+FootstepSe.followerFootstepSe	Stage1_2 の動かない Player に付いている FootstepSe（本当はプレハブに付けるもの。SE-01）

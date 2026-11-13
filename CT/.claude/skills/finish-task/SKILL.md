@@ -26,6 +26,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .claude/skills/finish-task/s
 - [ ] 実行時の C# を変えたなら、`perf-review` の `scripts/scan.ps1`（変更したファイル）をかけ、「1. per-frame code（hot）」の指摘を読んだ（自分の書いた毎フレームの処理に Find・GetComponent・new・文字列の組み立てがないか）。
 - [ ] 動きを変えたなら `unity-playtest` で再生して確かめた（`end.ps1` まで実行した）。
 - [ ] イベント・セーブ・シーンの通り道を変えたなら、**ロードしても困らないか**を確かめた（イベントの前・後で `GameSession.ReturnToTitle()` → `GameSession.Continue(Save.AutoSlot, ...)`。出た位置から進めるか・イベントが繰り返さないか。手順は `rules/save-ui.md`）。通り道が変わるイベントの最後に部品「オートセーブ」があるか。
+- [ ] 素材（音・絵・アニメ・エフェクト）を入れた・素材の欄を持つ部品を足したなら、`asset-audit` の `audit.ps1 -Apply -NewSlots` で素材チェックリストを更新した（新しい空き欄は行を足すか `data/ignore.tsv` へ）。
 - [ ] **確認できなかった項目**（キー入力・UI のフォーカス・見た目・音など）を書き出した。
 - [ ] テスト用のアセット（`Assets/__ClaudeTest/`）が残っていない。シーンを勝手に保存していない（保存したなら理由を伝える）。
 

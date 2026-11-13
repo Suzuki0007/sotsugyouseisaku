@@ -1,0 +1,47 @@
+{
+  "output": "C:\\tokeitou\\sotsugyouseisaku\\CT\\Docs\\素材チェックリスト.xlsx",
+  "sheetHowto": "使い方",
+  "sheetList": "素材リスト",
+  "sheetSummary": "集計",
+  "sheetSpec": "仕様の目安",
+  "extraHeaders": ["担当", "期限", "進み具合", "備考"],
+  "listCategory": "効果音,BGM,立ち絵,キャラの絵・モーション,敵,エフェクト,UI,背景・マップ,一枚絵・演出,その他",
+  "listState": "枠あり・素材なし,仮素材,枠なし・あった方が良い,今後必要（台本から）,あるが要改善",
+  "listPriority": "A,B,C",
+  "listHow": "制作,フリー素材,購入素材,制作（加工）,制作 or 購入素材,制作 or フリー素材,要相談",
+  "listProgress": "未着手,作業中,確認待ち,完了,保留",
+  "defaultProgress": "未着手",
+  "summaryTitle1": "区分ごとの進み具合（件数）",
+  "summaryTitle2": "優先度ごとの状態（件数）",
+  "summaryTotal": "合計",
+  "summaryDoneRate": "完了の割合",
+  "summaryNote": "※ 素材リストの区分・状態・優先度・進み具合から自動で数えます（行を足しても数え直されます）",
+
+  "format": {
+    "checkHeader": "済",
+    "checkMark": "✓",
+    "checkNote": "済：この素材の収集・作成が終わったら ✓（セルを選ぶとプルダウンで選べる。消すときは Delete）。✓ の行は文字が灰色になる。Unity に入れて確かめたかは「進み具合」で管理する",
+    "nameHeader": "素材名",
+    "howtoLine": ["■ 済（一番左の列）", "素材の収集・作成が終わったら ✓ を付ける（プルダウン）。✓ の行は灰色の文字になる。Unity に入れて動くか確かめたら、進み具合を「完了」にする"],
+    "categoryHeader": "区分",
+    "priorityHeader": "優先度",
+    "categoryColors": ["#DDEBF7", "#E4DFEC", "#FCE4EC", "#FCE4D6", "#FFCCCC", "#FFF2CC", "#E2EFDA", "#D0F0EC", "#EDE2D6", "#DEE2EA"],
+    "bandColor": "#F2F2F2",
+    "priorityColors": ["#FFCEC7", "#FFEB9C"]
+  },
+
+  "audit": {
+    "idHeader": "ID",
+    "nameHeader": "素材名",
+    "progressHeader": "進み具合",
+    "keyHeader": "確認キー（自動）",
+    "resultHeader": "自動の点検",
+    "resolved": "解決",
+    "notYet": "まだ",
+    "notFound": "欄が見つからない",
+    "manual": "（キーなし：手で確認）",
+    "progressReview": "確認待ち",
+    "progressMovable": ["未着手", "作業中"],
+    "keyNote": "確認キー（自動）：asset-audit スキルが Unity を調べて、この素材が入ったかを判定するための印。slot:部品.欄@場所 ＝その欄が空でなくなったら解決／nouse:ファイル名の一部 ＝その仮の絵・仮のデータが使われなくなったら解決／has:プレハブかシーン:部品 ＝その部品が付いたら解決／chara:キャラ:表情・anim:名前:動き・item:アイテム ＝立ち絵・アニメ・アイコンが入ったら解決。空なら手で確認"
+  }
+}

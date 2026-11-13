@@ -280,6 +280,8 @@
 | 場所 | 内容 |
 |---|---|
 | Stage1_1 / Stage1_2 / Stage_1_3 / SampleScene の `MapEntity/OB_TRbox` | 宝箱の Id が空（シーンチェックでエラー。ほかの宝箱と開いた記録が混ざる） |
+| 🆕 シグルのアニメ（`Data/Animation/Sample/Anim_Sample_Sigle`） | 待機（Idle）しかなく、歩くと絵が止まったまま滑る。ノアも歩き・待機とも仮の絵（res_kari）。素材の一覧は `Docs/素材チェックリスト.xlsx` |
+| 🆕 音の欄の多くが空 | 足音（プレハブ）・攻撃・守り・キャラ切り替え・ゲームオーバー・ペグ・敵の攻撃などの SE、タイトルの BGM が空。ティンパニ戦は砂漠と同じ BGM。一覧は `Docs/素材チェックリスト.xlsx` |
 | 🆕 Stage_1_3 の `Event`（Stage1_1 のコピーの残り） | EventZone の中身が空・Is Trigger の Collider2D がない（シーンチェックでエラー。何も起きないので害はない。不要なら消してよい） |
 | 同じ3シーンの `Event`（ルート） | 中身が空の EventZone / EventSequence。Is Trigger の Collider2D もない（シーンチェックでエラー・注意が出るが、動作上の害はない。不要なら消す） |
 | 🆕 Stage1_1 の `Event/DialogueEventZone` | 入ると古い会話（非表示の `OB_Text` の Dialogue）を出す EventZone が、マップの右側（-106.8, 17.3）に残っている。OP とは別。要らなければ消す |
