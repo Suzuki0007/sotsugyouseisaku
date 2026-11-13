@@ -50,6 +50,7 @@ public static class BarkCsv
         ("シーンに着いた", BarkTrigger.SceneEnter),
         ("謎を解いた", BarkTrigger.PuzzleSolved),
         ("間違えた", BarkTrigger.PuzzleWrong),
+        ("合図", BarkTrigger.Signal),
     };
 
     private static readonly (string name, BarkSpeaker speaker)[] speakerNames =

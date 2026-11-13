@@ -41,4 +41,58 @@ public static class SignalMenu
         Undo.RegisterCreatedObjectUndo(go, "合図を受けたら");
         Selection.activeGameObject = go;
     }
+
+    /// <summary> 標準の合図の置き場所 </summary>
+    public const string StandardFolder = "Assets/Data/Signals/標準";
+
+    /// <summary>
+    /// 標準の合図のアセットを作る（あるものは ID とメモを合わせ直す。名前は変えない）
+    /// </summary>
+    [MenuItem("Tools/合図/標準の合図を作る（足りない分）")]
+    public static void CreateStandardSignals()
+    {
+        int created = CreateStandardSignalsSilently(out int updated);
+        EditorUtility.DisplayDialog("標準の合図", $"作った：{created} 個　合わせ直した：{updated} 個\n{StandardFolder}", "OK");
+        Object folder = AssetDatabase.LoadAssetAtPath<Object>(StandardFolder);
+        if(folder != null) { EditorGUIUtility.PingObject(folder); }
+    }
+
+    /// <summary> 標準の合図のアセットを作る（ダイアログなし。作った数を返す） </summary>
+    public static int CreateStandardSignalsSilently(out int updated)
+    {
+        updated = 0;
+        if(!AssetDatabase.IsValidFolder("Assets/Data")) { AssetDatabase.CreateFolder("Assets", "Data"); }
+        if(!AssetDatabase.IsValidFolder("Assets/Data/Signals")) { AssetDatabase.CreateFolder("Assets/Data", "Signals"); }
+        if(!AssetDatabase.IsValidFolder(StandardFolder)) { AssetDatabase.CreateFolder("Assets/Data/Signals", "標準"); }
+
+        // 今ある合図を ID で引けるように
+        var existing = new System.Collections.Generic.Dictionary<string, GameSignal>();
+        foreach(string guid in AssetDatabase.FindAssets("t:GameSignal"))
+        {
+            var s = AssetDatabase.LoadAssetAtPath<GameSignal>(AssetDatabase.GUIDToAssetPath(guid));
+            if(s != null && !existing.ContainsKey(s.Id)) { existing[s.Id] = s; }
+        }
+
+        int created = 0;
+        foreach(StandardSignals.Info info in StandardSignals.All)
+        {
+            if(existing.TryGetValue(info.id, out GameSignal found))
+            {
+                if(found.Memo != info.memo)
+                {
+                    found.Setup(info.id, info.memo);
+                    EditorUtility.SetDirty(found);
+                    updated++;
+                }
+                continue;
+            }
+
+            var asset = ScriptableObject.CreateInstance<GameSignal>();
+            asset.Setup(info.id, info.memo);
+            AssetDatabase.CreateAsset(asset, $"{StandardFolder}/{info.name}.asset");
+            created++;
+        }
+        AssetDatabase.SaveAssets();
+        return created;
+    }
 }

@@ -428,6 +428,7 @@ public class BattleArea : MonoBehaviour
         SetParticipants(true);
         if(battleFlag != null) { battleFlag.Value = true; }
         if(onStart != null) { onStart.Play(gameObject); }
+        StandardSignals.Send(StandardSignals.BattleStarted, gameObject);
 
         if(HasWaves && waveIndex < 0) { StartCoroutine(StartWave(0)); }
 
@@ -527,12 +528,14 @@ public class BattleArea : MonoBehaviour
         ApplyEndEnemies(false);
         if(once) { Save.SetPending(saveKey, true); }
         if(onWin != null) { onWin.Play(gameObject); }
+        StandardSignals.Send(StandardSignals.BattleWon, gameObject);
         BattleHud.ShowMessage(winMessage, messageSeconds);
     }
 
     private void Lose()
     {
         if(onLose != null) { onLose.Play(gameObject); }
+        StandardSignals.Send(StandardSignals.BattleLost, gameObject);
         BattleHud.ShowMessage(loseMessage, messageSeconds);
 
         switch(loseResult)

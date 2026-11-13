@@ -19,7 +19,7 @@ using UnityEngine;
 [CreateAssetMenu(menuName = "合図/合図", fileName = "Signal_New")]
 public class GameSignal : ScriptableObject
 {
-    [Tooltip("合図の ID。空ならアセット名を使う。標準の合図は決まった ID（Timpani.PegTightened など）なので変えない")]
+    [Tooltip("合図の ID。空ならアセット名を使う。標準の合図は決まった ID（timpani/peg_tightened など）なので変えない")]
     [SerializeField]
     private string id;
 

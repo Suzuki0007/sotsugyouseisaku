@@ -50,7 +50,7 @@ paths:
 - 敵の行動「見ていない間に近づく」（`UnseenApproachAction`。`CharacterMovement.LastDirection`）。サンプル `EnemyData_Sample_像`。
 
 ## 相棒の一言（段階6、`Assets/Script/Party/Bark/`）
-- `BarkData`（**`Resources/Barks/` に置くだけ**で自動。きっかけ `BarkTrigger` 18 種〔番号は末尾に足す〕・条件・優先度・確率・回数〔`Bark/<名前>` でセーブ〕・次に出せるまで・候補〔行が2つ以上で掛け合い〕・使う）。
+- `BarkData`（**`Resources/Barks/` に置くだけ**で自動。きっかけ `BarkTrigger` 19 種〔番号は末尾に足す。18＝合図が来た（`signal`。`rules/signals.md`）〕・条件・優先度・確率・回数〔`Bark/<名前>` でセーブ〕・次に出せるまで・候補〔行が2つ以上で掛け合い〕・使う）。
 - `Bark.Fire(trigger, BarkContext)` をきっかけの側から呼ぶ（GimmickInteractable の `Refuse`／`RefuseCharacter`・PushBlock・PartyHintView・PlayerSwitchManager の来られない・PuzzleCheck／CodeLock）。`BarkWatcher`（シーンごとに自動）が 2人の状態・切り替え・ダメージ／体力・`Enemy.Defeated`・待たせている時間・止まっている時間・シーンに着いたを見る。
 - `BarkView`：ゲームを止めない吹き出し（画面の外は画面の下に名前つき、会話・メニューでやめる）。設定 `Resources/BarkSettings.asset`。イベントの部品 `BarkEventAction`、`BarkArea`。
 - ツール：一言の一覧（`BarkListWindow`）・CSV（`BarkCsv`。`DialogueCsv` の Parse などを internal にして使い回し）。サンプル `Resources/Barks/Sample/`（16 個、使うはオフ）。

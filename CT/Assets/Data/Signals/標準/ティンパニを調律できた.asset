@@ -1,0 +1,16 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0c78fc586c39b4649a1bdda906955cd6, type: 3}
+  m_Name: "\u30C6\u30A3\u30F3\u30D1\u30CB\u3092\u8ABF\u5F8B\u3067\u304D\u305F"
+  m_EditorClassIdentifier: Assembly-CSharp::GameSignal
+  id: timpani/calmed
+  memo: "\u6700\u5F8C\u306E1\u53F0\uFF08\uFF1D\u5168\u90E8\u8ABF\u5F8B\u3067\u304D\u305F\uFF09\u306F\u9664\u304F\u3002\u9001\u308A\u5143\uFF1D\u30C6\u30A3\u30F3\u30D1\u30CB\u3002\u6570\uFF1D\u8ABF\u5F8B\u3067\u304D\u305F\u6570"

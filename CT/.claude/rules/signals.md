@@ -18,7 +18,12 @@ paths:
    - `Signal/SignalListener`（「合図を受けたら」。反応＝合図・送り元〔どこでも／この物と子／決めた物と子〕・GameCondition・何回まで・次に反応できるまで・遅らせる → EventSequence・フラグ・BarkData〔Bark.Play、条件を見る〕。表示中だけ受ける。回数はセーブしない）。Hierarchy 右クリック > 合図 > 合図を受けたら（`SignalMenu`）。
    - デバッグウィンドウ「合図（記録・試しに送る）」。
    - 確かめ：何回まで・送り元の絞り込み・部品から送る・記録（eval で確認）。
-2. **C2 標準の合図**（このあと）：今あるプログラムの通知（TimpaniPeg・TimpaniUnit・TimpaniRoom・GuardGauge・InstantPickup・Enemy.Defeated・GameSession.AutoSaved・BattleArea・プレイヤーの Health）から合図を出す橋渡し。標準の合図のアセットを `Assets/Data/Signals/標準/` に作るメニュー。BarkData のきっかけに「合図」（`BarkTrigger` の**末尾**に足す）。
+2. **C2 標準の合図（完了）**：
+   - `Signal/StandardSignals`：ID の定数と一覧 `All`（ID・アセット名・説明。メニュー・早見表・チェックが使う）。`BeforeSceneLoad` で static イベント（TimpaniPeg・TimpaniUnit・TimpaniRoom・GuardGauge・InstantPickup・Enemy.Defeated・GameSession.AutoSaved）に登録して合図を出す（**各クラスの static イベントは SubsystemRegistration で空になるので、つなぐのは BeforeSceneLoad**）。
+   - 直接出す所：`BattleArea`（Begin／Win／Lose → battle/started・won・lost）、`BarkWatcher.OnDamaged`（player/low_health〔最大の 0.34 以下〕を先に・player/damaged、同じフレームは1回）、`TimpaniRoom.Update`（戦闘中にペグが「ヒントの合図を出すまでの時間」25 秒進まない → timpani/stalled）。
+   - 合図の中身は TimpaniBarks の条件に合わせた：peg_hit は締まっていないときだけ、peg_tightened はそのティンパニの最後のペグを除く、calmed は最後の1台を除く（ユニットを自分で数える。部屋の数え直しより先に呼ばれるため）、アイテムは守り／回復で分ける。
+   - アセット：`Assets/Data/Signals/標準/`（18 個。Tools > 合図 > 標準の合図を作る〔足りない分〕＝`SignalMenu.CreateStandardSignalsSilently`。ID で既存を探し、メモだけ合わせ直す）。
+   - 一言：`BarkTrigger.Signal = 18`（「合図が来た」）・`BarkData.signal`・`BarkContext.signal`。`Bark.HookSignals`（BeforeSceneLoad で `Signals.Sent` に登録 → `Fire(Signal)`、出せたら `MarkReceived`。subject は送り元がノア・シグルならそのキャラ、ほかは操作中のキャラ）。CSV のきっかけ名「合図」（どの合図かは Inspector で）。シーンチェック：合図が空の「合図が来た」。
 3. **C3 ティンパニの一言の置き換え**：TimpaniBarks の中身を、合図をきっかけにした一言データに変換し、部品を外す。シーンチェックに合図の点検。
 
 ## 約束

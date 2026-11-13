@@ -1062,6 +1062,10 @@ public static class SceneChecker
             {
                 issues.Add(new Issue { level = Level.Info, target = d, message = $"一言「{d.name}」：どの敵を倒しても出て、次に出せるまでが 0 秒です（敵が多いとしゃべりすぎます）" });
             }
+            if(d.trigger == BarkTrigger.Signal && d.signal == null)
+            {
+                issues.Add(new Issue { level = Level.Error, target = d, message = $"一言「{d.name}」：きっかけが「合図が来た」なのに「合図」が空です（出ません）" });
+            }
             if(names.TryGetValue(d.name, out string other))
             {
                 issues.Add(new Issue { level = Level.Warning, target = d, message = $"一言「{d.name}」と同じ名前が {other} にあります（「ゲームの中で1回だけ」の記録が混ざります）" });

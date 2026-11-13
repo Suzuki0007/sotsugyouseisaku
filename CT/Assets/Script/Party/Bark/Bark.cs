@@ -26,6 +26,9 @@ public struct BarkContext
     public float previous;
     public float value;
 
+    /// <summary> 来た合図の ID（きっかけが「合図が来た」のとき） </summary>
+    public string signal;
+
     public static BarkContext Of(GameObject subject, Transform source = null)
     {
         return new BarkContext { subject = subject, source = source };
@@ -64,6 +67,30 @@ public static class Bark
         log.Clear();
         globalReadyTime = 0.0f;
         Muted = false;
+    }
+
+    // 合図を受ける（Signals.Sent は SubsystemRegistration で空になるので、そのあとでつなぐ）
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+    private static void HookSignals()
+    {
+        Signals.Sent += OnSignal;
+    }
+
+    private static void OnSignal(string id, SignalContext sc)
+    {
+        Load();
+        if(!byTrigger.ContainsKey(BarkTrigger.Signal)) { return; }
+
+        PlayerSwitchManager m = PlayerSwitchManager.Instance;
+        GameObject subject = sc.source != null && PlayerCharacters.Of(sc.source) != PlayerCharacter.None ? sc.source : (m != null ? m.CurrentPlayer : null);
+        var c = new BarkContext
+        {
+            subject = subject,
+            source = sc.source != null ? sc.source.transform : null,
+            value = sc.value,
+            signal = id,
+        };
+        if(Fire(BarkTrigger.Signal, c)) { Signals.MarkReceived(); }
     }
 
     //=====================================================================
@@ -280,6 +307,8 @@ public static class Bark
                 return c.previous > d.healthRatio && c.value <= d.healthRatio;
             case BarkTrigger.EnemyDefeated:
                 return d.enemy == null || d.enemy == c.enemy;
+            case BarkTrigger.Signal:
+                return Signals.Matches(d.signal, c.signal);
         }
         return true;
     }

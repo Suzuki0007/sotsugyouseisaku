@@ -29,6 +29,10 @@ public class BarkWatcher : MonoBehaviour
     private GameObject lastPlayer;
     private float readyTime = -1.0f;
     private bool sceneEnterDone;
+    private int damageSignalFrame = -1;
+
+    /// <summary> 合図「体力が少ない」を出す割合（最大を 1） </summary>
+    private const float LowHealthRatio = 0.34f;
 
     /// <summary> シーンに着いてから、2人の状態の変化で一言を出さない秒数（セーブからの復元で出さないように） </summary>
     private const float StartupQuiet = 1.5f;
@@ -181,6 +185,15 @@ public class BarkWatcher : MonoBehaviour
         if(party == null || party.MaxHealth <= 0 || party.IsDead) { return; }
 
         float ratio = (float)party.CurrentHealth / party.MaxHealth;
+
+        // 標準の合図（一緒のときの2回目は出さない）。「体力が少ない」を先に出す（優先度の高い一言が先に決まるように）
+        if(damageSignalFrame != Time.frameCount)
+        {
+            damageSignalFrame = Time.frameCount;
+            if(ratio <= LowHealthRatio) { StandardSignals.Send(StandardSignals.LowHealth, who, party.CurrentHealth); }
+            StandardSignals.Send(StandardSignals.Damaged, who, party.CurrentHealth);
+        }
+
         if(!Bark.Fire(BarkTrigger.LowHealth, new BarkContext { subject = who, previous = lastRatio, value = ratio }))
         {
             Bark.Fire(BarkTrigger.Damaged, BarkContext.Of(who));

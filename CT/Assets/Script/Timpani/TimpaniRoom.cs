@@ -47,7 +47,13 @@ public class TimpaniRoom : MonoBehaviour
     [Tooltip("全部調律できたら表示する物（出口への通路の「歩ける範囲」など）。クリアしたあとに戻ってきたときも表示する")]
     private List<GameObject> showWhenCleared = new List<GameObject>();
 
+    [SerializeField, Label("ヒントの合図を出すまでの時間（秒）", 0.0f)]
+    [Tooltip("戦闘中、ペグがこの時間進まなかったら標準の合図「しばらくペグが進まない」を出す（0 なら出さない）。一言のヒントのきっかけ")]
+    private float stalledSeconds = 25.0f;
+
     private int calmedCount;
+    private float lastProgressTime;
+    private bool wasBattle;
 
     //=====================================================================
     // プロパティ・イベント
@@ -114,11 +120,33 @@ public class TimpaniRoom : MonoBehaviour
     private void OnEnable()
     {
         TimpaniUnit.Calmed += OnUnitCalmed;
+        TimpaniPeg.Succeeded += OnPegProgress;
     }
 
     private void OnDisable()
     {
         TimpaniUnit.Calmed -= OnUnitCalmed;
+        TimpaniPeg.Succeeded -= OnPegProgress;
+    }
+
+    private void OnPegProgress(TimpaniPeg peg) { lastProgressTime = Time.time; }
+
+    //=====================================================================
+    // ペグが進まない（ヒントの合図）
+    //=====================================================================
+
+    private void Update()
+    {
+        bool battle = BattleArea.AnyActive && calmedCount < units.Count;
+        if(battle && !wasBattle) { lastProgressTime = Time.time; }
+        wasBattle = battle;
+        if(!battle || stalledSeconds <= 0.0f) { return; }
+
+        if(Time.time - lastProgressTime > stalledSeconds)
+        {
+            lastProgressTime = Time.time;
+            StandardSignals.Send(StandardSignals.Stalled, gameObject);
+        }
     }
 
     private void OnUnitCalmed(TimpaniUnit unit)

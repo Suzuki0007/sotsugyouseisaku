@@ -67,6 +67,9 @@ public enum BarkTrigger
 
     [InspectorName("答えを間違えた")]
     PuzzleWrong = 17,
+
+    [InspectorName("合図が来た（下の「合図」）")]
+    Signal = 18,
 }
 
 /// <summary>
@@ -165,6 +168,10 @@ public class BarkData : ScriptableObject
     [Label("きっかけ")]
     [Tooltip("いつ出すか。「イベント・範囲からだけ」は、イベントの部品「一言」と一言の範囲から出す")]
     public BarkTrigger trigger = BarkTrigger.Manual;
+
+    [Label("合図")]
+    [Tooltip("きっかけが「合図が来た」のとき：この合図で出す（標準の合図は Assets/Data/Signals/標準/）。戦闘中だけにしたいときは、条件に戦闘中のフラグなどを入れる")]
+    public GameSignal signal;
 
     [Label("秒数", 0.0f)]
     [Tooltip("「長く待たせている」：待たせてからこの秒数で出す\n「しばらく止まっている」：止まってからこの秒数で出す\n「体力が少なくなった」では使わない")]
