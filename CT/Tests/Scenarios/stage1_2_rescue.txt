@@ -1,0 +1,22 @@
+# Stage1_2：着いたとき → ランタンを E キーで調べる → 化け物が降る → 追跡 → シグルに助けられて合流 → ロードしても困らない
+scene Stage1_2
+save on
+advance all                     # 着いたとき（頭痛 → 暗い → ランタンを取ろう）
+expect idle
+warp -107.25,14.9               # ランタンの前
+wait 1
+expect prompt 調べる             # キーの案内が出ている
+key E                           # 本当の E キーで調べる
+advance battle                  # ランタン → 揺れ → 化け物が降る → 追跡が始まったらすぐ止まる
+warp -128.6,13.0                # 追跡のゴール（左の行き止まり）へすぐ（遅いと捕まってやり直しになる）
+wait 2
+advance all                     # 追い詰められる → シグルに助けられる → 合流
+expect flag Flag_Sigle_Joined on
+expect party Together
+expect near -128.6,13.0 1.5
+expect no-error
+reload                          # タイトルへ → つづきから（合流した場所のオートセーブ）
+expect near -128.6,13.0 1.5      # 入口側（ガレキの向こう）から始まらない
+expect idle                     # イベントが繰り返さない
+expect reach 正面の扉            # 出口の扉まで歩いて行ける
+expect no-error

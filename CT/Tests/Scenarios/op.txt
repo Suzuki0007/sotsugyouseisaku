@@ -1,0 +1,15 @@
+# OP：暗転からの声 → モノローグ → 砂漠 → OP の最後のオートセーブ → ロードしても OP が繰り返さない
+scene Stage1_1
+save on
+wait 2
+expect talk ？？？                 # F1_00：誰かの途切れた声から始まる
+advance all
+expect flag Flag_OP_Done on
+expect idle
+expect no-error
+reload                          # タイトルへ → つづきから（オートセーブ）
+wait 2
+expect scene Stage1_1
+expect idle                     # OP が繰り返さない
+expect flag Flag_OP_Done on
+expect no-error

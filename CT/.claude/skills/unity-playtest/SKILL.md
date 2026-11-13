@@ -52,6 +52,22 @@ powershell -NoProfile -ExecutionPolicy Bypass -File $ev -Flag Flag_Sigle_Joined 
 powershell -NoProfile -ExecutionPolicy Bypass -File $ev -Capture s1         # ゲームビューを撮る（%TEMP%\ct_playtest_capture\s1.png を Read で見る）
 ```
 
+### テストシナリオ（11-14 に追加。**通しの確認・壊れていないかの確認はまずこれ**）
+
+```powershell
+$sc = ".claude/skills/unity-playtest/scripts/scenario.ps1"
+powershell -NoProfile -ExecutionPolicy Bypass -File $sc -Name stage1_2_rescue   # Tests/Scenarios/stage1_2_rescue.txt
+powershell -NoProfile -ExecutionPolicy Bypass -File $sc -Name all               # 全部（1本 1〜2 分）
+```
+
+- 書き方は `Docs/テストシナリオの書き方.md`（プランナー向け）と、`scenario.ps1` の先頭のコメント（命令の一覧）。
+- `scene` の最初の行で `start.ps1` を呼び、最後に必ず `end.ps1`（セーブを戻す）。`-KeepPlaying` で再生を止めない。`-StopOnFail` で最初の不合格で止まる。
+- **本当のキー入力**：実行中だけ `InputSystem.settings.editorInputBehaviorInPlayMode = AllDeviceInputAlwaysGoesToGameView`・`backgroundBehavior = IgnoreFocus` にして `QueueStateEvent` で押す（エディタが手前になくても届く。E で調べる・Enter で UI の決定まで確かめた）。終わったら元の設定（`PointersAndKeyboardsRespectGameViewFocus`・`ResetAndDisableNonBackgroundDevices`）に戻す。press.ps1 を単体で使うときは設定を変えないので届かない。
+- 追跡は `advance battle`（戦闘エリアが始まった瞬間に止まる）のすぐ後に `warp`。遅いと捕まって最初からやり直しになる。
+- 戦闘中に `invincible off` で会話を送ると倒れる。倒す確認は `kill`（自分で無敵を切る）。
+- `expect no-error` は、始めてからのコンソールのエラー（Pipeline・Account API の通信のエラーは除く）。
+- イベント・部屋・セーブを変えたら、関係するシナリオを流す（finish-task）。新しいイベントには1本足す。
+
 ### ロードの確かめ・調べるの確かめ（11-13 に追加）
 
 ```powershell

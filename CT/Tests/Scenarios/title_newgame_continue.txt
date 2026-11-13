@@ -1,0 +1,19 @@
+# タイトル：はじめから（オートセーブ枠）→ OP → タイトルへ → つづきから
+scene Title
+eval UnityEngine.Object.FindAnyObjectByType<TitleMenu>().OpenNewGame(); return "open";
+button SlotAuto                 # オートセーブの枠
+button YesButton                # 前のデータがあるときの「上書きしますか？」（なければ何もしない）
+wait scene Stage1_1
+expect scene Stage1_1
+wait 2
+advance all                     # OP
+expect flag Flag_OP_Done on
+title
+expect scene Title
+eval UnityEngine.Object.FindAnyObjectByType<TitleMenu>().OpenContinue(); return "open";
+button SlotAuto
+wait scene Stage1_1
+expect scene Stage1_1
+wait 1
+expect idle                     # OP が繰り返さない
+expect no-error

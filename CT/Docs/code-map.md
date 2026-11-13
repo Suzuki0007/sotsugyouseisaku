@@ -9,6 +9,7 @@
 
 | フォルダ | 中身 |
 |---|---|
+| `Tests/Scenarios/`（Assets の外） | （11-14 F1）**テストシナリオ**：1行1命令の手順（scene・advance・warp・key・reload・expect など）。`.claude/skills/unity-playtest/scripts/scenario.ps1` が流して合格／不合格を出す。op・stage1_2_rescue・timpani・title_newgame_continue・gameover_retry。書き方は `Docs/テストシナリオの書き方.md` |
 | `Assets/Scenes/` | **Build Settings：`Title` → `Stage1_1` ⇄ `Stage1_2`、`SceneGameOver`**。ファイルだけ残っているもの：`Stage1` / `Stage2`（**古い作り**：プレイヤーをシーンに直接置く）、`SampleScene`、`kari/`（仮の Start / Clear）、`Tilemap/` |
 | `Assets/Prefab/` | `Players/`（Player_Noah / Player_Sigle）、`Gimmicks/Sample/`（仕掛けのサンプルの部屋）、`Enemies/`（Enemy＝古い作り。新しい作りの Enemy_Base は `Resources/Enemies/`）、`Bullet/`、`UI/`（DialoguePanel、**DialogueSystem**） |
 | `Assets/Resources/` | `Items/`（ItemData。**必ずここ**。`Items/Sample/` にサンプル）、`UI/`（ItemMenu・GameMenu のプレハブ。それぞれ Resources.Load で自動生成）、`PlaceNames.asset`（場所の表示名）、`Enemies/Enemy_Base.prefab`（新しい作りの敵の共通プレハブ。仲間を呼ぶときに実行中に読む）、`UI/BattleHud.prefab`（戦闘の画面表示）、`Barks/`（相棒の一言 BarkData。`Sample/` にサンプル 16 個＝使うはオフ）、`BarkSettings.asset`（一言の見た目・出し方）、`PartyHints.asset`・`PuzzleUI.asset`・`Notes/` |

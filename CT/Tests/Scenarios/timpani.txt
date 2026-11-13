@@ -1,0 +1,21 @@
+# Stage_1_3：戦闘前の会話 → ペグを E キーで回す → 全部調律 → クリアの会話 → ロードしても調律したまま
+scene Stage_1_3
+save on
+advance all                     # 着いたとき（戦闘前の会話）→ 戦闘が始まる
+expect eval BattleArea.AnyActive
+warp -113.14,15.1               # 右下のティンパニのペグ2の前
+wait 1
+expect prompt 締める
+key E                           # 本当の E キーでリズムゲームを始める
+expect eval System.Array.Exists(UnityEngine.Object.FindObjectsByType<TimpaniPeg>(), p => p.IsPlaying)
+tighten all                     # タイミングは合わせられないので、残りは一気に締める
+wait 2
+advance all                     # 全部調律できたとき（会話）
+expect flag Flag_Timpani_Cleared on
+expect eval !BattleArea.AnyActive
+expect no-error
+reload
+expect scene Stage_1_3
+expect eval System.Array.TrueForAll(UnityEngine.Object.FindObjectsByType<TimpaniPeg>(), p => p.IsTightened)
+expect idle                     # 戦闘前の会話が繰り返さない
+expect no-error

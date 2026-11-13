@@ -1,0 +1,14 @@
+# ゲームオーバー：ティンパニ戦で倒れる → ゲームオーバー画面（リトライが選ばれている）→ Enter キーでリトライ → 短い会話のあと戦闘
+scene Stage_1_3                 # 無敵のまま始める（会話を送っている間に戦闘で倒れないように）
+advance all                     # 戦闘前の会話
+expect eval BattleArea.AnyActive
+kill                            # 無敵を切って、ノア（とシグル）の体力を 0 に
+wait scene SceneGameOver
+expect selected Button          # 最初にリトライが選ばれている（キーボードで選べる）
+key Enter                       # 本当の Enter キーで決定
+wait scene Stage_1_3
+expect scene Stage_1_3
+expect talk もう一度             # やり直したとき（F1_10c の短い会話）
+advance all
+expect eval BattleArea.AnyActive
+expect no-error
