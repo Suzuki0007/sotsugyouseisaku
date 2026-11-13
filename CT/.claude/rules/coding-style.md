@@ -40,7 +40,7 @@ paths:
 3. 設定ミスが起きやすければ `SceneChecker.CheckScene` / `CheckProject` にチェックを足す。
 4. 再生中に確かめたい状態があれば `DebugWindow` に足す。
 5. 仕掛けの状態（GimmickState）を参照するなら、配線の表示（`GimmickWiring`）に出るか確かめる。
-6. `Docs/` の手順書に追記し、`Docs/プランナー向け作業手順書.md`（付録の早見表を含む）も更新する。
+6. `Docs/` の手順書に追記し、`Docs/プランナー向け作業手順書.md`（付録の早見表を含む）も更新する。`Docs/早見表（自動）.md` は `QuickReferenceBuilder.Build()`（Tools > 手順書 > 早見表を作り直す）で作り直す。クラスの `/// <summary>` の1行目が見出し、「・」の行が説明としてそのまま載るので、プランナー向けの言葉で書く。
 7. 入力を止める条件は `InputBlock.IsBlocked`、敵を止める条件は `EnemyBlock.IsBlocked` にだけ足す。
 8. 攻撃を当てる処理は `DamageUtility.Apply(collider, info)` を通す。
 
