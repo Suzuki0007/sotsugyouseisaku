@@ -13,7 +13,7 @@ paths:
 ## 決めたこと（2026-11-13、ユーザーと合意）
 - **推測で直さない。計測して原因を決め、直したら前後を比べる**（バイブル 1章）。
 - 目標：**60fps**（`Fps.cs` が targetFrameRate 60・VSync なし）。重い場面の基準は **ティンパニ戦**（Stage_1_3、戦闘エリアが動いている間）。
-- 4段階で進める：①計測の道具（PerfMonitor・perf.ps1）**完了** → ②点検のスキル `perf-review`（ティップス 4部3章の形。公開されているルール集〔MIT〕のダウンロードはユーザーが許可済み。Python がないので一次の点検は PowerShell で）→ ③ Project Auditor（`com.unity.project-auditor-rules` を入れるのは許可をもらってから）→ ④ 計測で重いとわかった所だけ直す（ほかの人のコードは報告だけ）。
+- 4段階で進める：①計測の道具（PerfMonitor・perf.ps1）**完了** → ②点検のスキル `perf-review` **完了**（ティップス 4部3章の公開ルール集〔MIT、163 ルール〕を `references/upstream/` に取り込み、独自ルール CT01〜08・例外 `rules-overrides.md`・環境 `tuning-env.md`。一次の点検は `scan.ps1`〔Python がないので PowerShell に移した。毎フレームの処理の中かどうか＝hot／code／tooling／asset を行ごとに決め、例外を機械的に当てる〕）→ ③ Project Auditor（`com.unity.project-auditor-rules` を入れるのは許可をもらってから）→ ④ 計測で重いとわかった所だけ直す（ほかの人のコードは報告だけ）。
 
 ## 道具
 - `Debug/PerfMonitor.cs`：エディタと Development Build だけで自動で作られる。画面右上の表示（F3）、`BeginRecord`／`EndRecord`、`Snapshot`／`CollectNow`。
@@ -32,7 +32,12 @@ paths:
 - fps 59.8、フレーム p95 約 17.7ms、処理 p50 約 1.8〜2.0ms・p95 約 2.7〜3.1ms、スクリプト p95 約 0.36ms、ドローコール 平均 39、ゲームの確保 約 1.3〜1.7KB/フレーム。
 - タイトル → つづきから を 3 回：メモリ・テクスチャ・音・マテリアル・オブジェクトの数は増えない。
 
-## 書くときの約束（資料から。点検のスキルができるまでの目安）
+## 点検（perf-review）の使いどころ
+- C# の実行時のコードを書いた・直したら、締めの前に `perf-review/scripts/scan.ps1`（変更したファイル）を1回かけ、**1. per-frame code（hot）** の指摘を読む（`finish-task` の確認に入れた）。
+- 全体の点検（`-All`）は段階の区切りや提出前に。2026-11-13 の結果と本物の指摘は `perf-review/SKILL.md` の最後・`Docs/code-map.md` の問題点。
+- 指摘は「疑い」。直すかは計測（perf.ps1）で決める。
+
+## 書くときの約束（資料から。perf-review のルールのうち、書く前に気をつければ済むもの）
 - 毎フレームの処理（Update・LateUpdate・FixedUpdate）で `Find*`・`GetComponent`・`Camera.main`・`new List`・文字列の組み立て・LINQ を使わない（Awake でキャッシュする、変わったときだけ作る）。
 - 有るかわからないコンポーネントは `TryGetComponent`（`GetComponent` が null を返すと、エディタで確保が出る）。
 - 中身のない Update を残さない。Animator・マテリアルの名前指定は `StringToHash`／`PropertyToID` をキャッシュ。`.material` で複製したマテリアル・`new Texture2D`・`Sprite.Create` は自分で `Destroy`。

@@ -1,6 +1,6 @@
 # コード構成と問題点（開発者・Claude 向け）
 
-最終更新：2026-11-13（性能の計測 PerfMonitor を追加）。**毎回は自動で読み込まない**（2026-11-12 から。機能ごとの説明は `.claude/rules/`）。コードを触る前に関係する節を読み、コードを変えたら、この表も更新すること。
+最終更新：2026-11-13（性能の計測 PerfMonitor を追加。性能の点検スキル perf-review で全体を点検し、問題点に追記）。**毎回は自動で読み込まない**（2026-11-12 から。機能ごとの説明は `.claude/rules/`）。コードを触る前に関係する節を読み、コードを変えたら、この表も更新すること。
 ファイルの参照は `Assets/Script/` からの相対パス。行番号は目安。
 
 ---
@@ -252,7 +252,10 @@
 | 低 | `Data/NoahData.cs` / `NoahInventory.GetKey(null)` | `hasKey` はセーブされない。ItemData なしで鍵を拾うと、シーン遷移後に鍵が消える |
 | 低 | 🆕 `Gimmick/Note/NoteData.cs:41` | 警告 CS0414「`memo` は代入されているが使われていない」（2026-11-12 の再コンパイルで確認。メモ欄として Inspector 用なら `#pragma warning disable 0414` か、どこかで読む） |
 | 低 | 🆕 毎フレームの小さな確保（11-13 の計測で確認。ティンパニ戦で合計 約 1.3〜1.7KB/フレーム、ほぼ全フレーム） | 多い順に `GetComponent` が null を返す所（エディタだけで確保される `GetComponentNullErrorMessage`。`TryGetComponent` にすると消える）、`Enemy.LateUpdate`、`InteractPromptView.LateUpdate`、`PlayerMapLimit.LateUpdate`、`BattleArea.Update`、`EnemyBrain` のコルーチン。60fps は保てていて（処理 約 2ms）今は困っていないが、GC の引っかかりの元になる。直すかは計測しながら（性能の段階4） |
-| 低 | 🆕 `Fps/Fps.cs`（鈴木さん） | 中身のない `Update()` が残っている（呼ばれるだけ少し無駄。性能の資料のルール） |
+| 低 | 🆕 `Fps/Fps.cs`、`ObjectBase/ObjectBase.cs`、`CharaBase/CharaBase.cs`（鈴木さん） | 中身のない `Update()`・`Start()` が残っている。ObjectBase・CharaBase は基底クラスなので、自分で Update を持たない子（CharacterSorting・NoahInventory・NoahDead など）でも毎フレーム空の Update が呼ばれる（perf-review の US01。1 回は小さいがキャラの数だけ増える） |
+| 中 | 🆕 `BGM/PMH_Atmos_HospitalHall_01.wav`（47MB）・`BGM/BGM_Stage1.mp3`（4.7MB） | Load Type が Decompress On Load（読み込み時に展開してまるごとメモリに乗る）。BGM・長い環境音は Streaming が普通（perf-review の CT08）。音の設定なのでプランナー・サウンド担当と相談して変える |
+| 低 | 🆕 `Images/UI/UI_TitleImage.PNG`、`Images/Player/playermotion_idle(192).png` の .meta | 機種別の設定に最大サイズ 4096／8192 がある（既定は 2048。perf-review の AS01）。PC で効いているかを確かめて、要らなければ下げる |
+| 低 | 🆕 `ProjectSettings/Physics2DSettings.asset` | 2D の衝突の組み合わせ（Layer Collision Matrix）がほぼ全部オンのまま（perf-review の PH10）。当たる必要のないレイヤーの組を切ると判定が軽くなる。今は 60fps に余裕があるので急がない |
 | 低 | 🆕 `Title.unity` の `System`（SceneBgm） | Default Clip が空なので、タイトルで BGM が鳴らない（ステージの曲はタイトルで止まる）。曲が決まったら入れる |
 
 ### 提出前に整理したいもの
