@@ -110,8 +110,7 @@ public class PlayerPartySpawner : MonoBehaviour
         string sceneName = gameObject.scene.name;
         if(pendingPosition.HasValue) { GameSession.RecordResumePosition(sceneName, pendingPosition.Value); }
         else                         { GameSession.RecordResumePoint(sceneName, spawnPoint != null ? spawnPoint.SpawnPointId : ""); }
-        Save.Commit();
-        Save.WriteAsync();
+        GameSession.AutoSaveOnArrival();
 
         // プレイヤーの初期化
 

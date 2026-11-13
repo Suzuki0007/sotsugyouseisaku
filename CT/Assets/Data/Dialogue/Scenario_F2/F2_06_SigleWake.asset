@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eac73eb13381b184b8a3fd1f6643eddc, type: 3}
+  m_Name: F2_06_SigleWake
+  m_EditorClassIdentifier: Assembly-CSharp::DialogueData
+  lines:
+  - character: {fileID: 11400000, guid: 1e130490a0c3e1c45886bec74eba2656, type: 2}
+    expression: 0
+    speakerName: 
+    text: "\u3069\u308C\u304F\u3089\u3044\u7D4C\u3063\u305F\uFF1F"
+  - character: {fileID: 11400000, guid: 1e130490a0c3e1c45886bec74eba2656, type: 2}
+    expression: 5
+    speakerName: 
+    text: "\u30CE\u30A2\u306F"
+  - character: {fileID: 11400000, guid: 1e130490a0c3e1c45886bec74eba2656, type: 2}
+    expression: 5
+    speakerName: 
+    text: "\u307E\u305A\u3044\u306A\u3001\u65E9\u304F\u5408\u6D41\u3057\u306A\u3051\u308C\u3070\u3002"

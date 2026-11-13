@@ -18,10 +18,11 @@ using UnityEngine.UI;
 /// </summary>
 ///
 /// Open(使い方, 決まったときの処理, 戻ったときの処理) で開く
-/// ・NewGame  ：すべて選べる。使用中なら上書きの確認
-/// ・Continue ：データのあるスロットだけ。確認なし
-/// ・Load     ：データのあるスロットだけ。「ロードしますか？」の確認
-/// ・Save     ：すべて選べる。使用中なら上書きの確認
+/// ・NewGame  ：オートセーブ枠だけを出す。データがあれば上書きの確認
+/// ・Continue ：オートセーブ枠＋手動の枠のうち、データのあるものだけ選べる。確認なし
+/// ・Load     ：オートセーブ枠＋手動の枠のうち、データのあるものだけ選べる。「ロードしますか？」の確認
+/// ・Save     ：手動の枠だけ（オートセーブ枠には手動でセーブしない）。使用中なら上書きの確認
+/// オートセーブ枠の行は、1つ目のスロットのボタンを複製して一番上に足す（番号は Save.AutoSlot）
 /// Esc / Backspace・「もどる」で戻る。ゲームを止めていても（Time.timeScale = 0）操作できる
 public class SaveSlotPanel : MonoBehaviour
 {
@@ -65,6 +66,7 @@ public class SaveSlotPanel : MonoBehaviour
     private SeData cancelSe;
 
     private Purpose purpose;
+    private SaveSlotButton autoButton;
     private Action<int> onDecided;
     private Action onCancel;
     private bool isOpen;
@@ -145,22 +147,74 @@ public class SaveSlotPanel : MonoBehaviour
     /// </summary>
     public void Refresh()
     {
+        // オートセーブ枠（セーブ以外で出す）
+        EnsureAutoButton();
+        if(autoButton != null)
+        {
+            bool showAuto = purpose != Purpose.Save;
+            autoButton.gameObject.SetActive(showAuto);
+            if(showAuto)
+            {
+                SaveSlotInfo info = SaveSlotInfo.Load(Save.AutoSlot);
+                bool selectable = purpose == Purpose.NewGame || info.Exists;
+                bool isCurrent = purpose == Purpose.Load && Save.CurrentSlot == Save.AutoSlot;
+                autoButton.Show(info, PlaceNameTable.GetName(info.SceneName), selectable, isCurrent);
+                autoButton.SetOnClick(() => OnSlotClicked(Save.AutoSlot));
+            }
+        }
+
+        // 手動の枠（はじめからでは出さない）
         for(int i = 0; i < slotButtons.Count; i++)
         {
             SaveSlotButton button = slotButtons[i];
             if(button == null) { continue; }
 
             int slot = i + 1;
-            bool inRange = slot <= Save.SlotCount;
+            bool inRange = slot <= Save.SlotCount && purpose != Purpose.NewGame;
             button.gameObject.SetActive(inRange);
             if(!inRange) { continue; }
 
             SaveSlotInfo info = SaveSlotInfo.Load(slot);
-            bool selectable = purpose == Purpose.NewGame || purpose == Purpose.Save || info.Exists;
+            bool selectable = purpose == Purpose.Save || info.Exists;
             bool isCurrent = (purpose == Purpose.Save || purpose == Purpose.Load) && Save.CurrentSlot == slot;
             button.Show(info, PlaceNameTable.GetName(info.SceneName), selectable, isCurrent);
             button.SetOnClick(() => OnSlotClicked(slot));
         }
+    }
+
+    /// <summary>
+    /// オートセーブ枠の行を作る（1つ目のスロットのボタンを複製して、一番上に置く）
+    /// </summary>
+    private void EnsureAutoButton()
+    {
+        if(autoButton != null || slotButtons.Count == 0 || slotButtons[0] == null) { return; }
+
+        SaveSlotButton source = slotButtons[0];
+        autoButton = Instantiate(source, source.transform.parent);
+        autoButton.name = "SlotAuto";
+        autoButton.transform.SetSiblingIndex(source.transform.GetSiblingIndex());
+
+        // 行が1つ増えて1行が低くなり、文字がはみ出すので、すき間を詰めて並びの高さを広げる
+        var list = source.transform.parent as RectTransform;
+        var layout = list != null ? list.GetComponent<UnityEngine.UI.VerticalLayoutGroup>() : null;
+        if(layout != null)
+        {
+            const float RowHeight = 165.0f;
+            layout.spacing = Mathf.Min(layout.spacing, 12.0f);
+            int rows = slotButtons.Count + 1;
+            float need = rows * RowHeight + (rows - 1) * layout.spacing + layout.padding.vertical;
+            if(list.rect.height < need) { list.sizeDelta += new Vector2(0.0f, need - list.rect.height); }
+        }
+    }
+
+    /// <summary>
+    /// どれかのセーブデータ（オートセーブ枠か手動の枠）があるか
+    /// </summary>
+    public static bool AnySaveExists()
+    {
+        if(Save.SlotExists(Save.AutoSlot)) { return true; }
+        for(int slot = 1; slot <= Save.SlotCount; slot++) { if(Save.SlotExists(slot)) { return true; } }
+        return false;
     }
 
     //=====================================================================
@@ -215,7 +269,7 @@ public class SaveSlotPanel : MonoBehaviour
     {
         switch(p)
         {
-            case Purpose.NewGame:  return "はじめから：保存するスロットを選んでください";
+            case Purpose.NewGame:  return "はじめから：記録はオートセーブに残ります";
             case Purpose.Continue: return "つづきから：読み込むデータを選んでください";
             case Purpose.Load:     return "ロード：読み込むデータを選んでください";
             case Purpose.Save:     return "セーブ：保存するスロットを選んでください";
@@ -229,13 +283,14 @@ public class SaveSlotPanel : MonoBehaviour
     private static string ConfirmMessage(Purpose p, int slot)
     {
         bool exists = Save.SlotExists(slot);
+        string name = slot == Save.AutoSlot ? "オートセーブ" : $"スロット {slot}";
         switch(p)
         {
             case Purpose.NewGame:
-                return exists ? $"スロット {slot} のデータを上書きして\nはじめから始めますか？\n<size=80%>（上書きしたデータは元に戻せません）</size>" : null;
+                return exists ? $"{name}のデータを上書きして\nはじめから始めますか？\n<size=80%>（手動でセーブしたスロット 1〜{Save.SlotCount} は残ります）</size>" : null;
 
             case Purpose.Load:
-                return $"スロット {slot} のデータをロードしますか？\n<size=80%>（最後にセーブしたあとの進行は失われます）</size>";
+                return $"{name}のデータをロードしますか？\n<size=80%>（最後にセーブしたあとの進行は失われます）</size>";
 
             case Purpose.Save:
                 if(!exists) { return null; }
@@ -257,15 +312,20 @@ public class SaveSlotPanel : MonoBehaviour
         GameObject target = null;
 
         // セーブ・ロードでは、プレイ中のスロットを最初に選ぶ
-        if((purpose == Purpose.Save || purpose == Purpose.Load) && Save.HasSlot && Save.CurrentSlot - 1 < slotButtons.Count)
+        if((purpose == Purpose.Save || purpose == Purpose.Load) && Save.HasSlot)
         {
-            SaveSlotButton current = slotButtons[Save.CurrentSlot - 1];
-            if(current != null && current.Button.interactable) { target = current.gameObject; }
+            SaveSlotButton current = null;
+            if(Save.CurrentSlot == Save.AutoSlot) { current = autoButton; }
+            else if(Save.CurrentSlot >= 1 && Save.CurrentSlot - 1 < slotButtons.Count) { current = slotButtons[Save.CurrentSlot - 1]; }
+            if(current != null && current.gameObject.activeSelf && current.Button.interactable) { target = current.gameObject; }
         }
 
         if(target == null)
         {
-            foreach(SaveSlotButton b in slotButtons)
+            var ordered = new List<SaveSlotButton>();
+            if(autoButton != null) { ordered.Add(autoButton); }
+            ordered.AddRange(slotButtons);
+            foreach(SaveSlotButton b in ordered)
             {
                 if(b != null && b.gameObject.activeSelf && b.Button.interactable) { target = b.gameObject; break; }
             }

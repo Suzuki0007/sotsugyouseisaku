@@ -73,6 +73,76 @@ public static class SceneChecker
         CheckDialogues(ctx);
         CheckEnemies(ctx);
         CheckGimmicks(ctx);
+        CheckWalkAreaAndTimpani(ctx);
+    }
+
+    //=====================================================================
+    // 歩ける範囲・ティンパニ
+    //=====================================================================
+
+    private static void CheckWalkAreaAndTimpani(Context ctx)
+    {
+        // 歩ける範囲：形があるか・出現位置や調べる物が範囲の中か
+        List<WalkArea> areas = new List<WalkArea>(ctx.Find<WalkArea>());
+        if(areas.Count > 1) { ctx.Add(Level.Warning, areas[1], "歩ける範囲（WalkArea）が2つ以上あります（使われるのは1つだけです）"); }
+
+        WalkArea area = areas.Count > 0 ? areas[0] : null;
+        if(area != null)
+        {
+            if(area.ShapeCount == 0)
+            {
+                ctx.Add(Level.Error, area, "歩ける範囲（WalkArea）に形がありません。子に Circle / Box / Polygon Collider 2D の付いた物を置いてください（このままだとどこへでも歩けます）");
+            }
+            else
+            {
+                foreach(PlayerSpawnPoint point in ctx.Find<PlayerSpawnPoint>())
+                {
+                    if(!area.ContainsPoint(point.transform.position))
+                    {
+                        ctx.Add(Level.Error, point, $"出現位置「{point.SpawnPointId}」が歩ける範囲の外にあります（出たとたんに範囲のふちへ動かされます）");
+                    }
+                }
+                foreach(TimpaniPeg peg in ctx.Find<TimpaniPeg>())
+                {
+                    Collider2D col = peg.GetComponent<Collider2D>();
+                    bool reachable = area.ContainsPoint(peg.transform.position) ||
+                                     (col != null && area.ContainsPoint(col.bounds.ClosestPoint(peg.transform.position + Vector3.down * 10.0f)));
+                    if(!reachable) { ctx.Add(Level.Warning, peg, "ペグが歩ける範囲の外にあります（近づけないかもしれません）"); }
+                }
+            }
+        }
+
+        // ティンパニ1台：真ん中の敵とペグがあるか
+        foreach(TimpaniUnit unit in ctx.Find<TimpaniUnit>())
+        {
+            if(unit.GetComponentInChildren<Enemy>(true) == null && new SerializedObject(unit).FindProperty("creature").objectReferenceValue == null)
+            {
+                ctx.Add(Level.Error, unit, "ティンパニ（TimpaniUnit）に真ん中の敵がありません（子に敵を置くか、「真ん中の敵」に入れてください）");
+            }
+            if(unit.GetComponentsInChildren<TimpaniPeg>(true).Length == 0 && new SerializedObject(unit).FindProperty("pegs").arraySize == 0)
+            {
+                ctx.Add(Level.Error, unit, "ティンパニ（TimpaniUnit）にペグがありません（子にペグのプレハブを置いてください）");
+            }
+        }
+
+        // 部屋全体：クリアのフラグ・激しさのフラグ
+        foreach(TimpaniRoom room in ctx.Find<TimpaniRoom>())
+        {
+            var so = new SerializedObject(room);
+            if(so.FindProperty("clearedFlag").objectReferenceValue == null)
+            {
+                ctx.Add(Level.Warning, room, "ティンパニの部屋（TimpaniRoom）の「全部調律できたら立てるフラグ」が空です（戦闘の勝ち方・クリア後に戻ってきたときの姿に使います）");
+            }
+
+            SerializedProperty flags = so.FindProperty("escalationFlags");
+            for(int i = 0; i < flags.arraySize; i++)
+            {
+                if(flags.GetArrayElementAtIndex(i).objectReferenceValue is GameFlag flag && flag.Saved)
+                {
+                    ctx.Add(Level.Info, room, $"激しさのフラグ「{flag.Id}」がセーブするフラグです（シーンが始まるたびに OFF に戻すので動きますが、セーブしないフラグにするのがおすすめです）");
+                }
+            }
+        }
     }
 
     //=====================================================================
@@ -612,10 +682,18 @@ public static class SceneChecker
 
     private static void CheckInteractables(Context ctx)
     {
+        // イベントの部品「会話」（DialogueEventAction）から使われている Dialogue
+        var usedByEvent = new HashSet<Object>();
+        foreach(DialogueEventAction action in ctx.Find<DialogueEventAction>())
+        {
+            Object dialogue = new SerializedObject(action).FindProperty("dialogue").objectReferenceValue;
+            if(dialogue != null) { usedByEvent.Add(dialogue); }
+        }
+
         foreach(Intaractable target in ctx.Find<Intaractable>())
         {
             // DialogueEventAction から呼ぶための Dialogue は、調べる範囲がなくてよい
-            if(target is Dialogue && target.GetComponent<EventAction>() != null) { continue; }
+            if(target is Dialogue && (target.GetComponent<EventAction>() != null || usedByEvent.Contains(target))) { continue; }
 
             if(!HasTrigger(target.gameObject))
             {
@@ -958,10 +1036,25 @@ public static class SceneChecker
         }
     }
 
+    /// <summary>
+    /// 調べる物（Intaractable）の子に Update があると、土台の Update（E キーで調べる）が呼ばれなくなる
+    /// </summary>
+    private static void CheckInteractableUpdate(List<Issue> issues)
+    {
+        const System.Reflection.BindingFlags Flags = System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public |
+                                                     System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.DeclaredOnly;
+        foreach(System.Type type in TypeCache.GetTypesDerivedFrom<Intaractable>())
+        {
+            if(type.GetMethod("Update", Flags, null, System.Type.EmptyTypes, null) == null) { continue; }
+            issues.Add(new Issue { level = Level.Error, message = $"プログラム：{type.Name} に Update があるため、E キーで調べられません（Intaractable の Update が呼ばれない）。毎フレームの処理は LateUpdate に書いてください" });
+        }
+    }
+
     public static void CheckProject(List<Issue> issues)
     {
         CheckEnemyAssets(issues);
         CheckBarkAssets(issues);
+        CheckInteractableUpdate(issues);
 
         // Build Settings
         foreach(EditorBuildSettingsScene scene in EditorBuildSettings.scenes)

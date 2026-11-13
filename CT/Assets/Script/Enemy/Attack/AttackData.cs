@@ -23,6 +23,21 @@ public enum AttackOrigin
 }
 
 /// <summary>
+/// 「上から落ちる」を何個も落とすときの場所
+/// </summary>
+public enum DropScatter
+{
+    [InspectorName("歩ける範囲全体（なければ敵の周り）")]
+    WalkArea = 0,
+
+    [InspectorName("敵の周り")]
+    AroundEnemy = 1,
+
+    [InspectorName("プレイヤーの周り")]
+    AroundPlayer = 2,
+}
+
+/// <summary>
 /// 攻撃の向き
 /// </summary>
 public enum AttackAim
@@ -310,6 +325,34 @@ public class AttackData : ScriptableObject
     [Tooltip("予告の最後のこの時間で落ちてくる")]
     public float dropTime = 0.35f;
 
+    [Label("落とす数", 1)]
+    [Tooltip("「上から落ちる」で、1回の攻撃で落とす数。2 以上にすると、下の「ばらまく場所」に間をあけて次々に落とす（1 なら今までどおり起点に1つ）")]
+    public int dropCount = 1;
+
+    [Label("次を落とすまで（秒）", 0.0f)]
+    [Tooltip("落とす数が 2 以上のとき、1つ落としてから次の影を出すまでの時間")]
+    public float dropInterval = 0.3f;
+
+    [Label("ばらまく場所")]
+    [Tooltip("落とす数が 2 以上のとき、どこに落とすか")]
+    public DropScatter dropScatter = DropScatter.WalkArea;
+
+    [Label("ばらまく半径（マス）", 0.0f)]
+    [Tooltip("ばらまく場所が「敵の周り」「プレイヤーの周り」のときの広さ。「歩ける範囲全体」で歩ける範囲がないシーンでも、敵の周りのこの広さにする")]
+    public float dropScatterRadius = 8.0f;
+
+    [Label("プレイヤーを狙う割合", 0.0f, 1.0f)]
+    [Tooltip("ばらまくうち、この割合はプレイヤーの近く（下の「狙うときのずれ」の中）に落とす。0 なら狙わない")]
+    public float dropAimChance = 0.15f;
+
+    [Label("狙うときのずれ（マス）", 0.0f)]
+    [Tooltip("プレイヤーを狙うとき、プレイヤーの位置からこの距離までずらす（ちょうど足元には落ちにくい）")]
+    public float dropAimJitter = 1.5f;
+
+    [Label("影どうしの最低の間（マス）", 0.0f)]
+    [Tooltip("同じ攻撃で落とす影どうしを、この距離より近くに置かない（同じ場所に重ならない）")]
+    public float dropMinSpacing = 1.6f;
+
     [Label("突き出る物（プレハブ）")]
     [Tooltip("「下から突き出る」のとき、地面から出てくる見た目（とげ・腕など）。当たり判定（Collider2D）が付いていれば、残っている間は壁になる")]
     public GameObject riseObject;
@@ -358,6 +401,18 @@ public class AttackData : ScriptableObject
 
     [Label("発動の SE")]
     public SeData activeSe;
+
+    [Label("発動したときの画面の揺れ（マス）", 0.0f)]
+    [Tooltip("地響き・落石などで画面を揺らす大きさ（0.1 で小さく、0.3 で大きく）。0 なら揺らさない")]
+    public float activeShake = 0.0f;
+
+    [Label("発動したときに出す物")]
+    [Tooltip("範囲の真ん中に出す物（落石と一緒に落ちてくるアイテムなど。InstantPickup のプレハブ）。空なら出さない。弾を撃つ攻撃では出さない")]
+    public GameObject spawnOnActive;
+
+    [Label("出す確率", 0.0f, 1.0f)]
+    [Tooltip("発動するたびに、この確率で出す（1 なら毎回）")]
+    public float spawnChance = 0.3f;
 
     [Label("発動中の敵のアニメ")]
     public string activeAnimation = "Attack";

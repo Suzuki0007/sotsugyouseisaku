@@ -11,6 +11,10 @@ using System.Collections.Generic;
 /// <summary>
 /// プレイヤーの履歴を管理するクラス
 /// </summary>
+///
+/// LateUpdate は、ついていく処理（PlayerFollower）とマップの端で止める処理（PlayerMapLimit）の後に記録する
+/// （順番が決まっていないと、端で「外の位置」と「戻した位置」を交互に記録し、ついてくる相棒が震える）
+[DefaultExecutionOrder(200)]
 public class PlayerHistory : CharaBase
 {
     //=====================================================================

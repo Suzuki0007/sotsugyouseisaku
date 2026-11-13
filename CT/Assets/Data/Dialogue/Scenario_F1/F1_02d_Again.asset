@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eac73eb13381b184b8a3fd1f6643eddc, type: 3}
+  m_Name: F1_02d_Again
+  m_EditorClassIdentifier: Assembly-CSharp::DialogueData
+  lines:
+  - character: {fileID: 11400000, guid: 5dd6beef385447d41b6fb1926a5d911e, type: 2}
+    expression: 4
+    speakerName: 
+    text: "(\u307E\u305F\u3001\u3001\uFF01\uFF1F \u53F3\u306E\u307B\u3046\u304B\u3089\u4F55\u304B\u3001\u3001)"

@@ -16,6 +16,8 @@ using UnityEngine;
 ///   オフなら、何度でも調べて読める（壁の落書き・掲示板）
 public class NotePickup : GimmickInteractable
 {
+    public override string PromptLabel => "読む";
+
     [SerializeField, Label("メモ")]
     [Tooltip("Assets/Resources/Notes/ の NoteData")]
     private NoteData note;

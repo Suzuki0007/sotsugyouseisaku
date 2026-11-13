@@ -55,38 +55,49 @@ public static class  Save
     //=====================================================================
 
     /// <summary>
-    /// セーブスロットの数
+    /// 手動セーブのスロットの数
     /// </summary>
     public const int SlotCount = 3;
 
     /// <summary>
-    /// 今使っているスロット（1〜SlotCount）。0 ならどのスロットも使っていない（ファイルに書き込まない）
+    /// オートセーブ枠の番号（ファイルは save_auto.json）
+    /// ・自動の書き込み（Write / WriteAsync）は、いつもオートセーブ枠に書く
+    /// ・手動の枠（1〜SlotCount）に書くのは、セーブポイントの手動セーブ（SaveToSlot）だけ
+    /// </summary>
+    public const int AutoSlot = -1;
+
+    /// <summary>
+    /// 最後に読み込んだ・手動セーブした枠（1〜SlotCount、オートセーブ枠なら AutoSlot）。0 ならプレイしていない
+    /// （画面の「プレイ中」の表示に使う。書き込み先ではない）
     /// </summary>
     public static int CurrentSlot { get; private set; }
 
     /// <summary>
-    /// スロットを使っているか（false の間は、仮置き・確定はできるが、ファイルには書き込まない）
+    /// プレイ中か（false の間は、仮置き・確定はできるが、ファイルには書き込まない＝エディタでステージから直接再生したときなど）
     /// </summary>
-    public static bool HasSlot => CurrentSlot >= 1 && CurrentSlot <= SlotCount;
+    public static bool HasSlot => sessionActive;
+
+    private static bool sessionActive;
 
     /// <summary>
     /// 確定する直前に呼ばれる（プレイ時間や保存日時など、毎回記録したいものを仮置きするため）
     /// </summary>
     public static event Action BeforeCommit;
 
-    // メインスレッドでしか取得できないので、別スレッドから呼ばないようにする
+    // 自動の書き込み先（オートセーブ枠）。メインスレッドでしか取得できないので、別スレッドから呼ばないようにする
     private static string FilePath
     {
-        get { return SlotPath(CurrentSlot); }
+        get { return SlotPath(AutoSlot); }
     }
 
     /// <summary>
-    /// スロットのファイルのパス
+    /// スロットのファイルのパス（AutoSlot ならオートセーブ枠）
     /// </summary>
     // Application.persistentDataPathは、Unityが提供する、アプリケーションのデータを保存するためのディレクトリのパスです。
     // Path.Combineは、複数のパスを結合するための関数です。
     public static string SlotPath(int slot)
     {
+        if(slot == AutoSlot) { return Path.Combine(Application.persistentDataPath, "save_auto.json"); }
         return Path.Combine(Application.persistentDataPath, $"save_{slot}.json");
     }
 
@@ -107,6 +118,7 @@ public static class  Save
         pending.Clear();
         dirty = false;
         CurrentSlot = 0;
+        sessionActive = false;
         BeforeCommit = null;
     }
 
@@ -119,42 +131,54 @@ public static class  Save
     }
 
     /// <summary>
-    /// スロットを読み込んで、以後そのスロットに保存する（つづきから）
+    /// スロット（手動の枠かオートセーブ枠）を読み込んでプレイを始める（つづきから・ロード）
+    /// 以後の自動の書き込みはオートセーブ枠に行く（読み込んだ手動の枠は、手動セーブするまで変わらない）
     /// </summary>
     public static void LoadSlot(int slot)
     {
         CurrentSlot = slot;
+        sessionActive = true;
         Read();
     }
 
     /// <summary>
-    /// 空の状態でスロットを使い始める（はじめから）。次に書き込むときにスロットのデータは上書きされる
+    /// 空の状態でプレイを始める（はじめから）。次の自動の書き込みで、オートセーブ枠が上書きされる
     /// </summary>
-    public static void StartNewSlot(int slot)
+    public static void StartNewGame()
     {
-        CurrentSlot = slot;
+        CurrentSlot = AutoSlot;
+        sessionActive = true;
         Discard();
         dirty = true;
     }
 
     /// <summary>
-    /// 今の内容（仮置きも確定して）を、指定したスロットにすぐ書き込む（セーブポイント）
-    /// 以後はそのスロットを使う
+    /// 以前の呼び方（スロットを選んで、はじめから）。今はオートセーブ枠で始める（slot は使わない）
     /// </summary>
-    public static void SaveToSlot(int slot)
+    public static void StartNewSlot(int slot)
     {
-        CurrentSlot = slot;
-        Commit();
-        dirty = true;   // 別のスロットにも全部書き込むため
-        Write();
+        StartNewGame();
     }
 
     /// <summary>
-    /// スロットを使うのをやめる（タイトルに戻ったときなど）。読み込んだデータも消す
+    /// 今の内容（仮置きも確定して）を、指定した手動の枠にすぐ書き込む（セーブポイントの手動セーブ）
+    /// オートセーブ枠は変えない
+    /// </summary>
+    public static void SaveToSlot(int slot)
+    {
+        Commit();
+        sessionActive = true;
+        CurrentSlot = slot;
+        WriteFile(SlotPath(slot), BuildJson());
+    }
+
+    /// <summary>
+    /// プレイをやめる（タイトルに戻ったときなど）。読み込んだデータも消す（ファイルには書かない）
     /// </summary>
     public static void CloseSlot()
     {
         CurrentSlot = 0;
+        sessionActive = false;
         Discard();
         dirty = false;
     }
@@ -306,7 +330,7 @@ public static class  Save
         // スロットを使っていなければ読むものはない
         if(!HasSlot) { return; }
 
-        string path = FilePath;
+        string path = SlotPath(CurrentSlot);
         // ファイルが存在しない場合は何もしない
         if(!File.Exists(path))
         {
@@ -341,7 +365,7 @@ public static class  Save
     /// </summary>
     public static int Count => data.Count;
 
-    // データを保存する
+    // データをオートセーブ枠に保存する（自動の書き込み。手動の枠は SaveToSlot）
     public static void Write()
     {
         if(!dirty)
@@ -357,7 +381,7 @@ public static class  Save
         WriteFile(FilePath, BuildJson());// 同期的に書き込む
     }
 
-    // データを非同期で保存する
+    // データをオートセーブ枠に非同期で保存する
     public static void WriteAsync()
     {
         if(!dirty)

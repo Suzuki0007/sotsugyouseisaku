@@ -16,4 +16,6 @@ MonoBehaviour:
   nameColor: {r: 1, g: 1, b: 1, a: 1}
   side: 1
   flipX: 0
-  expressions: []
+  expressions:
+  - expression: 0
+    sprite: {fileID: -8439929994397625928, guid: 35ff13542be325b409dad65e6c05cb3b, type: 3}

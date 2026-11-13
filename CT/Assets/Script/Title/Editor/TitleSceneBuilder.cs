@@ -24,7 +24,7 @@ using static MenuUIBuilder;
 public static class TitleSceneBuilder
 {
     public const string ScenePath = "Assets/Scenes/Title.unity";
-    private const string BackgroundPath = "Assets/res_kari/kari_scene/scene_start.png";
+    private const string BackgroundPath = "Assets/Images/UI/UI_TitleImage.PNG";
 
     [MenuItem("Tools/タイトル画面/タイトルシーンを作成")]
     private static void BuildFromMenu()
@@ -75,8 +75,14 @@ public static class TitleSceneBuilder
         var bg = CreateImage("Background", root, Color.white);
         Stretch(bg.rectTransform);
         bg.sprite = LoadSprite(BackgroundPath);
-        bg.preserveAspect = true;
         bg.raycastTarget = false;
+        // 縦横比を保ったまま画面いっぱいに（はみ出た上下・左右は切れる）
+        if(bg.sprite != null)
+        {
+            var fit = bg.gameObject.AddComponent<AspectRatioFitter>();
+            fit.aspectMode = AspectRatioFitter.AspectMode.EnvelopeParent;
+            fit.aspectRatio = bg.sprite.rect.width / bg.sprite.rect.height;
+        }
 
         // メインメニュー
         var main = CreateRect("MainMenu", root);

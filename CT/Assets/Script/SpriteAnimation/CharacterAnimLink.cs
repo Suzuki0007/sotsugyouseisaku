@@ -18,6 +18,7 @@ using UnityEngine;
 /// 操作中のキャラクターは、壁に向かって押しているときも入力の方向を向く
 /// </summary>
 [DisallowMultipleComponent]
+[DefaultExecutionOrder(300)]   // 位置が決まってから（PlayerFollower・PlayerMapLimit の後に）動いた向きを見る
 [RequireComponent(typeof(SpriteAnimator))]
 [AddComponentMenu("Animation/Character Anim Link")]
 public class CharacterAnimLink : MonoBehaviour

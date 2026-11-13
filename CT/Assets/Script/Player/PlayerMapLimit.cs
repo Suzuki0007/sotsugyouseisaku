@@ -11,6 +11,12 @@ using UnityEngine.Tilemaps;
 /// <summary>
 /// プレイヤーのマップ制限クラス
 /// </summary>
+///
+/// ・動く前に止める：PlayerMovement が物理で動かす前に ClampToMap で行き先を範囲内に収める（端の外へ出ない）
+/// ・念のため LateUpdate でも戻す（ついていく処理・ワープなどで外に出たとき）
+/// ・LateUpdate の順番：PlayerFollower（0）→ これ（100）→ PlayerHistory（200）
+///   （順番が決まっていないと、履歴が「外の位置」と「戻した位置」を交互に記録し、ついてくる相棒が震える）
+[DefaultExecutionOrder(100)]
 public class PlayerMapLimit : CharaBase
 {
     //=====================================================================
@@ -22,6 +28,8 @@ public class PlayerMapLimit : CharaBase
     private Tilemap tilemap;
 
     private MapBounds mapBounds;
+
+    private Collider2D body;
 
     //=====================================================================
     // 関数
@@ -65,28 +73,57 @@ public class PlayerMapLimit : CharaBase
 
         if(movement == null || mapBounds == null) { return; }
 
-        Bounds bounds = mapBounds.WorldBounds;
-
         Vector3 position = movement.transform.position;
+        Vector2 clamped = ClampToMap(position);
+        if(clamped.x == position.x && clamped.y == position.y) { return; }
 
-        Collider2D playerCollider = GetComponent<Collider2D>();
-
-        float halfWidth = playerCollider.bounds.extents.x;
-        float halfHeight = playerCollider.bounds.extents.y;
-
-        position.x = Mathf.Clamp(
-            position.x,
-            bounds.min.x + halfWidth,
-            bounds.max.x - halfWidth
-        );
-
-        position.y = Mathf.Clamp(
-            position.y,
-            bounds.min.y + halfHeight,
-            bounds.max.y - halfHeight
-        );
-
+        position.x = clamped.x;
+        position.y = clamped.y;
         movement.transform.position = position;
+
+        // 物理の位置も合わせる（合わせないと、次の物理の計算で外の位置に戻される）
+        if(movement.Rb != null) { movement.Rb.position = clamped; }
+    }
+
+    //=====================================================================
+    // 範囲
+    //=====================================================================
+
+    /// <summary>
+    /// 位置をマップの範囲内に収める（体の大きさの分だけ内側）
+    /// MapBounds がないときはそのまま返す
+    /// </summary>
+    public Vector2 ClampToMap(Vector2 position)
+    {
+        // 歩ける範囲（WalkArea）があるシーンでは、その中にも収める（ないシーンでは何もしない）
+        if(mapBounds == null) { return WalkArea.Clamp(position); }
+
+        Bounds bounds = mapBounds.WorldBounds;
+        Vector2 half = BodyHalfSize();
+
+        position.x = Mathf.Clamp(position.x, bounds.min.x + half.x, bounds.max.x - half.x);
+        position.y = Mathf.Clamp(position.y, bounds.min.y + half.y, bounds.max.y - half.y);
+        return WalkArea.Clamp(position);
+    }
+
+    /// <summary>
+    /// 体の大きさの半分
+    /// 当たり判定が無効のとき（ついてきているシグル）は bounds が 0 になるので、形の大きさから求める
+    /// （有効・無効で端の位置が変わると、切り替えたときにずれる）
+    /// </summary>
+    private Vector2 BodyHalfSize()
+    {
+        if(body == null) { body = GetComponent<Collider2D>(); }
+        if(body == null) { return Vector2.zero; }
+
+        Vector3 scale = body.transform.lossyScale;
+        float sx = Mathf.Abs(scale.x);
+        float sy = Mathf.Abs(scale.y);
+
+        if(body is CircleCollider2D circle)  { float r = circle.radius * Mathf.Max(sx, sy); return new Vector2(r, r); }
+        if(body is BoxCollider2D box)        { return new Vector2(box.size.x * sx, box.size.y * sy) * 0.5f; }
+        if(body is CapsuleCollider2D capsule) { return new Vector2(capsule.size.x * sx, capsule.size.y * sy) * 0.5f; }
+        return body.bounds.extents;
     }
 
     //=====================================================================

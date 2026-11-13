@@ -17,3 +17,5 @@ MonoBehaviour:
     displayName: "\u30B9\u30C6\u30FC\u30B81-1"
   - scene: Stage1_2
     displayName: "\u30B9\u30C6\u30FC\u30B81-2"
+  - scene: Stage_1_3
+    displayName: "\u30B9\u30C6\u30FC\u30B81-3"

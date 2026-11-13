@@ -14,9 +14,18 @@ using UnityEngine;
 /// ・調べられるのは、範囲（Is Trigger の Collider2D）の中にいる「操作しているキャラ」だけ
 ///   （Intaractable も操作キャラだけを見るようにしたが、念のため調べた瞬間にも範囲の中にいるかを確かめる）
 /// ・使えるキャラ（両方・ノアだけ・シグルだけ）の判定と、使えないときの反応（イベントか「できない」音）
-public abstract class GimmickInteractable : Intaractable
+public abstract class GimmickInteractable : Intaractable, IInteractPrompt
 {
     private Collider2D[] areas;
+
+    /// <summary> キーの案内を出すか（範囲に操作中のキャラがいて、そのキャラが使えるとき） </summary>
+    public virtual bool PromptVisible => player != null && Restriction.Allows(player) && CanPrompt;
+
+    /// <summary> キーの案内の文 </summary>
+    public virtual string PromptLabel => "調べる";
+
+    /// <summary> 今 E で何か起きるか（もう使えない仕掛けは false にする） </summary>
+    protected virtual bool CanPrompt => true;
 
     protected virtual void Awake()
     {
