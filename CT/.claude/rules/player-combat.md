@@ -31,7 +31,7 @@ paths:
 - 弾は `UnityEngine.Pool`（初期 300・最大 1000）。弾を `Destroy` しない・`Instantiate` しない（プールに返す）。1発だけ変えるのは `BulletBase.Configure`、敵の弾の当たり方は `EnemyBullet.SetRules`（取り出すたびに戻す）。
 - 同じ攻撃で同じ Health には1回だけ当たる（本体と部位の二重ヒット防止）。ダメージは `DamageUtility.Apply` を通す。
 - `StateMachine/*`・`ComponentBase` は未使用（`StateMachine.Update` に括弧の誤り）。新しいコードで使わない。
-- **ノア・シグルのプレハブに FootstepSe がない**（足音が鳴らない。`rules/audio.md`）。
+- ノア・シグルのプレハブに足音の `FootstepSe` が付いている（鳴らし方・素材は `rules/audio.md`）。
 
 ## 確かめ方
 - `unity-playtest` の `press.ps1`（キー）・`event.ps1 -State`（2人の状態）。攻撃や弾を変えたら `perf-review` の `scan.ps1`（毎フレームの確保）も。

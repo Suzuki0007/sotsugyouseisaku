@@ -8,18 +8,31 @@
 using UnityEngine;
 
 /// <summary>
-/// キャラクターが一定距離進むごとに足音SEを鳴らす
-/// 実際の移動量で判定するので、操作中のキャラにも追従中のキャラにも使える
-/// (移動速度が変わっても足音の間隔が自然に合う)
-///
-/// ノア・シグルのプレハブにそれぞれ付けて、SeData を設定する
-/// 足音の SeData は、複数の音を入れてピッチを少し揺らす(例: 0.9〜1.1)と単調になりにくい
+/// キャラクターが歩くと足音SEを鳴らす
 /// </summary>
+///
+/// ・ノア・シグルのプレハブに付いている。操作中と、ついてきているときで別の音を使える
+/// ・鳴らし方「一歩ずつ」：一定の距離を進むごとに1歩の音を鳴らす（音は1歩分の短い音にする。複数入れてピッチを少し揺らすと単調になりにくい）
+/// ・鳴らし方「歩いている間ループ」：歩き始めたら音をループで鳴らし、止まったら止める（歩き続ける音を録った長い音のとき。SeData の「ループ」をオンにする）
+/// ・実際の移動量で判定するので、速さが変わっても自然に合う。ワープ・キャラ切り替えは歩いたことにしない
 public class FootstepSe : MonoBehaviour
 {
+    public enum PlayMode
+    {
+        [InspectorName("一歩ずつ")]
+        PerStep = 0,
+
+        [InspectorName("歩いている間ループ")]
+        LoopWhileWalking = 1,
+    }
+
     //=====================================================================
     // 変数
     //=====================================================================
+
+    [SerializeField, Label("鳴らし方")]
+    [Tooltip("一歩ずつ：1歩分の短い音を、決めた距離ごとに鳴らす\n歩いている間ループ：歩き続ける音（長い音）を、歩いている間だけループで鳴らす（SeData の「ループ」をオンに）")]
+    private PlayMode playMode = PlayMode.PerStep;
 
     [Header("SE")]
 
@@ -53,6 +66,10 @@ public class FootstepSe : MonoBehaviour
     private float stillTime;
     private bool isWalking;
 
+    // 「歩いている間ループ」で鳴らしている音
+    private SeHandle loopHandle;
+    private SeData loopData;
+
     //=====================================================================
     // 初期化・更新
     //=====================================================================
@@ -65,6 +82,11 @@ public class FootstepSe : MonoBehaviour
     private void OnEnable()
     {
         ResetState();
+    }
+
+    private void OnDisable()
+    {
+        StopLoop();
     }
 
     private void LateUpdate()
@@ -86,7 +108,11 @@ public class FootstepSe : MonoBehaviour
         if(moved <= 0.0001f)
         {
             stillTime += Time.deltaTime;
-            if(stillTime >= stopDelay) { isWalking = false; }
+            if(stillTime >= stopDelay && isWalking)
+            {
+                isWalking = false;
+                StopLoop();
+            }
             return;
         }
 
@@ -97,6 +123,12 @@ public class FootstepSe : MonoBehaviour
         {
             isWalking = true;
             distanceSinceStep = playOnStart ? stepDistance : 0.0f;
+        }
+
+        if(playMode == PlayMode.LoopWhileWalking)
+        {
+            UpdateLoop();
+            return;
         }
 
         distanceSinceStep += moved;
@@ -114,10 +146,36 @@ public class FootstepSe : MonoBehaviour
 
     private void PlayStep()
     {
-        bool isControlled = playerMovement == null || playerMovement.CanControl;
-        SeData se = isControlled ? footstepSe : followerFootstepSe;
+        SeManager.PlaySe(CurrentSe(), transform.position);
+    }
 
-        SeManager.PlaySe(se, transform.position);
+    /// <summary> 操作中か、ついてきているかで使う音 </summary>
+    private SeData CurrentSe()
+    {
+        bool isControlled = playerMovement == null || playerMovement.CanControl;
+        return isControlled ? footstepSe : followerFootstepSe;
+    }
+
+    /// <summary>
+    /// 歩いている間のループ：鳴らしていなければ鳴らす。操作中／ついてくるが切り替わったら音を替える
+    /// </summary>
+    private void UpdateLoop()
+    {
+        SeData se = CurrentSe();
+        if(se == loopData && loopHandle.IsValid) { return; }
+
+        StopLoop();
+        if(se == null) { return; }
+
+        loopHandle = SeManager.PlaySe(se, transform);
+        loopData = se;
+    }
+
+    private void StopLoop()
+    {
+        if(loopHandle.IsValid) { SeManager.StopSe(loopHandle); }
+        loopHandle = SeHandle.None;
+        loopData = null;
     }
 
     private void ResetState()
@@ -126,5 +184,6 @@ public class FootstepSe : MonoBehaviour
         distanceSinceStep = 0.0f;
         stillTime = stopDelay;
         isWalking = false;
+        StopLoop();
     }
 }

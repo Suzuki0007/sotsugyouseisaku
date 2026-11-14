@@ -206,6 +206,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 399965c7902ef0f40952c6d622c87f01, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DialogueEventAction
+  dialogueData: {fileID: 0}
   dialogue: {fileID: 692614903}
   closeMode: 0
   waitUntilClosed: 1
@@ -222,6 +223,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 399965c7902ef0f40952c6d622c87f01, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DialogueEventAction
+  dialogueData: {fileID: 0}
   dialogue: {fileID: 1658001329}
   closeMode: 0
   waitUntilClosed: 1
@@ -238,6 +240,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 399965c7902ef0f40952c6d622c87f01, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DialogueEventAction
+  dialogueData: {fileID: 0}
   dialogue: {fileID: 637739253}
   closeMode: 0
   waitUntilClosed: 1
@@ -525,6 +528,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 399965c7902ef0f40952c6d622c87f01, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DialogueEventAction
+  dialogueData: {fileID: 0}
   dialogue: {fileID: 273449202}
   closeMode: 0
   waitUntilClosed: 1
@@ -31600,6 +31604,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 399965c7902ef0f40952c6d622c87f01, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DialogueEventAction
+  dialogueData: {fileID: 0}
   dialogue: {fileID: 262987124}
   closeMode: 1
   waitUntilClosed: 1
@@ -33528,6 +33533,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 399965c7902ef0f40952c6d622c87f01, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DialogueEventAction
+  dialogueData: {fileID: 0}
   dialogue: {fileID: 364490159}
   closeMode: 1
   waitUntilClosed: 1
@@ -33867,6 +33873,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 399965c7902ef0f40952c6d622c87f01, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DialogueEventAction
+  dialogueData: {fileID: 0}
   dialogue: {fileID: 132826629}
   closeMode: 0
   waitUntilClosed: 1
@@ -33883,6 +33890,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 399965c7902ef0f40952c6d622c87f01, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DialogueEventAction
+  dialogueData: {fileID: 0}
   dialogue: {fileID: 2058046956}
   closeMode: 0
   waitUntilClosed: 1
@@ -34047,6 +34055,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 399965c7902ef0f40952c6d622c87f01, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DialogueEventAction
+  dialogueData: {fileID: 0}
   dialogue: {fileID: 609404848}
   closeMode: 0
   waitUntilClosed: 1
@@ -34079,6 +34088,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 399965c7902ef0f40952c6d622c87f01, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DialogueEventAction
+  dialogueData: {fileID: 0}
   dialogue: {fileID: 2067143897}
   closeMode: 0
   waitUntilClosed: 1
@@ -34804,6 +34814,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 399965c7902ef0f40952c6d622c87f01, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DialogueEventAction
+  dialogueData: {fileID: 0}
   dialogue: {fileID: 292777272}
   closeMode: 0
   waitUntilClosed: 1
@@ -34836,6 +34847,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 399965c7902ef0f40952c6d622c87f01, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DialogueEventAction
+  dialogueData: {fileID: 0}
   dialogue: {fileID: 511887580}
   closeMode: 0
   waitUntilClosed: 1
@@ -35039,6 +35051,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 399965c7902ef0f40952c6d622c87f01, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DialogueEventAction
+  dialogueData: {fileID: 0}
   dialogue: {fileID: 530718572}
   closeMode: 0
   waitUntilClosed: 1
@@ -35087,6 +35100,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 399965c7902ef0f40952c6d622c87f01, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DialogueEventAction
+  dialogueData: {fileID: 0}
   dialogue: {fileID: 774830541}
   closeMode: 0
   waitUntilClosed: 1
@@ -38190,6 +38204,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 399965c7902ef0f40952c6d622c87f01, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DialogueEventAction
+  dialogueData: {fileID: 0}
   dialogue: {fileID: 1318130574}
   closeMode: 1
   waitUntilClosed: 1
@@ -38260,56 +38275,6 @@ MonoBehaviour:
   - {fileID: 1318130576}
   - {fileID: 1318130575}
   - {fileID: 1318130573}
---- !u!1 &1325396620
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1325396621}
-  - component: {fileID: 1325396622}
-  m_Layer: 0
-  m_Name: Player
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1325396621
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1325396620}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 259.1437, y: 321.90613, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1325396622
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1325396620}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7f24ed73e9db46c489e8e3bfdb895030, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::FootstepSe
-  footstepSe: {fileID: 11400000, guid: cc5887df1c4b53241ae386bfb2ce5c68, type: 2}
-  followerFootstepSe: {fileID: 0}
-  stepDistance: 0.8
-  playOnStart: 1
-  teleportThreshold: 1
-  stopDelay: 0.1
 --- !u!1 &1332356657
 GameObject:
   m_ObjectHideFlags: 0
@@ -39023,6 +38988,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 399965c7902ef0f40952c6d622c87f01, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DialogueEventAction
+  dialogueData: {fileID: 0}
   dialogue: {fileID: 2011798008}
   closeMode: 0
   waitUntilClosed: 1
@@ -42152,6 +42118,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 399965c7902ef0f40952c6d622c87f01, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DialogueEventAction
+  dialogueData: {fileID: 0}
   dialogue: {fileID: 2029074848}
   closeMode: 1
   waitUntilClosed: 1
@@ -42799,6 +42766,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 399965c7902ef0f40952c6d622c87f01, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DialogueEventAction
+  dialogueData: {fileID: 0}
   dialogue: {fileID: 2146947389}
   closeMode: 1
   waitUntilClosed: 1
@@ -42939,7 +42907,6 @@ SceneRoots:
   m_Roots:
   - {fileID: 1723348673}
   - {fileID: 1167110589}
-  - {fileID: 1325396621}
   - {fileID: 1703584050}
   - {fileID: 925343413}
   - {fileID: 12192314}

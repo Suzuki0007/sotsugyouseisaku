@@ -23,6 +23,7 @@ GameObject:
   - component: {fileID: 5893461590104330874}
   - component: {fileID: 6144506670913621034}
   - component: {fileID: 8489184389865483796}
+  - component: {fileID: 5706430740673846032}
   m_Layer: 0
   m_Name: Player_Sigle
   m_TagString: Player
@@ -319,3 +320,22 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Health
   maxHealth: 6
   shareWith: {fileID: 0}
+--- !u!114 &5706430740673846032
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3848283961383208032}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7f24ed73e9db46c489e8e3bfdb895030, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::FootstepSe
+  playMode: 1
+  footstepSe: {fileID: 11400000, guid: cc5887df1c4b53241ae386bfb2ce5c68, type: 2}
+  followerFootstepSe: {fileID: 11400000, guid: d5b4ca2c1257f894f8d5080fdc77bb8b, type: 2}
+  stepDistance: 0.8
+  playOnStart: 1
+  teleportThreshold: 1
+  stopDelay: 0.1

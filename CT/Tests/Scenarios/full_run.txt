@@ -1,0 +1,56 @@
+# 通し：タイトル → はじめから → OP → 塔の入口 → Stage1_2（ランタン → 追跡 → 合流）→ 正面の扉 → Stage_1_3（戦闘 → 調律 → クリア）→ 左の出口 → ロード
+# シーンをまたぐつながり（遷移・出現位置・フラグの引き継ぎ・2人で着くか）を確かめる。1本 5〜6 分
+scene Title
+eval UnityEngine.Object.FindAnyObjectByType<TitleMenu>().OpenNewGame(); return "open";
+button SlotAuto                 # オートセーブの枠
+button YesButton                # 前のデータがあるときの「上書きしますか？」
+wait scene Stage1_1
+wait 2
+advance all                     # OP
+expect flag Flag_OP_Done on
+expect eval !PlayerSwitchManager.Instance.Sigle.activeSelf   # まだノア1人
+warp -115.5,25.6                # 塔の入口（F1_01）
+wait 1
+advance all
+warp -115.3,29.0                # 上の扉 → Stage1_2
+wait scene Stage1_2
+expect scene Stage1_2
+wait 2
+advance all                     # 着いたとき
+expect idle
+warp -107.25,14.9               # ランタンの前
+wait 1
+key E
+advance battle                  # 追跡が始まったらすぐ止まる
+warp -128.6,13.0                # 追跡のゴールへすぐ
+wait 2
+advance all                     # 助けられて合流
+expect flag Flag_Sigle_Joined on
+expect party Together
+warp -107.3,15.0                # 正面の扉の前
+wait 1
+expect prompt 調べる
+key E                           # 扉を調べる → F1_08 → 揺れ → Stage_1_3 へ
+advance all
+wait scene Stage_1_3
+expect scene Stage_1_3
+expect eval PlayerSwitchManager.Instance.Sigle.activeSelf   # 2人で着く
+wait 2
+advance all                     # 戦闘前の会話 → 戦闘が始まる
+expect eval BattleArea.AnyActive
+tighten all
+wait 2
+advance all                     # 全部調律できたとき（F1_11）
+expect flag Flag_Timpani_Cleared on
+expect eval !BattleArea.AnyActive
+expect reach 左の出口             # 開いた通路から左の出口へ歩いて行ける
+warp -126.0,20.6                # 左の出口（F1_12）
+wait 1
+advance all
+expect no-error
+reload                          # タイトルへ → つづきから（クリアのオートセーブ）
+expect scene Stage_1_3
+expect idle                     # 戦闘前の会話が繰り返さない
+expect eval PlayerSwitchManager.Instance.Sigle.activeSelf
+expect eval !BattleArea.AnyActive
+expect no-error

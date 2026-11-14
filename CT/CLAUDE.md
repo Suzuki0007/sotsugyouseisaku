@@ -81,7 +81,7 @@
 
 | ルール | `team-code.md` | 成田さん・鈴木さんが書いたファイル（`\author` から作った一覧）：勝手に直さない・名前を変えない・コミットメッセージに説明 |
 | ルール | `player-combat.md` | プレイヤーの操作・攻撃・弾・プール（`Player/**`・`Attack/**`・`Bullet/**`・`Pool/**`・`CharaBase/**`）：キー・LateUpdate の順番・弾の約束 |
-| ルール | `audio.md` | BGM・SE（`Bgm/**`・`Se/**`・`Assets/BGM`・`Assets/SE`）：仕組み・既知の問題（足音・47MB の WAV）・耳での確認はユーザーに |
+| ルール | `audio.md` | BGM・SE（`Bgm/**`・`Se/**`・`Assets/BGM`・`Assets/SE`）：仕組み・足音の鳴らし方・BGM は Streaming・既知の問題・耳での確認はユーザーに |
 | ルール | `tests.md` | テストシナリオ（`Tests/**`）：1本に1つの通り道・最後に reload と no-error・`key E` で調べる |
 | フック | `.claude/hooks/` | `settings.json` で自動で動く：**.ps1 に日本語を書くと止める**（`guard-ps1`）、**変更する Git の操作は確認を求める**（`guard-git`）、`Assets/` の C# を変えたら unity-check とほかの人のファイルかを知らせる（`remind-check`）。フックのスクリプトも ASCII だけで書く |
 
@@ -114,10 +114,11 @@
 - 共有用（Claude Docs）：プランナー向け作業手順書 https://claude.ai/artifact/HawxoKhE7Pz73WdbUbxwt4 、引き継ぎ資料 https://claude.ai/artifact/MZz5A9WgmQNB8owyj3yxeW 。**Markdown と自動で同期はしない**ので、Markdown を大きく直したら共有用にも反映する（頼まれたとき）。
 
 ## 問題点の要約（優先度の高いもの）
+- 🆕 シグルがノアにぴったり重なって隠れることがある（未修正・低）：ついてくる距離が「記録 10 件」なので、円い範囲の縁に沿ってずれる・音楽生物に押される間に重なる。PlayerFollower／PlayerHistory／CharacterSorting（成田さん）。**「1-3 を直接再生するとシグルがいない」のは不具合ではない**（合流のフラグ `Flag_Sigle_Joined` が OFF のため。2人で確かめるときはデバッグウィンドウのフラグか `event.ps1 -Flag Flag_Sigle_Joined -Value 1`）。
 - 🆕 Stage1_2 の追跡の敵とランタンの見た目が仮、演出の音（キーーーン・ドスン・バン）が空欄。台本の F1_08〜F1_13（扉・広い部屋・ティンパニ・階段）は部屋がまだないので未作成。
 全体は `Docs/code-map.md` の「4. 問題点」と、引き継ぎ資料の「8. 既知の問題（すべて）」。
 - 🆕 ゲームオーバーのリトライは「シーンに着いた位置」から（進み具合はメモリのまま）。入口に戻れなくなるイベントのあとで倒れる場面を作ると進めなくなるおそれ。
-- **ノア・シグルのプレハブに FootstepSe がない**（足音が鳴らない。FootstepSe は Stage1_2 の動かない `Player` オブジェクトに付いている）。
+- 足音の素材が「9 秒歩き続ける録音」（砂漠）1つだけ。今は FootstepSe の「歩いている間ループ」で鳴らしている。1歩分の音と、塔の中・部屋の足音がほしい。
 - `BgmProgress`（BGM の進行度）が再生ごとにリセットされず、セーブもされない。
 - `StageDarkness` の明かりが操作キャラに付いていかないことがある。
 - **古い作りの敵**（Enemy.prefab / Behavior Graph）：移動が壁をすり抜ける、会話中も移動は続く。Stage1_2 のスポナーはまだ古い Enemy.prefab。

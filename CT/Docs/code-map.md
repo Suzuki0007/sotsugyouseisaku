@@ -155,7 +155,7 @@
 | フォルダ | 内容 | 手順書 |
 |---|---|---|
 | `Bgm/` | `BgmManager`（クロスフェード、エフェクト）、`SceneBgm`（条件つきルール）、`Conditions/`（Area / Flag / Health）、`Effects/`（進行度で音を変える） | なし |
-| `Se/` | `SeManager`（SeData で再生、ループ、追従）、`SePlayer`、`FootstepSe`、`HealthSe`、`SeEventAction`、🛠`SeDataCreator` | なし |
+| `Se/` | `SeManager`（SeData で再生、ループ、追従）、`SePlayer`、`FootstepSe`（ノア・シグルのプレハブに付いている。鳴らし方＝一歩ずつ／歩いている間ループ〔今はこちら。止まると止める・操作中とついてくるで音を替える〕）、`HealthSe`、`SeEventAction`、🛠`SeDataCreator` | なし |
 | `Effect/` | `EffectManager`、`EffectData`、`EffectTrigger`（コードなしで出す）、`EffectEventAction`、🛠エディタ一式 | `Effect/README_エフェクトの使い方.md` |
 | `SpriteAnimation/` | `SpriteAnimator` + `SpriteAnimData`（新方式）、`CharacterAnimLink`（移動・体力で自動切り替え）、`AnimEventAction`、🛠エディタ一式。`SpriteAnimation.cs`（Animator 版）は古い | `SpriteAnimation/README_アニメーションの使い方.md` |
 | `StageDarkness/` | `StageDarkness`（ステージを暗くしてプレイヤーの周りだけ明るく）、`LightSource` | なし |
@@ -218,8 +218,9 @@
 ### 不具合・不具合の可能性
 | 優先度 | 場所 | 内容 |
 |---|---|---|
-| 中 | 🆕 `ProjectSettings/QualitySettings.asset` | エディタの今の品質レベルが「Very Low」（テクスチャが半分の解像度〔Texture Quality = Half〕）。Windows のビルドの既定は「Ultra」。エディタで見た目・重さを確かめると、完成品と条件が違う（perf.ps1 の基準の値もこの条件）。使う品質レベルを決めて、使わないレベルを消すとよい（Project Auditor の PAS0018） |
-| **高** | `Prefab/Players/Player_Noah.prefab`、`Player_Sigle.prefab` | **FootstepSe が付いていない**ため足音が鳴らない。FootstepSe は Stage1_2 のルートの `Player`（Transform と FootstepSe だけの動かないオブジェクト）に付いている。11-06 の SE 手順書は「プレハブの FootstepSe に設定」と書いていた |
+| 低 | 🆕 `Player/PlayerFollower.cs`・`PlayerHistory.cs`・`CharaBase/CharacterSorting.cs`（成田さん。2026-11-14 に再生で再現） | **シグルがノアにぴったり重なって隠れることがある**（ユーザーが報告した「1-3 の戦闘でシグルが消える」は別の原因＝Stage_1_3 を直接再生すると合流のフラグが OFF でシグルが最初からいない。仕様どおり。最初から遊ぶと起きない）。原因：シグルは「ノアの位置の記録の 10 件前」に付いていくが、記録はどんなに小さな動きでも1件増える。ノアが円い歩ける範囲の縁に押し当てて縁に沿ってずれる・音楽生物（Dynamic）に触れて押される間は、1 フレームに 0.001 マスほどの記録が積もり、シグルがノアに 0.001〜0.03 マスまで重なる。シグルの方が少しでも上にいると `CharacterSorting` が描く順番を 99（ノアの 100 の奥）にするので、完全に隠れる。四角い範囲の端では位置が変わらず記録が増えないので、ほかのシーンでは起きにくい。再現：Stage_1_3 で戦闘を始め、右へ歩き続けて右下のティンパニの縁に押し当てる（間隔 0.033・順番 99）。**そもそも普通に歩いているときの間隔も 0.3〜0.55 マス**（10 フレーム分）で、どのシーンでもシグルの体の大部分はノアと重なっている |
+| 低 | 🆕 Stage_1_3 の音楽生物（`Enemy_Base`、Dynamic・半径 0.49） | ノアが触れたまま止まると、少しずつ押し出される（上の不具合のきっかけの1つ）。動かない敵なら Kinematic にするか、プレイヤーとの押し合いをなくすとよい |
+| 低 | 🆕 足音の素材 `SE/SE_Walk_sabaku.mp3` | 1歩の音ではなく **9 秒歩き続ける録音**（砂漠）。今は FootstepSe の「歩いている間ループ」で鳴らしている（歩き始めると毎回録音の頭から）。1歩分の短い音ができたら「一歩ずつ」に戻すと歩く速さに合う。塔の中（Stage1_2）・部屋（Stage_1_3）も砂漠の足音のまま |
 | 中 | `Bgm/Effects/BgmProgress.cs` | 進行度（static）が `SubsystemRegistration` でリセットされない（ドメインリロード無効のエディタで前回の値が残る）。セーブもされず、はじめから・つづきからでも戻らない |
 | 中 | `StageDarkness/StageDarkness.cs` FindTarget | 明かりの追従先を `FindWithTag("Player")` の最初の1人で決めるため、キャラ切り替えで操作キャラに付いていかないことがある |
 | 中 | **古い作りの敵**の移動（`Behavior/Enemy/Behavior Graph.asset` の SetPositionToTarget、`Prefab/Enemies/Enemy.prefab`） | 「6秒撃つ → 3秒かけてプレイヤーの位置へ移動」の繰り返し。移動は transform を直接動かし、Rigidbody2D は Static なので**壁をすり抜け、プレイヤーと重なる**。会話・イベント中も移動は続く（撃つのは止まるようにした）。同じ動きの新しい敵（サンプル「撃つ」）はできたが、**Stage1_2 のスポナーはまだ古い Enemy.prefab**（置き換えはシーンの変更が要るので未実施） |
@@ -257,7 +258,6 @@
 | 低 | 🆕 `Gimmick/Note/NoteData.cs:41` | 警告 CS0414「`memo` は代入されているが使われていない」（2026-11-12 の再コンパイルで確認。メモ欄として Inspector 用なら `#pragma warning disable 0414` か、どこかで読む） |
 | 低 | 🆕 毎フレームの小さな確保（11-13 の計測で確認。ティンパニ戦で合計 約 1.3〜1.7KB/フレーム、ほぼ全フレーム） | 多い順に `GetComponent` が null を返す所（エディタだけで確保される `GetComponentNullErrorMessage`。`TryGetComponent` にすると消える）、`Enemy.LateUpdate`、`InteractPromptView.LateUpdate`、`PlayerMapLimit.LateUpdate`、`BattleArea.Update`、`EnemyBrain` のコルーチン。60fps は保てていて（処理 約 2ms）今は困っていないが、GC の引っかかりの元になる。直すかは計測しながら（性能の段階4） |
 | 低 | 🆕 `Fps/Fps.cs`、`ObjectBase/ObjectBase.cs`、`CharaBase/CharaBase.cs`（鈴木さん） | 中身のない `Update()`・`Start()` が残っている。ObjectBase・CharaBase は基底クラスなので、自分で Update を持たない子（CharacterSorting・NoahInventory・NoahDead など）でも毎フレーム空の Update が呼ばれる（perf-review の US01。1 回は小さいがキャラの数だけ増える） |
-| 中 | 🆕 `BGM/PMH_Atmos_HospitalHall_01.wav`（47MB）・`BGM/BGM_Stage1.mp3`（4.7MB） | Load Type が Decompress On Load（読み込み時に展開してまるごとメモリに乗る）。BGM・長い環境音は Streaming が普通（perf-review の CT08）。音の設定なのでプランナー・サウンド担当と相談して変える |
 | 低 | 🆕 `Images/UI/UI_TitleImage.PNG`、`Images/Player/playermotion_idle(192).png` の .meta | 機種別の設定に最大サイズ 4096／8192 がある（既定は 2048。perf-review の AS01）。PC で効いているかを確かめて、要らなければ下げる |
 | 低 | 🆕 ドメインリロードの点検（Project Auditor の UDR、11-13） | ゲームのコードも解析できるようになって、static をリセットしていない疑いは 40 件（UDR0005 の 12 件を外したあと。主なもの：`Camera/CameraShake`・`Enemy/Battle/BattleArea` など（UDR0002 11 件）、`Bgm/Effects/BgmProgress`（既知）・`Bgm/BgmManager`・`Party/PartyHintView`・`Scene/SceneFader` など（UDR0001 9 件）、`Flag/FlagSwitch.cs:56` の static なイベントの登録の解除がない（UDR0004）、`Save/GameSession`・`UI/GameMenu` に RuntimeInitializeOnLoadMethod が複数（UDR0005。このプロジェクトの書き方なので auditor-ignore.md で外した））。私（uh）の `InteractPrompt`・`PartyHintView` も入っている。機械の判定なので、OnDestroy で null に戻している物などは誤検出。1 件ずつ確かめる（一覧は `PerfLog/auditor_issues.tsv` の reload） |
 | 低 | 🆕 Project Auditor のルールのパッケージ 1.0.3 | ドメインリロードの点検（UDR）がふだんのコンパイルにも入り、コンソールに警告が約 60 件出る（エディタのコードの分も含む）。新しい版（2.0.0 以降）はふだんのコンパイルから外したが、Unity 6.5 のエディタの Project Auditor 本体と合わずコンパイルエラーになる（6.6 以降向け） |
@@ -296,7 +296,6 @@
 | 🆕 Stage1_2 の演出の音 | 「キーーーン」「ドスン」「バン！」の SeEventAction は空欄（音のファイルがない）。音ができたら入れる |
 | 🆕 Stage1_2 で非表示にした物 | アイテムのサンプル一式（`ItemInteractionSample`）・`Itm_Key`・`OB_TRbox`・古い `EnemySpawner`・`Event/DialogueEventZone` は話の邪魔なので非表示（消してはいない）。壁の明かり `Light`〜`Light (2)` は最初非表示でランタンを拾うと点く。StageDarkness の値（0.813・半径 2 → 0.97・半径 1）とカメラの背景色（灰 → 黒）も変えた |
 | Stage1_2 | 会話 UI がシーンの Canvas に直接組まれている（他のシーンは DialogueSystem.prefab）。揃えるなら置き換え |
-| 🆕 Stage1_2 のルートの `Player` | Transform と FootstepSe だけの動かないオブジェクト（上の「FootstepSe が付いていない」を参照）。プレハブに移したら消す |
 | Stage1_1 / Stage1_2 の `OtherSystem/SceneChange`、SceneGameOver の SceneChange | 遷移先が空（シーンチェックで「参考」）。死亡時・リトライでコードから `ChangeScene` を呼ぶためのもので、問題なし |
 
 ### 設計上の注意（不具合ではない）
@@ -311,6 +310,9 @@
 ---
 
 ## 5. 解決済み（参考。2026-11-12 に CLAUDE.md から移した）
+- （2026-11-14）エディタの品質レベルが Very Low（テクスチャ半分）で、ビルド（Ultra）と条件が違った → 品質レベルを「軽い」（元の Very Low）と「標準」（元の Ultra。全解像度・垂直同期オン）の2つにし、エディタ・すべての機種の既定を「標準」に。ほかの4つは消した。perf.ps1 の基準の値を測り直した。
+- （2026-11-14）足音が鳴らない（FootstepSe が Stage1_2 の動かない `Player` にしか付いていなかった）→ ノア・シグルのプレハブに FootstepSe（`Se_Walk_sabaku`／ついてくるとき `Se_Walk_sabaku_follow`＝音量 0.5）、動かない `Player` は消した。素材が9秒の録音だったので「歩いている間ループ」の鳴らし方を足した。
+- （2026-11-14）BGM が読み込み時に全部展開されてメモリを使っていた（`BGM_Stage1.mp3` 約 42MB・`PMH_Atmos_HospitalHall_01.wav` 約 16MB。ファイルの大きさ 47MB は WAV の元の形式で、メモリの量ではない）→ 2つとも Streaming・品質 70%。再生中のメモリは 1 曲 約 0.2MB。フェードの切り替え・続きから再生も確かめた。
 - （2026-11-13）ついてくる相棒の絵が震える（シグルが先頭のとき目立つ）→ ①マップの端：動く前に範囲内に収める（`CharacterMovement.LimitNextPosition` → `PlayerMapLimit.ClampToMap`）、LateUpdate の順番を `DefaultExecutionOrder` で固定（相棒が写す履歴が「外」と「戻した位置」を交互に記録していた）。②シグルのプレハブの Interpolate をオン（物理 50 回/秒・描画 60 回/秒で 6 フレームに 1 回止まっていた）。
 - （2026-11-12）離れているときに切り替えると前のキャラが歩き続ける → `PlayerMovement.SetControlEnabled(false)` で向きと速さを消す。
 - （2026-11-12）2人が押し合い、押された方が滑り続ける・一緒でシグルを操作するとついてくるノアとぶつかって押し出される → 2人の体はすり抜ける（`PlayerSwitchManager.IgnorePartnerCollision`）、プレイヤーは毎回速さを 0 に（`PlayerMovement.FixedUpdate`）。
