@@ -392,7 +392,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e789af79d5d78d94688f2e44fb2703bf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SeEventAction
-  seOnEnter: {fileID: 0}
+  seOnEnter: {fileID: 11400000, guid: bdab386be8c76eb45b66e03fa3cf5ee7, type: 2}
   seOnExit: {fileID: 0}
   stopLoopOnExit: 1
   playAtThisPosition: 1
@@ -32107,6 +32107,8 @@ MonoBehaviour:
   keyHintText: "<b>E</b> / <b>Space</b> / <b>Enter</b>\u3000\u6B21\u3078"
   keyHintSize: 24
   charInterval: 0.04
+  typeSe: {fileID: 11400000, guid: b2c00df1d5c5d9840a7018131637c22f, type: 2}
+  typeSeEvery: 2
 --- !u!4 &353919149
 Transform:
   m_ObjectHideFlags: 0
@@ -33857,7 +33859,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e789af79d5d78d94688f2e44fb2703bf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SeEventAction
-  seOnEnter: {fileID: 0}
+  seOnEnter: {fileID: 11400000, guid: c9db9a590aeae7e4395e82bef3f22ff3, type: 2}
   seOnExit: {fileID: 0}
   stopLoopOnExit: 1
   playAtThisPosition: 1
@@ -34121,7 +34123,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e789af79d5d78d94688f2e44fb2703bf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SeEventAction
-  seOnEnter: {fileID: 0}
+  seOnEnter: {fileID: 11400000, guid: 303b6de916bef6f47b4e07ffc61b2fdc, type: 2}
   seOnExit: {fileID: 0}
   stopLoopOnExit: 1
   playAtThisPosition: 1
@@ -34742,6 +34744,7 @@ GameObject:
   - component: {fileID: 598011919}
   - component: {fileID: 598011918}
   - component: {fileID: 598011917}
+  - component: {fileID: 598011943}
   m_Layer: 0
   m_Name: "\u30E9\u30F3\u30BF\u30F3\uFF08\u8ABF\u3079\u308B\u3068\u62FE\u3046\uFF09"
   m_TagString: Untagged
@@ -34894,7 +34897,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e789af79d5d78d94688f2e44fb2703bf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SeEventAction
-  seOnEnter: {fileID: 0}
+  seOnEnter: {fileID: 11400000, guid: abea681317c1bcd42a2305c966296561, type: 2}
   seOnExit: {fileID: 0}
   stopLoopOnExit: 1
   playAtThisPosition: 1
@@ -35084,7 +35087,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e789af79d5d78d94688f2e44fb2703bf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SeEventAction
-  seOnEnter: {fileID: 0}
+  seOnEnter: {fileID: 11400000, guid: 60c15bd4d184dd749928ae79df2ee24e, type: 2}
   seOnExit: {fileID: 0}
   stopLoopOnExit: 1
   playAtThisPosition: 1
@@ -35137,7 +35140,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ItemGiveEventAction
   item: {fileID: 11400000, guid: 1b65d1eeb4756944796a652ba4108a0b, type: 2}
   count: 1
-  se: {fileID: 0}
+  se: {fileID: 11400000, guid: d322620ac2f0e794d922140e96f74c89, type: 2}
 --- !u!114 &598011939
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -35171,7 +35174,31 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EventSequence
   playMode: 0
   lockPlayer: 1
-  actions: []
+  actions:
+  - {fileID: 598011939}
+  - {fileID: 598011938}
+  - {fileID: 598011937}
+  - {fileID: 598011936}
+  - {fileID: 598011935}
+  - {fileID: 598011934}
+  - {fileID: 598011933}
+  - {fileID: 598011932}
+  - {fileID: 598011931}
+  - {fileID: 598011930}
+  - {fileID: 598011929}
+  - {fileID: 598011928}
+  - {fileID: 598011927}
+  - {fileID: 598011926}
+  - {fileID: 598011925}
+  - {fileID: 598011924}
+  - {fileID: 598011923}
+  - {fileID: 598011922}
+  - {fileID: 598011943}
+  - {fileID: 598011921}
+  - {fileID: 598011920}
+  - {fileID: 598011919}
+  - {fileID: 598011918}
+  - {fileID: 598011917}
 --- !u!114 &598011941
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -35234,6 +35261,22 @@ CircleCollider2D:
   m_CompositeOrder: 0
   m_Offset: {x: 0, y: 0}
   m_Radius: 1
+--- !u!114 &598011943
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 598011915}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e789af79d5d78d94688f2e44fb2703bf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SeEventAction
+  seOnEnter: {fileID: 11400000, guid: 447779ecd4a1b734cb0522d57f2175be, type: 2}
+  seOnExit: {fileID: 0}
+  stopLoopOnExit: 1
+  playAtThisPosition: 0
 --- !u!1 &609404846
 GameObject:
   m_ObjectHideFlags: 0
@@ -35472,6 +35515,53 @@ MonoBehaviour:
   dialogueText: 
   dialoguePanel: {fileID: 0}
   dialogueTextUI: {fileID: 0}
+--- !u!1 &652177364
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 652177366}
+  - component: {fileID: 652177365}
+  m_Layer: 0
+  m_Name: "\u6761\u4EF6_\u8FFD\u8DE1"
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &652177365
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 652177364}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 18414a443950d024daf6839fd3f5948c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BgmConditionFlag
+  invert: 0
+  flag: {fileID: 11400000, guid: 56a8594741f63b942a062cc24b0a03fd, type: 2}
+  flagName: 
+--- !u!4 &652177366
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 652177364}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 791300647}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &664389519
 GameObject:
   m_ObjectHideFlags: 0
@@ -35698,7 +35788,7 @@ MonoBehaviour:
   interactKeyInput: 19
   item: {fileID: 11400000, guid: 7bf37f77a3a0b9843904197cfae0aed3, type: 2}
   pickupId: Sample_Lantern
-  pickupSe: {fileID: 0}
+  pickupSe: {fileID: 11400000, guid: 8e9c79b162f6d3740b6ba88ce53beb94, type: 2}
 --- !u!61 &724241116
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -36205,15 +36295,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b399a9d04b03cf444a5a20fe8a50f89f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SceneBgm
-  defaultClip: {fileID: 8300000, guid: b889a3bc5c660124b9dcb04089f07f7a, type: 3}
-  defaultVolume: 0.602
+  defaultClip: {fileID: 8300000, guid: 37c76cac28694c042a739bd519c94bdb, type: 3}
+  defaultVolume: 0.7
   defaultFadeTime: 1
   resumeDefault: 1
   effectProfile: {fileID: 0}
   startFadeInTime: 2
   fadeOutPrevious: 1
   previousFadeOutTime: 0.5
-  rules: []
+  rules:
+  - label: "\u8FFD\u8DE1"
+    condition: {fileID: 652177365}
+    clip: {fileID: 8300000, guid: 866b523318f72c64e937cf6a764215e3, type: 3}
+    volume: 0.8
+    priority: 10
+    fadeTime: 0.8
+    effectProfile: {fileID: 0}
+    latch: 0
   clearFlagsOnStart: 0
 --- !u!4 &791300647
 Transform:
@@ -36227,7 +36325,8 @@ Transform:
   m_LocalPosition: {x: -114.68821, y: 23.02692, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 652177366}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &799623328
@@ -36318,14 +36417,14 @@ MonoBehaviour:
   sigle: {fileID: 3848283961383208032, guid: 96b593b4c0a0ac64d9ab2afdcc1dacea, type: 3}
   focusCamera: {fileID: 519420033}
   switchKey: 17
-  switchSe: {fileID: 0}
+  switchSe: {fileID: 11400000, guid: 0dcb8161d5d926440a664875a6222eb6, type: 2}
   rejoinWalkDistance: 10
   apartSwitchStyle: 1
   apartEnemyTarget: 0
   waitKey: 20
-  waitSe: {fileID: 0}
-  followSe: {fileID: 0}
-  cannotSe: {fileID: 0}
+  waitSe: {fileID: 11400000, guid: 3dd64603ee5aa1442852b3b943308e24, type: 2}
+  followSe: {fileID: 11400000, guid: ba64f11fdb1a01948bcd9ab6fff64f89, type: 2}
+  cannotSe: {fileID: 11400000, guid: 56796a2c7ee104044a2440852e05a6f1, type: 2}
   cannotFollow: {fileID: 0}
   sigleJoinedFlag: {fileID: 11400000, guid: 52fdb545de6620e4b9f0277195ebe4c4, type: 2}
 --- !u!1 &823229329
@@ -38053,7 +38152,7 @@ MonoBehaviour:
   onStart: {fileID: 0}
   onWin: {fileID: 5094770}
   onLose: {fileID: 0}
-  battleFlag: {fileID: 0}
+  battleFlag: {fileID: 11400000, guid: 56a8594741f63b942a062cc24b0a03fd, type: 2}
   showHud: 1
   objective: "\u5DE6\u306E\u5965\u3078\u9003\u3052\u308D"
   startMessage: 
@@ -38672,7 +38771,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SceneChange
   sceneName: 
   spawnPointId: 
-  leaveSe: {fileID: 0}
+  leaveSe: {fileID: 11400000, guid: 5a0bfd4e3770a6e49ab563db17589e5b, type: 2}
   arriveSe: {fileID: 0}
 --- !u!1 &1448037748
 GameObject:
@@ -39088,7 +39187,7 @@ MonoBehaviour:
   interactKeyInput: 19
   item: {fileID: 11400000, guid: 334a070ce9970134d82b23f3c6392091, type: 2}
   pickupId: Sample_Gem
-  pickupSe: {fileID: 0}
+  pickupSe: {fileID: 11400000, guid: 8e9c79b162f6d3740b6ba88ce53beb94, type: 2}
 --- !u!61 &1516762099
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -41326,7 +41425,7 @@ MonoBehaviour:
   interactKeyInput: 19
   item: {fileID: 11400000, guid: e0fdc9f2cba007f4793ff39cd6725412, type: 2}
   pickupId: Sample_Key
-  pickupSe: {fileID: 0}
+  pickupSe: {fileID: 11400000, guid: 8e9c79b162f6d3740b6ba88ce53beb94, type: 2}
 --- !u!61 &1907546588
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -41833,7 +41932,7 @@ MonoBehaviour:
   noahInventory: {fileID: 8908782603096249720, guid: dd9779ac97fbb06489888bc76e2e392a, type: 3}
   keyItemData: {fileID: 0}
   pickupId: 
-  pickupSe: {fileID: 11400000, guid: 26697cb9098d4ab40abcbf61a750a3fe, type: 2}
+  pickupSe: {fileID: 11400000, guid: 8e9c79b162f6d3740b6ba88ce53beb94, type: 2}
 --- !u!1 &1999012009
 GameObject:
   m_ObjectHideFlags: 0

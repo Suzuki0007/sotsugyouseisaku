@@ -6,6 +6,7 @@ advance all                     # 着いたとき（戦闘前の会話）→ 戦
 expect eval BattleArea.AnyActive
 expect flag Flag_Timpani_InBattle on
 wait 1
+expect eval BgmManager.Instance.CurrentClip != null && BgmManager.Instance.CurrentClip.name == "BGM-02_timpani_battle_loop"   # 戦闘中はティンパニ戦の曲
 expect eval System.Linq.Enumerable.Any(Bark.Log, l => l.Contains("Bark_Timpani_戦闘が始まった"))   # 合図「戦闘が始まった」で一言
 warp -113.14,15.1               # 右下のティンパニのペグ2の前
 wait 1
@@ -18,6 +19,7 @@ advance all                     # 全部調律できたとき（会話）
 expect flag Flag_Timpani_Cleared on
 expect eval !BattleArea.AnyActive
 expect flag Flag_Timpani_InBattle off
+expect eval BgmManager.Instance.CurrentClip != null && BgmManager.Instance.CurrentClip.name == "BGM-03_tower1_explore_loop"   # クリア後は塔の探索の曲に戻る
 expect eval System.Linq.Enumerable.Any(Signals.Log, e => e.id == "timpani/all_calmed")
 expect no-error
 reload

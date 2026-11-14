@@ -1,5 +1,7 @@
 # タイトル：はじめから（オートセーブ枠）→ OP → タイトルへ → つづきから
 scene Title
+wait 1
+expect eval BgmManager.Instance.CurrentClip != null && BgmManager.Instance.CurrentClip.name == "BGM-01_title"   # タイトルの曲
 eval UnityEngine.Object.FindAnyObjectByType<TitleMenu>().OpenNewGame(); return "open";
 button SlotAuto                 # オートセーブの枠
 button YesButton                # 前のデータがあるときの「上書きしますか？」（なければ何もしない）

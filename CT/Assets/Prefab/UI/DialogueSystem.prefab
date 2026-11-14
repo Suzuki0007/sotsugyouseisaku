@@ -128,7 +128,13 @@ MonoBehaviour:
   inactivePortraitColor: {r: 0.45, g: 0.45, b: 0.45, a: 1}
   keepPortraitsOnNarration: 0
   advanceKey: 19
+  extraAdvanceKeys: 01000000020000004d000000
+  showKeyHint: 1
+  keyHintText: "<b>E</b> / <b>Space</b> / <b>Enter</b>\u3000\u6B21\u3078"
+  keyHintSize: 24
   charInterval: 0.04
+  typeSe: {fileID: 11400000, guid: b2c00df1d5c5d9840a7018131637c22f, type: 2}
+  typeSeEvery: 2
 --- !u!1 &8620036278965963066
 GameObject:
   m_ObjectHideFlags: 0

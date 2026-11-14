@@ -67,6 +67,10 @@ public class CharacterProfile : ScriptableObject
     [SerializeField]
     private List<ExpressionSprite> expressions = new List<ExpressionSprite>();
 
+    [SerializeField, Label("文字送りの音")]
+    [Tooltip("このキャラが話すときの文字送りの音（空なら会話の画面〔DialogueManager〕の音）")]
+    private SeData typeSe;
+
     //=====================================================================
     // プロパティ
     //=====================================================================
@@ -74,6 +78,9 @@ public class CharacterProfile : ScriptableObject
     public string DisplayName => displayName;
 
     public Color NameColor => nameColor;
+
+    /// <summary> 文字送りの音（空なら会話の画面の音） </summary>
+    public SeData TypeSe => typeSe;
 
     public PortraitSide Side => side;
 

@@ -95,7 +95,16 @@ public class TimpaniPeg : GimmickInteractable
     private SeData startSe;
 
     [SerializeField, Label("成功の音")]
+    [Tooltip("タイミングよく押せたとき（下の「成功するたびの音」が空のとき・足りないとき）")]
     private SeData successSe;
+
+    [SerializeField]
+    [Tooltip("成功するたびの音（1回目・2回目・3回目…の順。音程が上がっていく音を並べる）。回数より少なければ最後の音をくり返す。空なら「成功の音」")]
+    private System.Collections.Generic.List<SeData> successSeSteps = new System.Collections.Generic.List<SeData>();
+
+    [SerializeField, Label("締まったときも成功の音を鳴らす")]
+    [Tooltip("最後の成功（締まった瞬間）に、成功するたびの音と「締まった音」を重ねて鳴らす")]
+    private bool successSeOnTighten = true;
 
     [SerializeField, Label("失敗の音")]
     private SeData missSe;
@@ -254,7 +263,7 @@ public class TimpaniPeg : GimmickInteractable
                 return;
             }
 
-            SeManager.PlaySe(successSe, transform.position);
+            SeManager.PlaySe(SuccessSeFor(successCount), transform.position);
             if(successEffect != null) { EffectManager.Play(successEffect, transform.position, Vector2.zero, 0.0f, null, false); }
             Succeeded?.Invoke(this);
         }
@@ -271,6 +280,16 @@ public class TimpaniPeg : GimmickInteractable
         RefreshVisuals();
     }
 
+    /// <summary> 何回目の成功かで鳴らす音（1 から） </summary>
+    private SeData SuccessSeFor(int count)
+    {
+        for(int i = Mathf.Min(count, successSeSteps.Count) - 1; i >= 0; i--)
+        {
+            if(successSeSteps[i] != null) { return successSeSteps[i]; }
+        }
+        return successSe;
+    }
+
     /// <summary>
     /// 締まった
     /// </summary>
@@ -279,7 +298,8 @@ public class TimpaniPeg : GimmickInteractable
         playing = false;
         successCount = RequiredSuccess;
 
-        SeManager.PlaySe(tightenedSe != null ? tightenedSe : successSe, transform.position);
+        if(successSeOnTighten && tightenedSe != null) { SeManager.PlaySe(SuccessSeFor(successCount), transform.position); }
+        SeManager.PlaySe(tightenedSe != null ? tightenedSe : SuccessSeFor(successCount), transform.position);
         if(tightenedEffect != null)      { EffectManager.Play(tightenedEffect, transform.position, Vector2.zero, 0.0f, null, false); }
         else if(successEffect != null)   { EffectManager.Play(successEffect, transform.position, Vector2.zero, 0.0f, null, false); }
 

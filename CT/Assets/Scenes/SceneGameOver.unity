@@ -654,6 +654,60 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1204090804}
   m_CullTransparentMesh: 1
+--- !u!1 &1302448907
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1302448909}
+  - component: {fileID: 1302448908}
+  m_Layer: 0
+  m_Name: BGMset
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1302448908
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1302448907}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b399a9d04b03cf444a5a20fe8a50f89f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SceneBgm
+  defaultClip: {fileID: 8300000, guid: c26c4b86207c00348bd2fc0e0e3670e5, type: 3}
+  defaultVolume: 0.7
+  defaultFadeTime: 1
+  resumeDefault: 1
+  effectProfile: {fileID: 0}
+  startFadeInTime: 2.5
+  fadeOutPrevious: 1
+  previousFadeOutTime: 0.3
+  rules: []
+  clearFlagsOnStart: 0
+--- !u!4 &1302448909
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1302448907}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1341157773
 GameObject:
   m_ObjectHideFlags: 0
@@ -1165,7 +1219,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SceneChange
   sceneName: 
   spawnPointId: 
-  leaveSe: {fileID: 0}
+  leaveSe: {fileID: 11400000, guid: 5a0bfd4e3770a6e49ab563db17589e5b, type: 2}
   arriveSe: {fileID: 0}
 --- !u!4 &1654027133
 Transform:
@@ -1191,3 +1245,4 @@ SceneRoots:
   - {fileID: 410325391}
   - {fileID: 1575773017}
   - {fileID: 1654027133}
+  - {fileID: 1302448909}

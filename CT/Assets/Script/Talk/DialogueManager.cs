@@ -86,6 +86,16 @@ public class DialogueManager : Singleton<DialogueManager>
     [SerializeField]
     private float charInterval = 0.04f;
 
+    [Header("文字送りの音")]
+
+    [SerializeField, Label("文字送りの音")]
+    [Tooltip("文字が出るときに鳴らす小さな音（空なら鳴らさない）。キャラごとの音は、キャラの設定（CharacterProfile）の「文字送りの音」が先")]
+    private SeData typeSe;
+
+    [SerializeField, Label("何文字ごとに鳴らす", 1)]
+    [Tooltip("1 なら毎文字。2〜3 にすると、うるさくならない。空白・記号では鳴らさない")]
+    private int typeSeEvery = 2;
+
     // 現在の会話
     private DialogueData.Line[] lines;
 
@@ -325,15 +335,37 @@ public class DialogueManager : Singleton<DialogueManager>
 
         if(charInterval > 0f)
         {
+            SeData se = TypeSeOf(lines != null && index < lines.Length ? lines[index] : null);
+            int every = Mathf.Max(1, typeSeEvery);
+            int sounding = 0;
             for(int i = 1; i <= total; i++)
             {
                 bodyText.maxVisibleCharacters = i;
+                if(se != null && IsSoundingChar(bodyText.textInfo.characterInfo[i - 1].character))
+                {
+                    if(sounding % every == 0) { SeManager.PlaySe(se); }
+                    sounding++;
+                }
                 yield return new WaitForSeconds(charInterval);
             }
         }
 
         typingCoroutine = null;
         CompleteLine();
+    }
+
+    /// <summary> その文で鳴らす文字送りの音（キャラの設定が先、なければ全体の設定） </summary>
+    private SeData TypeSeOf(DialogueData.Line line)
+    {
+        if(line != null && line.character != null && line.character.TypeSe != null) { return line.character.TypeSe; }
+        return typeSe;
+    }
+
+    /// <summary> 音を鳴らす文字か（空白・句読点・記号・括弧では鳴らさない） </summary>
+    private static bool IsSoundingChar(char c)
+    {
+        if(char.IsWhiteSpace(c) || char.IsPunctuation(c) || char.IsSymbol(c)) { return false; }
+        return "、。…ー～―・「」『』（）！？".IndexOf(c) < 0;
     }
 
     /// <summary>

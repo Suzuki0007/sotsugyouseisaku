@@ -15,6 +15,7 @@ using UnityEngine;
 /// ・鳴らし方「一歩ずつ」：一定の距離を進むごとに1歩の音を鳴らす（音は1歩分の短い音にする。複数入れてピッチを少し揺らすと単調になりにくい）
 /// ・鳴らし方「歩いている間ループ」：歩き始めたら音をループで鳴らし、止まったら止める（歩き続ける音を録った長い音のとき。SeData の「ループ」をオンにする）
 /// ・実際の移動量で判定するので、速さが変わっても自然に合う。ワープ・キャラ切り替えは歩いたことにしない
+/// ・シーン・範囲に「足音の設定」（SceneFootstep）があれば、そこでは鳴らし方と音をそちらに替える（外のマップは砂の足音、など）
 public class FootstepSe : MonoBehaviour
 {
     public enum PlayMode
@@ -69,6 +70,9 @@ public class FootstepSe : MonoBehaviour
     // 「歩いている間ループ」で鳴らしている音
     private SeHandle loopHandle;
     private SeData loopData;
+
+    // 今いる場所の足音の設定（SceneFootstep。なければ null）
+    private SceneFootstep place;
 
     //=====================================================================
     // 初期化・更新
@@ -125,11 +129,15 @@ public class FootstepSe : MonoBehaviour
             distanceSinceStep = playOnStart ? stepDistance : 0.0f;
         }
 
-        if(playMode == PlayMode.LoopWhileWalking)
+        // このシーン・この範囲の足音の設定（外のマップなど）。なければプレハブの設定
+        place = SceneFootstep.At(position);
+
+        if(CurrentMode == PlayMode.LoopWhileWalking)
         {
             UpdateLoop();
             return;
         }
+        if(loopHandle.IsValid) { StopLoop(); }   // 範囲を出て「一歩ずつ」に替わった
 
         distanceSinceStep += moved;
 
@@ -149,12 +157,15 @@ public class FootstepSe : MonoBehaviour
         SeManager.PlaySe(CurrentSe(), transform.position);
     }
 
-    /// <summary> 操作中か、ついてきているかで使う音 </summary>
+    /// <summary> 操作中か、ついてきているかで使う音（このシーン・範囲の設定があればそちら） </summary>
     private SeData CurrentSe()
     {
         bool isControlled = playerMovement == null || playerMovement.CanControl;
-        return isControlled ? footstepSe : followerFootstepSe;
+        SeData own = isControlled ? footstepSe : followerFootstepSe;
+        return place != null ? place.SeFor(PlayerCharacters.Of(gameObject), isControlled, own) : own;
     }
+
+    private PlayMode CurrentMode => place != null ? place.Mode : playMode;
 
     /// <summary>
     /// 歩いている間のループ：鳴らしていなければ鳴らす。操作中／ついてくるが切り替わったら音を替える

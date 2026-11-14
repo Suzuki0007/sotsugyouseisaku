@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a23b2586c0ed41d42aaed8e712c7d47a, type: 3}
+  m_Name: Se_Footstep_Sigle_Follow
+  m_EditorClassIdentifier: Assembly-CSharp::SeData
+  clips:
+  - {fileID: 8300000, guid: 80969f9efee710748b6faa164fa07d53, type: 3}
+  - {fileID: 8300000, guid: 137396d1e3d61a842a4dd7f566145a2f, type: 3}
+  - {fileID: 8300000, guid: 5ff96437c50582e4484b60c2976f4fa7, type: 3}
+  - {fileID: 8300000, guid: 3751c1b9077d5bc4c930df8d2cd24c00, type: 3}
+  volume: 0.35
+  pitchMin: 0.95
+  pitchMax: 1.05
+  loop: 0
+  spatialBlend: 0
+  minInterval: 0.05
+  maxConcurrent: 2
+  outputGroup: {fileID: 0}

@@ -155,7 +155,7 @@
 | フォルダ | 内容 | 手順書 |
 |---|---|---|
 | `Bgm/` | `BgmManager`（クロスフェード、エフェクト）、`SceneBgm`（条件つきルール）、`Conditions/`（Area / Flag / Health）、`Effects/`（進行度で音を変える） | なし |
-| `Se/` | `SeManager`（SeData で再生、ループ、追従）、`SePlayer`、`FootstepSe`（ノア・シグルのプレハブに付いている。鳴らし方＝一歩ずつ／歩いている間ループ〔今はこちら。止まると止める・操作中とついてくるで音を替える〕）、`HealthSe`、`SeEventAction`、🛠`SeDataCreator` | なし |
+| `Se/` | `SeManager`（SeData で再生、ループ、追従）、`SePlayer`、`FootstepSe`（ノア・シグルのプレハブに付いている。鳴らし方＝一歩ずつ〔11-14 から〕／歩いている間ループ）、`SceneFootstep`（11-14。足音の設定＝このシーン・範囲の中だけ足音を替える。外のマップ Stage1_1 は砂の録音のループ。🛠`SceneFootstepMenu`）、`HealthSe`（11-14 ノア・シグルのプレハブに付けた。体力を共有しているとき1回の攻撃で鳴るのは当たったキャラの音だけ）、`SeEventAction`、🛠`SeDataCreator`。素材の置き場所・入れた先は `rules/audio.md` | なし |
 | `Effect/` | `EffectManager`、`EffectData`、`EffectTrigger`（コードなしで出す）、`EffectEventAction`、🛠エディタ一式 | `Effect/README_エフェクトの使い方.md` |
 | `SpriteAnimation/` | `SpriteAnimator` + `SpriteAnimData`（新方式）、`CharacterAnimLink`（移動・体力で自動切り替え）、`AnimEventAction`、🛠エディタ一式。`SpriteAnimation.cs`（Animator 版）は古い | `SpriteAnimation/README_アニメーションの使い方.md` |
 | `StageDarkness/` | `StageDarkness`（ステージを暗くしてプレイヤーの周りだけ明るく）、`LightSource` | なし |
@@ -220,7 +220,8 @@
 |---|---|---|
 | 低 | 🆕 `Player/PlayerFollower.cs`・`PlayerHistory.cs`・`CharaBase/CharacterSorting.cs`（成田さん。2026-11-14 に再生で再現） | **シグルがノアにぴったり重なって隠れることがある**（ユーザーが報告した「1-3 の戦闘でシグルが消える」は別の原因＝Stage_1_3 を直接再生すると合流のフラグが OFF でシグルが最初からいない。仕様どおり。最初から遊ぶと起きない）。原因：シグルは「ノアの位置の記録の 10 件前」に付いていくが、記録はどんなに小さな動きでも1件増える。ノアが円い歩ける範囲の縁に押し当てて縁に沿ってずれる・音楽生物（Dynamic）に触れて押される間は、1 フレームに 0.001 マスほどの記録が積もり、シグルがノアに 0.001〜0.03 マスまで重なる。シグルの方が少しでも上にいると `CharacterSorting` が描く順番を 99（ノアの 100 の奥）にするので、完全に隠れる。四角い範囲の端では位置が変わらず記録が増えないので、ほかのシーンでは起きにくい。再現：Stage_1_3 で戦闘を始め、右へ歩き続けて右下のティンパニの縁に押し当てる（間隔 0.033・順番 99）。**そもそも普通に歩いているときの間隔も 0.3〜0.55 マス**（10 フレーム分）で、どのシーンでもシグルの体の大部分はノアと重なっている |
 | 低 | 🆕 Stage_1_3 の音楽生物（`Enemy_Base`、Dynamic・半径 0.49） | ノアが触れたまま止まると、少しずつ押し出される（上の不具合のきっかけの1つ）。動かない敵なら Kinematic にするか、プレイヤーとの押し合いをなくすとよい |
-| 低 | 🆕 足音の素材 `SE/SE_Walk_sabaku.mp3` | 1歩の音ではなく **9 秒歩き続ける録音**（砂漠）。今は FootstepSe の「歩いている間ループ」で鳴らしている（歩き始めると毎回録音の頭から）。1歩分の短い音ができたら「一歩ずつ」に戻すと歩く速さに合う。塔の中（Stage1_2）・部屋（Stage_1_3）も砂漠の足音のまま |
+| 低 | 🆕 `Attack/Player/TimingGaugeAttackController.cs`・`UI/AttackArcGauge/TimingGaugeUI.cs`（成田さん） | タイミングゲージ攻撃の**成功・失敗の音を鳴らす欄がない**（素材 SE-09 success / fail はある）。今の Attack Se はゲージを出した瞬間に鳴る欄なので空のまま。判定のところ（パーフェクト・グッド・ミス）に SE の欄を足す必要がある |
+| 低 | 🆕 音の素材（2026-11-14） | 音量の差：音楽生物の攻撃（SE-18）が他より約 10dB 大きい（SeData の音量で 0.34〜0.38 に下げた）。仕掛けのスイッチ（SE-22_switch、RMS -36dB）・床スイッチ・箱を押す・守りの始まり（-28dB）がかなり小さい（音量 1 でも小さいので、素材側で上げてほしい）。追跡の曲 BGM-04 は 5 分（注文は 1 分前後のループ）。BGM-09 は mp3（ループするならつなぎ目に隙間が出やすい） |
 | 中 | `Bgm/Effects/BgmProgress.cs` | 進行度（static）が `SubsystemRegistration` でリセットされない（ドメインリロード無効のエディタで前回の値が残る）。セーブもされず、はじめから・つづきからでも戻らない |
 | 中 | `StageDarkness/StageDarkness.cs` FindTarget | 明かりの追従先を `FindWithTag("Player")` の最初の1人で決めるため、キャラ切り替えで操作キャラに付いていかないことがある |
 | 中 | **古い作りの敵**の移動（`Behavior/Enemy/Behavior Graph.asset` の SetPositionToTarget、`Prefab/Enemies/Enemy.prefab`） | 「6秒撃つ → 3秒かけてプレイヤーの位置へ移動」の繰り返し。移動は transform を直接動かし、Rigidbody2D は Static なので**壁をすり抜け、プレイヤーと重なる**。会話・イベント中も移動は続く（撃つのは止まるようにした）。同じ動きの新しい敵（サンプル「撃つ」）はできたが、**Stage1_2 のスポナーはまだ古い Enemy.prefab**（置き換えはシーンの変更が要るので未実施） |
@@ -262,7 +263,6 @@
 | 低 | 🆕 ドメインリロードの点検（Project Auditor の UDR、11-13） | ゲームのコードも解析できるようになって、static をリセットしていない疑いは 40 件（UDR0005 の 12 件を外したあと。主なもの：`Camera/CameraShake`・`Enemy/Battle/BattleArea` など（UDR0002 11 件）、`Bgm/Effects/BgmProgress`（既知）・`Bgm/BgmManager`・`Party/PartyHintView`・`Scene/SceneFader` など（UDR0001 9 件）、`Flag/FlagSwitch.cs:56` の static なイベントの登録の解除がない（UDR0004）、`Save/GameSession`・`UI/GameMenu` に RuntimeInitializeOnLoadMethod が複数（UDR0005。このプロジェクトの書き方なので auditor-ignore.md で外した））。私（uh）の `InteractPrompt`・`PartyHintView` も入っている。機械の判定なので、OnDestroy で null に戻している物などは誤検出。1 件ずつ確かめる（一覧は `PerfLog/auditor_issues.tsv` の reload） |
 | 低 | 🆕 Project Auditor のルールのパッケージ 1.0.3 | ドメインリロードの点検（UDR）がふだんのコンパイルにも入り、コンソールに警告が約 60 件出る（エディタのコードの分も含む）。新しい版（2.0.0 以降）はふだんのコンパイルから外したが、Unity 6.5 のエディタの Project Auditor 本体と合わずコンパイルエラーになる（6.6 以降向け） |
 | 低 | 🆕 `ProjectSettings/Physics2DSettings.asset` | 2D の衝突の組み合わせ（Layer Collision Matrix）がほぼ全部オンのまま（perf-review の PH10）。当たる必要のないレイヤーの組を切ると判定が軽くなる。今は 60fps に余裕があるので急がない |
-| 低 | 🆕 `Title.unity` の `System`（SceneBgm） | Default Clip が空なので、タイトルで BGM が鳴らない（ステージの曲はタイトルで止まる）。曲が決まったら入れる |
 
 ### 提出前に整理したいもの
 | 場所 | 内容 |
@@ -271,7 +271,7 @@
 | `Behavior/Enemy/SampleAction.cs` | 練習用ノード（未使用。ブラックボードの値を書き換えて戻さない） |
 | `Intaract/Intaractable.cs:58` | Debug.Log「調べられるまする」（誤字、範囲に入るたびに出る） |
 | 不要な using | `PlayerFollower` の `using Unity.AppUI.Redux` は 11-13 にコメントアウト済み（エディタだけのパッケージで、ビルドのコンパイルが失敗していた。成田さんに確認のうえ行ごと消してよい）、`PlayerInput` / `NoahDead`（Unity.VisualScripting）、`AbcdefuckAction`（RuleTile） |
-| 使われていないクラス | `StateMachine/*`、`ComponentBase`、`FocusPlayer`、`SpriteAnimation`（Animator 版）、`kari/player/*`、`BgmProgressDebug`、`SePlayer`、`HealthSe`（シーン・プレハブに未配置） |
+| 使われていないクラス | `StateMachine/*`、`ComponentBase`、`FocusPlayer`、`SpriteAnimation`（Animator 版）、`kari/player/*`、`BgmProgressDebug`、`SePlayer`（シーン・プレハブに未配置） |
 | `Player_Noah/NoahBulletDeleteAreaController.cs` | ヘッダーの説明が「ノアのアニメーションクラス」になっている |
 | `Attack/AreaAttack.cs` | 命中のたびに Debug.Log。Health がない相手（壁など）に当たるたびにも Log |
 | `Bullet/BulletDeleteArea.cs` | `deleteRadius` は Gizmo の表示にしか使っておらず、実際の範囲は Collider の大きさ |
@@ -284,7 +284,7 @@
 |---|---|
 | Stage1_1 / Stage1_2 / Stage_1_3 / SampleScene の `MapEntity/OB_TRbox` | 宝箱の Id が空（シーンチェックでエラー。ほかの宝箱と開いた記録が混ざる） |
 | 🆕 シグルのアニメ（`Data/Animation/Sample/Anim_Sample_Sigle`） | 待機（Idle）しかなく、歩くと絵が止まったまま滑る。ノアも歩き・待機とも仮の絵（res_kari）。素材の一覧は `Docs/素材チェックリスト.xlsx` |
-| 🆕 音の欄の多くが空 | 足音（プレハブ）・攻撃・守り・キャラ切り替え・ゲームオーバー・ペグ・敵の攻撃などの SE、タイトルの BGM が空。ティンパニ戦は砂漠と同じ BGM。一覧は `Docs/素材チェックリスト.xlsx` |
+| 🆕 音の欄で残っている物（2026-11-14 に素材を入れたあと） | ノアのタイミングゲージの成功・失敗（欄がない）、宝箱（古い仕組み）、敵の部位が壊れた・スポナー・やり直す位置の音、Stage1_1 の BGM（砂漠、BGM_Stage1 のまま）。二層の曲（BGM-07〜09）は入れただけ。一覧は `Docs/素材チェックリスト.xlsx` |
 | 🆕 Stage_1_3 の `Event`（Stage1_1 のコピーの残り） | EventZone の中身が空・Is Trigger の Collider2D がない（シーンチェックでエラー。何も起きないので害はない。不要なら消してよい） |
 | 同じ3シーンの `Event`（ルート） | 中身が空の EventZone / EventSequence。Is Trigger の Collider2D もない（シーンチェックでエラー・注意が出るが、動作上の害はない。不要なら消す） |
 | 🆕 Stage1_1 の `Event/DialogueEventZone` | 入ると古い会話（非表示の `OB_Text` の Dialogue）を出す EventZone が、マップの右側（-106.8, 17.3）に残っている。OP とは別。要らなければ消す |
@@ -293,7 +293,6 @@
 | 🆕 Stage1_2 の追跡の敵（`Stage1_2_イベント/塔の化け物`） | 見た目が仮（敵の共通プレハブの絵＝シグルに似た絵）。敵の画像ができたら `EnemyData_Stage1_2_Chaser` の Sprite / Animation に入れる。ランタンも仮の丸（`見た目（仮）`） |
 | 🆕 シグルのアニメのデータ（`Anim_Sample_Sigle`） | 「Walk」の動きがないので、歩いても立ち姿のまま動く（ついてくるとき・Stage1_2 の助けの場面で歩いてくるとき）。ノアのデータには Walk がある |
 | 🆕 Stage1_2 のガレキ・シグルの攻撃 | 仮の絵（四角を並べたガレキ、プレイヤーの弾の絵）。絵ができたら差し替える |
-| 🆕 Stage1_2 の演出の音 | 「キーーーン」「ドスン」「バン！」の SeEventAction は空欄（音のファイルがない）。音ができたら入れる |
 | 🆕 Stage1_2 で非表示にした物 | アイテムのサンプル一式（`ItemInteractionSample`）・`Itm_Key`・`OB_TRbox`・古い `EnemySpawner`・`Event/DialogueEventZone` は話の邪魔なので非表示（消してはいない）。壁の明かり `Light`〜`Light (2)` は最初非表示でランタンを拾うと点く。StageDarkness の値（0.813・半径 2 → 0.97・半径 1）とカメラの背景色（灰 → 黒）も変えた |
 | Stage1_2 | 会話 UI がシーンの Canvas に直接組まれている（他のシーンは DialogueSystem.prefab）。揃えるなら置き換え |
 | Stage1_1 / Stage1_2 の `OtherSystem/SceneChange`、SceneGameOver の SceneChange | 遷移先が空（シーンチェックで「参考」）。死亡時・リトライでコードから `ChangeScene` を呼ぶためのもので、問題なし |

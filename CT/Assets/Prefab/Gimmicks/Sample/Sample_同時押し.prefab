@@ -385,7 +385,7 @@ MonoBehaviour:
   byBlock: 0
   byEnemy: 0
   requiredCount: 1
-  pressSe: {fileID: 0}
+  pressSe: {fileID: 11400000, guid: f8b7468883df9c547aa0bcbaa00749d5, type: 2}
   releaseSe: {fileID: 0}
 --- !u!114 &2046097373634436248
 MonoBehaviour:
@@ -530,7 +530,7 @@ MonoBehaviour:
   byBlock: 0
   byEnemy: 0
   requiredCount: 1
-  pressSe: {fileID: 0}
+  pressSe: {fileID: 11400000, guid: f8b7468883df9c547aa0bcbaa00749d5, type: 2}
   releaseSe: {fileID: 0}
 --- !u!114 &7216113347204852280
 MonoBehaviour:
@@ -996,7 +996,7 @@ MonoBehaviour:
   hideWhenMet:
   - {fileID: 1035131207722670571}
   moves: []
-  moveSe: {fileID: 0}
+  moveSe: {fileID: 11400000, guid: 4b94f23d36967b9469fb62cff48bee28, type: 2}
   onMet: {fileID: 2941708123415260644}
   onUnmet: {fileID: 0}
   saveId: 

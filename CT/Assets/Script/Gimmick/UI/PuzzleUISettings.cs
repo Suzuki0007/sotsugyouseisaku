@@ -38,4 +38,14 @@ public class PuzzleUISettings : ScriptableObject
 
     [Label("メモの文字の色")]
     public Color paperTextColor = new Color(0.15f, 0.12f, 0.1f, 1.0f);
+
+    [Header("音")]
+
+    [Label("番号を回す音")]
+    [Tooltip("番号錠で数字・記号を上下に回したとき（空なら UI の「選ぶ」の音）")]
+    public SeData dialSe;
+
+    [Label("ページをめくる音")]
+    [Tooltip("メモ・日記の次のページ・前のページ（空なら UI の「選ぶ」の音）")]
+    public SeData pageSe;
 }

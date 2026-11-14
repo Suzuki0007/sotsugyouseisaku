@@ -30,14 +30,15 @@ MonoBehaviour:
   staggerRules: []
   staggerAnimation: Stagger
   staggerEffect: {fileID: 0}
-  staggerSe: {fileID: 0}
+  staggerSe: {fileID: 11400000, guid: 8ba07508b848d0d4d90ab8d27a0c5e7b, type: 2}
   lookRules: []
   contactDamage: 1
   contactInterval: 1
   animation: {fileID: 0}
   sprite: {fileID: 0}
+  moveLoopSe: {fileID: 0}
   deathEffect: {fileID: 11400000, guid: db953535983d3f047a3398fdc6e212b4, type: 2}
-  deathSe: {fileID: 0}
+  deathSe: {fileID: 11400000, guid: 33c513e7c2502164c82252bc5bc37343, type: 2}
   deathAnimation: Dead
   defeatStyle: 0
   remainTint: {r: 0.6, g: 0.6, b: 0.6, a: 1}

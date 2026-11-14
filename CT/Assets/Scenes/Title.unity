@@ -2212,8 +2212,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b399a9d04b03cf444a5a20fe8a50f89f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SceneBgm
-  defaultClip: {fileID: 0}
-  defaultVolume: 1
+  defaultClip: {fileID: 8300000, guid: 88d0f31a3acd7cc448aaf9b1c0e946f4, type: 3}
+  defaultVolume: 0.8
   defaultFadeTime: 1
   resumeDefault: 1
   effectProfile: {fileID: 0}

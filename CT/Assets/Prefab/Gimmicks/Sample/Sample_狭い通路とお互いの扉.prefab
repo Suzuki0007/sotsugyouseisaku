@@ -65,7 +65,7 @@ MonoBehaviour:
   hideWhenMet:
   - {fileID: 8354390261207826149}
   moves: []
-  moveSe: {fileID: 0}
+  moveSe: {fileID: 11400000, guid: 4b94f23d36967b9469fb62cff48bee28, type: 2}
   onMet: {fileID: 4165376632648665090}
   onUnmet: {fileID: 0}
   saveId: 
@@ -187,7 +187,7 @@ MonoBehaviour:
     gimmicks: []
     party: 0
     partnerWithin: 0
-  useSe: {fileID: 0}
+  useSe: {fileID: 11400000, guid: 484d3db3d76ac5a469eed76265ece896, type: 2}
   wrongCharacter: {fileID: 0}
   conditionNotMet: {fileID: 0}
   lockedSequence: {fileID: 0}
@@ -2434,7 +2434,7 @@ MonoBehaviour:
   requiredHits: 1
   brokenSprite: {fileID: 0}
   breakEffect: {fileID: 0}
-  breakSe: {fileID: 0}
+  breakSe: {fileID: 11400000, guid: 0600b6d28aca256459ae4fb520b72603, type: 2}
   onBroken: {fileID: 0}
   hitEffect: {fileID: 0}
   hitSe: {fileID: 0}

@@ -522,6 +522,7 @@ public class Enemy : MonoBehaviour
     {
         all.Remove(this);
         if(health != null) { health.OnDied -= OnDied; }
+        StopMoveSound();
     }
 
     private void Start()
@@ -650,6 +651,33 @@ public class Enemy : MonoBehaviour
     private void LateUpdate()
     {
         ClampToMap();
+        UpdateMoveSound();
+    }
+
+    //=====================================================================
+    // 動いている間の音
+    //=====================================================================
+
+    private SeHandle moveLoopHandle;
+    private float moveStillTime;
+
+    /// <summary> 動いている間の音（敵のデータの「動いている間の音」）。少し止まっただけでは切らない </summary>
+    private void UpdateMoveSound()
+    {
+        SeData se = data != null ? data.MoveLoopSe : null;
+        if(se == null) { return; }
+
+        bool moving = !IsDead && CanAct && rb != null && rb.linearVelocity.sqrMagnitude > 0.04f;
+        moveStillTime = moving ? 0.0f : moveStillTime + Time.deltaTime;
+
+        if(moving && !moveLoopHandle.IsValid) { moveLoopHandle = SeManager.PlaySe(se, transform); }
+        else if(!moving && moveStillTime > 0.25f) { StopMoveSound(); }
+    }
+
+    private void StopMoveSound()
+    {
+        if(moveLoopHandle.IsValid) { SeManager.StopSe(moveLoopHandle); }
+        moveLoopHandle = SeHandle.None;
     }
 
     /// <summary>

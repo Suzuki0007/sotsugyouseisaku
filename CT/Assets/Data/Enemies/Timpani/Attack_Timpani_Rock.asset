@@ -20,7 +20,7 @@ MonoBehaviour:
   telegraphBlink: 0
   telegraphSortingOrder: 3
   telegraphUnlit: 1
-  telegraphSe: {fileID: 0}
+  telegraphSe: {fileID: 11400000, guid: c55e3608171dd944b90cee9619c05dbc, type: 2}
   telegraphAnimation: Windup
   origin: 1
   aim: 0
@@ -75,7 +75,7 @@ MonoBehaviour:
   chargeSpeed: 12
   chargeStunTime: 0
   activeEffect: {fileID: 11400000, guid: db953535983d3f047a3398fdc6e212b4, type: 2}
-  activeSe: {fileID: 0}
+  activeSe: {fileID: 11400000, guid: 75b34eff967d15045a2f91769112b072, type: 2}
   activeShake: 0.15
   spawnOnActive: {fileID: 74003795867570883, guid: 87b63e7265df5274bb1dd9e0ac7d2a3f, type: 3}
   spawnChance: 0.08

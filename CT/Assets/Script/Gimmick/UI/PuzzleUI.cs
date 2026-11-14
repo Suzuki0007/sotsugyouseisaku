@@ -224,8 +224,8 @@ public class PuzzleUI : MonoBehaviour
         int n = values.Length;
         if(left)  { cursor = (cursor - 1 + n) % n; UISound.Play(UISoundType.Select); RefreshCode(); }
         if(right) { cursor = (cursor + 1) % n; UISound.Play(UISoundType.Select); RefreshCode(); }
-        if(up)    { values[cursor] = (values[cursor] + 1) % symbols.Length; UISound.Play(UISoundType.Select); RefreshCode(); }
-        if(down)  { values[cursor] = (values[cursor] - 1 + symbols.Length) % symbols.Length; UISound.Play(UISoundType.Select); RefreshCode(); }
+        if(up)    { values[cursor] = (values[cursor] + 1) % symbols.Length; PlayOr(settings != null ? settings.dialSe : null); RefreshCode(); }
+        if(down)  { values[cursor] = (values[cursor] - 1 + symbols.Length) % symbols.Length; PlayOr(settings != null ? settings.dialSe : null); RefreshCode(); }
 
         if(decide)
         {
@@ -236,6 +236,13 @@ public class PuzzleUI : MonoBehaviour
             return;
         }
         if(cancel) { Cancel(); }
+    }
+
+    /// <summary> 決めた音を鳴らす（空なら UI の「選ぶ」の音） </summary>
+    private static void PlayOr(SeData se)
+    {
+        if(se != null) { SeManager.PlaySe(se); }
+        else           { UISound.Play(UISoundType.Select); }
     }
 
     private void UpdateChoice(bool up, bool down, bool decide, bool cancel)
@@ -261,11 +268,12 @@ public class PuzzleUI : MonoBehaviour
     private void UpdateText(bool left, bool right, bool decide, bool cancel)
     {
         int pages = Mathf.Max(1, body.textInfo.pageCount);
-        if(right && body.pageToDisplay < pages) { body.pageToDisplay++; UISound.Play(UISoundType.Select); RefreshTextHint(); return; }
-        if(left && body.pageToDisplay > 1)      { body.pageToDisplay--; UISound.Play(UISoundType.Select); RefreshTextHint(); return; }
+        SeData page = settings != null ? settings.pageSe : null;
+        if(right && body.pageToDisplay < pages) { body.pageToDisplay++; PlayOr(page); RefreshTextHint(); return; }
+        if(left && body.pageToDisplay > 1)      { body.pageToDisplay--; PlayOr(page); RefreshTextHint(); return; }
 
         // 決定は「次のページ」、最後のページなら閉じる
-        if(decide && body.pageToDisplay < pages) { body.pageToDisplay++; UISound.Play(UISoundType.Select); RefreshTextHint(); return; }
+        if(decide && body.pageToDisplay < pages) { body.pageToDisplay++; PlayOr(page); RefreshTextHint(); return; }
         if(decide || cancel)
         {
             Action close = onClose;

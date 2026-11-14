@@ -143,7 +143,7 @@ MonoBehaviour:
   hideWhenMet:
   - {fileID: 207301807565561509}
   moves: []
-  moveSe: {fileID: 0}
+  moveSe: {fileID: 11400000, guid: 4b94f23d36967b9469fb62cff48bee28, type: 2}
   onMet: {fileID: 8044489843727995016}
   onUnmet: {fileID: 0}
   saveId: 
@@ -346,7 +346,7 @@ MonoBehaviour:
     gimmicks: []
     party: 0
     partnerWithin: 0
-  useSe: {fileID: 0}
+  useSe: {fileID: 11400000, guid: 2d0523b77298a89498cab8ae7c787eb6, type: 2}
   wrongCharacter: {fileID: 0}
   conditionNotMet: {fileID: 0}
   lockedSequence: {fileID: 0}
@@ -1691,10 +1691,10 @@ MonoBehaviour:
   timing: 0
   lockInputs: 1
   onSolved: {fileID: 1117660814063013483}
-  solvedSe: {fileID: 0}
+  solvedSe: {fileID: 11400000, guid: 01b0db1a6093ce24e91786f99d3cff85, type: 2}
   resetOnWrong: 1
   onWrong: {fileID: 0}
-  wrongSe: {fileID: 0}
+  wrongSe: {fileID: 11400000, guid: da9a6cfdac1b696478a212d52794f9d2, type: 2}
 --- !u!1 &6775075997421468820
 GameObject:
   m_ObjectHideFlags: 0
@@ -1815,7 +1815,7 @@ MonoBehaviour:
     gimmicks: []
     party: 0
     partnerWithin: 0
-  useSe: {fileID: 0}
+  useSe: {fileID: 11400000, guid: 2d0523b77298a89498cab8ae7c787eb6, type: 2}
   wrongCharacter: {fileID: 0}
   conditionNotMet: {fileID: 0}
   lockedSequence: {fileID: 0}
@@ -2749,7 +2749,7 @@ MonoBehaviour:
     gimmicks: []
     party: 0
     partnerWithin: 0
-  useSe: {fileID: 0}
+  useSe: {fileID: 11400000, guid: 2d0523b77298a89498cab8ae7c787eb6, type: 2}
   wrongCharacter: {fileID: 0}
   conditionNotMet: {fileID: 0}
   lockedSequence: {fileID: 0}

@@ -481,7 +481,7 @@ MonoBehaviour:
   cellSize: 1
   pushDelay: 0.25
   moveTime: 0.2
-  pushSe: {fileID: 0}
+  pushSe: {fileID: 11400000, guid: 013fda0180142e2449927297f00d0e08, type: 2}
   fallSe: {fileID: 0}
   wrongCharacter: {fileID: 0}
   save: 1
@@ -1303,7 +1303,7 @@ MonoBehaviour:
   cellSize: 1
   pushDelay: 0.25
   moveTime: 0.2
-  pushSe: {fileID: 0}
+  pushSe: {fileID: 11400000, guid: 013fda0180142e2449927297f00d0e08, type: 2}
   fallSe: {fileID: 0}
   wrongCharacter: {fileID: 0}
   save: 1
@@ -1372,7 +1372,7 @@ MonoBehaviour:
   hideWhenMet:
   - {fileID: 3409573850356833995}
   moves: []
-  moveSe: {fileID: 0}
+  moveSe: {fileID: 11400000, guid: 4b94f23d36967b9469fb62cff48bee28, type: 2}
   onMet: {fileID: 7153557713396902358}
   onUnmet: {fileID: 0}
   saveId: 
@@ -1682,7 +1682,7 @@ MonoBehaviour:
   byBlock: 1
   byEnemy: 0
   requiredCount: 1
-  pressSe: {fileID: 0}
+  pressSe: {fileID: 11400000, guid: f8b7468883df9c547aa0bcbaa00749d5, type: 2}
   releaseSe: {fileID: 0}
 --- !u!114 &5734557038178212214
 MonoBehaviour:

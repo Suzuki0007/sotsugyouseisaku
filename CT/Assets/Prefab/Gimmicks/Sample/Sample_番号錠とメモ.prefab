@@ -661,7 +661,7 @@ MonoBehaviour:
   hideWhenMet:
   - {fileID: 1048348648525547249}
   moves: []
-  moveSe: {fileID: 0}
+  moveSe: {fileID: 11400000, guid: 4b94f23d36967b9469fb62cff48bee28, type: 2}
   onMet: {fileID: 6900637500580298665}
   onUnmet: {fileID: 0}
   saveId: 
@@ -1818,9 +1818,9 @@ MonoBehaviour:
   answer: 0314
   rememberInput: 1
   user: 0
-  correctSe: {fileID: 0}
+  correctSe: {fileID: 11400000, guid: 01b0db1a6093ce24e91786f99d3cff85, type: 2}
   onCorrect: {fileID: 0}
-  wrongSe: {fileID: 0}
+  wrongSe: {fileID: 11400000, guid: da9a6cfdac1b696478a212d52794f9d2, type: 2}
   onWrong: {fileID: 0}
   afterOpened: {fileID: 0}
   wrongCharacter: {fileID: 0}
@@ -1943,5 +1943,5 @@ MonoBehaviour:
   interactKeyInput: 19
   note: {fileID: 11400000, guid: cf58f09df478a284dbb01a3ba42343b5, type: 2}
   hideAfterRead: 1
-  pickSe: {fileID: 0}
+  pickSe: {fileID: 11400000, guid: eb536b97407a42048919133232854b07, type: 2}
   onRead: {fileID: 0}

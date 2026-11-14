@@ -20,3 +20,5 @@ MonoBehaviour:
   normalColor: {r: 0.25, g: 0.25, b: 0.32, a: 1}
   paperColor: {r: 0.93, g: 0.9, b: 0.82, a: 1}
   paperTextColor: {r: 0.15, g: 0.12, b: 0.1, a: 1}
+  dialSe: {fileID: 11400000, guid: c5401a93de6311948a4eb664f9c28659, type: 2}
+  pageSe: {fileID: 11400000, guid: eb536b97407a42048919133232854b07, type: 2}

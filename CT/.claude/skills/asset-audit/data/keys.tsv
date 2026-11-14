@@ -1,7 +1,7 @@
 ID	確認キー（自動）
 SE-01	has:Player_Noah.prefab:FootstepSe;has:Player_Sigle.prefab:FootstepSe
 SE-02	slot:SeEventAction.seOnEnter@着いたとき（頭痛
-SE-03	slot:SeEventAction.seOnEnter@ランタン（調べると拾う）;slot:EnemyCommandEventAction.se@ランタン（調べると拾う）
+SE-03	slot:SeEventAction.seOnEnter@ランタン（調べると拾う）
 SE-04	slot:SeEventAction.seOnEnter@シグルに助けられる;slot:SigleShooter.shotSe
 SE-05	slot:SeEventAction.seOnEnter@ティンパニ部屋/着いたとき
 SE-06	slot:SeEventAction.seOnEnter@正面の扉
@@ -16,12 +16,12 @@ SE-14	slot:PlayerSwitchManager.switchSe;slot:PlayerSwitchManager.waitSe;slot:Pla
 SE-16	slot:TimpaniPeg.startSe;slot:TimpaniPeg.successSe;slot:TimpaniPeg.missSe;slot:TimpaniPeg.tightenedSe
 SE-17	slot:TimpaniUnit.calmSe
 SE-18	slot:AttackData.telegraphSe@Timpani;slot:AttackData.activeSe@Timpani
-SE-19	slot:EnemyData.staggerSe@EnemyData_Stage1_2;slot:EnemyData.deathSe@EnemyData_Stage1_2;slot:EnemyData.staggerSe@Timpani;slot:EnemyData.deathSe@Timpani
-SE-20	slot:EnemyCommandEventAction.se@シグルに助けられる
+SE-19	slot:EnemyData.staggerSe@EnemyData_Stage1_2;slot:EnemyData.deathSe@EnemyData_Stage1_2
+SE-20	slot:EnemyData.moveLoopSe@EnemyData_Stage1_2;slot:SeEventAction.seOnEnter@ランタン（調べると拾う）
 SE-21	slot:InstantPickup.pickupSe
-SE-26	slot:SavePoint.saveSe@SCENE
+SE-26	slot:SceneChange.leaveSe@OtherSystem/SceneChange
 BGM-01	slot:SceneBgm.defaultClip@SCENE Title
-BGM-05	has:SceneGameOver:SceneBgm
+BGM-05	has:SceneGameOver:SceneBgm;slot:SceneBgm.defaultClip@SCENE SceneGameOver
 POR-01	chara:Noah:Surprise;chara:Noah:Troubled;chara:Noah:Sad;chara:Noah:Smile;chara:Noah:Angry
 POR-02	chara:Sigle:Surprise;chara:Sigle:Troubled;chara:Sigle:Sad;chara:Sigle:Angry
 POR-04	chara:Kairos:Normal
@@ -44,3 +44,7 @@ UI-01	item:Item_Key;item:Item_Lantern
 UI-02	nouse:res_kari/kari/hp.png;nouse:res_kari/kari/empty_hp.png
 UI-04	nouse:scene_gameover
 MAP-08	slot:LightSource.lightSprite@SCENE Stage1_2
+SE-22	slot:CodeLock.correctSe;slot:FloorSwitch.pressSe;slot:PushBlock.pushSe;slot:BreakableWall.breakSe;slot:PuzzleUISettings.dialSe
+SE-23	slot:SeEventAction.seOnEnter@OP_途中
+SE-24	slot:NotePickup.pickSe;slot:PuzzleUISettings.pageSe
+SE-25	slot:DialogueManager.typeSe

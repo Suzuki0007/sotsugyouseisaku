@@ -4,6 +4,7 @@ advance all                     # 戦闘前の会話
 expect eval BattleArea.AnyActive
 kill                            # 無敵を切って、ノア（とシグル）の体力を 0 に
 wait scene SceneGameOver
+expect eval BgmManager.Instance.CurrentClip != null && BgmManager.Instance.CurrentClip.name == "BGM-05_gameover_loop"   # ゲームオーバーの曲
 expect selected Button          # 最初にリトライが選ばれている（キーボードで選べる）
 key Enter                       # 本当の Enter キーで決定
 wait scene Stage_1_3

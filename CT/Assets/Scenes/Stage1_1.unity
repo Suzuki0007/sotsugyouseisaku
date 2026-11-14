@@ -30758,6 +30758,56 @@ Tilemap:
     e31: 0
     e32: 0
     e33: 1
+--- !u!1 &226670913
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 226670915}
+  - component: {fileID: 226670914}
+  m_Layer: 0
+  m_Name: "\u8DB3\u97F3\u306E\u8A2D\u5B9A\uFF08\u5916\u30FB\u7802\uFF09"
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &226670914
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 226670913}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2e6136765d4dfa4419b56526ed2a3e97, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SceneFootstep
+  playMode: 1
+  noahSe: {fileID: 11400000, guid: cc5887df1c4b53241ae386bfb2ce5c68, type: 2}
+  noahFollowSe: {fileID: 11400000, guid: d5b4ca2c1257f894f8d5080fdc77bb8b, type: 2}
+  sigleSe: {fileID: 11400000, guid: cc5887df1c4b53241ae386bfb2ce5c68, type: 2}
+  sigleFollowSe: {fileID: 11400000, guid: d5b4ca2c1257f894f8d5080fdc77bb8b, type: 2}
+  memo: "\u5916\uFF08\u7802\u6F20\uFF09\u306E\u8DB3\u97F3\u3002\u7D20\u6750\u304C\u6B69\u304D\u7D9A\u3051\u308B\u9332\u97F3\u306A\u306E\u3067\u300C\u6B69\u3044\u3066\u3044\u308B\u9593\u30EB\u30FC\u30D7\u300D\u30021\u6B69\u305A\u3064\u306E\u7802\u306E\u97F3\u304C\u3067\u304D\u305F\u3089\u300C\u4E00\u6B69\u305A\u3064\u300D\u306B\u3057\u3066\u5DEE\u3057\u66FF\u3048\u308B"
+--- !u!4 &226670915
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 226670913}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &275716278
 GameObject:
   m_ObjectHideFlags: 0
@@ -30850,6 +30900,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 399965c7902ef0f40952c6d622c87f01, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DialogueEventAction
+  dialogueData: {fileID: 0}
   dialogue: {fileID: 93222979}
   closeMode: 0
   waitUntilClosed: 1
@@ -31093,6 +31144,7 @@ GameObject:
   - component: {fileID: 332126240}
   - component: {fileID: 332126239}
   - component: {fileID: 332126238}
+  - component: {fileID: 332126242}
   m_Layer: 0
   m_Name: "OP_\u9014\u4E2D\uFF08\u9418\u306E\u8A00\u3044\u4F1D\u3048\uFF09"
   m_TagString: Untagged
@@ -31128,6 +31180,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 399965c7902ef0f40952c6d622c87f01, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DialogueEventAction
+  dialogueData: {fileID: 0}
   dialogue: {fileID: 857818557}
   closeMode: 0
   waitUntilClosed: 1
@@ -31146,7 +31199,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EventSequence
   playMode: 0
   lockPlayer: 1
-  actions: []
+  actions:
+  - {fileID: 332126242}
+  - {fileID: 332126238}
 --- !u!114 &332126240
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -31219,6 +31274,22 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 14.4, y: 1}
   m_EdgeRadius: 0
+--- !u!114 &332126242
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 332126236}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e789af79d5d78d94688f2e44fb2703bf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SeEventAction
+  seOnEnter: {fileID: 11400000, guid: 1326d9d98b5a2624e850fa5aa851995a, type: 2}
+  seOnExit: {fileID: 0}
+  stopLoopOnExit: 1
+  playAtThisPosition: 0
 --- !u!1 &348674307
 GameObject:
   m_ObjectHideFlags: 0
@@ -33242,6 +33313,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 399965c7902ef0f40952c6d622c87f01, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DialogueEventAction
+  dialogueData: {fileID: 0}
   dialogue: {fileID: 769581224}
   closeMode: 0
   waitUntilClosed: 1
@@ -33288,6 +33360,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 399965c7902ef0f40952c6d622c87f01, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DialogueEventAction
+  dialogueData: {fileID: 0}
   dialogue: {fileID: 350975037}
   closeMode: 0
   waitUntilClosed: 1
@@ -33318,6 +33391,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 399965c7902ef0f40952c6d622c87f01, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DialogueEventAction
+  dialogueData: {fileID: 0}
   dialogue: {fileID: 177315145}
   closeMode: 0
   waitUntilClosed: 1
@@ -34371,14 +34445,14 @@ MonoBehaviour:
   sigle: {fileID: 3848283961383208032, guid: 96b593b4c0a0ac64d9ab2afdcc1dacea, type: 3}
   focusCamera: {fileID: 519420033}
   switchKey: 17
-  switchSe: {fileID: 0}
+  switchSe: {fileID: 11400000, guid: 0dcb8161d5d926440a664875a6222eb6, type: 2}
   rejoinWalkDistance: 10
   apartSwitchStyle: 1
   apartEnemyTarget: 0
   waitKey: 20
-  waitSe: {fileID: 0}
-  followSe: {fileID: 0}
-  cannotSe: {fileID: 0}
+  waitSe: {fileID: 11400000, guid: 3dd64603ee5aa1442852b3b943308e24, type: 2}
+  followSe: {fileID: 11400000, guid: ba64f11fdb1a01948bcd9ab6fff64f89, type: 2}
+  cannotSe: {fileID: 11400000, guid: 56796a2c7ee104044a2440852e05a6f1, type: 2}
   cannotFollow: {fileID: 0}
   sigleJoinedFlag: {fileID: 11400000, guid: 52fdb545de6620e4b9f0277195ebe4c4, type: 2}
 --- !u!1 &823229329
@@ -35930,7 +36004,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SceneChange
   sceneName: 
   spawnPointId: 
-  leaveSe: {fileID: 0}
+  leaveSe: {fileID: 11400000, guid: 5a0bfd4e3770a6e49ab563db17589e5b, type: 2}
   arriveSe: {fileID: 0}
 --- !u!1 &1448037748
 GameObject:
@@ -36279,6 +36353,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 399965c7902ef0f40952c6d622c87f01, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DialogueEventAction
+  dialogueData: {fileID: 0}
   dialogue: {fileID: 2011798008}
   closeMode: 0
   waitUntilClosed: 1
@@ -38276,7 +38351,7 @@ MonoBehaviour:
   noahInventory: {fileID: 8908782603096249720, guid: dd9779ac97fbb06489888bc76e2e392a, type: 3}
   keyItemData: {fileID: 0}
   pickupId: 
-  pickupSe: {fileID: 0}
+  pickupSe: {fileID: 11400000, guid: 8e9c79b162f6d3740b6ba88ce53beb94, type: 2}
 --- !u!1 &2011798005
 GameObject:
   m_ObjectHideFlags: 0
@@ -38999,3 +39074,4 @@ SceneRoots:
   - {fileID: 7613632181593805640}
   - {fileID: 416675134}
   - {fileID: 2109445071}
+  - {fileID: 226670915}

@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: Se_UI_Select
   m_EditorClassIdentifier: Assembly-CSharp::SeData
   clips:
-  - {fileID: 8300000, guid: 73d116ecf77297442a71e281143b70ff, type: 3}
-  volume: 0.6
+  - {fileID: 8300000, guid: 728b19c2cf47e8e4cb483584b8cbda4c, type: 3}
+  volume: 0.96
   pitchMin: 1
   pitchMax: 1
   loop: 0

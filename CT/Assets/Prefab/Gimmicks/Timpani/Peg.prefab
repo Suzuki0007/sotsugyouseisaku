@@ -213,10 +213,15 @@ MonoBehaviour:
   targetRadius: 0.55
   ringColor: {r: 1, g: 1, b: 1, a: 0.95}
   hitColor: {r: 1, g: 0.9, b: 0.2, a: 1}
-  startSe: {fileID: 0}
-  successSe: {fileID: 0}
-  missSe: {fileID: 0}
-  tightenedSe: {fileID: 0}
+  startSe: {fileID: 11400000, guid: a4bec609794dadb4ba7facd0b6e02027, type: 2}
+  successSe: {fileID: 11400000, guid: 0110e54828cbcaa4ebc6e248aabf6d46, type: 2}
+  successSeSteps:
+  - {fileID: 11400000, guid: 0110e54828cbcaa4ebc6e248aabf6d46, type: 2}
+  - {fileID: 11400000, guid: 7d3f989125d053f4fae027fc13eb6579, type: 2}
+  - {fileID: 11400000, guid: ecc479bb0aa907f4396314dd07976edf, type: 2}
+  successSeOnTighten: 1
+  missSe: {fileID: 11400000, guid: c86473be36fee564c8b5a19750bf6ac6, type: 2}
+  tightenedSe: {fileID: 11400000, guid: a344b34120f4f7f4e8f60e8d67aecf4e, type: 2}
   successEffect: {fileID: 0}
   tightenedEffect: {fileID: 0}
   onTightened: {fileID: 0}

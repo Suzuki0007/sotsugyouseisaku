@@ -20,7 +20,7 @@ MonoBehaviour:
   telegraphBlink: 1
   telegraphSortingOrder: 3
   telegraphUnlit: 1
-  telegraphSe: {fileID: 0}
+  telegraphSe: {fileID: 11400000, guid: d5b960ffd3fdaa64ba65209260b921b6, type: 2}
   telegraphAnimation: Windup
   origin: 0
   aim: 0
@@ -56,6 +56,13 @@ MonoBehaviour:
   dropObject: {fileID: 0}
   dropHeight: 6
   dropTime: 0.35
+  dropCount: 1
+  dropInterval: 0.3
+  dropScatter: 0
+  dropScatterRadius: 8
+  dropAimChance: 0.15
+  dropAimJitter: 1.5
+  dropMinSpacing: 1.6
   riseObject: {fileID: 0}
   riseLinger: 1
   riseHitWhileLingering: 0
@@ -68,8 +75,10 @@ MonoBehaviour:
   chargeSpeed: 12
   chargeStunTime: 0
   activeEffect: {fileID: 0}
-  activeSe: {fileID: 0}
+  activeSe: {fileID: 11400000, guid: eceb9ad535ec97e4981ad0fdc0541c53, type: 2}
   activeShake: 0
+  spawnOnActive: {fileID: 0}
+  spawnChance: 0.3
   activeAnimation: Attack
   recoveryTime: 0.5
   memo: "\u30C6\u30A3\u30F3\u30D1\u30CB\u306E\u97F3\u697D\u751F\u7269\uFF1A\u4E88\u5146\uFF08\u9EC4\u8272\u3044\u8F2A\u304C\u70B9\u6EC5\uFF09\u2192

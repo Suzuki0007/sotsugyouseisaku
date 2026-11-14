@@ -90,7 +90,7 @@ MonoBehaviour:
   lifeSeconds: 12
   blinkSeconds: 3
   pickupDelay: 0.3
-  pickupSe: {fileID: 0}
+  pickupSe: {fileID: 11400000, guid: d34573a0f0ba6224f88baec6b8aed4c1, type: 2}
   pickupEffect: {fileID: 0}
 --- !u!1 &2054048678322151265
 GameObject:

@@ -113,6 +113,12 @@ public class EnemyData : ScriptableObject
     [Tooltip("アニメーションが空のときに表示する絵。空ならプレハブの絵のまま")]
     private Sprite sprite;
 
+    [Header("音")]
+
+    [SerializeField, Label("動いている間の音（ループ）")]
+    [Tooltip("歩いている・追いかけている間ずっと鳴らす音（足音・うなり声など）。SeData の「ループ」をオンにする。止まる・倒れる・会話中は止める。空なら鳴らさない")]
+    private SeData moveLoopSe;
+
     [Header("倒されたとき")]
 
     [SerializeField, Label("エフェクト")]
@@ -172,6 +178,7 @@ public class EnemyData : ScriptableObject
     public string StaggerAnimation => staggerAnimation;
     public EffectData StaggerEffect => staggerEffect;
     public SeData StaggerSe => staggerSe;
+    public SeData MoveLoopSe => moveLoopSe;
     public IReadOnlyList<EnemyLookRule> LookRules => lookRules;
 
     /// <summary>

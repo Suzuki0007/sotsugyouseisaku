@@ -8,11 +8,14 @@ wait 1
 expect prompt 調べる             # キーの案内が出ている
 key E                           # 本当の E キーで調べる
 advance battle                  # ランタン → 揺れ → 化け物が降る → 追跡が始まったらすぐ止まる
+expect eval BgmManager.Instance.CurrentClip != null && BgmManager.Instance.CurrentClip.name == "BGM-04_chase_full"   # 追跡の曲
+expect eval System.Array.Exists(UnityEngine.Object.FindObjectsByType<UnityEngine.AudioSource>(), a => a.isPlaying && a.clip != null && a.clip.name == "SE-20_monster_steps_loop")   # 追いかけてくる化け物の足音
 warp -128.6,13.0                # 追跡のゴール（左の行き止まり）へすぐ（遅いと捕まってやり直しになる）
 wait 2
 advance all                     # 追い詰められる → シグルに助けられる → 合流
 expect flag Flag_Sigle_Joined on
 expect party Together
+expect eval BgmManager.Instance.CurrentClip != null && BgmManager.Instance.CurrentClip.name == "BGM-03_tower1_explore_loop"   # 追跡が終わると塔の探索の曲
 expect near -128.6,13.0 1.5
 expect no-error
 reload                          # タイトルへ → つづきから（合流した場所のオートセーブ）
