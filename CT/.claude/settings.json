@@ -2,8 +2,53 @@
   "permissions": {
     "allow": [
       "PowerShell(powershell -NoProfile -ExecutionPolicy Bypass -File .claude/skills/unity-check/scripts/check.ps1:*)",
+      "PowerShell(powershell -NoProfile -ExecutionPolicy Bypass -File .claude/skills/*)",
       "Read(.claude/**)",
-      "Read(Docs/**)"
+      "Read(Docs/**)",
+      "Read(Assets/**)",
+      "Read(Tests/**)",
+      "Read(PerfLog/**)",
+      "Read(ProjectSettings/**)",
+      "Read(Packages/**)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "powershell.exe",
+            "args": ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File", ".claude/hooks/guard-ps1.ps1"],
+            "timeout": 15
+          }
+        ]
+      },
+      {
+        "matcher": "PowerShell|Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "powershell.exe",
+            "args": ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File", ".claude/hooks/guard-git.ps1"],
+            "timeout": 15
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "powershell.exe",
+            "args": ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File", ".claude/hooks/remind-check.ps1"],
+            "timeout": 15
+          }
+        ]
+      }
     ]
   }
 }
