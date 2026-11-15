@@ -34,7 +34,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File $r -Recipe stage1_2_door  # 
 |---|---|---|
 | Stage1_1 | `stage1_1_op` → `autosave_points` | ルート「OP」を消して作る |
 | Stage1_2 | `stage1_2_events` → `stage1_2_door` → `autosave_points` | events は「Stage1_2_イベント」を消して作るので、扉・オートセーブも消える |
-| 音（全シーン・データ・プレハブ） | `audio_1_sedata` → `audio_2_assets` → `audio_3_scenes` → `audio_4_footstep_outdoor`（Stage1_1 の外の足音） | 2026-11-14 の BGM・SE の素材。1＝SeData を作る（音量をそろえる）、2＝プレハブ・データの欄、3＝5 シーンの欄・BGM の条件（保存する）。何度実行しても同じ。**Stage1_2・Stage_1_3 のイベントのレシピで作り直したら `audio_3_scenes` をもう一度**（演出の音・足した鐘やうなり声の部品が消えるため） |
+| 音（全シーン・データ・プレハブ） | `audio_1_sedata` → `audio_2_assets` → `audio_3_scenes` → `audio_4_footstep_outdoor`（Stage1_1 の外の足音）。**11-15 から同じことを割り当て表 `Docs/素材の割り当て/2026-11-14_BGM_SE.tsv` で流せる**（`asset-intake` の `apply.ps1`。素材の入れ直しはこちらを使う） | 2026-11-14 の BGM・SE の素材。1＝SeData を作る（音量をそろえる）、2＝プレハブ・データの欄、3＝5 シーンの欄・BGM の条件（保存する）。何度実行しても同じ。**Stage1_2・Stage_1_3 のイベントのレシピで作り直したら `audio_3_scenes` をもう一度**（演出の音・足した鐘やうなり声の部品が消えるため） |
 | Stage_1_3 | `stage1_3_1_room` → `2_pegs` → `3b_enemies` → `3c_bullet` → `4_link` → `4b_calmsprite` → `5_flow` → `autosave_points` | 1_room は「ティンパニ部屋」を消して作るので、**後の全部をやり直す**。`3a_enemydata` はアセット（EnemyData・行動・攻撃・フラグ）を作る/上書きするので、ふだんは実行しない。`6_barks`（11-14）は TimpaniBarks を一言データに移した一度きりのレシピ（スクリプトは削除済みなので、もう実行できない。`5_flow` は戦闘エリアの戦闘中フラグ `Flag_Timpani_InBattle` を入れる形に直した） |
 | SceneGameOver | `gameover_keyboard` | |
 | （アセット） | `portrait_and_title` | Sigle.asset・UI_TitleImage の取り込み設定・Title の背景 |

@@ -1,0 +1,7 @@
+フォルダ	種類	設定	メモ
+Assets/BGM/	音	load=streaming;format=vorbis;quality=70;background=on	長い曲。読み込み時に全部展開しない（メモリ約 0.2MB/曲）
+Assets/SE/	音	load=decompress;format=vorbis;quality=100	短い効果音
+Assets/Images/Map/	画像	ppu=100;mesh=full;filter=bilinear;compress=on;mip=off;maxsize=auto	マップの絵（大きいので四角のまま描く）
+Assets/Images/Effect/	画像	ppu=100;mesh=tight;filter=bilinear;compress=off;mip=off;maxsize=auto	エフェクト（色がにじまないように圧縮しない）
+Assets/Images/UI/	画像	ppu=100;mesh=tight;filter=bilinear;compress=on;mip=off;maxsize=auto	立ち絵・アイコン・画面
+Assets/Images/	画像	ppu=100;mesh=tight;filter=bilinear;compress=on;mip=off;maxsize=auto	そのほかの絵（キャラ・敵・アイテム）

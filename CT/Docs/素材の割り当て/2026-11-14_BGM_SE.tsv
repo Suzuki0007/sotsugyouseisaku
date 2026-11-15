@@ -1,0 +1,88 @@
+ファイル	入れる先	設定	メモ
+# 2026-11-14 BGM_SE_Assets（BGM 9・SE 74）。最初はレシピ audio_1〜4 で入れた。この表は記録と、作り直しのため（流しても同じ結果）
+# ---- BGM ----
+BGM-01_title.ogg	bgm:Title	vol=0.8	BGM-01 タイトル
+BGM-03_tower1_explore_loop.ogg	bgm:Stage1_2;bgm:Stage_1_3	vol=0.7	BGM-03 塔の探索（基本の曲）
+BGM-04_chase_full.ogg	bgm-rule:Stage1_2/追跡=Flag_1_2_Chase	vol=0.8	BGM-04 追跡の間
+Flag_1_2_Chase.asset	slot:BattleArea.battleFlag@追跡（戦闘エリア）		追跡の戦闘中フラグ（BGM の切り替えに使う）
+BGM-02_timpani_battle_loop.ogg	bgm-rule:Stage_1_3/ティンパニ戦=Flag_Timpani_InBattle	vol=0.8	BGM-02 ティンパニ戦の間
+BGM-05_gameover_loop.ogg	bgm:SceneGameOver	vol=0.7	BGM-05（ジングルは使っていない）
+BGM-05_gameover_jingle.ogg	-		入れただけ
+BGM-07_floor2_explore_loop.ogg	-		二層（まだシーンがない）
+BGM-08_fake_battle_loop.ogg	-		二層
+BGM-09_kairos_reunion.mp3	-		二層
+# ---- 足音（SE-01）：塔の中＝1歩ずつ。外のマップは下の SceneFootstep ----
+SE-01_footstep_noah_01.wav+SE-01_footstep_noah_02.wav+SE-01_footstep_noah_03.wav+SE-01_footstep_noah_04.wav	slot:FootstepSe.footstepSe@Player_Noah.prefab	name=Se_Footstep_Noah;pitch=0.95-1.05;interval=0.05;max=2
+SE-01_footstep_noah_01.wav+SE-01_footstep_noah_02.wav+SE-01_footstep_noah_03.wav+SE-01_footstep_noah_04.wav	slot:FootstepSe.followerFootstepSe@Player_Noah.prefab	name=Se_Footstep_Noah_Follow;pitch=0.95-1.05;interval=0.05;max=2
+SE-01_footstep_sigul_01.wav+SE-01_footstep_sigul_02.wav+SE-01_footstep_sigul_03.wav+SE-01_footstep_sigul_04.wav	slot:FootstepSe.footstepSe@Player_Sigle.prefab	name=Se_Footstep_Sigle;pitch=0.95-1.05;interval=0.05;max=2
+SE-01_footstep_sigul_01.wav+SE-01_footstep_sigul_02.wav+SE-01_footstep_sigul_03.wav+SE-01_footstep_sigul_04.wav	slot:FootstepSe.followerFootstepSe@Player_Sigle.prefab	name=Se_Footstep_Sigle_Follow;pitch=0.95-1.05;interval=0.05;max=2
+Assets/SE/Se_Walk_sabaku.asset	slot:SceneFootstep.noahSe@Stage1_1;slot:SceneFootstep.sigleSe@Stage1_1		外（砂漠）の足音
+Assets/SE/Se_Walk_sabaku_follow.asset	slot:SceneFootstep.noahFollowSe@Stage1_1;slot:SceneFootstep.sigleFollowSe@Stage1_1
+# ---- 演出（Stage1_2・Stage_1_3・OP） ----
+SE-02_kiiin.wav	slot:SeEventAction.seOnEnter@着いたとき（頭痛		F1_02
+SE-05_rumble_short.wav	slot:SeEventAction.seOnEnter@ランタン（調べると拾う）#1		F1_02d また音と揺れ
+SE-03_dosun_monster_fall.wav	slot:SeEventAction.seOnEnter@ランタン（調べると拾う）#2		化け物が降ってくる
+SE-20_monster_roar.wav	event-se:Stage1_2/Stage1_2_イベント/ランタン（調べると拾う）@19		F1_03 の前のうなり声
+SE-04_bang_rescue_scene.wav	slot:SeEventAction.seOnEnter@シグルに助けられる		F1_05
+SE-06_door_force_open.wav	slot:SeEventAction.seOnEnter@正面の扉		F1_08b
+SE-05_rumble_long.wav	slot:SeEventAction.seOnEnter@着いたとき（戦闘前の会話）		F1_09
+SE-23_bell_clocktower.wav	event-se:Stage1_1/OP/OP_途中（鐘の言い伝え）@1		OP_03
+SE-07_lantern_pickup.wav	slot:ItemGiveEventAction.se@ランタン
+# ---- プレイヤー・2人 ----
+SE-04_bang_sigul_attack.wav	slot:SigleShooter.shotSe
+SE-09_noah_attack_area.wav	slot:AreaAttackController.attackSe
+SE-10_guard_start.wav	slot:NoahBulletDeleteAreaController.areaStartSe
+SE-10_guard_loop.wav	slot:NoahBulletDeleteAreaController.areaLoopSe	loop=on
+SE-10_guard_end.wav	slot:NoahBulletDeleteAreaController.areaEndSe
+SE-12_damage_noah.wav	slot:HealthSe.damageSe@Player_Noah.prefab
+SE-12_damage_sigul.wav	slot:HealthSe.damageSe@Player_Sigle.prefab
+SE-13_fall_glass.wav	slot:NoahDead.gameOverLeaveSe
+SE-13_gameover_arrive.wav	slot:NoahDead.gameOverArriveSe
+SE-14_switch.wav	slot:PlayerSwitchManager.switchSe	name=Se_party_switch
+SE-14_wait.wav	slot:PlayerSwitchManager.waitSe	name=Se_party_wait
+SE-14_follow.wav	slot:PlayerSwitchManager.followSe	name=Se_party_follow
+SE-14_cannot.wav	slot:PlayerSwitchManager.cannotSe	name=Se_party_cannot
+SE-08_item_pickup.wav	slot:KeyItem.pickupSe;slot:ItemPickup.pickupSe
+SE-26_scene_leave.wav	slot:SceneChange.leaveSe@OtherSystem/SceneChange;slot:SceneChange.leaveSe@SceneGameOver Scene
+# ---- UI（UISounds が使っている Se_UI_〇〇 の音を差し替え） ----
+SE-15_ui_select.wav	slot:UISoundSettings.select	name=Assets/SE/UI/Se_UI_Select.asset
+SE-15_ui_decide.wav	slot:UISoundSettings.decide	name=Assets/SE/UI/Se_UI_Decide.asset
+SE-15_ui_cancel.wav	slot:UISoundSettings.cancel	name=Assets/SE/UI/Se_UI_Cancel.asset
+SE-15_ui_menu_open.wav	slot:UISoundSettings.menuOpen	name=Assets/SE/UI/Se_UI_MenuOpen.asset
+SE-15_ui_menu_close.wav	slot:UISoundSettings.menuClose	name=Assets/SE/UI/Se_UI_MenuClose.asset
+SE-15_ui_save.wav	slot:UISoundSettings.save	name=Assets/SE/UI/Se_UI_Save.asset
+SE-15_ui_cannot.wav	slot:UISoundSettings.cannot	name=Assets/SE/UI/Se_UI_Cannot.asset
+SE-25_text_blip_A.wav	slot:DialogueManager.typeSe		会話の文字送り（全体）
+SE-25_text_blip_B.wav	slot:CharacterProfile.typeSe@Characters/Sigle		シグル
+# ---- ティンパニ ----
+SE-16_peg_start.wav	slot:TimpaniPeg.startSe@Peg.prefab
+SE-16_peg_success_1.wav	slot:TimpaniPeg.successSe@Peg.prefab;slot:TimpaniPeg.successSeSteps[0]@Peg.prefab
+SE-16_peg_success_2.wav	slot:TimpaniPeg.successSeSteps[1]@Peg.prefab
+SE-16_peg_success_3.wav	slot:TimpaniPeg.successSeSteps[2]@Peg.prefab
+SE-16_peg_miss.wav	slot:TimpaniPeg.missSe@Peg.prefab
+SE-16_peg_tightened.wav	slot:TimpaniPeg.tightenedSe@Peg.prefab
+SE-17_calm.wav	slot:TimpaniUnit.calmSe
+SE-11_guard_empty.wav	slot:GuardGauge.emptySe
+SE-11_guard_ready.wav	slot:GuardGauge.readySe
+SE-18_warning_roll.wav	slot:AttackData.telegraphSe@Attack_Timpani_Ring;slot:AttackData.telegraphSe@Attack_Timpani_Spiral
+SE-18_ring_hit.wav	slot:AttackData.activeSe@Attack_Timpani_Ring
+SE-18_spiral_hits.wav	slot:AttackData.activeSe@Attack_Timpani_Spiral
+SE-18_rock_warning.wav	slot:AttackData.telegraphSe@Attack_Timpani_Rock
+SE-18_rock_land.wav	slot:AttackData.activeSe@Attack_Timpani_Rock
+SE-21_pickup_heal.wav	slot:InstantPickup.pickupSe@Item_Heal
+SE-21_pickup_guard.wav	slot:InstantPickup.pickupSe@Item_GuardBoost
+# ---- 敵 ----
+SE-19_stagger.wav	slot:EnemyData.staggerSe@Stage1_2_Chaser;slot:EnemyData.staggerSe@Enemies/Sample/
+SE-19_death.wav	slot:EnemyData.deathSe@Stage1_2_Chaser;slot:EnemyData.deathSe@Enemies/Sample/
+SE-20_monster_steps_loop.wav	slot:EnemyData.moveLoopSe@Stage1_2_Chaser	loop=on
+# ---- 仕掛け（見本の部屋）・謎解きの画面 ----
+SE-22_candle_light.wav	slot:GimmickSwitch.useSe@燭台
+SE-22_switch.wav	slot:GimmickSwitch.useSe@スイッチ（真ん中の扉を開ける）
+SE-22_floor_switch.wav	slot:FloorSwitch.pressSe
+SE-22_push_block.wav	slot:PushBlock.pushSe
+SE-22_door_open.wav	slot:GimmickReaction.moveSe@Gimmicks/Sample
+SE-22_wall_break.wav	slot:BreakableWall.breakSe
+SE-22_codelock_correct.wav	slot:CodeLock.correctSe;slot:PuzzleCheck.solvedSe
+SE-22_codelock_wrong.wav	slot:CodeLock.wrongSe;slot:PuzzleCheck.wrongSe
+SE-22_codelock_tick.wav	slot:PuzzleUISettings.dialSe
+SE-24_page_turn.wav	slot:NotePickup.pickSe;slot:PuzzleUISettings.pageSe

@@ -19,3 +19,4 @@ MonoBehaviour:
   expressions:
   - expression: 0
     sprite: {fileID: 6619503555236249352, guid: 1982c5e667556904caff05572bdfe6d6, type: 3}
+  typeSe: {fileID: 0}

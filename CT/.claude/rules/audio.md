@@ -24,7 +24,8 @@ paths:
 ## 素材（2026-11-14 BGM_SE_Assets を入れた）
 - 置き場所：**フォルダ名＝素材チェックリストの ID**。BGM は `Assets/BGM/BGM-0x_〇〇/`（Streaming・Vorbis 70%）、SE は `Assets/SE/SE-xx_〇〇/`、SeData は同じフォルダの `Se_<ファイル名から SE-xx_ を外した名前>`。2人の操作の音（SE-14）だけ `Se_party_〇〇`（SE-22 の `Se_switch` とぶつかるため）。
 - 入れていない物：`*_image_*.wav`（イメージを確かめるための通しの音）、`SE-01_Footsteps/_old`、`SE-26_save.wav`（`SE-15_ui_save` と中身が同じ）。
-- 作り直し・やり直しはレシピ（`scene-recipe`）：`audio_1_sedata`（SeData。音量は RMS を -20dB くらいにそろえる・大きい音だけ下げる）→ `audio_2_assets`（プレハブ・データ）→ `audio_3_scenes`（5 シーン。保存する）。
+- **新しい音を入れるときは `asset-intake` スキル**（割り当て表）。11-14 の分は `Docs/素材の割り当て/2026-11-14_BGM_SE.tsv` に書いてある（流しても同じ結果）。
+- 最初に入れたときのレシピ（`scene-recipe`）：`audio_1_sedata`（SeData。音量は RMS を -20dB くらいにそろえる・大きい音だけ下げる）→ `audio_2_assets`（プレハブ・データ）→ `audio_3_scenes`（5 シーン。保存する）。
 - 入れた先（主な物）：
   - BGM：Title＝BGM-01／Stage1_2・Stage_1_3 の基本＝BGM-03（塔の探索）／Stage1_2 の追跡中＝BGM-04（`Flag_1_2_Chase`＝追跡の戦闘エリアの戦闘中フラグ）／Stage_1_3 の戦闘中＝BGM-02（`Flag_Timpani_InBattle`）／SceneGameOver＝BGM-05 のループ（`BGMset` を足した）。BGM-05 のジングル・BGM-07〜09 は入れただけ（二層がない・ジングルはゲームオーバーの着いた音 SE-13 と重なるので使っていない）。Stage1_1 は今の BGM_Stage1 のまま。
   - 演出：Stage1_2 着いたとき＝キーーーン、ランタン＝火がつく（ItemGive）・2回目の揺れ＝地響き短・降ってくる＝ドスン・**うなり声（部品を足した、F1_03 の前）**、助け＝バン、正面の扉＝こじ開ける。Stage_1_3 着いたとき＝地響き長。Stage1_1 OP の `OP_途中（鐘の言い伝え）` の最初に鐘（部品を足した）。

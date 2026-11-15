@@ -1,0 +1,13 @@
+prefix	dest	kind
+BGM	Assets/BGM	audio
+SE	Assets/SE	audio
+POR	Assets/Images/UI	image
+UI	Assets/Images/UI	image
+CHR	Assets/Images/Player	image
+ENM	Assets/Images/Enemy	image
+FX	Assets/Images/Effect	image
+MAP	Assets/Images/Map	image
+EVT	Assets/Images/Event	image
+ETC	Assets/Images/Other	image
+*audio	Assets/SE	audio
+*image	Assets/Images/Other	image
