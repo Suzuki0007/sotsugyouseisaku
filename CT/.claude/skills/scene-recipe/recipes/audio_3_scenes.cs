@@ -179,8 +179,10 @@ System.Func<string, UnityEngine.SceneManagement.Scene> Open = path =>
     Set(ActionAt(lantern, 16), "seOnEnter", Se("Se_dosun_monster_fall")); // 化け物が降ってきた
     InsertSe(lantern, 18, Se("Se_monster_roar"));                       // 揺れ・待つのあと、F1_03 の前にうなり声
 
-    var rescue = Find(s, "Stage1_2_イベント/追跡（戦闘エリア）/勝ったとき（追い詰められる → シグルに助けられる）");
-    Set(ActionAt(rescue, 11), "seOnEnter", Se("Se_bang_rescue_scene"));
+    // 2026-11-19：助けの場面は合流しない形（シグルが扉Aを壊して書斎へ）に変わった。8 番目＝敵を倒すバン、22 番目＝扉A を壊す音
+    var rescue = Find(s, "Stage1_2_イベント/追跡（戦闘エリア）/勝ったとき（追い詰められる → 助けられる → シグルが扉Aを壊して先へ）");
+    Set(ActionAt(rescue, 8), "seOnEnter", Se("Se_bang_rescue_scene"));
+    Set(ActionAt(rescue, 22), "seOnEnter", Se("Se_door_force_open"));
 
     var door = Find(s, "Stage1_2_イベント/正面の扉（合流後に調べると Stage_1_Boss へ）");
     Set(ActionAt(door, 3), "seOnEnter", Se("Se_door_force_open"));

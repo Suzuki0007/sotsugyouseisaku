@@ -1,0 +1,15 @@
+# Stage1_2：追跡で捕まる → やり直し（シーンの読み直し）→ 化け物がまた追いかけてくる（2026-11-20 の不具合：やり直しのあと化け物が止まったままになった）
+scene Stage1_2
+advance all                     # 着いたとき
+warp -107.25,14.9               # ランタンの前
+wait 1
+key E                           # ランタンを調べる
+advance battle                  # 化け物が降る → 追跡が始まる
+wait 8                          # 動かずに捕まる → 暗転 → やり直す位置から始め直す
+wait battle
+warp -119.0,13.0                # 化け物から離れる（すぐまた捕まってやり直しを繰り返さないように）
+wait 3.5                        # やり直しのあと少し止まっている時間（2 秒）が過ぎるまで
+expect eval BattleArea.AnyActive
+expect eval !UnityEngine.Object.FindAnyObjectByType<Enemy>().Paused   # 止まったままにならない
+expect eval UnityEngine.Object.FindAnyObjectByType<Enemy>().transform.position.x < -105.0   # やり直しの位置（-104.4）から追いかけて動いた
+expect no-error

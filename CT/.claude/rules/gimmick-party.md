@@ -27,7 +27,7 @@ paths:
 - 使えるキャラ `CharacterRestriction`（両方／ノアだけ／シグルだけ）。`GimmickSwitch` は範囲の中の**操作中のキャラ**だけ（`Intaractable` の player はついてくる相棒のこともあるため、自分で確かめる）。
 
 ## 仕掛けの土台（`Assets/Script/Gimmick/`）
-- **入力 → 状態 → 条件 → 動く物**：入力（`GimmickSwitch` 調べる・`AttackSwitch` 攻撃・`GimmickEventAction` イベント）が `GimmickState`（ON/OFF か 0〜n、`Gimmick/<シーン>/<ID>` でセーブ、固定は `/Locked`）を変え、`GimmickReaction`（条件で表示切り替え・イベント、一度満たしたらずっと＝`Reaction/<シーン>/<ID>`）や `PuzzleCheck`（全部 ON／順番／組み合わせ、正解で自分の GimmickState を ON・入力を固定）が `GameCondition.gimmicks`（`GimmickCondition`）で見る。`GameCondition` に `party`（一緒／離れている）・`partnerWithin`。
+- **入力 → 状態 → 条件 → 動く物**：入力（`GimmickSwitch` 調べる・`AttackSwitch` 攻撃・`GimmickEventAction` イベント）が `GimmickState`（ON/OFF か 0〜n、`Gimmick/<シーン>/<ID>` でセーブ、固定は `/Locked`）を変え、`GimmickReaction`（条件で表示切り替え・イベント、一度満たしたらずっと＝`Reaction/<シーン>/<ID>`）や `PuzzleCheck`（全部 ON／順番／組み合わせ、正解で自分の GimmickState を ON・入力を固定。11-20：答え合わせをする条件・入力を叩く扱い〔同じ入力を何回でも〕・進み具合を書く GimmickState。入力の Changed は重なりを除いて1回だけ登録＝同じ入力を答えに2回並べても2重に数えない）が `GameCondition.gimmicks`（`GimmickCondition`）で見る。`GameCondition` に `party`（一緒／離れている）・`partnerWithin`。
 - **基本の部品**（段階2）：`FloorSwitch`（ノア・シグル・押せる箱・敵、必要な数、乗っている間だけ／一度で ON／切り替え）、`PushBlock`（操作中のキャラが押し続けると 1 マス、押せるキャラ、`Block/<シーン>/<ID>`、`ResetToHome`、`PushBlockResetEventAction`、「2人で押す」）、`GimmickHole`（箱が落ちると埋まる）、`ItemSocket`（置き台。Choices で何をはめるか選ぶ）、`GimmickVisual`（状態ごとの絵・色・表示する物・有効にする部品）、`GimmickState` の時間で戻る、`GimmickReaction` の Moves。調べる部品の共通の土台は `GimmickInteractable`（範囲の中の操作中のキャラだけ・断るときの反応）。
 
 ## 2人の能力（段階3、`Assets/Script/Party/`）

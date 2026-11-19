@@ -1,4 +1,4 @@
-// Stage1_2：一層の序盤（Stage1_2_イベント 一式）を作り直す。正面の扉が消えるので、続けて stage1_2_door → autosave_points
+// Stage1_2：一層の序盤（Stage1_2_イベント 一式）を作り直す。正面の扉が消えるので、続けて stage1_2_door → autosave_points → audio_3_scenes（2026-11-19：助けの場面は合流せず、シグルが扉Aを壊して書斎 Stage1_3 へ。先に shosai_0_assets と会話の取り込み）
 var scene = UnityEditor.SceneManagement.EditorSceneManager.OpenScene("Assets/Scenes/Stage1_2.unity", UnityEditor.SceneManagement.OpenSceneMode.Single);
 var sb = new System.Text.StringBuilder();
 System.Func<string, DialogueData> D = n => { var d = UnityEditor.AssetDatabase.LoadAssetAtPath<DialogueData>("Assets/Data/Dialogue/Scenario_F1/" + n + ".asset"); if (d == null) throw new System.Exception("no dialogue " + n); return d; };
@@ -103,15 +103,39 @@ P(battle, "win", 3); P(battle, "goal", gcol); P(battle, "lose", 1); P(battle, "c
 P(battle, "objective", "左の奥へ逃げろ"); P(battle, "startMessage", ""); P(battle, "loseMessage", ""); P(battle, "winMessage", "");
 P(battle, "endEnemies", 1); P(battle, "once", true); P(battle, "saveId", "Stage1_2_Chase");
 
+// ---- door A at the end of the corridor (2026-11-19 shosai spec: Sigle breaks it and goes into the study = Stage1_3) ----
+var doorABroken = F("Flag_Shosai_DoorABroken");
+var doorA = GO(root.transform, "扉A（廊下の奥。シグルが壊す → 書斎 Stage1_3 へ）", new UnityEngine.Vector3(-128.3f, 16.9f, 0f));
+UnityEngine.GameObject doorAClosed, doorAOpen;
+{ System.Func<string, string, UnityEngine.GameObject> DoorPic = (n, file) => { var g = GO(doorA.transform, n, doorA.transform.position); var sr = g.AddComponent<UnityEngine.SpriteRenderer>(); sr.sprite = UnityEditor.AssetDatabase.LoadAssetAtPath<UnityEngine.Sprite>("Assets/Images/Map/Stage1_3/Karisozai/" + file + ".png"); sr.sharedMaterial = roomMat; sr.sortingLayerID = roomSr0.sortingLayerID; sr.sortingOrder = roomSr0.sortingOrder + 2; return g; };
+  doorAClosed = DoorPic("絵_閉（仮素材）", "door_A_closed"); doorAOpen = DoorPic("絵_開（仮素材）", "door_A_open"); doorAOpen.SetActive(false); }
+{ var r = GO(doorA.transform, "壊れたら開いた絵にする", doorA.transform.position).AddComponent<GimmickReaction>(); var so = new UnityEditor.SerializedObject(r);
+  var fl = so.FindProperty("condition.flags"); fl.arraySize = 1; fl.GetArrayElementAtIndex(0).FindPropertyRelative("flag").objectReferenceValue = doorABroken; fl.GetArrayElementAtIndex(0).FindPropertyRelative("state").enumValueIndex = 0;
+  so.FindProperty("latch").boolValue = true; so.FindProperty("saveId").stringValue = "Stage1_2_DoorA_Broken";
+  var sh = so.FindProperty("showWhenMet"); sh.arraySize = 1; sh.GetArrayElementAtIndex(0).objectReferenceValue = doorAOpen;
+  var hd = so.FindProperty("hideWhenMet"); hd.arraySize = 1; hd.GetArrayElementAtIndex(0).objectReferenceValue = doorAClosed; so.ApplyModifiedPropertiesWithoutUndo(); }
+var doorAMark = GO(doorA.transform, "目印_シグルが扉を壊す位置", new UnityEngine.Vector3(-128.3f, 15.9f, 0f));
+var doorAIn = GO(doorA.transform, "目印_扉の奥", new UnityEngine.Vector3(-128.3f, 17.3f, 0f));
+{ var enter = GO(doorA.transform, "入口（壊れたあと、入ると書斎へ）", new UnityEngine.Vector3(-128.3f, 16.1f, 0f));
+  var bx = enter.AddComponent<UnityEngine.BoxCollider2D>(); bx.isTrigger = true; bx.size = new UnityEngine.Vector2(1.0f, 0.6f);
+  var ii = enter.AddComponent<ItemInteraction>(); Seq(enter, true);
+  { var a = enter.AddComponent<SceneChangeEventAction>(); P(a, "sceneName", "Stage1_3"); P(a, "spawnPointId", "FromStage1_2"); }
+  var so = new UnityEditor.SerializedObject(ii); so.FindProperty("trigger").enumValueIndex = 1; so.FindProperty("saveId").stringValue = "Stage1_2_DoorA_Enter"; so.FindProperty("saveCompleted").boolValue = false;
+  var rules = so.FindProperty("rules"); rules.arraySize = 1; var r = rules.GetArrayElementAtIndex(0);
+  r.FindPropertyRelative("label").stringValue = "シグルが壊したあと：書斎（Stage1_3）へ"; r.FindPropertyRelative("sequence").objectReferenceValue = enter.GetComponent<EventSequence>(); r.FindPropertyRelative("markCompleted").boolValue = false;
+  var fc = r.FindPropertyRelative("flagConditions"); fc.arraySize = 1; fc.GetArrayElementAtIndex(0).FindPropertyRelative("flag").objectReferenceValue = doorABroken; fc.GetArrayElementAtIndex(0).FindPropertyRelative("state").enumValueIndex = 0;
+  so.ApplyModifiedPropertiesWithoutUndo(); }
+// Sigle as an NPC for the rescue (not a party member yet: he joins later, before the boss)
+var sigleNpc = GO(root.transform, "シグル（NPC・助けの場面）", sigleDest.transform.position);
+{ var spawner = UnityEngine.Object.FindAnyObjectByType<PlayerPartySpawner>(); var sp = (UnityEngine.GameObject)new UnityEditor.SerializedObject(spawner).FindProperty("siglePrefab").objectReferenceValue; var psr = sp.GetComponentInChildren<UnityEngine.SpriteRenderer>();
+  var sr = sigleNpc.AddComponent<UnityEngine.SpriteRenderer>(); sr.sprite = psr.sprite; sr.sharedMaterial = psr.sharedMaterial; sr.sortingLayerID = psr.sortingLayerID; sr.sortingOrder = 98; sigleNpc.transform.localScale = psr.transform.lossyScale; }
+sigleNpc.SetActive(false);
+
 // ---- rescue (on win) ----
-var rescue = Seq(GO(battleGo.transform, "勝ったとき（追い詰められる → シグルに助けられる）", goal.transform.position), true);
+var rescue = Seq(GO(battleGo.transform, "勝ったとき（追い詰められる → 助けられる → シグルが扉Aを壊して先へ）", goal.transform.position), true);
 Wait(rescue, 0.3f); // let the run-in motion settle, then face right
 Face(rescue, 0, 3);
-Talk(rescue, "F1_04_Cornered");
-// Sigle joins but waits off-screen (not shown at the moment of the attack)
-{ var a = rescue.AddComponent<SetFlagEventAction>(); a.AddFlagForEditor(sigleJoined, true); }
-{ var a = rescue.AddComponent<PartyModeEventAction>(); P(a, "mode", 1); }
-{ var a = rescue.AddComponent<PartyWarpEventAction>(); P(a, "destination", sigleDest.transform); P(a, "fade", false); }
+Talk(rescue, "F1_TP_ChaseDoor");
 // Sigle's shot flies in from off-screen and hits the enemy
 { var a = rescue.AddComponent<SetActiveEventAction>(); L(a, "show", new UnityEngine.Object[]{ shot }); }
 { var a = rescue.AddComponent<MoveObjectEventAction>(); P(a, "target", shot.transform); P(a, "type", 2); P(a, "destination", enemyGo.transform); P(a, "offset", new UnityEngine.Vector2(0f, 0.5f)); P(a, "duration", 0.18f); P(a, "ease", 0); P(a, "waitUntilDone", true); }
@@ -124,15 +148,22 @@ Shake(rescue, 0.35f, 0.5f, false);
 { var a = rescue.AddComponent<EnemyCommandEventAction>(); L(a, "enemies", new UnityEngine.Object[]{ enemy }); P(a, "command", 5); }
 { var a = rescue.AddComponent<ScreenFadeEventAction>(); P(a, "type", 1); P(a, "duration", 0.45f); P(a, "waitUntilDone", true); var so = new UnityEditor.SerializedObject(a); so.FindProperty("color").colorValue = UnityEngine.Color.white; so.ApplyModifiedPropertiesWithoutUndo(); }
 Wait(rescue, 0.8f);
-// Sigle walks in from off-screen and stops facing Noah (to Noah's right, a little apart)
-{ var a = rescue.AddComponent<MoveObjectEventAction>(); P(a, "targetKind", 2); P(a, "type", 2); P(a, "destinationKind", 1); P(a, "offset", new UnityEngine.Vector2(2.6f, 0f)); P(a, "duration", 2.2f); P(a, "ease", 2); P(a, "waitUntilDone", true); }
+// Sigle (NPC) walks in from off-screen and stops facing Noah (to Noah's right, a little apart)
+{ var a = rescue.AddComponent<SetActiveEventAction>(); L(a, "show", new UnityEngine.Object[]{ sigleNpc }); }
+{ var a = rescue.AddComponent<MoveObjectEventAction>(); P(a, "targetKind", 0); P(a, "target", sigleNpc.transform); P(a, "type", 2); P(a, "destinationKind", 1); P(a, "offset", new UnityEngine.Vector2(2.6f, 0f)); P(a, "duration", 2.2f); P(a, "ease", 2); P(a, "waitUntilDone", true); }
 Face(rescue, 0, 3);
-Face(rescue, 1, 2);
-Talk(rescue, "F1_05_Rescue");
-Talk(rescue, "F1_06_MeetSigle");
-Talk(rescue, "F1_07_SigleIntro");
-// after the talk: together (Sigle follows from here)
-{ var a = rescue.AddComponent<PartyModeEventAction>(); P(a, "mode", 0); }
+Talk(rescue, "F1_TP_Rescue");
+Talk(rescue, "F1_TP_Grab");
+Talk(rescue, "F1_TP_GoHome");
+// Sigle breaks door A and goes into the study (Noah follows by herself: Stage1_3)
+{ var a = rescue.AddComponent<MoveObjectEventAction>(); P(a, "targetKind", 0); P(a, "target", sigleNpc.transform); P(a, "type", 2); P(a, "destinationKind", 0); P(a, "destination", doorAMark.transform); P(a, "offset", UnityEngine.Vector2.zero); P(a, "duration", 1.2f); P(a, "ease", 2); P(a, "waitUntilDone", true); }
+Face(rescue, 0, 0);
+SeSlot(rescue);
+Shake(rescue, 0.35f, 0.5f, true);
+{ var a = rescue.AddComponent<SetFlagEventAction>(); a.AddFlagForEditor(doorABroken, true); }
+Talk(rescue, "F1_TP_BreakDoor");
+{ var a = rescue.AddComponent<MoveObjectEventAction>(); P(a, "targetKind", 0); P(a, "target", sigleNpc.transform); P(a, "type", 2); P(a, "destinationKind", 0); P(a, "destination", doorAIn.transform); P(a, "offset", UnityEngine.Vector2.zero); P(a, "duration", 0.6f); P(a, "ease", 0); P(a, "waitUntilDone", true); }
+{ var a = rescue.AddComponent<SetActiveEventAction>(); L(a, "hide", new UnityEngine.Object[]{ sigleNpc }); }
 P(battle, "onWin", rescue.GetComponent<EventSequence>());
 
 // ---- lantern event ----

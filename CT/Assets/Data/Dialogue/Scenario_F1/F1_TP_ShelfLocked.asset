@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eac73eb13381b184b8a3fd1f6643eddc, type: 3}
+  m_Name: F1_TP_ShelfLocked
+  m_EditorClassIdentifier: Assembly-CSharp::DialogueData
+  lines:
+  - character: {fileID: 11400000, guid: 5dd6beef385447d41b6fb1926a5d911e, type: 2}
+    expression: 5
+    speakerName: 
+    text: "(\u672C\u306E\u9593\u306B\u3001\u4F55\u304B\u631F\u307E\u3063\u3066\u308B)"
+  - character: {fileID: 11400000, guid: 5dd6beef385447d41b6fb1926a5d911e, type: 2}
+    expression: 5
+    speakerName: 
+    text: "(\u683C\u5B50\u304C\u90AA\u9B54\u3067\u3001\u53D6\u308C\u306A\u3044\u3001\u3001)"

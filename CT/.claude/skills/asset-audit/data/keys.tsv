@@ -2,7 +2,7 @@ ID	確認キー（自動）
 SE-01	has:Player_Noah.prefab:FootstepSe;has:Player_Sigle.prefab:FootstepSe
 SE-02	slot:SeEventAction.seOnEnter@着いたとき（頭痛
 SE-03	slot:SeEventAction.seOnEnter@ランタン（調べると拾う）
-SE-04	slot:SeEventAction.seOnEnter@シグルに助けられる;slot:SigleShooter.shotSe
+SE-04	slot:SeEventAction.seOnEnter@助けられる;slot:SigleShooter.shotSe
 SE-05	slot:SeEventAction.seOnEnter@ティンパニ部屋/着いたとき
 SE-06	slot:SeEventAction.seOnEnter@正面の扉
 SE-07	slot:ItemGiveEventAction.se@ランタン

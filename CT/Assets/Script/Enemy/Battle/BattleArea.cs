@@ -602,6 +602,13 @@ public class BattleArea : MonoBehaviour
         SceneFader.Instance.FadeAndLoad(gameObject.scene.name);
     }
 
+    /// <summary> その敵が、始まっている戦闘エリアに参加しているか（イベントの「止める」を戻すときに使う） </summary>
+    public static bool IsRunningWith(Enemy enemy)
+    {
+        foreach(BattleArea area in active) { if(area != null && area.running && area.participants.Contains(enemy)) { return true; } }
+        return false;
+    }
+
     private void PauseEnemies(float seconds)
     {
         if(seconds <= 0.0f) { return; }

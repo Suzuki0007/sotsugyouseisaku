@@ -1,4 +1,4 @@
-# Stage1_2：着いたとき → ランタンを E キーで調べる → 化け物が降る → 追跡 → シグルに助けられて合流 → ロードしても困らない
+# Stage1_2：着いたとき → ランタンを E キーで調べる → 化け物が降る → 追跡 → シグルに助けられる（合流しない）→ シグルが扉A を壊して先へ → ロードしても困らない → 扉A から書斎（Stage1_3）へ
 scene Stage1_2
 save on
 advance all                     # 着いたとき（頭痛 → 暗い → ランタンを取ろう）
@@ -12,14 +12,20 @@ expect eval BgmManager.Instance.CurrentClip != null && BgmManager.Instance.Curre
 expect eval System.Array.Exists(UnityEngine.Object.FindObjectsByType<UnityEngine.AudioSource>(), a => a.isPlaying && a.clip != null && a.clip.name == "SE-20_monster_steps_loop")   # 追いかけてくる化け物の足音
 warp -128.6,13.0                # 追跡のゴール（左の行き止まり）へすぐ（遅いと捕まってやり直しになる）
 wait 2
-advance all                     # 追い詰められる → シグルに助けられる → 合流
-expect flag Flag_Sigle_Joined on
-expect party Together
+advance all                     # 追い詰められる → 助けられる → 帰れ → 扉A を壊して先へ
+expect flag Flag_Sigle_Joined off    # 合流はまだ（ボスの前で合流する）
+expect flag Flag_Shosai_DoorABroken on
+expect eval !PlayerSwitchManager.Instance.Sigle.activeSelf   # ノア1人
 expect eval BgmManager.Instance.CurrentClip != null && BgmManager.Instance.CurrentClip.name == "BGM-03_tower1_explore_loop"   # 追跡が終わると塔の探索の曲
 expect near -128.6,13.0 1.5
 expect no-error
-reload                          # タイトルへ → つづきから（合流した場所のオートセーブ）
+reload                          # タイトルへ → つづきから（助けの場面のオートセーブ）
 expect near -128.6,13.0 1.5      # 入口側（ガレキの向こう）から始まらない
 expect idle                     # イベントが繰り返さない
-expect reach 正面の扉            # 出口の扉まで歩いて行ける
+expect reach 入口（壊れたあと      # 扉A まで歩いて行ける
+expect no-error
+warp -128.3,16.1                # 扉A に入る → 書斎へ
+wait scene Stage1_3
+expect scene Stage1_3
+expect near 5.6,-0.9 1.0        # 扉A の内側に着く
 expect no-error

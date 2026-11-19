@@ -247,6 +247,7 @@ public class Enemy : MonoBehaviour
     public void SetPaused(bool paused, Color? tint = null)
     {
         if(pauseRoutine != null) { StopCoroutine(pauseRoutine); pauseRoutine = null; }
+        pendingPauseSeconds = 0.0f;
         ApplyPaused(paused, tint);
     }
 
@@ -255,10 +256,17 @@ public class Enemy : MonoBehaviour
     /// </summary>
     public void PauseFor(float seconds, Color? tint = null)
     {
-        if(pauseRoutine != null) { StopCoroutine(pauseRoutine); }
+        if(pauseRoutine != null) { StopCoroutine(pauseRoutine); pauseRoutine = null; }
         ApplyPaused(true, tint);
+
+        // 非表示の間はコルーチンを始められない（始めないと止まったままになる）→ 表示されたときに数え始める
+        if(!isActiveAndEnabled) { pendingPauseSeconds = seconds; return; }
+        pendingPauseSeconds = 0.0f;
         pauseRoutine = StartCoroutine(PauseRoutine(seconds));
     }
+
+    // 非表示のときに「○秒止める」を受けた残り（表示されたら数え始める）
+    private float pendingPauseSeconds;
 
     private System.Collections.IEnumerator PauseRoutine(float seconds)
     {
@@ -516,6 +524,14 @@ public class Enemy : MonoBehaviour
     {
         if(!all.Contains(this)) { all.Add(this); }
         if(health != null) { health.OnDied += OnDied; }
+
+        // 非表示の間に「○秒止める」を受けていたら、ここから数える
+        if(pendingPauseSeconds > 0.0f && Paused)
+        {
+            float seconds = pendingPauseSeconds;
+            pendingPauseSeconds = 0.0f;
+            pauseRoutine = StartCoroutine(PauseRoutine(seconds));
+        }
     }
 
     private void OnDisable()

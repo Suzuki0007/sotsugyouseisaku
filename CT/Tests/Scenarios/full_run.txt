@@ -1,4 +1,4 @@
-# 通し：タイトル → はじめから → Stage1_0（船の上で OP → 奥の出口）→ Stage1_1（塔の入口）→ Stage1_2（ランタン → 追跡 → 合流）→ 正面の扉 → Stage_1_Boss（戦闘 → 調律 → クリア）→ 左の出口 → ロード
+# 通し：タイトル → はじめから → Stage1_0（船の上で OP → 奥の出口）→ Stage1_1（塔の入口）→ Stage1_2（ランタン → 追跡 → 助けられる → シグルが扉A を壊す）→ 扉A → Stage1_3（書斎。着いたとき）→ ロード
 # シーンをまたぐつながり（遷移・出現位置・フラグの引き継ぎ・2人で着くか）を確かめる。1本 5〜6 分
 scene Title
 eval UnityEngine.Object.FindAnyObjectByType<TitleMenu>().OpenNewGame(); return "open";
@@ -29,33 +29,19 @@ key E
 advance battle                  # 追跡が始まったらすぐ止まる
 warp -128.6,13.0                # 追跡のゴールへすぐ
 wait 2
-advance all                     # 助けられて合流
-expect flag Flag_Sigle_Joined on
-expect party Together
-warp -107.3,15.0                # 正面の扉の前
+advance all                     # 助けられる → 帰れ → シグルが扉A を壊して先へ（合流しない）
+expect flag Flag_Sigle_Joined off
+expect flag Flag_Shosai_DoorABroken on
+warp -128.3,16.1                # 扉A に入る → 書斎（Stage1_3）へ
+wait scene Stage1_3
+expect scene Stage1_3
+expect eval !PlayerSwitchManager.Instance.Sigle.activeSelf   # ノア1人で着く（シグルは部屋の NPC）
 wait 1
-expect prompt 調べる
-key E                           # 扉を調べる → F1_08 → 揺れ → Stage_1_Boss へ
-advance all
-wait scene Stage_1_Boss
-expect scene Stage_1_Boss
-expect eval PlayerSwitchManager.Instance.Sigle.activeSelf   # 2人で着く
-wait 2
-advance all                     # 戦闘前の会話 → 戦闘が始まる
-expect eval BattleArea.AnyActive
-tighten all
-wait 2
-advance all                     # 全部調律できたとき（F1_11）
-expect flag Flag_Timpani_Cleared on
-expect eval !BattleArea.AnyActive
-expect reach 左の出口             # 開いた通路から左の出口へ歩いて行ける
-warp -126.0,20.6                # 左の出口（F1_12）
-wait 1
-advance all
+advance all                     # 着いたとき：シグルが扉を殴る → ロック
+expect flag Flag_Shosai_DoorsLocked on
 expect no-error
-reload                          # タイトルへ → つづきから（クリアのオートセーブ）
-expect scene Stage_1_Boss
-expect idle                     # 戦闘前の会話が繰り返さない
-expect eval PlayerSwitchManager.Instance.Sigle.activeSelf
-expect eval !BattleArea.AnyActive
+reload                          # タイトルへ → つづきから（書斎の着いたときのオートセーブ）
+expect scene Stage1_3
+expect idle                     # 着いたときの演出が繰り返さない
 expect no-error
+# 2026-11-19：合流はボスの前に移した。書斎の先（廊下・楽器倉庫・合流地点）がまだないので、Stage_1_Boss へはつながっていない（ボスは timpani.txt で直接確かめる）

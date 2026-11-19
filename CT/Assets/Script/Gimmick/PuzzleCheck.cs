@@ -64,6 +64,18 @@ public class PuzzleCheck : MonoBehaviour
     [SerializeField, Label("答え合わせをするとき")]
     private PuzzleJudgeTiming timing = PuzzleJudgeTiming.Auto;
 
+    [SerializeField, Label("答え合わせをする条件")]
+    [Tooltip("満たしているときだけ入力を数える（空なら いつでも）。満たしていない間の入力は、正解にも間違いにもしない。例：第2問は「第1問が正解・太鼓の調律が済んでいる」とき")]
+    private GameCondition condition = new GameCondition();
+
+    [SerializeField, Label("入力を叩く扱いにする")]
+    [Tooltip("「決めた順番」用。オン：入力が ON になったら数えて、すぐ最初の状態に戻す。同じ太鼓・鐘を何回でも続けて数えられる（答えに同じ入力を2回並べてよい）")]
+    private bool hitInputs = false;
+
+    [SerializeField, Label("進み具合を書く仕掛け")]
+    [Tooltip("「決めた順番」用。合った数（0〜入力の数）をこの仕掛けの値に書く。ランプ・ヒントの「条件」（この値以上）で使う。段階の数は「入力の数＋1」以上にする。空なら書かない")]
+    private GimmickState progressState;
+
     [Header("正解したとき")]
 
     [SerializeField, Label("正解したら入力を固定する")]
@@ -104,6 +116,13 @@ public class PuzzleCheck : MonoBehaviour
     public IReadOnlyList<GimmickState> Inputs => inputs;
     public PuzzleMode Mode => mode;
     public IReadOnlyList<int> Answer => answer;
+    public GimmickState ProgressState => progressState;
+
+    /// <summary> 「決めた順番」で今いくつ合っているか </summary>
+    public int Progress => progress;
+
+    /// <summary> 答え合わせをする条件を満たしているか（空なら いつでも） </summary>
+    public bool IsActive => condition == null || condition.IsEmpty || condition.IsMet();
 
     /// <summary> デバッグ用の状態 </summary>
     public string StatusText
@@ -138,13 +157,16 @@ public class PuzzleCheck : MonoBehaviour
 
     private void Start()
     {
-        foreach(GimmickState g in inputs) { if(g != null) { g.Changed += OnInputChanged; } }
+        // 同じ入力が答えに2回以上並んでいても、1回だけ登録する（2回登録すると、1回叩いて2回数えてしまう）
+        foreach(GimmickState g in DistinctInputs()) { g.Changed += OnInputChanged; }
 
         if(Solved)
         {
             // セーブから戻った：入力を固定し直す
             if(lockInputs) { foreach(GimmickState g in inputs) { if(g != null) { g.SetLocked(true); } } }
             if(onSolved != null) { onSolved.Restore(gameObject); }
+            progress = inputs.Count;
+            WriteProgress();
             return;
         }
 
@@ -154,7 +176,15 @@ public class PuzzleCheck : MonoBehaviour
 
     private void OnDestroy()
     {
-        foreach(GimmickState g in inputs) { if(g != null) { g.Changed -= OnInputChanged; } }
+        foreach(GimmickState g in DistinctInputs()) { g.Changed -= OnInputChanged; }
+    }
+
+    // 入力（空と重なりを除く）
+    private List<GimmickState> DistinctInputs()
+    {
+        var list = new List<GimmickState>();
+        foreach(GimmickState g in inputs) { if(g != null && !list.Contains(g)) { list.Add(g); } }
+        return list;
     }
 
     //=====================================================================
@@ -164,15 +194,25 @@ public class PuzzleCheck : MonoBehaviour
     private void OnInputChanged(GimmickState input, int value)
     {
         if(Solved || judging) { return; }
+        if(!isActiveAndEnabled || !IsActive) { return; }
 
         if(mode == PuzzleMode.Order)
         {
             if(value == 0) { return; }    // OFF にしたのは数えない
 
+            // 叩く扱い：数えたらすぐ戻す（同じ入力を続けて数えられるように）
+            if(hitInputs)
+            {
+                judging = true;
+                input.Set(input.InitialValue, true, false);
+                judging = false;
+            }
+
             int expected = progress < inputs.Count ? progress : -1;
             if(expected >= 0 && inputs[expected] == input)
             {
                 progress++;
+                WriteProgress();
                 if(progress >= inputs.Count) { Solve(); }
             }
             else
@@ -241,6 +281,7 @@ public class PuzzleCheck : MonoBehaviour
     {
         SeManager.PlaySe(wrongSe, transform.position);
         progress = 0;
+        WriteProgress();
         if(resetOnWrong) { ResetInputs(); }
         if(onWrong != null) { onWrong.Play(gameObject); }
         Bark.Fire(BarkTrigger.PuzzleWrong, BarkContext.Of(CurrentPlayer, transform));
@@ -257,5 +298,12 @@ public class PuzzleCheck : MonoBehaviour
         foreach(GimmickState g in inputs) { if(g != null) { g.ResetValue(true); } }
         judging = false;
         progress = 0;
+        WriteProgress();
+    }
+
+    // 進み具合を仕掛けに書く（ランプ・ヒント用）
+    private void WriteProgress()
+    {
+        if(progressState != null) { progressState.Set(progress, true); }
     }
 }

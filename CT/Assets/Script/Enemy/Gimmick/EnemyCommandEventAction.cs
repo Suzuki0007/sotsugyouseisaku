@@ -100,7 +100,11 @@ public class EnemyCommandEventAction : EventAction
 
             switch(command)
             {
-                case EnemyCommand.Stop:      enemy.SetPaused(true, tint); break;
+                case EnemyCommand.Stop:
+                    // 戻すとき、その敵の戦闘エリアがもう始まっている（やり直しで読み込み直した）なら止め直さない（戦闘が動かしている）
+                    if(restoring && BattleArea.IsRunningWith(enemy)) { break; }
+                    enemy.SetPaused(true, tint);
+                    break;
                 case EnemyCommand.StopFor:   enemy.PauseFor(seconds, tint); break;
                 case EnemyCommand.Resume:    enemy.SetPaused(false); break;
                 case EnemyCommand.Interrupt: if(enemy.Brain != null) { enemy.Brain.Interrupt(); } break;

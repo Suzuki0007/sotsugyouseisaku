@@ -1,0 +1,65 @@
+# Stage1_3（書斎）：着いたとき（シグルが扉を殴る → ロック）→ マレット → 第1問（間違い → 正解）→ ロード → 本棚（1回でキー・断片・メモ）→ T2 の調律 → 第2問（同じ太鼓を2回）→ 紹介 → 出口が開く → ロード
+scene Stage1_3
+save on
+advance all                     # 着いたとき：シグルが扉を殴る → 扉A が閉まる → F1_TP_Enter・Enter2
+expect flag Flag_Shosai_DoorsLocked on
+expect eval !PlayerSwitchManager.Instance.Sigle.activeSelf   # 合流前：ノア1人（シグルは NPC）
+expect eval UnityEngine.GameObject.Find("書斎（Stage1_3）/物/扉A（入口）/絵_閉").activeSelf   # 扉A が閉まった絵
+expect idle
+warp -2.4,1.85                  # T1 の前：マレットなしで叩く → 数えない
+run 書斎（Stage1_3）/物/T1（32インチ・低いド）
+expect eval UnityEngine.GameObject.Find("書斎（Stage1_3）/仕掛けとイベント/答え合わせと状態/第1問の進み具合（ランプ1〜3）").GetComponent<GimmickState>().Value == 0
+warp -1.6,-1.3                  # マレット置き場
+wait 1
+expect prompt 取る
+key E                           # 本当の E キーで取る
+advance all
+expect eval UnityEngine.GameObject.Find("書斎（Stage1_3）/物/マレット置き場/絵_なし").activeSelf   # 取ったので置き場が空になった
+warp 2.2,2.05                   # T3 を先に叩く → 間違い（失敗 1）
+run 書斎（Stage1_3）/物/T3（26インチ・ソ）
+expect eval UnityEngine.GameObject.Find("書斎（Stage1_3）/仕掛けとイベント/答え合わせと状態/第1問の失敗回数").GetComponent<GimmickState>().Value == 1
+warp -2.4,1.85
+run 書斎（Stage1_3）/物/T1（32インチ・低いド）
+warp 2.2,2.05
+run 書斎（Stage1_3）/物/T3（26インチ・ソ）
+warp 4.5,2.15
+run 書斎（Stage1_3）/物/T4（23インチ・高いド）
+advance all                     # 第1問クリア（格子が開く）
+expect flag Flag_Shosai_Q1Clear on
+expect flag Flag_Shosai_DoorOpen off   # 第1問だけでは出口は開かない
+reload                          # 第1問のあとでロード
+expect idle
+expect flag Flag_Shosai_Q1Clear on
+warp 5.8,1.5                    # 東の本棚：1回でキー・断片・棚のメモ
+run 書斎（Stage1_3）/物/東の本棚
+advance all
+expect flag Flag_Shosai_ClueFragment on
+expect flag Flag_Shosai_ClueShelfMemo on
+warp -0.1,1.95                  # T2 の前：キーがあるので調律
+wait 1
+expect prompt 締める
+eval var peg = UnityEngine.Object.FindAnyObjectByType<TimpaniPeg>(); typeof(TimpaniPeg).GetMethod("Tighten", System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.NonPublic).Invoke(peg, null); return "tightened";
+advance all
+expect flag Flag_Shosai_T2Tuned on
+warp -2.4,1.85                  # 第2問：T1 → T3 → T2 → T3 → T4（T3 を2回）
+run 書斎（Stage1_3）/物/T1（32インチ・低いド）
+warp 2.2,2.05
+run 書斎（Stage1_3）/物/T3（26インチ・ソ）
+warp -0.1,1.95
+run 書斎（Stage1_3）/物/T2（29インチ・ミ）/T2_叩く（調律のあと）
+warp 2.2,2.05
+run 書斎（Stage1_3）/物/T3（26インチ・ソ）
+warp 4.5,2.15
+run 書斎（Stage1_3）/物/T4（23インチ・高いド）
+advance all                     # 出口が開く → 紹介（名前を聞く）→ シグルが先へ
+wait 3
+expect flag Flag_Shosai_DoorOpen on
+expect flag Flag_Sigle_NameKnown on
+expect flag Flag_Shosai_SigleLeft on
+expect reach 出口の先            # 開いた出口まで歩いて行ける
+expect no-error
+reload                          # 第2問のあとでロード
+expect idle                     # 紹介が繰り返さない
+expect eval !UnityEngine.GameObject.Find("書斎（Stage1_3）/物/シグル（NPC）").activeSelf   # シグルはもういない
+expect reach 出口の先
+expect no-error
