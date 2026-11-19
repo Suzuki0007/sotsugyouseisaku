@@ -20,7 +20,7 @@ MonoBehaviour:
   - character: {fileID: 11400000, guid: 5dd6beef385447d41b6fb1926a5d911e, type: 2}
     expression: 4
     speakerName: 
-    text: "\u30C9\u30A2\u304C\u3001\u958B\u304B\u306A\u3044\u3001\u3001\uFF01"
+    text: "\u6249\u304C\u3001\u958B\u304B\u306A\u3044\u3001\u3001\uFF01"
   - character: {fileID: 11400000, guid: 5dd6beef385447d41b6fb1926a5d911e, type: 2}
     expression: 5
     speakerName: 

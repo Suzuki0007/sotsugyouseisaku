@@ -16,7 +16,7 @@ MonoBehaviour:
   - character: {fileID: 11400000, guid: 5dd6beef385447d41b6fb1926a5d911e, type: 2}
     expression: 0
     speakerName: 
-    text: "\u3053\u3053\u304C\u3002"
+    text: "\u3053\u3053\u304C\u3001\u5854\u3001\u3001"
   - character: {fileID: 11400000, guid: 5dd6beef385447d41b6fb1926a5d911e, type: 2}
     expression: 5
     speakerName: 

@@ -23,3 +23,4 @@ NoahDead.gameOverLeaveSe	ゲームオーバー画面から戻るときの音。S
 FootstepSe.followerFootstepSe	Stage1_2 の動かない Player に付いている FootstepSe（本当はプレハブに付けるもの。SE-01）
 GimmickReaction.moveSe	条件で動く物の「ずらす」動きの音。ずらす物（Moves）を使うときだけ入れる（書斎のランプ・扉は表示の切り替えだけ）
 EnemyCommandEventAction.se	敵への命令（止める・倒す など）を出したときの音。演出で鳴らしたいときだけ入れる
+TimpaniPeg.guideFont	ペグの遊び方の案内の文字。案内の文を出すペグだけ入れる（書斎の T2。ボス戦のペグは案内なし）

@@ -144,6 +144,8 @@ NoBox("歩けない_西の譜面箱（壁まで）", boxX - 20, boxY, 150, 80);
 // ---- 出現位置：扉A の内側（Stage1_2 から） ----
 { var sp = room.transform.Find("出現位置（Stage1_3_Entrance）"); sp.name = "出現位置_Stage1_2 から（扉Aの内側）"; sp.position = P(1280, 630); SetProp(sp.GetComponent<PlayerSpawnPoint>(), "spawnPointId", "FromStage1_2"); }
 foreach (var n in new[]{ "Spawner/PlayerPartySpawner/NoahSpaenPoint", "Spawner/PlayerPartySpawner/SigleSpawnPoint" }) { var g = UnityEngine.GameObject.Find(n); if (g != null) g.transform.position = P(1280, 630); }
+// T字通路（Stage1_4）から戻ってきたとき：北西の出口の内側（11-20）
+{ var g = NewGO(room.transform, "出現位置_Stage1_4 から（北西の出口の内側）", P(270, 180)); SetProp(g.AddComponent<PlayerSpawnPoint>(), "spawnPointId", "FromStage1_4"); }
 
 // ---- 合流前：シグルは操作キャラとしては出さない（合流フラグ）----
 { var so = new UnityEditor.SerializedObject(UnityEngine.Object.FindAnyObjectByType<PlayerSwitchManager>()); Log.Append("sigleJoinedFlag=").Append(so.FindProperty("sigleJoinedFlag").objectReferenceValue).Append("\n"); }

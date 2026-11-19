@@ -24,32 +24,28 @@ MonoBehaviour:
   - character: {fileID: 11400000, guid: 1e130490a0c3e1c45886bec74eba2656, type: 2}
     expression: 0
     speakerName: "\uFF1F\uFF1F\uFF1F"
-    text: "\u3001\u3001\u30B7\u30B0\u30EB\u3060\u3002"
+    text: "\u3001\u3001\u30B7\u30B0\u30EB\u3002"
   - character: {fileID: 11400000, guid: 5dd6beef385447d41b6fb1926a5d911e, type: 2}
-    expression: 0
+    expression: 1
     speakerName: 
     text: "\u30DC\u30AF\u306F\u30CE\u30A2\u3002\u3088\u308D\u3057\u304F\u3001\u30B7\u30B0\u30EB\u3002"
   - character: {fileID: 11400000, guid: 1e130490a0c3e1c45886bec74eba2656, type: 2}
     expression: 0
     speakerName: 
-    text: "\u304A\u524D\u3001\u4F55\u3057\u306B\u6765\u305F\u3002"
+    text: "\u3001\u3001\u3067\u3001\u306A\u3093\u3067\u592A\u9F13\u304C\u5206\u304B\u3063\u305F\u3002"
   - character: {fileID: 11400000, guid: 5dd6beef385447d41b6fb1926a5d911e, type: 2}
-    expression: 5
+    expression: 0
     speakerName: 
-    text: "\u6570\u5E74\u524D\u306B\u51FA\u3066\u884C\u3063\u3061\u3083\u3063\u305F\u5BB6\u65CF\u3092\u3001\u63A2\u3057\u306B\u304D\u305F\u3093\u3060\u3002"
+    text: "\u5E2B\u5320\u306B\u6559\u308F\u3063\u305F\u3093\u3060\u3002\u30AB\u30A4\u30ED\u30B9\u3063\u3066\u3044\u3046\u3001\u8857\u4E00\u756A\u306E\u8ABF\u5F8B\u5E2B\u3002"
+  - character: {fileID: 11400000, guid: 5dd6beef385447d41b6fb1926a5d911e, type: 2}
+    expression: 0
+    speakerName: 
+    text: "\u305D\u306E\u5E2B\u5320\u3092\u63A2\u3057\u306B\u6765\u305F\u3093\u3060\u3051\u3069\u3001\u3001\u4F55\u304B\u77E5\u3089\u306A\u3044\uFF1F"
   - character: {fileID: 11400000, guid: 1e130490a0c3e1c45886bec74eba2656, type: 2}
     expression: 0
     speakerName: 
-    text: "\u3001\u3001\u305D\u306E\u592A\u9F13\u3001\u306A\u3093\u3067\u5206\u304B\u3063\u305F\u3002"
+    text: "\u3055\u3042\u306A\u3002\u597D\u304D\u306B\u3057\u308D\u3002"
   - character: {fileID: 11400000, guid: 5dd6beef385447d41b6fb1926a5d911e, type: 2}
-    expression: 5
+    expression: 2
     speakerName: 
-    text: "\u5E2B\u5320\u306B\u3001\u6559\u308F\u3063\u305F\u304B\u3089\u3001\u3001"
-  - character: {fileID: 11400000, guid: 5dd6beef385447d41b6fb1926a5d911e, type: 2}
-    expression: 0
-    speakerName: 
-    text: "\u3042\u306E\u8857\u4E00\u756A\u306E\u8ABF\u5F8B\u5E2B\u3067\u3001\u30DC\u30AF\u306E\u5E2B\u5320\u306A\u3093\u3060\u3002"
-  - character: {fileID: 11400000, guid: 1e130490a0c3e1c45886bec74eba2656, type: 2}
-    expression: 0
-    speakerName: 
-    text: "\u3001\u3001\u597D\u304D\u306B\u3057\u308D\u3002"
+    text: "\u3061\u3087\u3063\u3068\u3001\u307E\u3060\u8A71\u306E\u9014\u4E2D\u3001\u3001\uFF01"

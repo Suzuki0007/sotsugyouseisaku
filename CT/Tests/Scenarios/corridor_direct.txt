@@ -1,0 +1,12 @@
+# T字通路（Stage1_4）を直接再生：入口に立ったまま、南の出口に触れて書斎へ戻されない（11-20 の不具合）
+scene Stage1_4
+wait 3
+expect scene Stage1_4
+expect near 0,-5.85 0.6               # 入口 (1080,1305)
+advance all                           # E1
+wait 1
+expect scene Stage1_4
+key DownArrow 1500                    # 南へ歩くと、ちゃんと出口で書斎へ移る
+wait scene Stage1_3
+expect scene Stage1_3
+expect no-error

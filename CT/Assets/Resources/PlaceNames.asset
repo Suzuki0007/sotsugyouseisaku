@@ -23,3 +23,5 @@ MonoBehaviour:
     displayName: "\u30B9\u30C6\u30FC\u30B81-3"
   - scene: Stage1_3
     displayName: "\u66F8\u658E"
+  - scene: Stage1_4
+    displayName: "T\u5B57\u901A\u8DEF"

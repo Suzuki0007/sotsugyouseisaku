@@ -1,0 +1,90 @@
+# T字通路（Stage1_4）：書斎の北の出口から入る → E1 → 縦の通路を北へ（E2 の震え → 開始ラインで E3）→ 扉の前のイベント → 扉・シグル・管を調べる
+#   → 西の管のフラグでランプと会話が切り替わる → 左右の出口まで行ける → ロード → 南の出口で書斎へ戻る
+scene Stage1_3
+save on
+flag Flag_Shosai_DoorsLocked on       # 書斎は第2問まで済んだ状態にする（着いたときの演出を出さない）
+flag Flag_Shosai_DoorOpen on
+flag Flag_Shosai_SigleLeft on
+flag Flag_Sigle_NameKnown on
+wait 1
+warp -4.5,5.3                         # 書斎の北西の出口の先の範囲 → T字通路へ
+wait scene Stage1_4
+wait 2
+expect near 0,-5.85 0.6               # 入口 (1080,1305)
+expect talk 震えてる                  # E1
+expect eval UnityEngine.Camera.main.transform.position.y + UnityEngine.Camera.main.orthographicSize < 5.4   # 入ったときの画面に扉（下の端 y=5.4）が映らない
+advance all
+expect flag Flag_TC_EnterSeen on
+expect idle
+warp 0,-0.6                           # 縦の通路の途中（E2 の範囲 y=700 の手前）
+key UpArrow 1200                      # 本当のキーで北へ歩く → E2（震え）→ 開始ライン → E3
+wait 3
+expect flag Flag_TC_Rumble on
+expect talk 遅えぞ                    # E3 の始まり（ノアが扉の前まで歩いた）
+expect near 0,3.9 0.6
+expect eval UnityEngine.Camera.main.transform.position.y + UnityEngine.Camera.main.orthographicSize > 6.5   # 扉が映っている
+advance 5                             # F1_TC_DoorFirst（5文）→ 触れる → 光る → ランプの明滅
+wait 3
+expect flag Flag_TC_NoteGlowed on
+expect eval !UnityEngine.GameObject.Find("T字通路（Stage1_4）/物/西のランプ/絵_点").activeSelf   # 明滅のあと消灯に戻っている
+expect eval UnityEngine.GameObject.Find("T字通路（Stage1_4）/物/西のランプ/絵_消").activeSelf
+capture corridor_e3
+advance all                           # F1_TC_DoorFirst2
+expect flag Flag_TC_DoorEventDone on
+expect idle
+expect eval UnityEngine.GameObject.Find("T字通路（Stage1_4）/物/扉（開かない。開く処理はまだ作らない）/音符の光（E3 から）").activeSelf
+expect eval UnityEngine.GameObject.Find("T字通路（Stage1_4）/物/シグル（NPC）/絵_南向き（E3 から）").activeSelf
+expect reach 西の出口
+expect reach 東の出口
+expect reach 扉を調べる
+key E                                 # 扉の前のまま調べる（ランプ0つ）
+wait 1
+expect talk 光ったまま
+advance all
+warp 1.95,4.6                         # シグルの前（右寄り）
+wait 1
+key E
+wait 1
+expect talk 触ったときだけ
+advance all
+warp -4.8,5.3                         # 西の管の前（壁ぎわ）
+wait 1
+key E
+wait 1
+expect talk 冷たい管
+advance all
+flag Flag_TC_WestPipeOn on            # 西の部屋の成果の代わり（デバッグ）
+wait 1
+expect eval UnityEngine.GameObject.Find("T字通路（Stage1_4）/物/西のランプ/絵_点").activeSelf
+expect eval UnityEngine.GameObject.Find("T字通路（Stage1_4）/物/西の管の震え（西の部屋の成果）").activeSelf
+expect eval !UnityEngine.GameObject.Find("T字通路（Stage1_4）/物/東のランプ/絵_点").activeSelf
+key E
+wait 1
+expect talk 震えてる
+advance all
+warp 0,3.9                            # 扉（ランプ1つ）
+wait 1
+key E
+wait 1
+expect talk 片方
+advance all
+warp 1.95,4.6                         # シグル（ランプ1つ）
+wait 1
+key E
+wait 1
+expect talk 1つ、ついた
+advance all
+capture corridor_lamp1
+flag Flag_TC_WestPipeOn off
+expect no-error
+reload                                # E3 のあと（オートセーブ）からロード
+expect scene Stage1_4
+expect idle                           # E1・E3 が繰り返さない
+expect eval UnityEngine.GameObject.Find("T字通路（Stage1_4）/物/扉（開かない。開く処理はまだ作らない）/音符の光（E3 から）").activeSelf
+expect reach 西の出口
+warp 0,-6.6                           # 南の出口（一番下の帯）→ 書斎へ戻る
+wait scene Stage1_3
+wait 1
+expect near -4.5,3.6 0.8              # 書斎の北西の出口の内側（FromStage1_4）
+expect idle                           # 書斎の着いたときの演出は出ない
+expect no-error

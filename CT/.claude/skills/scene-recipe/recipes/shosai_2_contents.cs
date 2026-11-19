@@ -243,8 +243,9 @@ React("譜面箱の光とメモ：第1問のあと取るまで", new[]{ new obje
   Inter(g, "Shosai_DoorA", 0, new[]{ new object[]{ "閉まっている（ロックのあと）", s, new[]{ new object[]{ "Flag_Shosai_DoorsLocked", true } }, null } }, null, null); Range(g, 1340, 630, 20, 160); }
 { var g = NewGO(exitDoor, "出口とランプを調べる（開くまで）", P(270, 175)); var s = Seq("出口：ランプの説明", true); Talk(s, "F1_TP_ExitDoor");
   Inter(g, "Shosai_ExitDoor", 0, new[]{ new object[]{ "開くまで", s, new[]{ new object[]{ "Flag_Shosai_DoorOpen", false } }, null } }, null, null); Range(g, 270, 175, 160, 50); }
-{ var s = Seq("出口の先：まだない（仮）", false); Bark(s, 2, "(シグルを、追いかけなきゃ、、)", 2.0f);
-  Inter(exitArea, "Shosai_ExitArea", 1, new[]{ new object[]{ "入ったら一言（仮：この先の廊下ができたら「シーンを移る」を足す）", s, null, null } }, null, null); Range(exitArea, 270, 60, 180, 60);
+// 北西の出口の先 → T字通路（Stage1_4）の南の入口（11-20）。戻ってくるときの出現位置は FromStage1_4（shosai_1_scene）
+{ var s = Seq("出口の先：T字通路（Stage1_4）へ", true); var sc = s.AddComponent<SceneChangeEventAction>(); SetProp(sc, "sceneName", "Stage1_4"); SetProp(sc, "spawnPointId", "FromStage1_3");
+  Inter(exitArea, "Shosai_ExitArea", 1, new[]{ new object[]{ "入ったら T字通路へ", s, null, null } }, null, null); Range(exitArea, 270, 60, 180, 60);
   exitArea.SetActive(false); }
 { var g = sigle.gameObject; var t1 = Seq("シグル：1回目", true); Talk(t1, "F1_TP_SigleTalk1"); var t2s = Seq("シグル：2回目から", true); Talk(t2s, "F1_TP_SigleTalk2");
   var c = g.AddComponent<UnityEngine.CircleCollider2D>(); c.isTrigger = true; c.radius = 0.55f; Examine(g, "Shosai_SigleTalk", new[]{ t1, t2s }); }
