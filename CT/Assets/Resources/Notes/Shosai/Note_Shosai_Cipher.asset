@@ -10,11 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 275a4959388921f42ab755db6032b6f3, type: 3}
-  m_Name: Note_Shosai_ShelfMemo
+  m_Name: Note_Shosai_Cipher
   m_EditorClassIdentifier: Assembly-CSharp::NoteData
-  id: Shosai_ShelfMemo
-  title: "\u68DA\u306E\u30E1\u30E2"
-  body: "\u300C\u30BD\u306F2\u56DE\u3001\u6700\u5F8C\u306F\u4E00\u756A\u5C0F\u3055\u3044\u592A\u9F13\u300D"
+  id: Shosai_Cipher
+  title: "\u8B5C\u9762\u7BB1\u306E\u30E1\u30E2\uFF08\u6249\u306E\u6B4C\uFF09"
+  body: "\u306F\u3058\u307E\u308A\u306F\u3001\u3044\u3061\u3070\u3093\u5927\u304D\u306A\u592A\u9F13\u3002\n\u305D\u3053\u304B\u3089\n\u3000\u21922\u3000\u21901\u3000\u21921\u3000\u21921\n\uFF08\u77E2\u5370\u306E\u5411\u304D\u3078\u3001\u6570\u306E\u5206\u3060\u3051\u96A3\u306E\u592A\u9F13\u3078\uFF09"
   picture: {fileID: 0}
-  order: 15
+  order: 14
   memo: "\u66F8\u658E\uFF08Stage1_3\uFF09\u306E\u4EEE\u306E\u6587\u30022026-11-19"

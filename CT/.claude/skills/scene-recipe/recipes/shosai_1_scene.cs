@@ -82,26 +82,45 @@ for (int i = 0; i < 4; i++) { var t = Obj(tname[i], tx[i], 225); Pic(t, "絵", t
 { var t = Obj("机", 720, 620); Pic(t, "絵", "desk", 720, 620, 3); }
 { var t = Obj("机の楽譜（第1問の手がかり）", 720, 620); Pic(t, "絵", "score_on_desk", 720, 620, 4); }
 { var t = Obj("マレット置き場", 560, 620); Pic(t, "絵_あり", "mallet_stand", 560, 620, 3); Pic(t, "絵_なし", "mallet_stand_empty", 560, 620, 3).gameObject.SetActive(false); }
-{ var t = Obj("東の本棚", 1300, 300); Pic(t, "絵", "bookshelf_east", 1300, 300, 3); }
-{ var t = Obj("楽譜断片（第2問の手がかり）", 1300, 300); Pic(t, "絵", "score_fragment", 1300, 300, 5); }
-// 第1問の前後で本棚の見た目を変える（2026-11-20 ユーザーの指示「クリアしたときに、取れるようになる所の変化を分かりやすく」。仮の絵＝Unity 付属の四角・丸に色を付けた物）
+// 東の本棚（チューニングキー）：右下の壁ぎわ。11-20 ユーザーの指示「ティンパニの側によりすぎ」で (1300,300) から移した（README の座標とは違う）
+var shelfX = 1300f; var shelfY = 860f;
+// 西の譜面箱（暗号のメモ）：左下の壁ぎわ。11-20 に足した（仮素材なし。四角と丸で仮の絵）
+var boxX = 240f; var boxY = 830f;
+{ var t = Obj("東の本棚", shelfX, shelfY); Pic(t, "絵", "bookshelf_east", shelfX, shelfY, 3); }
+// 第1問の前後で、取れる所の見た目を変える（2026-11-20 ユーザーの指示「クリアしたときに、取れるようになる所の変化を分かりやすく」。仮の絵＝Unity 付属の四角・丸に色を付けた物）
 { var uiSprite = UnityEditor.AssetDatabase.GetBuiltinExtraResource<UnityEngine.Sprite>("UI/Skin/UISprite.psd");
   var knob = UnityEditor.AssetDatabase.GetBuiltinExtraResource<UnityEngine.Sprite>("UI/Skin/Knob.psd");
   System.Func<UnityEngine.Transform, string, UnityEngine.Sprite, float, float, float, float, UnityEngine.Color, int, UnityEngine.GameObject> Shape = (parent, n, sp, x, y, w, h, col, order) => {
     var g = NewGO(parent, n, P(x, y)); var sr = g.AddComponent<UnityEngine.SpriteRenderer>(); sr.sprite = sp; sr.color = col; sr.sortingOrder = order; sr.sharedMaterial = litMat;
     var size = sp.bounds.size; g.transform.localScale = new UnityEngine.Vector3(w / 100f / size.x, h / 100f / size.y, 1f); return g; };
-  // 格子：本棚の前に縦の棒 4 本＋横の棒 2 本（第1問で消える）
-  var lattice = NewGO(objs, "本棚の格子（仮の絵・第1問で開く）", P(1300, 300)).transform;
   var barCol = new UnityEngine.Color(0.22f, 0.2f, 0.22f, 1f);
-  foreach (var x in new[]{ 1265f, 1288f, 1312f, 1335f }) Shape(lattice, "縦の棒", uiSprite, x, 300, 6, 176, barCol, 6);
-  foreach (var y in new[]{ 240f, 360f }) Shape(lattice, "横の棒", uiSprite, 1300, y, 86, 6, barCol, 6);
-  // 取れる目印：黄色い光＋チューニングキー（第1問のあと、取るまで）
-  var shine = NewGO(objs, "取れる目印（仮の絵・第1問のあと取るまで）", P(1300, 300)).transform;
-  Shape(shine, "光", knob, 1300, 300, 150, 150, new UnityEngine.Color(1f, 0.85f, 0.3f, 0.55f), 4);
-  var key = NewGO(shine, "チューニングキー（仮の絵）", P(1300, 335)).transform;
-  Shape(key, "持つ所", knob, 1288, 335, 22, 22, new UnityEngine.Color(0.95f, 0.75f, 0.2f, 1f), 5);
-  Shape(key, "軸", uiSprite, 1308, 335, 30, 6, new UnityEngine.Color(0.95f, 0.75f, 0.2f, 1f), 5);
-  shine.gameObject.SetActive(false); }
+  var glowCol = new UnityEngine.Color(1f, 0.85f, 0.3f, 0.55f);
+  var gold = new UnityEngine.Color(0.95f, 0.75f, 0.2f, 1f);
+  // 本棚の格子：縦の棒 4 本＋横の棒 2 本（第1問で消える）
+  var lattice = NewGO(objs, "本棚の格子（仮の絵・第1問で開く）", P(shelfX, shelfY)).transform;
+  foreach (var dx in new[]{ -35f, -12f, 12f, 35f }) Shape(lattice, "縦の棒", uiSprite, shelfX + dx, shelfY, 6, 176, barCol, 6);
+  foreach (var dy in new[]{ -60f, 60f }) Shape(lattice, "横の棒", uiSprite, shelfX, shelfY + dy, 86, 6, barCol, 6);
+  // 本棚の取れる目印：黄色い光＋チューニングキー（第1問のあと、取るまで）
+  var shine = NewGO(objs, "本棚の取れる目印（仮の絵・第1問のあと取るまで）", P(shelfX, shelfY)).transform;
+  Shape(shine, "光", knob, shelfX, shelfY, 150, 150, glowCol, 4);
+  var key = NewGO(shine, "チューニングキー（仮の絵）", P(shelfX, shelfY + 35)).transform;
+  Shape(key, "持つ所", knob, shelfX - 12, shelfY + 35, 22, 22, gold, 5);
+  Shape(key, "軸", uiSprite, shelfX + 8, shelfY + 35, 30, 6, gold, 5);
+  shine.gameObject.SetActive(false);
+  // 譜面箱：箱（いつも見える）
+  var box = Obj("西の譜面箱", boxX, boxY);
+  Shape(box, "箱（仮の絵）", uiSprite, boxX, boxY, 110, 70, new UnityEngine.Color(0.42f, 0.28f, 0.16f, 1f), 3);
+  Shape(box, "ふた（仮の絵）", uiSprite, boxX, boxY - 30, 116, 14, new UnityEngine.Color(0.3f, 0.19f, 0.1f, 1f), 4);
+  // 譜面箱の鍵：帯 2 本＋音符の形の錠（第1問で消える）
+  var lockGo = NewGO(objs, "譜面箱の鍵（仮の絵・第1問で開く）", P(boxX, boxY)).transform;
+  foreach (var dx in new[]{ -30f, 30f }) Shape(lockGo, "帯", uiSprite, boxX + dx, boxY, 8, 74, barCol, 6);
+  Shape(lockGo, "錠", knob, boxX, boxY - 2, 26, 26, new UnityEngine.Color(0.55f, 0.55f, 0.6f, 1f), 7);
+  Shape(lockGo, "錠の棒（音符の旗）", uiSprite, boxX + 11, boxY - 20, 4, 26, new UnityEngine.Color(0.55f, 0.55f, 0.6f, 1f), 7);
+  // 譜面箱の取れる目印：光＋暗号のメモ（第1問のあと、取るまで。紙は楽譜断片の仮素材を使い回す）
+  var shine2 = NewGO(objs, "譜面箱の取れる目印（仮の絵・第1問のあと取るまで）", P(boxX, boxY)).transform;
+  Shape(shine2, "光", knob, boxX, boxY, 150, 150, glowCol, 4);
+  Pic(shine2, "暗号のメモ（仮素材 score_fragment）", "score_fragment", boxX, boxY - 10, 5);
+  shine2.gameObject.SetActive(false); }
 // シグル（NPC）：絵はプレイヤーのシグル（Player_Sigle）と同じ（ユーザーの指示 2026-11-20。仮素材 sigle_npc_placeholder は使わない）
 { var t = Obj("シグル（NPC）", 270, 400);
   var spawner = UnityEngine.Object.FindAnyObjectByType<PlayerPartySpawner>(); var sp = (UnityEngine.GameObject)new UnityEditor.SerializedObject(spawner).FindProperty("siglePrefab").objectReferenceValue; var psr = sp.GetComponentInChildren<UnityEngine.SpriteRenderer>();
@@ -116,7 +135,8 @@ var tr = new[]{ 100f, 90f, 80f, 70f };   // 直径の目安 200/180/160/140px �
 for (int i = 0; i < 4; i++) NoCircle("歩けない_" + tname[i], tx[i], 225, tr[i] / 100f);
 NoBox("歩けない_机", 720, 620, 180, 120);
 NoBox("歩けない_マレット置き場", 560, 630, 60, 50);
-NoBox("歩けない_東の本棚（壁まで）", 1305, 300, 110, 180);
+NoBox("歩けない_東の本棚（壁まで）", shelfX + 5, shelfY, 110, 180);
+NoBox("歩けない_西の譜面箱（壁まで）", boxX - 20, boxY, 150, 80);
 // 扉の通路（イベントで開ける。今は閉じている）
 { var g = NewGO(walk, "通路_扉A（閉じている）", P(1395, 630)); var b = g.AddComponent<UnityEngine.BoxCollider2D>(); b.isTrigger = true; b.size = new UnityEngine.Vector2(1.0f, 1.4f); g.SetActive(false); }
 { var g = NewGO(walk, "通路_北西の出口（開くと表示）", P(270, 90)); var b = g.AddComponent<UnityEngine.BoxCollider2D>(); b.isTrigger = true; b.size = new UnityEngine.Vector2(1.4f, 1.4f); g.SetActive(false); }

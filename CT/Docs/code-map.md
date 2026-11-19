@@ -1,6 +1,6 @@
 # コード構成と問題点（開発者・Claude 向け）
 
-最終更新：2026-11-20（上陸 Stage1_0〜Stage1_2 入口の問題点。PuzzleCheck の欄・書斎 Stage1_3 の問題点）。2026-11-13（性能の計測 PerfMonitor を追加。性能の点検スキル perf-review と Project Auditor で全体を点検し、問題点に追記：ビルドのコンパイル失敗〔PlayerFollower〕・品質レベル・static のリセット漏れの疑い など）。**毎回は自動で読み込まない**（2026-11-12 から。機能ごとの説明は `.claude/rules/`）。コードを触る前に関係する節を読み、コードを変えたら、この表も更新すること。
+最終更新：2026-11-20（TimpaniPeg に初めての説明・案内の欄。上陸 Stage1_0〜Stage1_2 入口の問題点。PuzzleCheck の欄・書斎 Stage1_3 の問題点）。2026-11-13（性能の計測 PerfMonitor を追加。性能の点検スキル perf-review と Project Auditor で全体を点検し、問題点に追記：ビルドのコンパイル失敗〔PlayerFollower〕・品質レベル・static のリセット漏れの疑い など）。**毎回は自動で読み込まない**（2026-11-12 から。機能ごとの説明は `.claude/rules/`）。コードを触る前に関係する節を読み、コードを変えたら、この表も更新すること。
 ファイルの参照は `Assets/Script/` からの相対パス。行番号は目安。
 
 ---
@@ -84,7 +84,7 @@
 | `Timpani/TimpaniUnit.cs` | （11-13）ティンパニ1台。ペグが締まるたびに周りの弾を消し敵を止める、全部締まると敵をおとなしくする（`Kill`・絵の差し替え・♪・回復アイテム）。`Calmed`・`AttacksCleared` | ◎ |
 | `Timpani/TimpaniRoom.cs` | （11-13）ティンパニの部屋全体。調律できた数で敵の段階を進めるフラグを立てる、全部でクリアのフラグ・`AllCalmed`・イベント | ◎ |
 | （削除）`Timpani/TimpaniBarks.cs` | 11-14 C3 で削除。ティンパニ戦の一言は一言データ `Resources/Barks/Timpani/`（きっかけ「合図が来た」、条件 `Flag_Timpani_InBattle`） | − |
-| `Timpani/TimpaniPeg.cs` | （11-13）ティンパニのペグ。調べるとリズムゲーム（縮む輪が中心の輪に重なるときに E）、決めた回数の成功で締まり GimmickState が ON。ゲームは止まらない・離れると中断・使えるキャラ（ノアだけ）。色と印（◆◇・♪）で進み具合。`Succeeded`・`Missed`・`Tightened`（static イベント）。プレハブ `Prefab/Gimmicks/Timpani/Peg.prefab` | ◎ |
+| `Timpani/TimpaniPeg.cs` | （11-13）ティンパニのペグ。調べるとリズムゲーム（縮む輪が中心の輪に重なるときに E）、決めた回数の成功で締まり GimmickState が ON。ゲームは止まらない・離れると中断・使えるキャラ（ノアだけ）。色と印（◆◇・♪）で進み具合。`Succeeded`・`Missed`・`Tightened`（static イベント）。（11-20）初めて始めるときのイベント（終わったらそのまま始まる）・説明を見たフラグ・遊んでいる間の案内の文（輪の下、`{n}`＝あと何回）・案内の文字（書斎の T2 で使用。空なら前と同じ）。プレハブ `Prefab/Gimmicks/Timpani/Peg.prefab` | ◎ |
 | `Scene/SceneChangeEventAction.cs` | （11-13）イベントの部品「シーンを移る」（シーンの `SceneChange.ChangeScene` を呼ぶ。イベントの最後に置く）。Stage1_2 の正面の扉 → Stage_1_Boss | ◎ |
 | `Camera/CameraShake.cs`、`ShakeEventAction.cs` | （11-13）画面を揺らす。描画の間だけカメラの位置をずらす（`RenderPipelineManager.begin/endCameraRendering`）ので、FocusCamera の追従とぶつからない。イベントの部品「画面を揺らす」 | ◎ |
 | `StageDarkness/DarknessEventAction.cs` | （11-13）イベントの部品「暗さ・視界を変える」（暗さとプレイヤーの明かりの半径を同時に、時間をかけて。セーブから戻るときは最後の値） | ◎ |

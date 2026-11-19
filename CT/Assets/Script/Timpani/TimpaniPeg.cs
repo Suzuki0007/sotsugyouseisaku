@@ -118,6 +118,24 @@ public class TimpaniPeg : GimmickInteractable
     [SerializeField, Label("締まったときのエフェクト")]
     private EffectData tightenedEffect;
 
+    [Header("初めての説明・案内（空でよい）")]
+
+    [SerializeField, Label("初めて始めるときのイベント")]
+    [Tooltip("最初に調べたときだけ、リズムゲームの前に実行する（「よし、直すぞ」と遊び方の説明の会話など）。終わったらそのままリズムゲームが始まる。空なら説明なしですぐ始まる")]
+    private EventSequence firstStartEvent;
+
+    [SerializeField, Label("説明を見たフラグ")]
+    [Tooltip("説明を見たら ON にするフラグ。ON なら説明を出さない（セーブするフラグにすると、ロードしても繰り返さない）。空なら、このシーンにいる間だけ覚える")]
+    private GameFlag firstStartFlag;
+
+    [SerializeField, Label("遊んでいる間の案内の文")]
+    [Tooltip("リズムゲームの間、ペグの下に出す文。{n} は「あと何回」に置き換わる。例：輪が重なった瞬間に [E]（あと{n}回）。空なら出さない")]
+    private string playingGuide = "";
+
+    [SerializeField, Label("案内の文字（フォント）")]
+    [Tooltip("案内の文に使う日本語のフォント（NotoSansJP-Regular SDF など）。空なら TextMeshPro の標準")]
+    private TMP_FontAsset guideFont;
+
     [Header("イベント")]
 
     [SerializeField, Label("締まったときのイベント")]
@@ -135,6 +153,9 @@ public class TimpaniPeg : GimmickInteractable
     private LineRenderer targetRing;
     private LineRenderer shrinkRing;
     private TextMeshPro marks;
+    private TextMeshPro guide;
+    private bool firstStartSeen;
+    private Coroutine firstStartRoutine;
 
     //=====================================================================
     // プロパティ・イベント
@@ -196,6 +217,7 @@ public class TimpaniPeg : GimmickInteractable
 
     private void OnDisable()
     {
+        firstStartRoutine = null;
         StopPlaying();
     }
 
@@ -213,13 +235,46 @@ public class TimpaniPeg : GimmickInteractable
             return;
         }
 
+        if(firstStartRoutine != null) { return; }
+
         if(!playing)
         {
+            if(NeedsFirstStart())
+            {
+                firstStartRoutine = StartCoroutine(FirstStartRoutine(user));
+                return;
+            }
             StartPlaying();
             return;
         }
 
         Judge();
+    }
+
+    // 初めて始めるときの説明がまだか
+    private bool NeedsFirstStart()
+    {
+        if(firstStartEvent == null) { return false; }
+        if(firstStartFlag != null) { return !GameFlags.Get(firstStartFlag); }
+        return !firstStartSeen;
+    }
+
+    // 説明のイベントが終わるのを待って、リズムゲームを始める
+    private System.Collections.IEnumerator FirstStartRoutine(GameObject user)
+    {
+        firstStartSeen = true;
+        if(firstStartFlag != null) { GameFlags.Set(firstStartFlag, true); }
+
+        firstStartEvent.Play(user);
+        yield return null;
+        while(firstStartEvent.IsPlaying || InputBlock.IsBlocked) { yield return null; }
+
+        // 会話を閉じた E がそのまま判定に使われないよう、少し待つ
+        yield return new WaitForSeconds(0.25f);
+
+        firstStartRoutine = null;
+        GameObject current = CurrentPlayer;
+        if(!IsTightened && current != null && restriction.Allows(current) && IsInside(current)) { StartPlaying(); }
     }
 
     protected override void OnPlayerExit(GameObject exitedPlayer)
@@ -404,6 +459,21 @@ public class TimpaniPeg : GimmickInteractable
         marks.alignment = TextAlignmentOptions.Center;
         marks.rectTransform.sizeDelta = new Vector2(4.0f, 1.0f);
         marks.sortingOrder = 201;
+
+        if(!string.IsNullOrEmpty(playingGuide))
+        {
+            var g = new GameObject("案内");
+            g.transform.SetParent(transform, false);
+            g.transform.localPosition = new Vector3(0.0f, -Mathf.Max(startRadius, 0.6f) - 0.35f, 0.0f);
+            guide = g.AddComponent<TextMeshPro>();
+            guide.fontSize = 2.4f;
+            guide.alignment = TextAlignmentOptions.Center;
+            guide.rectTransform.sizeDelta = new Vector2(8.0f, 1.0f);
+            guide.sortingOrder = 201;
+            guide.outlineWidth = 0.2f;
+            guide.outlineColor = Color.black;
+            if(guideFont != null) { guide.font = guideFont; }
+        }
     }
 
     private LineRenderer CreateRing(string ringName, float width)
@@ -456,6 +526,12 @@ public class TimpaniPeg : GimmickInteractable
 
             // 締める前で、まだ触っていないペグは印を出さない
             marks.gameObject.SetActive(IsTightened || playing || successCount > 0);
+        }
+
+        if(guide != null)
+        {
+            guide.gameObject.SetActive(playing && !IsTightened);
+            guide.text = playingGuide.Replace("{n}", Mathf.Max(0, RequiredSuccess - successCount).ToString());
         }
 
         ApplyBodyLook();

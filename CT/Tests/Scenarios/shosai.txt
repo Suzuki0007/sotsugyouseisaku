@@ -1,4 +1,4 @@
-# Stage1_3（書斎）：着いたとき（シグルが扉を殴る → ロック）→ マレット → 第1問（間違い → 正解）→ ロード → 本棚（1回でキー・断片・メモ）→ T2 の調律 → 第2問（同じ太鼓を2回）→ 紹介 → 出口が開く → ロード
+# Stage1_3（書斎）：着いたとき（シグルが扉を殴る → ロック）→ マレット → 第1問（間違い → 正解）→ 2か所の鍵が外れる → ロード → 東の本棚（キー）→ 西の譜面箱（暗号のメモ）→ T2 の調律（初めての説明 → そのまま輪＋案内） → 第2問（同じ太鼓を2回）→ 紹介 → 出口が開く → ロード
 scene Stage1_3
 save on
 advance all                     # 着いたとき：シグルが扉を殴る → 扉A が閉まる → F1_TP_Enter・Enter2
@@ -24,20 +24,46 @@ warp 2.2,2.05
 run 書斎（Stage1_3）/物/T3（26インチ・ソ）
 warp 4.5,2.15
 run 書斎（Stage1_3）/物/T4（23インチ・高いド）
+wait 5                          # 鍵が外れる → カメラが本棚 → 譜面箱 → 会話
+advance 1                       # ノア「開いた、、！」
+expect talk 音で開くのか         # シグルの反応
 advance all                     # 第1問クリア（格子が開く）
 expect flag Flag_Shosai_Q1Clear on
 expect flag Flag_Shosai_DoorOpen off   # 第1問だけでは出口は開かない
 reload                          # 第1問のあとでロード
 expect idle
 expect flag Flag_Shosai_Q1Clear on
-warp 5.8,1.5                    # 東の本棚：1回でキー・断片・棚のメモ
-run 書斎（Stage1_3）/物/東の本棚
+expect eval UnityEngine.GameObject.Find("書斎（Stage1_3）/物/本棚の取れる目印（仮の絵・第1問のあと取るまで）").activeSelf   # 2か所とも光っている
+expect eval UnityEngine.GameObject.Find("書斎（Stage1_3）/物/譜面箱の取れる目印（仮の絵・第1問のあと取るまで）").activeSelf
+expect eval !UnityEngine.GameObject.Find("書斎（Stage1_3）/物/譜面箱の鍵（仮の絵・第1問で開く）").activeSelf
+warp 5.05,-2.6                  # 東の本棚（右下）の左側：チューニングキーだけ
+wait 1
+key E
+wait 1
+expect talk チューニングキーだ
 advance all
-expect flag Flag_Shosai_ClueFragment on
-expect flag Flag_Shosai_ClueShelfMemo on
-warp -0.1,1.95                  # T2 の前：キーがあるので調律
+expect flag Flag_Shosai_GotKey on
+expect flag Flag_Shosai_ClueCipher off   # 暗号のメモはまだ（別の場所）
+expect eval !UnityEngine.GameObject.Find("書斎（Stage1_3）/物/本棚の取れる目印（仮の絵・第1問のあと取るまで）").activeSelf
+warp -4.8,-1.6                  # 西の譜面箱（左下）の上側：暗号のメモ
+wait 1
+key E
+wait 1
+expect talk 箱の中に
+advance all
+expect flag Flag_Shosai_ClueCipher on
+warp -0.1,1.95                  # T2 の前：キーがあるので調律。初めては「よし、直すぞ」と遊び方 → そのままリズムゲーム
 wait 1
 expect prompt 締める
+key E
+wait 1
+expect talk 直すぞ
+advance all
+wait 1
+expect flag Flag_Shosai_TuneExplained on
+expect eval UnityEngine.Object.FindAnyObjectByType<TimpaniPeg>().IsPlaying   # 説明のあと、E を押し直さずに始まっている
+expect eval UnityEngine.Object.FindAnyObjectByType<TimpaniPeg>().transform.Find("案内").gameObject.activeSelf   # 輪の下の案内
+capture shosai_peg_guide
 eval var peg = UnityEngine.Object.FindAnyObjectByType<TimpaniPeg>(); typeof(TimpaniPeg).GetMethod("Tighten", System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.NonPublic).Invoke(peg, null); return "tightened";
 advance all
 expect flag Flag_Shosai_T2Tuned on

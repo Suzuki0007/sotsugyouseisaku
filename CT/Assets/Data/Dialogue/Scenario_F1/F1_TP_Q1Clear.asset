@@ -17,11 +17,19 @@ MonoBehaviour:
     expression: 1
     speakerName: 
     text: "\u958B\u3044\u305F\u3001\u3001\uFF01"
+  - character: {fileID: 11400000, guid: 1e130490a0c3e1c45886bec74eba2656, type: 2}
+    expression: 4
+    speakerName: "\uFF1F\uFF1F\uFF1F"
+    text: "\u3001\u3001\u97F3\u3067\u958B\u304F\u306E\u304B\u3002"
   - character: {fileID: 11400000, guid: 5dd6beef385447d41b6fb1926a5d911e, type: 2}
     expression: 4
     speakerName: 
-    text: "(\u672C\u68DA\u306E\u683C\u5B50\u304C\u3001\u306A\u304F\u306A\u3063\u3066\u308B\uFF01)"
+    text: "(\u672C\u68DA\u306E\u683C\u5B50\u3068\u3001\u8B5C\u9762\u7BB1\u306E\u9375\u304C\u5916\u308C\u305F\uFF01)"
   - character: {fileID: 11400000, guid: 5dd6beef385447d41b6fb1926a5d911e, type: 2}
     expression: 0
     speakerName: 
-    text: "(\u5149\u3063\u3066\u308B\u6240\u306B\u3001\u4F55\u304B\u3042\u308B\u3001\u3001\u53D6\u3063\u3066\u307F\u3088\u3046)"
+    text: "(\u30E9\u30F3\u30D7\u30823\u3064\u3064\u3044\u305F\u3001\u3001\u3042\u30685\u3064)"
+  - character: {fileID: 11400000, guid: 5dd6beef385447d41b6fb1926a5d911e, type: 2}
+    expression: 0
+    speakerName: 
+    text: "(\u5149\u3063\u3066\u308B2\u304B\u6240\u3092\u3001\u8ABF\u3079\u3066\u307F\u3088\u3046)"

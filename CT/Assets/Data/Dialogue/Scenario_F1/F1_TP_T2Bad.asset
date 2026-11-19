@@ -20,4 +20,4 @@ MonoBehaviour:
   - character: {fileID: 11400000, guid: 5dd6beef385447d41b6fb1926a5d911e, type: 2}
     expression: 5
     speakerName: 
-    text: "(\u76F4\u3055\u306A\u3044\u3068\u3001\u30C0\u30E1\u304B\u3082)"
+    text: "(\u5F35\u308A\u304C\u3086\u308B\u3093\u3067\u308B\u3001\u3001\u7DE0\u3081\u308B\u9053\u5177\u304C\u3042\u308C\u3070\u3001\u76F4\u305B\u308B\u306E\u306B)"

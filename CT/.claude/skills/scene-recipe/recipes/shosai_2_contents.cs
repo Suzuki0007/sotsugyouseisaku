@@ -131,7 +131,12 @@ var pegPrefab = (UnityEngine.GameObject)A("Assets/Prefab/Gimmicks/Timpani/Peg.pr
 var peg = (UnityEngine.GameObject)UnityEditor.PrefabUtility.InstantiatePrefab(pegPrefab, scene);
 peg.name = "T2_調律（キーがある・調律の前。輪＋E を3回）"; peg.transform.SetParent(t2, true); peg.transform.position = P(710, 350);
 { peg.GetComponent<UnityEngine.CircleCollider2D>().radius = 0.45f; peg.transform.Find("見た目（仮）").localScale = new UnityEngine.Vector3(1.4f, 1.4f, 1f);
-  var pg = peg.GetComponent<TimpaniPeg>(); SetProp(pg, "requiredSuccess", 3); SetProp(pg, "shrinkSeconds", 1.8f); SetProp(pg, "startRadius", 1.0f); SetProp(pg, "targetRadius", 0.35f); SetProp(pg, "tolerance", 0.12f); SetProp(pg, "onTightened", tuned.GetComponent<EventSequence>()); }
+  var pg = peg.GetComponent<TimpaniPeg>(); SetProp(pg, "requiredSuccess", 3); SetProp(pg, "shrinkSeconds", 1.8f); SetProp(pg, "startRadius", 1.0f); SetProp(pg, "targetRadius", 0.35f); SetProp(pg, "tolerance", 0.12f); SetProp(pg, "onTightened", tuned.GetComponent<EventSequence>());
+  // 初めて調べたとき：「よし、直すぞ」と遊び方の説明 → そのままリズムゲーム（11-20 ユーザーの指示）。遊んでいる間は輪の下に案内
+  var tuneStart = Seq("T2：調律の前の説明（初めてだけ）", true); Talk(tuneStart, "F1_TP_TuneStart");
+  SetProp(pg, "firstStartEvent", tuneStart.GetComponent<EventSequence>()); SetProp(pg, "firstStartFlag", Flag("Flag_Shosai_TuneExplained"));
+  SetProp(pg, "playingGuide", "輪が重なった瞬間に [E]（あと{n}回）");
+  SetProp(pg, "guideFont", A("Assets/Fonts/NotoSansJP-Regular SDF.asset")); }
 
 // ---------------- 答え合わせ ----------------
 var q1Prog = State("第1問の進み具合（ランプ1〜3）", 4, 0, false);
@@ -140,11 +145,15 @@ var q1Fail = State("第1問の失敗回数", 3, 0, true);
 var q2Fail = State("第2問の失敗回数", 6, 0, true);
 var wrong1 = Seq("第1問：間違えたとき", false); Gim(wrong1, q1Fail, 3); Bark(wrong1, 2, "(順番が違うみたいだ)", 1.6f);
 var wrong2 = Seq("第2問：間違えたとき", false); Gim(wrong2, q2Fail, 3); Bark(wrong2, 2, "(順番が違うみたいだ)", 1.6f);
-// 第1問：格子が消える瞬間を見せる（エフェクト・揺れ）→ 光とキーが出る → 「本棚の格子が開いた」
-var shelfT = Obj("東の本棚");
-var solved1 = Seq("第1問：正解したとき（本棚の格子が開く）", true); AddWait(solved1, 0.4f); FaceNoah(solved1, 3);
-Se(solved1, seDoorOpen); Fx(solved1, A("Assets/Data/Effect/Sample/Fx_Sample_Vanish.asset"), shelfT); Shake(solved1, 0.12f, 0.3f, false);
-SetF(solved1, "Flag_Shosai_Q1Clear", true); AddWait(solved1, 0.3f); Fx(solved1, A("Assets/Data/Effect/Sample/Fx_Sample_Spawn.asset"), shelfT); AddWait(solved1, 0.8f);
+// 第1問：2か所の鍵が外れる（11-20 ユーザーの指示「一気にいろいろ獲得しすぎ」→ 東の本棚＝キー、西の譜面箱＝暗号のメモ）。カメラで本棚 → 譜面箱を順に映す
+var shelfT = Obj("東の本棚"); var boxT = Obj("西の譜面箱");
+var fxVanish = A("Assets/Data/Effect/Sample/Fx_Sample_Vanish.asset"); var fxSpawn = A("Assets/Data/Effect/Sample/Fx_Sample_Spawn.asset");
+System.Action<UnityEngine.GameObject, UnityEngine.Transform, float, bool> LookAt = (g, t, hold, back) => { var a = g.AddComponent<CameraLookEventAction>(); SetProp(a, "target", t); SetProp(a, "moveTime", 0.7f); SetProp(a, "holdTime", hold); SetProp(a, "returnAfter", back); };
+var solved1 = Seq("第1問：正解したとき（本棚と譜面箱の鍵が外れる）", true); AddWait(solved1, 0.4f);
+Se(solved1, seDoorOpen); Shake(solved1, 0.12f, 0.3f, false); Fx(solved1, fxVanish, shelfT); Fx(solved1, fxVanish, boxT);
+SetF(solved1, "Flag_Shosai_Q1Clear", true); AddWait(solved1, 0.3f);
+Fx(solved1, fxSpawn, shelfT); LookAt(solved1, shelfT, 0.9f, false);
+Fx(solved1, fxSpawn, boxT); LookAt(solved1, boxT, 0.9f, true);
 Talk(solved1, "F1_TP_Q1Clear"); AutoSv(solved1);
 var solved2 = Seq("第2問：正解したとき（出口が開く → 紹介 → シグルが先へ）", true);
 AddWait(solved2, 0.4f); Se(solved2, seDoorOpen); Shake(solved2, 0.25f, 0.6f, true); SetF(solved2, "Flag_Shosai_DoorOpen", true); AddWait(solved2, 0.8f);
@@ -187,20 +196,20 @@ React("出口：第2問の正解で開く", new[]{ new object[]{ "Flag_Shosai_Do
 React("シグル：先へ進んだら消す", new[]{ new object[]{ "Flag_Shosai_SigleLeft", true } }, null, null, null, new[]{ sigle.gameObject }, true, null);
 var mStand = Obj("マレット置き場");
 React("マレット置き場：取ったら空にする", null, new[]{ new object[]{ mallet, false } }, null, new[]{ mStand.Find("絵_なし").gameObject }, new[]{ mStand.Find("絵_あり").gameObject }, false, null);
-React("楽譜断片：取ったら消す", new[]{ new object[]{ "Flag_Shosai_ClueFragment", true } }, null, null, null, new[]{ Obj("楽譜断片（第2問の手がかり）").gameObject }, true, null);
-// 本棚の見た目：第1問のあとは格子を消す／取るまでは光とキーの絵を出す
+// 本棚・譜面箱の見た目：第1問のあとは鍵（格子・帯と錠）を消す／取るまでは光と中身の絵を出す
 React("本棚の格子：第1問で開く", new[]{ new object[]{ "Flag_Shosai_Q1Clear", true } }, null, null, null, new[]{ Obj("本棚の格子（仮の絵・第1問で開く）").gameObject }, true, null);
-React("本棚の光とキー：第1問のあと取るまで", new[]{ new object[]{ "Flag_Shosai_Q1Clear", true }, new object[]{ "Flag_Shosai_ClueFragment", false } }, null, null, new[]{ Obj("取れる目印（仮の絵・第1問のあと取るまで）").gameObject }, null, false, null);
+React("本棚の光とキー：第1問のあと取るまで", new[]{ new object[]{ "Flag_Shosai_Q1Clear", true }, new object[]{ "Flag_Shosai_GotKey", false } }, null, null, new[]{ Obj("本棚の取れる目印（仮の絵・第1問のあと取るまで）").gameObject }, null, false, null);
+React("譜面箱の鍵：第1問で開く", new[]{ new object[]{ "Flag_Shosai_Q1Clear", true } }, null, null, null, new[]{ Obj("譜面箱の鍵（仮の絵・第1問で開く）").gameObject }, true, null);
+React("譜面箱の光とメモ：第1問のあと取るまで", new[]{ new object[]{ "Flag_Shosai_Q1Clear", true }, new object[]{ "Flag_Shosai_ClueCipher", false } }, null, null, new[]{ Obj("譜面箱の取れる目印（仮の絵・第1問のあと取るまで）").gameObject }, null, false, null);
 
 // ヒント（失敗の回数・手がかりがそろった）
 { var h = Seq("ヒント：第1問で2回失敗", false); Bark(h, 2, "(大きい方から、かな、、)", 2.2f);
   React("ヒント：第1問で2回失敗", null, null, new[]{ new object[]{ q1Fail, GE, 2 } }, null, null, true, h); }
-{ var h = Seq("ヒント：第2問で3回失敗", false); Bark(h, 2, "(最初は ♪ド ♪ソ ♪ミ、、だったはず)", 2.6f);
+// 第2問のヒントは暗号に合わせる（11-20：手がかりがそろうと答えが自動で出る仕組みは、暗号を解く前に答えが出るので消した）
+{ var h = Seq("ヒント：第2問で3回失敗", false); Bark(h, 2, "(一番大きい太鼓から、矢印の数だけ隣へ、、)", 2.6f);
   React("ヒント：第2問で3回失敗", null, null, new[]{ new object[]{ q2Fail, GE, 3 } }, null, null, true, h); }
-{ var h = Seq("ヒント：第2問で5回失敗（メモの楽譜が読める）", false); AddNote(h, Note("Shosai_Q2Answer")); Bark(h, 2, "(メモの楽譜が、読み取れた、、Tab で見よう)", 2.6f);
+{ var h = Seq("ヒント：第2問で5回失敗（メモの暗号が解けた）", false); AddNote(h, Note("Shosai_Q2Answer")); Bark(h, 2, "(メモの暗号が、解けた、、Tab で見よう)", 2.6f);
   React("ヒント：第2問で5回失敗", null, null, new[]{ new object[]{ q2Fail, GE, 5 } }, null, null, true, h); }
-{ var h = Seq("手がかりが3つそろった（メモにまとめる）", false); AddNote(h, Note("Shosai_Q2Answer")); Bark(h, 2, "(ド、ソ、ミ、ソ、高いド、、メモにまとめよう)", 2.6f);
-  React("手がかりが3つそろった", new[]{ new object[]{ "Flag_Shosai_ClueFragment", true }, new object[]{ "Flag_Shosai_ClueFloor", true }, new object[]{ "Flag_Shosai_ClueShelfMemo", true } }, null, null, null, null, true, h); }
 
 // ---------------- 調べる物 ----------------
 { var g = mStand.gameObject; var get = Seq("マレット置き場：取る", true); Give(get, mallet); Talk(get, "F1_TP_Mallet"); AddNote(get, Note("Shosai_TimpaniBasic"));
@@ -212,16 +221,24 @@ React("本棚の光とキー：第1問のあと取るまで", new[]{ new object[
   Inter(g, "Shosai_Wall", 0, new[]{ new object[]{ "見る", s, null, null } }, null, null); Range(g, 170, 405, 50, 140); }
 { var g = NewGO(objs, "絨毯の叩き跡を調べる", P(720, 475)); var s = Seq("叩き跡：見る", true); Talk(s, "F1_TP_Floor"); AddNote(s, Note("Shosai_Floor")); SetF(s, "Flag_Shosai_ClueFloor", true);
   Inter(g, "Shosai_Floor", 0, new[]{ new object[]{ "見る", s, null, null } }, null, null); Range(g, 720, 475, 400, 40); }
+// 東の本棚（右下）：第1問のあとチューニングキーだけ（11-20 ユーザーの指示で2か所に分けた）。調べるのは本棚の左側から
 { var g = Obj("東の本棚").gameObject;
-  // 1回調べるだけで、チューニングキー・楽譜断片・棚のメモをまとめて手に入れる（2026-11-20 ユーザーの指示「二回調べないとメモが入手できないのは分かりにくい」）
-  var take = Seq("東の本棚：キー・楽譜断片・棚のメモをまとめて取る", true); Se(take, sePage); Give(take, tkey); Talk(take, "F1_TP_Fragment");
-  AddNote(take, Note("Shosai_Fragment")); AddNote(take, Note("Shosai_ShelfMemo")); SetF(take, "Flag_Shosai_ClueFragment", true); SetF(take, "Flag_Shosai_ClueShelfMemo", true);
+  var take = Seq("東の本棚：チューニングキーを取る", true); Se(take, sePage); Give(take, tkey); Talk(take, "F1_TP_GetKey"); SetF(take, "Flag_Shosai_GotKey", true);
   var done = Seq("東の本棚：もう何もない", false); Bark(done, 2, "(もう、何もなさそう)", 1.6f);
   var locked = Seq("東の本棚：格子で取れない（第1問の前）", true); Talk(locked, "F1_TP_ShelfLocked");
   Inter(g, "Shosai_Shelf", 0, new[]{
-    new object[]{ "第1問のあと：キー・断片・メモをまとめて取る", take, new[]{ new object[]{ "Flag_Shosai_Q1Clear", true }, new object[]{ "Flag_Shosai_ClueFragment", false } }, null },
-    new object[]{ "取ったあと", done, new[]{ new object[]{ "Flag_Shosai_ClueFragment", true } }, null } }, locked, null);
-  Range(g, 1300, 420, 100, 50); }
+    new object[]{ "第1問のあと：チューニングキーを取る", take, new[]{ new object[]{ "Flag_Shosai_Q1Clear", true }, new object[]{ "Flag_Shosai_GotKey", false } }, null },
+    new object[]{ "取ったあと", done, new[]{ new object[]{ "Flag_Shosai_GotKey", true } }, null } }, locked, null);
+  Range(g, 1225, 860, 50, 170); }
+// 西の譜面箱（左下）：第1問のあと暗号のメモ（第2問の答え）。調べるのは箱の上側から
+{ var g = Obj("西の譜面箱").gameObject;
+  var take = Seq("西の譜面箱：暗号のメモを取る", true); Se(take, sePage); Talk(take, "F1_TP_GetCipher"); AddNote(take, Note("Shosai_Cipher")); SetF(take, "Flag_Shosai_ClueCipher", true);
+  var done = Seq("西の譜面箱：もう何もない", false); Bark(done, 2, "(メモは、Tab で見返せる)", 1.8f);
+  var locked = Seq("西の譜面箱：鍵がかかっている（第1問の前）", true); Talk(locked, "F1_TP_BoxLocked");
+  Inter(g, "Shosai_Box", 0, new[]{
+    new object[]{ "第1問のあと：暗号のメモを取る", take, new[]{ new object[]{ "Flag_Shosai_Q1Clear", true }, new object[]{ "Flag_Shosai_ClueCipher", false } }, null },
+    new object[]{ "取ったあと", done, new[]{ new object[]{ "Flag_Shosai_ClueCipher", true } }, null } }, locked, null);
+  Range(g, 240, 765, 160, 50); }
 { var g = NewGO(objs, "扉A を調べる", P(1340, 630)); var s = Seq("扉A：閉まっている", true); Talk(s, "F1_TP_DoorA");
   Inter(g, "Shosai_DoorA", 0, new[]{ new object[]{ "閉まっている（ロックのあと）", s, new[]{ new object[]{ "Flag_Shosai_DoorsLocked", true } }, null } }, null, null); Range(g, 1340, 630, 20, 160); }
 { var g = NewGO(exitDoor, "出口とランプを調べる（開くまで）", P(270, 175)); var s = Seq("出口：ランプの説明", true); Talk(s, "F1_TP_ExitDoor");

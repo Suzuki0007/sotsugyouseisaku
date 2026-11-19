@@ -10,8 +10,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8fde97924fec5fc4193d96c21f0440c3, type: 3}
-  m_Name: Flag_Shosai_ClueShelfMemo
+  m_Name: Flag_Shosai_GotKey
   m_EditorClassIdentifier: Assembly-CSharp::GameFlag
-  id: Flag_Shosai_ClueShelfMemo
-  memo: "\u66F8\u658E\u306E\u624B\u304C\u304B\u308A\uFF1A\u68DA\u306E\u30E1\u30E2\u3092\u8AAD\u3093\u3060"
+  id: Flag_Shosai_GotKey
+  memo: "\u66F8\u658E\uFF1A\u6771\u306E\u672C\u68DA\u304B\u3089\u30C1\u30E5\u30FC\u30CB\u30F3\u30B0\u30AD\u30FC\u3092\u53D6\u3063\u305F\uFF08\u7B2C1\u554F\u306E\u3042\u3068\uFF09"
   saved: 1

@@ -48,3 +48,5 @@ SE-22	slot:CodeLock.correctSe;slot:FloorSwitch.pressSe;slot:PushBlock.pushSe;slo
 SE-23	slot:SeEventAction.seOnEnter@OP_途中
 SE-24	slot:NotePickup.pickSe;slot:PuzzleUISettings.pageSe
 SE-25	slot:DialogueManager.typeSe
+EVT-04	nouse:tower_still_placeholder_lowangle
+ENM-06	slot:EnemyData.sprite@EnemyData_Stage1_1_DesertChaser;slot:EnemyData.animation@EnemyData_Stage1_1_DesertChaser
