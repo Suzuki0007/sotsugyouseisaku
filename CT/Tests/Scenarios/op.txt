@@ -1,11 +1,17 @@
-# OP：Stage1_0（砂浜）。暗転からの声 → モノローグ → 砂浜 → OP の最後のオートセーブ → ロードしても OP が繰り返さない
-#     → 奥（上の端）へ歩くと Stage1_1 の下の端に着く（Stage1_1 でも OP は繰り返さない）
+# OP・上陸：Stage1_0（砂浜）。暗転からの声 → モノローグ → 小舟の上で手紙（メモ）→ 岸に着く → 上陸・振動（小）→ オートセーブ
+#     → ロードしても OP が繰り返さない・海の上に出られない → 奥の振動（中）→ Stage1_1 の下の端に着く（2026-11-20 上陸の指示書）
+# 残骸は調べない通り道（調べる通り道は landing_beach.txt）
 scene Stage1_0
 save on
 wait 2
 expect talk ？？？                 # F1_00：誰かの途切れた声から始まる
+expect eval PlayerSwitchManager.Instance.CurrentPlayer.transform.position.y < 14   # 海の上の小舟に乗っている
 advance all
+expect flag Flag_Land_LetterRead on
+expect flag Flag_Land_VibeS on
 expect flag Flag_OP_Done on
+expect eval NoteBook.Has(UnityEngine.Resources.Load<NoteData>("Notes/Landing/Note_KairosLetter"))   # 手紙がメモに残る
+expect near -115.2,21.6 0.6     # 小舟から降りて砂の上
 expect idle
 expect no-error
 reload                          # タイトルへ → つづきから（オートセーブ）
@@ -13,15 +19,15 @@ wait 2
 expect scene Stage1_0
 expect idle                     # OP が繰り返さない
 expect flag Flag_OP_Done on
-warp -115.1,37.5                # 奥の出口（マップの上の端）のすぐ手前
-key UpArrow 400                 # 本当の上キーで歩いて出口にぶつかる
+warp -115.2,14.0                # 海の上（歩けない）→ 砂浜へ戻される
+wait 1
+expect eval PlayerSwitchManager.Instance.CurrentPlayer.transform.position.y > 20
+warp -117.0,35.3                # 奥の振動（中）の範囲のすぐ手前
+key UpArrow 600                 # 本当の上キーで歩いて範囲に入る
+wait 1
+expect talk また                 # OP_02g：振動（中）
+advance all
 wait scene Stage1_1
 expect scene Stage1_1
-wait 2
-expect eval PlayerSwitchManager.Instance.CurrentPlayer.transform.position.y < 16   # Stage1_1 の下の端（出現位置 FromStage1_0）の近くに着く（押していた上キーの分だけ少し進むことがある）
-expect idle                     # Stage1_1 の OP は流れない
-expect no-error
-reload                          # 着いたときのオートセーブ → Stage1_1 の下の端から
-expect scene Stage1_1
-expect near -115.2,11.0 1.5
+expect flag Flag_Land_VibeM on
 expect no-error

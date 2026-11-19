@@ -19,7 +19,7 @@ paths:
 - `DialogueCsv`（エディタ）：CSV（会話ID, キャラ, 表情, 名前, 本文）⇄ DialogueData。UTF-8 / Shift-JIS、同名は上書き（GUID 維持）。`DialogueCsv.Import(path, showDialog:false)`。Parse などは internal にして `BarkCsv`（相棒の一言）が使い回す。
 
 ## シナリオ
-- 元は `Assets/Data/Dialogue/Scenario_OP.csv`（OP）・`Scenario_F1.csv`（一層）・`Scenario_F2.csv`（二層）。台本 `セリフ.xlsx`（ユーザーのダウンロード）から変換し、演出は「#」のメモ行に残した。
+- 元は `Assets/Data/Dialogue/Scenario_OP.csv`（OP）・`Scenario_F1.csv`（一層）・`Scenario_F2.csv`（二層）・`Scenario_Landing.csv`（上陸 OP_02a〜OP_02k。2026-11-20 の指示書から。OP_01 の手紙の行はこちらの OP_02a へ移した。`OP_02_Desert` は今は使っていない＝-Lint で UNUSED に出る）。台本 `セリフ.xlsx`（ユーザーのダウンロード）から変換し、演出は「#」のメモ行に残した。
 - 会話ID は `F<層>_<番号>_<場面>`。**直すときは CSV を直して取り込み直す**（DialogueData を直接直さない）。
 - ノア・シグル以外は CharacterProfile がなく「名前」の列だけ（ティンパニ・ヴェルツィー・カイロス・？？？）。正体を隠すシグルは キャラ=Sigle・名前=？？？。
 - 表情は台本から推測して入れてある。立ち絵は今「通常」だけ（ノア `Images/UI/UI_Noah`・シグル `Images/UI/UI_siguru`）なので、ほかの表情も通常の絵になる（コンソールに「表情 X の立ち絵がありません」が出るのはそのため）。

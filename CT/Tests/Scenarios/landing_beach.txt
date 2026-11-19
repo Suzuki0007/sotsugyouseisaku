@@ -1,0 +1,50 @@
+# 上陸：Stage1_0（砂浜）の残骸3つを調べる通り道（2026-11-20 上陸の指示書 E3・E4）
+# 残骸は何度でも調べられる・フラグ（1つでも調べた）が立つ・足跡は1回だけ・ロードしても残骸のフラグが残る
+scene Stage1_0
+save on
+wait 2
+advance all                     # OP → 手紙 → 上陸
+expect flag Flag_Land_WreckAny off
+warp -120.7,26.0                # 残骸1（西）の手前
+wait 1
+expect prompt 調べる
+key E
+wait 1
+expect talk 楽器の部品
+advance all
+expect flag Flag_Land_Wreck1 on
+expect flag Flag_Land_WreckAny on
+key E                           # 2回目も同じ会話
+wait 1
+expect talk 楽器の部品
+advance all
+warp -115.1,24.4                # 足跡の範囲（砂浜の真ん中の横いっぱい）
+wait 1
+expect talk 足跡
+advance all                     # 足跡の会話（範囲に入ると1回だけ）
+expect flag Flag_Land_Footprints on
+warp -110.8,25.4                # 残骸2（東）の手前
+wait 1
+key E
+wait 1
+expect talk 歯車
+advance all
+expect flag Flag_Land_Wreck2 on
+warp -109.6,29.9                # 残骸3（奥。割れた胴の下の歯車）の手前
+wait 1
+key E
+wait 1
+expect talk 彫ってある
+advance all
+expect flag Flag_Land_Wreck3 on
+warp -115.1,25.5                # 足跡の範囲にもう一度入る → 会話は出ない
+wait 1
+warp -115.1,23.8
+wait 1
+expect idle
+autosave
+reload
+expect scene Stage1_0
+expect flag Flag_Land_WreckAny on
+expect flag Flag_Land_Footprints on
+expect no-error

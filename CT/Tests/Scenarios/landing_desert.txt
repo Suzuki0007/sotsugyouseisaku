@@ -1,0 +1,39 @@
+# 上陸：Stage1_1（砂漠）。着いたら塔の全景スチル → 扉の爪痕 → 最大の振動 → 背後から怪物 → 追跡
+#   → 捕まると爪痕の帯の下からやり直し（会話は繰り返さない）→ 塔の入口（ゴール）→ Stage1_2（2026-11-20 上陸の指示書 E6〜E8）
+# 残骸を1つ調べた扱い（Flag_Land_WreckAny）で、OP_02j の「あの残骸と、同じ」が出ることも見る
+scene Stage1_1
+save on
+flag Flag_OP_Done on            # 直接再生なので Stage1_1 の古い OP を止めて、砂浜から来た扱いで読み直す
+flag Flag_Land_WreckAny on
+eval PlayerSpawnPoint.PendingSpawnPointId = "FromStage1_0"; UnityEngine.SceneManagement.SceneManager.LoadScene("Stage1_1"); return "load";
+wait 3
+expect talk あれが、塔          # E6：スチル
+expect eval UnityEngine.GameObject.Find("演出の画像（手紙・スチル）/塔の全景スチル（仮画像）") != null
+advance all
+expect flag Flag_Land_TowerStill on
+expect eval UnityEngine.GameObject.Find("演出の画像（手紙・スチル）/塔の全景スチル（仮画像）") == null
+expect idle
+warp -115.2,20.6                # 鐘の言い伝え（OP_03）の帯の手前
+key UpArrow 500
+wait 1
+expect talk 鐘が鳴った
+advance all
+warp -115.2,22.6                # 扉の爪痕の帯の手前
+key UpArrow 400
+wait 1
+expect talk この扉
+advance 3
+wait 3                          # 最大の振動 → 怪物が出る
+expect talk ！？                 # OP_02j
+advance 2
+expect talk あの残骸と           # 残骸を調べたので、その1行がある
+advance battle                  # 追跡が始まったらすぐ止まる
+expect flag Flag_Land_DoorMark on
+wait 6                          # 動かずに捕まる → 暗転 → 爪痕の帯の下からやり直し
+wait 2
+expect near -115.2,22.4 0.3     # やり直す位置（捕まる前は y 23.0 にいた）
+warp -115.55,27.6               # 塔の階段の上（ゴール）。怪物は2秒止まっている間に
+wait scene Stage1_2
+expect scene Stage1_2
+expect no-error
+# やり直しのあとで爪痕の会話が繰り返さないことは、ゴールに着けた（会話で止まらなかった）ことで見る

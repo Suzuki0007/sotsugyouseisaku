@@ -23,9 +23,16 @@ paths:
 ### Stage1_1（OP）
 - ルート `OP`（レシピ `stage1_1_op`）：`OP_はじめ`（SceneStartEvent、条件 `Flag_OP_Done` OFF → 待つ → F1_00 → OP_01 → 明転 → OP_02 → フラグ ON → オートセーブ）、`OP_途中`・`OP_塔の入口`（ItemInteraction のエリアに入る・1回だけ、saveId `OP_Bell` / `OP_TowerEntrance`）。会話用の Dialogue は子の「会話」に置く（調べる範囲なし。シーンチェックは DialogueEventAction から使われていれば対象外）。
 - 最初はノア1人（`Flag_Sigle_Joined` が立つまで）。
+- **上陸（2026-11-20、レシピ `landing_2_stage1_1`、ルート `上陸（Stage1_1）`）**：
+  - 着いたとき（SceneStartEvent・`Flag_Land_TowerStill` OFF）：暗くする → 塔の全景スチル（`演出の画像（手紙・スチル）` の Canvas 並び順 95、仮画像 `Images/UI/Still/tower_still_placeholder_lowangle.png`）→ OP_02h → スチルを閉じて明転 → フラグ → オートセーブ（砂漠に入ったときのオートセーブ）。
+  - 鐘の言い伝え（`OP/OP_途中`、y 21.5）は今のまま。**塔の入口の会話 `OP/OP_塔の入口（F1_01）` はオフ**（扉の爪痕に置き換え）。
+  - `扉の爪痕（…）`（横いっぱいの帯 y 23.3・1回だけ `Land_DoorMark`）：ルールが2つ＝`Flag_Land_WreckAny` ON なら OP_02j、OFF なら OP_02j_Monster_NoWreck（子の流れが2つ。中身は会話だけ違う）。OP_02i → `Flag_Land_DoorMark` → 地響き長・揺れ（大 0.32・3 秒）→ ノアが下を向く → 怪物を表示・止める・下から 4 マス入ってくる → カメラを怪物へ（戻さない）→ うなり声 → OP_02j → カメラをノアへ戻す → 戦闘エリアを始める → 一言「逃げなきゃ！」。
+  - 追跡（BattleArea：ゴール＝塔の階段の上 (-115.55, 27.6)・捕まる 0.9・やり直す位置 (-115.2, 22.4)・目的「塔の入口へ逃げろ」・1回だけ `Land_DesertChase`）→ 勝ったとき＝Stage1_2 の `FromStage1_1`（正面の扉と同じ）。怪物は `EnemyData_Stage1_1_DesertChaser`（攻撃 0 倍・速さ 2.6・見た目は Stage1_2 の化け物と同じ仮）。
+  - テストの注意：Stage1_1 を直接再生すると古い OP（`OP_はじめ`）が流れる。`Flag_OP_Done` を立てて `PendingSpawnPointId = "FromStage1_0"` で読み直す（`landing_desert.txt` の頭）。追跡が始まったらすぐワープ（動かないと捕まる）。
 
 ### Stage1_2（一層の序盤）
 - ルート `Stage1_2_イベント`（レシピ `stage1_2_events` → `stage1_2_door` → `autosave_points`）。
+- **上陸（2026-11-20、レシピ `landing_3_stage1_2`）**：着いたときの流れの頭（SceneStartEvent のすぐ後）に「待つ → 扉が閉まる音 `Se_Door_Close` → 入口の扉の絵を閉じた方へ → 小さく揺れる → 待つ → OP_02k」を差し込んだ（部品の並べ替えは `ComponentUtility.MoveComponentUp`）。入口の扉はルート `上陸（Stage1_2 入口）`（仮の絵＝書斎の `door_A_open/closed`、(-107.57, 8.7)。FlagSwitch：`Flag_1_2_Intro_Done` ON で閉じた絵）。「さらに大きな怪物」は今のランタンのあとに降ってくる化け物（順序は今のまま）。`stage1_2_events` で作り直すと消えるので、最後にこのレシピを流す。
 - 流れ：着いたとき（SceneStartEvent・`Flag_1_2_Intro_Done`）→ 真っ暗（Darkness 0.97・半径 1）で見えない壁の道をランタンへ → ランタン（ItemInteraction 調べる・saveId `Stage1_2_Lantern`：壁を消す・右の壁の明かり2つだけ点ける〔左の奥は暗いまま〕・`Item_Lantern` を渡す・Darkness 0.88・半径 3・揺れ・右を向く・敵とガレキ〔入口をふさぐ・当たり判定は落ちてから〕が降る・左を映す〔左端は映さない〕・戦闘エリアを始める・一言「逃げなきゃ！」）→ 追跡（BattleArea：ゴール＝左の行き止まり・捕まる・やり直す〔やり直す位置＝敵が出たところ〕・メッセージなし・目的だけ表示・1回だけ `Stage1_2_Chase`）→ 勝ったとき＝助けの場面。
 - **助けの場面（2026-11-19 から。書斎の仕様で合流をボスの前へ移した）**：F1_TP_ChaseDoor → シグルの攻撃（仮の弾）が飛んで当たる・バン・白いフラッシュ・敵を倒す → **シグル（NPC。`Stage1_2_イベント/シグル（NPC・助けの場面）`、絵は Player_Sigle と同じ）**が画面の外からノアの右 2.6 マスへ → F1_TP_Rescue・Grab・GoHome（帰れ）→ 左の行き止まりの奥の壁の **扉A**（`扉A（廊下の奥。…）`、仮の絵は書斎の `door_A_closed/open`）へ歩く → 扉を壊す音・揺れ → `Flag_Shosai_DoorABroken` → F1_TP_BreakDoor → シグルは扉の奥へ消える → オートセーブ。**合流フラグ `Flag_Sigle_Joined` は立てない**（シグルは操作キャラとしては出ない）。扉A の子「入口（壊れたあと、入ると書斎へ）」（ItemInteraction エリアに入る・条件 DoorABroken）→ Stage1_3 の `FromStage1_2`。
 - 最初の「右を向く」は 0.3 秒待ってから（走り込んだ勢いで向きが上書きされる）。
@@ -51,7 +58,13 @@ paths:
 ### Stage1_0（砂浜。2026-11-19 からゲームの最初のマップ）
 - 流れ（ユーザーの指示 2026-11-19、レシピ `stage1_0_flow`）：タイトルの「はじめから」＝ `Stage1_0` の `Start_Boat`（船の上、`PlayerSpawnPoint/出現位置_船の上（はじめから）`）→ `OP/OP_はじめ`（Stage1_1 からのコピー。SceneStartEvent・`Flag_OP_Done` OFF のとき・最後にオートセーブ＝船の上から再開）→ 奥（上の端）の `MapEntity/出口_Stage1_1へ（奥）`（ぶつかると移る SceneChange、横いっぱい）→ `Stage1_1` の `FromStage1_0`（下の端）。Stage1_1 の OP はフラグが立っているので流れない。
 - OP の途中（鐘）・塔の入口の範囲は Stage1_0 ではオフ（Stage1_1 の物を使う）。コピー元の塔の扉 `MapEntity/OB_Door`（Stage1_2 行き）もオフ。
-- まだないもの：歩ける範囲（WalkArea）。今は海の上も歩ける（マップの絵の中ならどこでも）。
+- **上陸（2026-11-20、指示書 `CT_landing_to_chase_claudecode_instruction_2026-11-20.md`、レシピ `landing_0_assets` → `landing_1_stage1_0`）**：
+  - `OP/OP_はじめ（暗転 → 小舟の上で手紙 → 上陸）`（`Flag_OP_Done` OFF）：F1_00 → OP_01（手紙の行は抜いた）→ 明転 → 手紙の紙（仮。`演出の画像（手紙・スチル）` の Canvas 並び順 95＝暗転の幕 90 より手前・会話 100 より奥）＋ OP_02a → メモ `Note_KairosLetter`（その場では開かない）→ **海の上の小舟とノアを同じずらし・同じ時間で岸へ**（物を動かす ×2）→ 降りる → `Flag_Land_LetterRead` → キーーーン・揺れ（小）→ OP_02b → `Flag_Land_VibeS`・`Flag_OP_Done` → オートセーブ。
+  - 小舟は2つ：`上陸（Stage1_0）/小舟（海の上。上陸するまで）` と岸の `sunahama_hune_0`。`歩ける範囲（砂浜だけ）` の FlagSwitch が `Flag_Land_LetterRead` で切り替える（海の小舟・通り道 ⇔ 岸の小舟・小舟の歩けない形）。**ノアは毎フレーム歩ける範囲に戻されるので、海の上にいる間は「小舟の通り道」が要る**。
+  - 出現位置 `Start_Boat` と直接再生の位置（`Spawner/PlayerPartySpawner/NoahSpaenPoint`）は海の上の小舟の上 (-115.2, 12.4)。
+  - 海の当たり判定（`Grid/soto_yuka` の BoxCollider2D 3つ。海全体と岸の両側）は**オフにした**（消していない）。代わりに歩ける範囲（砂浜の仮の四角 y 20.3〜38.3＋残骸3つの歩けない形）。本番はマスク画像から。
+  - 残骸＝もとからある絵 `sunahama_object_1`（西）・`sunahama_object_2_0`（東）・`sunahama_object_3`（奥の歯車）。調べる範囲は手前、何度でも（`Land_Wreck1〜3`）、`Flag_Land_Wreck1〜3` と `Flag_Land_WreckAny`。足跡（床の絵に描いてある）は横いっぱいの帯 y 23.8・1回だけ。奥の帯 y 36.4 で振動（中：揺れ＋地響き短 ×3、間隔 0.65 秒）→ OP_02g → `Flag_Land_VibeM` → Stage1_1 の `FromStage1_0`。奥の出口（ぶつかると移る）は残してある。
+  - 海の中の `SavePoint`（-115.4, 10.6。丸い絵）が海の上の場面で小舟のそばに見える（前からある物。触っていない）。
 - **夜（Stage1_0・Stage1_1、2026-11-19 ユーザーの指示）**：各シーンの `Global Light 2D` を色 (0.5, 0.6, 0.9)・強さ 0.45（昼は白・1）。レシピ `night_stage1_0_1`。マップ・物・ノア・シグルは Sprite-Lit-Default なので一緒に暗くなる。UI は暗くならない。明かりに反応しない絵（SpriteFrameBlend の波）は「シーンの明るさに合わせる」で同じ色にしている。新しく置く絵も Sprite-Lit-Default にする（Unlit だと夜でも明るいまま）。明るさを試すときは、一時的なカメラで色・強さを何通りか撮って並べる（`Global Light 2D` を変えて撮り、シーンを開き直して捨てる）。
 - 波 `sunahama_nami_1_size_0`：SpriteAnimator。**今のデータは `Anim_Sunahama_Nami_Renban`**（連番 `sunahama_nami_animetion.png` を 1440×622 の4コマに切った物・基準は下の真ん中・4fps ループ）。前の `Anim_Sunahama_Nami`（`sunahama_nami_1〜3_size` の3枚）も残してあり、SpriteAnimator の Data を替えれば戻せる。並びは 1,2,3,4,3,2 のループ（ユーザーの指示「1234321」）。**波の SpriteRenderer の Order in Layer は 1**：床 `Grid/soto_yuka` と同じ 0 だと、コマによって床が手前に描かれて波が消えて見えた（2・4コマ目。撮影して確かめた）。マップの絵どうしが重なるときは並び順を変えておく。
 - 11-19：波は **SpriteFrameBlend**（コマの間を混ぜる・水面の高さを合わせて上下・ゆらぎ）で動かしている。SpriteAnimator は付いたまま止めてある（戻すときは SpriteFrameBlend を外す・SpriteAnimator を有効・Material を Sprite-Lit-Default に）。データの Fps はユーザーが 0.3 にした（1コマ約 3.3 秒）。確かめ方：一時的なカメラで `EvaluateAt(秒)` ごとに撮る（シーンを保存せずに見られる）。3枚は Single・ピボット下の真ん中（3枚目だけ 3 ピクセル低いので下でそろえる）。前に付いていた Animator（`sunahama_nami_1_size_0.controller`・`NamiAnim.anim`）は外した（アセットは残っている）。
