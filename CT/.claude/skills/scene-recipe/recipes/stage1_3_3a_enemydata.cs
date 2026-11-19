@@ -1,4 +1,4 @@
-// Stage_1_3 段階3：音楽生物の EnemyData・行動・攻撃のアセットを作る/上書きする（注意：後で調整した値が戻る。下の README を読む）
+// Stage_1_Boss 段階3：音楽生物の EnemyData・行動・攻撃のアセットを作る/上書きする（注意：後で調整した値が戻る。下の README を読む）
 var sb = new System.Text.StringBuilder();
 System.Func<string, string, UnityEngine.Object> CopyAsset = (src, dst) => {
   if (UnityEditor.AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(dst) == null) UnityEditor.AssetDatabase.CopyAsset(src, dst);

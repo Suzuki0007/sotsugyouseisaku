@@ -1,4 +1,4 @@
-// Stage_1_3 段階4：おとなしくなった音楽生物の仮の絵
+// Stage_1_Boss 段階4：おとなしくなった音楽生物の仮の絵
 string path = "Assets/Images/Enemy/Enemy_Timpani_Creature_calm_kari.png";
 if (UnityEditor.AssetDatabase.LoadAssetAtPath<UnityEngine.Sprite>(path) == null) {
   int n = 128; var tex = new UnityEngine.Texture2D(n, n, UnityEngine.TextureFormat.RGBA32, false);
@@ -28,7 +28,7 @@ var sprite = UnityEditor.AssetDatabase.LoadAssetAtPath<UnityEngine.Sprite>(path)
 var data = UnityEditor.AssetDatabase.LoadAssetAtPath<UnityEngine.Object>("Assets/Data/Enemies/Timpani/EnemyData_Timpani_Creature.asset");
 { var so = new UnityEditor.SerializedObject(data); so.FindProperty("remainTint").colorValue = UnityEngine.Color.white; so.ApplyModifiedPropertiesWithoutUndo(); UnityEditor.EditorUtility.SetDirty(data); UnityEditor.AssetDatabase.SaveAssets(); }
 var scene = UnityEditor.SceneManagement.EditorSceneManager.GetActiveScene();
-if (scene.path != "Assets/Scenes/Stage_1_3.unity") scene = UnityEditor.SceneManagement.EditorSceneManager.OpenScene("Assets/Scenes/Stage_1_3.unity", UnityEditor.SceneManagement.OpenSceneMode.Single);
+if (scene.path != "Assets/Scenes/Stage_1_Boss.unity") scene = UnityEditor.SceneManagement.EditorSceneManager.OpenScene("Assets/Scenes/Stage_1_Boss.unity", UnityEditor.SceneManagement.OpenSceneMode.Single);
 foreach (var u in UnityEngine.Object.FindObjectsByType<TimpaniUnit>(UnityEngine.FindObjectsInactive.Include)) { var so = new UnityEditor.SerializedObject(u); so.FindProperty("calmSprite").objectReferenceValue = sprite; so.ApplyModifiedPropertiesWithoutUndo(); }
 UnityEditor.SceneManagement.EditorSceneManager.MarkSceneDirty(scene);
 return "saved=" + UnityEditor.SceneManagement.EditorSceneManager.SaveScene(scene);

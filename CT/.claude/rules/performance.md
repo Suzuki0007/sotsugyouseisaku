@@ -12,7 +12,7 @@ paths:
 
 ## 決めたこと（2026-11-13、ユーザーと合意）
 - **推測で直さない。計測して原因を決め、直したら前後を比べる**（バイブル 1章）。
-- 目標：**60fps**（`Fps.cs` が targetFrameRate 60・VSync なし）。重い場面の基準は **ティンパニ戦**（Stage_1_3、戦闘エリアが動いている間）。
+- 目標：**60fps**（`Fps.cs` が targetFrameRate 60・VSync なし）。重い場面の基準は **ティンパニ戦**（Stage_1_Boss、戦闘エリアが動いている間）。
 - 4段階で進める：①計測の道具（PerfMonitor・perf.ps1）**完了** → ②点検のスキル `perf-review` **完了**（ティップス 4部3章の公開ルール集〔MIT、163 ルール〕を `references/upstream/` に取り込み、独自ルール CT01〜08・例外 `rules-overrides.md`・環境 `tuning-env.md`。一次の点検は `scan.ps1`〔Python がないので PowerShell に移した。毎フレームの処理の中かどうか＝hot／code／tooling／asset を行ごとに決め、例外を機械的に当てる〕）→ ③ Project Auditor **完了**（ルールのパッケージ `com.unity.project-auditor-rules` 1.0.3 をユーザーの許可で追加。3.2.0〔Package Manager の既定〕と 2.0.0 は 6.5 のエディタの本体と API が合わずコンパイルエラー → 1.0.3。`perf-review/scripts/auditor.ps1` で解析・要約・差分・記録）→ ④ 計測で重いとわかった所だけ直す（ほかの人のコードは報告だけ）。
 
 ## 道具

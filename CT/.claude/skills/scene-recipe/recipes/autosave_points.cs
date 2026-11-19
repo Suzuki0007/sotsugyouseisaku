@@ -1,4 +1,4 @@
-// Stage1_2・Stage1_1・Stage_1_3：イベントの最後に部品「オートセーブ」を足す（何度実行しても1つだけ）
+// Stage1_2・Stage1_1・Stage_1_Boss：イベントの最後に部品「オートセーブ」を足す（何度実行しても1つだけ）
 var prev = UnityEditor.SceneManagement.EditorSceneManager.GetActiveScene();
 if (prev.isDirty) return "ABORT: active scene has unsaved changes: " + prev.path;
 string prevPath = prev.path;
@@ -6,7 +6,7 @@ var sb = new System.Text.StringBuilder();
 var targets = new[] {
   new[]{ "Assets/Scenes/Stage1_2.unity", "勝ったとき（追い詰められる" },
   new[]{ "Assets/Scenes/Stage1_1.unity", "OP_はじめ" },
-  new[]{ "Assets/Scenes/Stage_1_3.unity", "全部調律できたとき（会話）" },
+  new[]{ "Assets/Scenes/Stage_1_Boss.unity", "全部調律できたとき（会話）" },
 };
 foreach (var t in targets) {
   var scene = UnityEditor.SceneManagement.EditorSceneManager.OpenScene(t[0], UnityEditor.SceneManagement.OpenSceneMode.Single);

@@ -25,7 +25,7 @@ paths:
 - `ScreenFadeEventAction`（画面の暗転）：`ScreenCurtain`（シーンごとの Canvas、並び順 90 = 会話 100 より奥・HUD より手前）。`SceneFader`（全 UI より手前）とは別。
 - 演出の部品（11-13）：`ShakeEventAction`（画面を揺らす。`Camera/CameraShake` が描画の間だけカメラをずらす＝FocusCamera とぶつからない・UI は揺れない）、`FaceDirectionEventAction`（キャラの向き。SpriteAnimator.SetDirection。止まっている間はそのまま）、`MoveObjectEventAction`（ずらした位置から／へ・目的の物へ〔動いていても追う。目的はノア／シグルも選べる＋ずらし＝その横に止まる〕。動かすもの＝物／ノア／シグル〔再生中に探す。待機・別行動のときに使う。一緒だとついてくる動きに戻される〕。Restore で最後の位置〔ノア・シグルは戻さない〕）、`DarknessEventAction`（StageDarkness の暗さと視界の半径を同時に。Restore で最後の値。SetDarkness・SetRadius は続けて呼ぶと前の変化を止めるので自前で補間）。
 - **シーンごとのイベント**（Stage1_1 の OP・Stage1_2 の一層の序盤と出口・テストの注意）は `.claude/rules/scenes.md`。シーンにまとめて置くのは `scene-recipe` スキルのレシピで。
-- **部品「オートセーブ」**（`Save/AutoSaveEventAction`、11-13）：オートセーブ枠に進み具合と再開位置（今の操作キャラの位置／指定した場所）を書く。**入口に戻れなくなるなど通り道が変わるイベントの最後に必ず置く**（置かないとロードで「シーンに着いた位置」から始まる）。置いた所：Stage1_2 の助けの場面の最後（`PartyModeEventAction` の次）・Stage1_1 `OP_はじめ` の最後・Stage_1_3 `全部調律できたとき（会話）` の最後。レシピ `autosave_points` で足した（`stage1_2_events` で作り直すと消えるので、そのあとに実行し直す）。
+- **部品「オートセーブ」**（`Save/AutoSaveEventAction`、11-13）：オートセーブ枠に進み具合と再開位置（今の操作キャラの位置／指定した場所）を書く。**入口に戻れなくなるなど通り道が変わるイベントの最後に必ず置く**（置かないとロードで「シーンに着いた位置」から始まる）。置いた所：Stage1_2 の助けの場面の最後（`PartyModeEventAction` の次）・Stage1_1 `OP_はじめ` の最後・Stage_1_Boss `全部調律できたとき（会話）` の最後。レシピ `autosave_points` で足した（`stage1_2_events` で作り直すと消えるので、そのあとに実行し直す）。
 - `SceneStartEvent`：シーン開始時に GameCondition（Awake で1回だけ判定）を満たせば、1フレーム待って（プレイヤーの生成後）EventSequence を実行。「最初から暗転しておく」は Awake で幕を真っ暗に。
 - `EventZone` の「1回だけ」はセーブされない（提案⑦で未着手）。
 

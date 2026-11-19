@@ -1,5 +1,6 @@
-# OP：暗転からの声 → モノローグ → 砂漠 → OP の最後のオートセーブ → ロードしても OP が繰り返さない
-scene Stage1_1
+# OP：Stage1_0（砂浜）。暗転からの声 → モノローグ → 砂浜 → OP の最後のオートセーブ → ロードしても OP が繰り返さない
+#     → 奥（上の端）へ歩くと Stage1_1 の下の端に着く（Stage1_1 でも OP は繰り返さない）
+scene Stage1_0
 save on
 wait 2
 expect talk ？？？                 # F1_00：誰かの途切れた声から始まる
@@ -9,7 +10,18 @@ expect idle
 expect no-error
 reload                          # タイトルへ → つづきから（オートセーブ）
 wait 2
-expect scene Stage1_1
+expect scene Stage1_0
 expect idle                     # OP が繰り返さない
 expect flag Flag_OP_Done on
+warp -115.1,37.5                # 奥の出口（マップの上の端）のすぐ手前
+key UpArrow 400                 # 本当の上キーで歩いて出口にぶつかる
+wait scene Stage1_1
+expect scene Stage1_1
+wait 2
+expect eval PlayerSwitchManager.Instance.CurrentPlayer.transform.position.y < 16   # Stage1_1 の下の端（出現位置 FromStage1_0）の近くに着く（押していた上キーの分だけ少し進むことがある）
+expect idle                     # Stage1_1 の OP は流れない
+expect no-error
+reload                          # 着いたときのオートセーブ → Stage1_1 の下の端から
+expect scene Stage1_1
+expect near -115.2,11.0 1.5
 expect no-error

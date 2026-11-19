@@ -1,21 +1,24 @@
-# タイトル：はじめから（オートセーブ枠）→ OP → タイトルへ → つづきから
+# タイトル：はじめから（オートセーブ枠）→ Stage1_0（砂浜）の船の上で OP → タイトルへ → つづきから（船の上から・OP は繰り返さない）
 scene Title
 wait 1
 expect eval BgmManager.Instance.CurrentClip != null && BgmManager.Instance.CurrentClip.name == "BGM-01_title"   # タイトルの曲
 eval UnityEngine.Object.FindAnyObjectByType<TitleMenu>().OpenNewGame(); return "open";
 button SlotAuto                 # オートセーブの枠
 button YesButton                # 前のデータがあるときの「上書きしますか？」（なければ何もしない）
-wait scene Stage1_1
-expect scene Stage1_1
+wait scene Stage1_0
+expect scene Stage1_0
+expect near -115.58,17.99 1.0   # 船の上（出現位置 Start_Boat）から始まる
 wait 2
 advance all                     # OP
 expect flag Flag_OP_Done on
+expect near -115.58,17.99 1.0   # OP のあとも船の上
 title
 expect scene Title
 eval UnityEngine.Object.FindAnyObjectByType<TitleMenu>().OpenContinue(); return "open";
 button SlotAuto
-wait scene Stage1_1
-expect scene Stage1_1
+wait scene Stage1_0
+expect scene Stage1_0
 wait 1
 expect idle                     # OP が繰り返さない
+expect near -115.58,17.99 1.0   # OP の最後のオートセーブ＝船の上から再開
 expect no-error

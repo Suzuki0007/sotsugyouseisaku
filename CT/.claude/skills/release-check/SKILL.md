@@ -23,7 +23,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .claude/skills/unity-playtes
 - 不合格は `bug-fix` スキルの手順で原因を調べる（座標のずれ・部屋の作り直しが先に疑わしい）。
 
 ## 3. 設定と中身
-- [ ] Build Settings が `Title`・`Stage1_1`・`Stage1_2`・`Stage_1_3`・`SceneGameOver` の5つで、`Title` が先頭（`EditorBuildSettings.scenes` を eval で読む）。`Stage1`・`Stage2`・`SampleScene`・`kari_*` が入っていない。
+- [ ] Build Settings が `Title`・`Stage1_1`・`Stage1_2`・`Stage_1_Boss`・`SceneGameOver` の5つで、`Title` が先頭（`EditorBuildSettings.scenes` を eval で読む）。`Stage1`・`Stage2`・`SampleScene`・`kari_*` が入っていない。
 - [ ] **`Assets/Behavior/Enemy/AbcdefuckAction.cs`（不適切な語・未使用）が残っていないか** → 残っていれば削除を提案（Behavior Graph の参照を確かめてから）。
 - [ ] `Assets/__ClaudeTest/` がない。`kari_*`・`res_kari/`（仮の素材）がビルドに入るシーンから参照されていないか（`asset-audit` で仮素材の行を見る）。
 - [ ] デバッグ用の表示：`PerfMonitor`（F3）・`DebugWindow` の無敵や `DebugStartState` がビルドで効かないか（`Health.PlayerInvincible` が既定で false）。Debug.Log が毎フレーム・命中ごとに出ていないか（code-map の「提出前に整理したいもの」）。

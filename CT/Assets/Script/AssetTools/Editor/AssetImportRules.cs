@@ -19,6 +19,7 @@ using UnityEngine;
 /// ・新しく入れたファイル（初めての取り込み）と、取り込みの一時置き場（Assets/__Intake/）から移したファイルにだけかける。今ある素材は変えない
 /// ・今ある素材にかけ直すときは、Project で選んで右クリック > 素材 > 取り込み設定をかけ直す
 /// ・設定の書き方：画像＝ppu・mesh(tight/full)・filter(bilinear/point)・compress(on/off/hq)・mip(on/off)・maxsize(auto/数)・mode(single/multiple)
+///                ・sheet(名前に入っていたら連番として Multiple にする言葉を , で。例 _sheet,_animetion)
 ///                音＝load(streaming/decompress/compressed)・format(vorbis/pcm/adpcm)・quality(1〜100)・mono(on/off)・background(on/off)
 public class AssetImportRules : AssetPostprocessor
 {
@@ -128,7 +129,15 @@ public class AssetImportRules : AssetPostprocessor
         var s = new TextureImporterSettings();
         imp.ReadTextureSettings(s);
 
-        if(r.settings.TryGetValue("mode", out string mode)) { s.spriteMode = mode == "multiple" ? (int)SpriteImportMode.Multiple : (int)SpriteImportMode.Single; }
+        // 1枚の絵か、何コマも並んだ絵（連番）か。sheet= に書いた言葉が名前に入っていれば連番（Multiple。切るのは Sprite Editor で）
+        bool isSheet = false;
+        if(r.settings.TryGetValue("sheet", out string sheet))
+        {
+            string file = System.IO.Path.GetFileNameWithoutExtension(imp.assetPath).ToLowerInvariant();
+            foreach(string word in sheet.Split(',')) { if(word.Length > 0 && file.Contains(word.Trim())) { isSheet = true; } }
+        }
+        if(isSheet) { s.spriteMode = (int)SpriteImportMode.Multiple; }
+        else if(r.settings.TryGetValue("mode", out string mode)) { s.spriteMode = mode == "multiple" ? (int)SpriteImportMode.Multiple : (int)SpriteImportMode.Single; }
         else if(s.spriteMode == (int)SpriteImportMode.None) { s.spriteMode = (int)SpriteImportMode.Single; }
         if(r.settings.TryGetValue("ppu", out string ppu) && float.TryParse(ppu, out float p)) { s.spritePixelsPerUnit = p; }
         if(r.settings.TryGetValue("mesh", out string mesh)) { s.spriteMeshType = mesh == "full" ? SpriteMeshType.FullRect : SpriteMeshType.Tight; }

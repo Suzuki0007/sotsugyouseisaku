@@ -1,8 +1,8 @@
-// Stage_1_3 C3：戦闘中の一言（TimpaniBarks）を、合図をきっかけにした一言データ（Resources/Barks/Timpani/）に移す
+// Stage_1_Boss C3：戦闘中の一言（TimpaniBarks）を、合図をきっかけにした一言データ（Resources/Barks/Timpani/）に移す
 // ・Flag_Timpani_InBattle（セーブしない）を作り、ティンパニ戦の戦闘エリアの「戦闘中フラグ」に入れる（一言の条件「戦闘中だけ」に使う）
 // ・TimpaniBarks の各できごと → 標準の合図。候補の行 → 候補（1行ずつ）。確率・次に出せるまでをそのまま。大事なできごとは優先度 60・一言どうしの間を待たない
 // ・「戦闘中の一言」オブジェクトを消す（TimpaniBarks のスクリプトはこのあとで削除する。一度だけ実行するレシピ）
-// 前提：Stage_1_3 を開いている。標準の合図が Assets/Data/Signals/標準/ にある
+// 前提：Stage_1_Boss を開いている。標準の合図が Assets/Data/Signals/標準/ にある
 var sb = new System.Text.StringBuilder();
 var root = UnityEngine.GameObject.Find("ティンパニ部屋");
 if (root == null) return "no ティンパニ部屋";
@@ -75,7 +75,7 @@ for (int i = 0; i < list.arraySize; i++)
     d.repeat = BarkRepeat.Always;
     d.condition = new GameCondition();
     d.condition.flags.Add(new FlagCondition { flag = flag, state = FlagCondition.State.On });
-    d.memo = "ティンパニ戦（Stage_1_3）の戦闘中だけ。もとは TimpaniBarks の「" + names[when] + "」";
+    d.memo = "ティンパニ戦（Stage_1_Boss）の戦闘中だけ。もとは TimpaniBarks の「" + names[when] + "」";
     d.variants.Clear();
     var lines = e.FindPropertyRelative("lines");
     for (int j = 0; j < lines.arraySize; j++)

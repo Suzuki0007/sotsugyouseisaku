@@ -2,15 +2,15 @@
 paths:
   - "Assets/Script/Timpani/**"
   - "Assets/Script/Gimmick/WalkArea.cs"
-  - "Assets/Scenes/Stage_1_3.unity"
+  - "Assets/Scenes/Stage_1_Boss.unity"
 ---
 
-# ティンパニ部屋（Stage_1_3）
+# ティンパニ部屋（Stage_1_Boss）
 
 ユーザーの仕様（2026-11-13）と、合意したプラン。**1段階ずつ終わったら報告とコミットメッセージ**。
 
 ## 仕様（ユーザーの指示）
-- Stage1_2 → Stage_1_3 に遷移。プレイヤーはマップ中央付近に出る。
+- Stage1_2 → Stage_1_Boss に遷移。プレイヤーはマップ中央付近に出る。
 - 歩けるのは、ティンパニ（円3つ）とそれをつなぐ中央の部分だけ。
 - 各ティンパニにペグ3つ（数・位置は調整できる）。**ペグの調律はノアだけ**（近づくとノアのアイコン）。
 - ペグを触ると簡単なリズムゲーム：縮む円が中心の円に重なるときにボタン → 締めが進む。3回くらい成功で締まる。**ゲームは止まらない**。
@@ -25,14 +25,14 @@ paths:
 - ペグの数や位置・敵の攻撃・リズムゲームの難しさ・アイテムの出現などは調整できるようにする。
 
 ## 段階
-1. **部屋と遷移（完了）**：Stage1_2 の正面の扉（合流後に調べる → F1_08・F1_08b → 揺れ → 部品「シーンを移る」）→ Stage_1_3 の `出現位置_Stage1_2 から（中央）`（ID `FromStage1_2`）。`ティンパニ部屋/歩ける範囲`（`WalkArea`：円3つ＝半径 4.3、中央の六角形）。カメラは `CameraArea` で部屋の絵の中。
-2. **ペグとリズムゲーム（完了）**：`Timpani/TimpaniPeg`（GimmickInteractable。調べる E で開始 → 縮む輪が中心の輪に重なるときに E で成功 → 決めた回数で締まり、同じオブジェクトの GimmickState が ON）。プレハブ `Assets/Prefab/Gimmicks/Timpani/Peg.prefab`（絵は仮の丸・GimmickState はセーブしない）。Stage_1_3 は `ティンパニ部屋/ティンパニ_上・左下・右下` の下に `ペグ1〜3`（中心から 3.5 マス、90°・210°・330°）。static イベント `TimpaniPeg.Succeeded / Missed / Tightened`（段階4・5 で、攻撃を消す・一言に使う）、`ResetPeg()`。
+1. **部屋と遷移（完了）**：Stage1_2 の正面の扉（合流後に調べる → F1_08・F1_08b → 揺れ → 部品「シーンを移る」）→ Stage_1_Boss の `出現位置_Stage1_2 から（中央）`（ID `FromStage1_2`）。`ティンパニ部屋/歩ける範囲`（`WalkArea`：円3つ＝半径 4.3、中央の六角形）。カメラは `CameraArea` で部屋の絵の中。
+2. **ペグとリズムゲーム（完了）**：`Timpani/TimpaniPeg`（GimmickInteractable。調べる E で開始 → 縮む輪が中心の輪に重なるときに E で成功 → 決めた回数で締まり、同じオブジェクトの GimmickState が ON）。プレハブ `Assets/Prefab/Gimmicks/Timpani/Peg.prefab`（絵は仮の丸・GimmickState はセーブしない）。Stage_1_Boss は `ティンパニ部屋/ティンパニ_上・左下・右下` の下に `ペグ1〜3`（中心から 3.5 マス、90°・210°・330°）。static イベント `TimpaniPeg.Succeeded / Missed / Tightened`（段階4・5 で、攻撃を消す・一言に使う）、`ResetPeg()`。
 3. **敵とガードのリチャージ（完了）**：
    - 音楽生物：`Data/Enemies/Timpani/EnemyData_Timpani_Creature`（動かない・攻撃では倒れない＝すべての攻撃 ×0・倒されたあと「おとなしくなる」・絵は仮 `Images/Enemy/Enemy_Timpani_Creature_kari.png`）。各ティンパニの中心に `音楽生物`（Enemy_Base）。
    - 行動 `Pattern_Timpani_Creature`：通常（待つ 0.5〜2.5 → 弾の輪 → 待つ 2〜3 → 落石×2 → 待つ 2〜3）→ `Flag_Timpani_Calmed1` で「激しい」（16 方向×2・落石×3・待ち短め）→ `Flag_Timpani_Calmed2` で「もっと激しい」（うず巻きが増える）。フラグはセーブしない。**段階4 で、おとなしくなった数に合わせてフラグを立てる**。
    - 落石（11-13 に変更。ユーザーの指示「プレイヤーを追いすぎない・同じ場所に重ならない・マップのあちこちにどんどん落ちる」）：`Attack_Timpani_Rock` は落とす数 5・0.3 秒おき・歩ける範囲全体にばらまく・15% だけプレイヤーの近く（ずれ 1.5）・影どうし 1.8 以上（全部の敵で共有）・アイテム 8%/個。行動の回数は 通常 1・激しい 2・もっと激しい 2。
    - 攻撃：`Attack_Timpani_Ring`（予兆＝黄色い輪が点滅 1 秒 → 12 方向。弾消しで消せる）・`Ring_Hard`・`Spiral`（予兆ピンク）・`Rock`（足元に影 1.3 秒 → 落ちる・画面が揺れる＝AttackData に足した「発動したときの画面の揺れ」0.15）。
-   - 弾の絵：Stage_1_3 の EnemyBulletPool だけ `Prefab/Bullet/EnemyBullet_TimpaniNote`（丸い弾・仮）。ほかのシーンは今までの EnemyBullet。
+   - 弾の絵：Stage_1_Boss の EnemyBulletPool だけ `Prefab/Bullet/EnemyBullet_TimpaniNote`（丸い弾・仮）。ほかのシーンは今までの EnemyBullet。
    - 守りのゲージ `Party/GuardGauge`（`ティンパニ部屋/守りのゲージ`）：弾消し（ノアの Q のまま）を出している間減る（2 秒）、空になると 5 割たまるまで出せない、空から満タン 6 秒、やめて 0.4 秒でたまり始める。表示「シグルの守り（Q）」（HP の下・空のとき「回復中…」）。`Refill(割合)`・`BoostRecharge(倍率, 秒)`（段階4 のアイテム）・`ResetGauge`、`Emptied`・`Ready`（一言のきっかけ）。`NoahBulletDeleteAreaController.Update` が `GuardGauge.Use` を呼ぶ（ゲージがないシーンはいつでも出せる）。
 4. **アイテムと連動（完了）**：
    - `Item/InstantPickup`（触れるとすぐ効く。持ち物に入らない・セーブしない。回復／守りのゲージ〔すぐためる 0.3＋2 倍速 10 秒〕。12 秒で点滅して消える。拾えるまで 0.3 秒。`Picked`・`Appeared`）。プレハブ `Prefab/Gimmicks/Timpani/Item_Heal`（ハート・仮）・`Item_GuardBoost`（青い菱形・仮）。
@@ -43,7 +43,7 @@ paths:
 5. **会話と流れ・戦闘中の一言（完了）**：
    - `着いたとき（戦闘前の会話）`：SceneStartEvent（`Flag_Timpani_Cleared` OFF・`Flag_Timpani_IntroSeen` OFF）→ F1_09 → 揺れ（音は空欄）→ カメラが上の音楽生物を映す → F1_10 → F1_10b_HowTo（ノアがペグを締める、シグルが守る）→ IntroSeen ON → 戦闘エリアを始める。
    - `やり直したとき（短い会話）`：Cleared OFF・IntroSeen ON（ゲームオーバーのあと）→ F1_10c_Retry → 戦闘を始める。IntroSeen はセーブするフラグ（倒れたときも確定されるので、リトライで短くなる）。
-   - `ティンパニ戦（戦闘エリア）`：始まり＝イベントの部品から、3体を始まるまで止める、勝ち方＝フラグ（`Flag_Timpani_Cleared`）、負け方なし＝体力が 0 でいつものゲームオーバー → リトライで Stage_1_3 に着いた直後から（ペグ・敵・ゲージは保存しないので最初から）。目的「全部のペグを締めろ（E：ペグ　Q：守り）」・1回だけ（`Stage_1_3_Timpani`）。
+   - `ティンパニ戦（戦闘エリア）`：始まり＝イベントの部品から、3体を始まるまで止める、勝ち方＝フラグ（`Flag_Timpani_Cleared`）、負け方なし＝体力が 0 でいつものゲームオーバー → リトライで Stage_1_Boss に着いた直後から（ペグ・敵・ゲージは保存しないので最初から）。目的「全部のペグを締めろ（E：ペグ　Q：守り）」・1回だけ（`Stage_1_Boss_Timpani`）。
    - クリア：TimpaniRoom の「全部調律できたときのイベント」＝`全部調律できたとき（会話）`（F1_11）。「全部調律できたら表示する物」＝歩ける範囲の `左の出口への通路（クリアで開く）`。`左の出口（会話）`（エリアに入る・1回だけ・F1_12）。**この先のシーン（階段・二層）はまだない**。
    - クリアしたあとに戻ってきたとき：TimpaniRoom.Start が `RestoreCalmed`（ペグを締めた状態・敵をおとなしくした絵・♪、会話やアイテムなし）と通路の表示。
    - 戦闘中の一言：（11-14 C3 で変更）`TimpaniBarks` は削除。一言データ `Assets/Resources/Barks/Timpani/Bark_Timpani_*`（12 個。きっかけ「合図が来た」＋標準の合図、条件 `Flag_Timpani_InBattle`〔セーブしない。ティンパニ戦の戦闘エリアの「戦闘中フラグ」〕、大事なもの〔戦闘が始まった・調律できた・体力が少ない・ヒント〕は優先度 60・一言どうしの間を待たない）。ヒントの合図（timpani/stalled）は TimpaniRoom の「ヒントの合図を出すまでの時間」25 秒。移し替えはレシピ `stage1_3_6_barks`（一度だけ）。`rules/signals.md`。
@@ -55,10 +55,10 @@ paths:
 **全6段階 完了**。
 
 ## 決めたこと・注意
-- シーンはユーザーが作った `Stage_1_3.unity`（Stage1_1 のコピーにティンパニ部屋の絵 `room_timpani.png` を置いたもの）。ティンパニ3台と中央のつなぎは**絵に描いてある**ので、仮の絵は置かない。絵の位置：上（-115.23, 25.04）・左下（-120.29, 17.35）・右下（-110.11, 17.35）、半径 約4.4。
+- シーンはユーザーが作った `Stage_1_Boss.unity`（Stage1_1 のコピーにティンパニ部屋の絵 `room_timpani.png` を置いたもの）。ティンパニ3台と中央のつなぎは**絵に描いてある**ので、仮の絵は置かない。絵の位置：上（-115.23, 25.04）・左下（-120.29, 17.35）・右下（-110.11, 17.35）、半径 約4.4。
 - （11-13 D 段階1）歩ける範囲は `MapArea` 経由で、敵の移動・敵と相棒の道（ナビメッシュの床が円と六角形どおり）にも効く。ティンパニのすき間には敵も相棒も入らない。
 - `WalkArea`（`Assets/Script/Gimmick/`）：子の Circle / Box / Polygon の Collider2D を形として読み、再生中はコライダーを無効にする（弾・敵にぶつからない）。`PlayerMapLimit.ClampToMap` の最後で `WalkArea.Clamp`（ないシーンは何もしない）。子を非表示にするとその形が外れる（イベントで通路を開ける）。`WalkArea.Contains` は落石・アイテムの落ちる場所の判定に使う予定。
-- ゲームオーバー：ゲームオーバー画面 → リトライで Stage_1_3 に着いた直後（戦闘前の会話の前）から。
+- ゲームオーバー：ゲームオーバー画面 → リトライで Stage_1_Boss に着いた直後（戦闘前の会話の前）から。
 - リズムゲームは E で始めて E でタイミング。ペグから離れる・キャラを切り替えると中断（進んだ分は残る）。音楽生物は動かない。
 - ペグの調整項目（Inspector）：成功する回数 3・輪が縮む時間 1.3 秒・成功するたびに速くなる割合 0.1・判定の甘さ 0.16・失敗で戻る回数 0・失敗のあと押せない時間 0.35 秒・輪の大きさ・色・音・エフェクト・締まったときのイベント。
 - **ペグ（`TimpaniPeg`）に `Update()` を作らない**：土台の `Intaractable` の private な `Update`（E キーで調べる）が呼ばれなくなり、ペグを回せなくなった（11-13 の不具合）。毎フレームの処理は `LateUpdate` の override（`base.LateUpdate()` を呼ぶ）に書く。`Interact` を eval で直接呼ぶ確かめ方では見つからないので、player を null にして1フレーム後に戻るか（＝土台の Update が動いているか）も確かめる。
@@ -67,5 +67,5 @@ paths:
 - シーンの配置は `scene-recipe` スキルのレシピ（`stage1_3_1_room`〜`stage1_3_5_flow`・`autosave_points`。順番は SKILL.md）で作った。作り直すときは、作ったあとで参照（特にフラグ）が入っているかを確かめる（`stage1_3_4_link` で TimpaniRoom のクリアのフラグが空になったことがある）。`stage1_3_3a_enemydata` はアセットを上書きして、段階6・11-13 の調整が戻るので、ふだんは実行しない。
 - 守りのゲージは Q キーがテストで届かないので、`PlayerInput` を無効にしてから `NoahBulletDeleteAreaController.SetBulletDeleteAreaActive(true)` で確かめる（終わったら戻す）。段階の切り替えは `event.ps1 -Flag Flag_Timpani_Calmed1 -Value 1`。
 - 戦闘前の会話を最初から見るには、`Flag_Timpani_IntroSeen` と `Flag_Timpani_Cleared` が OFF の状態で始める。戦闘の「1回だけ」は勝ったときにセーブされるので、テストでクリアのフラグだけ戻しても戦闘は始まらない（再生し直す）。
-- Stage_1_3 を直接再生すると `Flag_Sigle_Joined` が立っていないのでノア1人で始まる。2人で確かめるときは `event.ps1 -Flag Flag_Sigle_Joined -Value 1`。
+- Stage_1_Boss を直接再生すると `Flag_Sigle_Joined` が立っていないのでノア1人で始まる。2人で確かめるときは `event.ps1 -Flag Flag_Sigle_Joined -Value 1`。
 - 左の出入口（絵の左の開いた所）は今は歩ける範囲の外。クリア後に開けるなら、歩ける範囲に通路の子を足して表示する。

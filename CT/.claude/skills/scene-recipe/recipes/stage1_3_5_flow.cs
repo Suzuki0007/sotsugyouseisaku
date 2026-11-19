@@ -1,4 +1,4 @@
-// Stage_1_3 段階5：戦闘前後の会話・戦闘エリア・左の出口・戦闘中の一言
+// Stage_1_Boss 段階5：戦闘前後の会話・戦闘エリア・左の出口・戦闘中の一言
 UnityEditor.AssetDatabase.Refresh();
 DialogueCsv.Import("Assets/Data/Dialogue/Scenario_F1.csv", false);
 var sb = new System.Text.StringBuilder();
@@ -7,7 +7,7 @@ System.Func<string, GameFlag> F = n => UnityEditor.AssetDatabase.LoadAssetAtPath
 { string p = "Assets/Data/Flags/Flag_Timpani_IntroSeen.asset"; var f = UnityEditor.AssetDatabase.LoadAssetAtPath<GameFlag>(p); if (f == null) { f = UnityEngine.ScriptableObject.CreateInstance<GameFlag>(); UnityEditor.AssetDatabase.CreateAsset(f, p); }
   var so = new UnityEditor.SerializedObject(f); so.FindProperty("id").stringValue = "Timpani_IntroSeen"; so.FindProperty("memo").stringValue = "ティンパニ戦の前の会話（調律のしかた）を見た。ゲームオーバーからやり直したときは短い会話にする。セーブする"; so.FindProperty("saved").boolValue = true; so.ApplyModifiedPropertiesWithoutUndo(); UnityEditor.AssetDatabase.SaveAssets(); }
 
-var scene = UnityEditor.SceneManagement.EditorSceneManager.OpenScene("Assets/Scenes/Stage_1_3.unity", UnityEditor.SceneManagement.OpenSceneMode.Single);
+var scene = UnityEditor.SceneManagement.EditorSceneManager.OpenScene("Assets/Scenes/Stage_1_Boss.unity", UnityEditor.SceneManagement.OpenSceneMode.Single);
 var cleared = F("Flag_Timpani_Cleared"); var introSeen = F("Flag_Timpani_IntroSeen");
 System.Func<string, DialogueData> D = n => { var d = UnityEditor.AssetDatabase.LoadAssetAtPath<DialogueData>("Assets/Data/Dialogue/Scenario_F1/" + n + ".asset"); if (d == null) throw new System.Exception("no dialogue " + n); return d; };
 System.Action<UnityEngine.Object, string, object> P = (o, prop, val) => {
@@ -39,7 +39,7 @@ battleGo.GetComponent<UnityEngine.BoxCollider2D>().isTrigger = true;
 P(battle, "start", 1); L(battle, "enemies", creatures.ToArray()); P(battle, "holdUntilStart", true);
 P(battle, "win", 4); P(battle, "winFlag", cleared); P(battle, "lose", 0);
 P(battle, "objective", "ペグを全部締めて、ティンパニを調律しろ（ペグ：E　守り：Q）"); P(battle, "startMessage", ""); P(battle, "winMessage", ""); P(battle, "loseMessage", "");
-P(battle, "endEnemies", 0); P(battle, "once", true); P(battle, "saveId", "Stage_1_3_Timpani"); P(battle, "showHud", true);
+P(battle, "endEnemies", 0); P(battle, "once", true); P(battle, "saveId", "Stage_1_Boss_Timpani"); P(battle, "showHud", true);
 
 // ---- intro (first time) ----
 var intro = Seq(GO(root.transform, "着いたとき（戦闘前の会話）", new UnityEngine.Vector3(-115.2f, 20f, 0f)));
@@ -76,7 +76,7 @@ var exit = GO(root.transform, "左の出口（会話）", new UnityEngine.Vector
 var exitInter = exit.AddComponent<ItemInteraction>();
 Seq(exit);
 Talk(exit, "F1_12_Continue");
-{ var so = new UnityEditor.SerializedObject(exitInter); so.FindProperty("trigger").enumValueIndex = 1; so.FindProperty("saveId").stringValue = "Stage_1_3_LeftExit"; so.FindProperty("saveCompleted").boolValue = true;
+{ var so = new UnityEditor.SerializedObject(exitInter); so.FindProperty("trigger").enumValueIndex = 1; so.FindProperty("saveId").stringValue = "Stage_1_Boss_LeftExit"; so.FindProperty("saveCompleted").boolValue = true;
   var rules = so.FindProperty("rules"); rules.arraySize = 1; var r = rules.GetArrayElementAtIndex(0); r.FindPropertyRelative("label").stringValue = "1回だけ会話"; r.FindPropertyRelative("sequence").objectReferenceValue = exit.GetComponent<EventSequence>(); r.FindPropertyRelative("markCompleted").boolValue = true; r.FindPropertyRelative("consumeItems").boolValue = false;
   r.FindPropertyRelative("conditions").arraySize = 0; r.FindPropertyRelative("flagConditions").arraySize = 0; so.ApplyModifiedPropertiesWithoutUndo(); }
 

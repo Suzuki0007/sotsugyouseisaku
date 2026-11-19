@@ -1,6 +1,6 @@
-// Stage_1_3 段階1：ティンパニ部屋のルート・歩ける範囲・出現位置・カメラ。ルート「ティンパニ部屋」を消して作るので、続けて 2→3b→3c→4→4b→5→autosave_points
+// Stage_1_Boss 段階1：ティンパニ部屋のルート・歩ける範囲・出現位置・カメラ。ルート「ティンパニ部屋」を消して作るので、続けて 2→3b→3c→4→4b→5→autosave_points
 var scene = UnityEditor.SceneManagement.EditorSceneManager.GetActiveScene();
-if (scene.path != "Assets/Scenes/Stage_1_3.unity") scene = UnityEditor.SceneManagement.EditorSceneManager.OpenScene("Assets/Scenes/Stage_1_3.unity", UnityEditor.SceneManagement.OpenSceneMode.Single);
+if (scene.path != "Assets/Scenes/Stage_1_Boss.unity") scene = UnityEditor.SceneManagement.EditorSceneManager.OpenScene("Assets/Scenes/Stage_1_Boss.unity", UnityEditor.SceneManagement.OpenSceneMode.Single);
 var sb = new System.Text.StringBuilder();
 System.Func<UnityEngine.Transform, string, UnityEngine.Vector3, UnityEngine.GameObject> GO = (parent, n, pos) => { var g = new UnityEngine.GameObject(n); if (parent != null) g.transform.SetParent(parent, false); else UnityEngine.SceneManagement.SceneManager.MoveGameObjectToScene(g, scene); g.transform.position = pos; return g; };
 
@@ -45,8 +45,8 @@ sb.Append("saved=").Append(UnityEditor.SceneManagement.EditorSceneManager.SaveSc
 
 // ---- build settings & place name ----
 var list = new System.Collections.Generic.List<UnityEditor.EditorBuildSettingsScene>(UnityEditor.EditorBuildSettings.scenes);
-if (!list.Exists(x => x.path == "Assets/Scenes/Stage_1_3.unity")) { int idx = list.FindIndex(x => x.path == "Assets/Scenes/Stage1_2.unity"); list.Insert(idx + 1, new UnityEditor.EditorBuildSettingsScene("Assets/Scenes/Stage_1_3.unity", true)); UnityEditor.EditorBuildSettings.scenes = list.ToArray(); sb.Append("added to build settings\n"); }
+if (!list.Exists(x => x.path == "Assets/Scenes/Stage_1_Boss.unity")) { int idx = list.FindIndex(x => x.path == "Assets/Scenes/Stage1_2.unity"); list.Insert(idx + 1, new UnityEditor.EditorBuildSettingsScene("Assets/Scenes/Stage_1_Boss.unity", true)); UnityEditor.EditorBuildSettings.scenes = list.ToArray(); sb.Append("added to build settings\n"); }
 var table = UnityEngine.Resources.Load<PlaceNameTable>(PlaceNameTable.ResourcePath);
-if (table != null && PlaceNameTable.GetName("Stage_1_3") == "Stage_1_3") { table.AddForEditor("Stage_1_3", "ティンパニの間"); UnityEditor.EditorUtility.SetDirty(table); UnityEditor.AssetDatabase.SaveAssets(); sb.Append("place name added\n"); }
-sb.Append("place=").Append(PlaceNameTable.GetName("Stage_1_3"));
+if (table != null && PlaceNameTable.GetName("Stage_1_Boss") == "Stage_1_Boss") { table.AddForEditor("Stage_1_Boss", "ティンパニの間"); UnityEditor.EditorUtility.SetDirty(table); UnityEditor.AssetDatabase.SaveAssets(); sb.Append("place name added\n"); }
+sb.Append("place=").Append(PlaceNameTable.GetName("Stage_1_Boss"));
 return sb.ToString();

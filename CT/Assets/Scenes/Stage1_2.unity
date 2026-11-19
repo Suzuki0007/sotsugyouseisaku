@@ -33829,7 +33829,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d8bdee97161d5514fbf682e59c31ba76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SceneChangeEventAction
-  sceneName: Stage_1_3
+  sceneName: Stage_1_Boss
   spawnPointId: FromStage1_2
 --- !u!114 &460020986
 MonoBehaviour:

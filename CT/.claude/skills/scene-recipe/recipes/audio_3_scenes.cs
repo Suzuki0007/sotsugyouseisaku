@@ -1,5 +1,5 @@
 // 音の素材（2026-11-14）：シーンの音の欄・BGM（何度実行しても同じ。足す部品は名前で見つけて重ねない）
-// 対象：Title・Stage1_1・Stage1_2・Stage_1_3・SceneGameOver を順に開いて入れ、保存する（最後に元のシーンを開き直す）
+// 対象：Title・Stage1_1・Stage1_2・Stage_1_Boss・SceneGameOver を順に開いて入れ、保存する（最後に元のシーンを開き直す）
 // 前提：audio_1_sedata・audio_2_assets を実行済み
 var sb = new System.Text.StringBuilder();
 var startPath = UnityEngine.SceneManagement.SceneManager.GetActiveScene().path;
@@ -182,7 +182,7 @@ System.Func<string, UnityEngine.SceneManagement.Scene> Open = path =>
     var rescue = Find(s, "Stage1_2_イベント/追跡（戦闘エリア）/勝ったとき（追い詰められる → シグルに助けられる）");
     Set(ActionAt(rescue, 11), "seOnEnter", Se("Se_bang_rescue_scene"));
 
-    var door = Find(s, "Stage1_2_イベント/正面の扉（合流後に調べると Stage_1_3 へ）");
+    var door = Find(s, "Stage1_2_イベント/正面の扉（合流後に調べると Stage_1_Boss へ）");
     Set(ActionAt(door, 3), "seOnEnter", Se("Se_door_force_open"));
 
     // 追跡中だけ追跡の曲（戦闘エリアの戦闘中フラグ）
@@ -198,9 +198,9 @@ System.Func<string, UnityEngine.SceneManagement.Scene> Open = path =>
     PartySe(s); KeySe(s); ExitSe(s);
     Save(s);
 }
-// ---- Stage_1_3：着いたとき・守りのゲージ・調律・BGM ----
+// ---- Stage_1_Boss：着いたとき・守りのゲージ・調律・BGM ----
 {
-    var s = Open("Assets/Scenes/Stage_1_3.unity");
+    var s = Open("Assets/Scenes/Stage_1_Boss.unity");
     Set(ActionAt(Find(s, "ティンパニ部屋/着いたとき（戦闘前の会話）"), 3), "seOnEnter", Se("Se_rumble_long"));
     var gauge = Find(s, "ティンパニ部屋/守りのゲージ");
     if (gauge != null) { Set(gauge.GetComponent<GuardGauge>(), "emptySe", Se("Se_guard_empty")); Set(gauge.GetComponent<GuardGauge>(), "readySe", Se("Se_guard_ready")); }

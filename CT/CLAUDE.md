@@ -10,7 +10,7 @@
 ## 進み具合
 - **完了：敵の仕組み**（段階0〜7）。→ `.claude/rules/enemy.md`
 - **進行中：謎解き・2人の仕掛け**。頼まれた範囲まで完了：段階0〜5、段階6 は相棒の一言だけ（ユーザーの指示：ヒント・待っている相棒の振る舞い・絆の段階・通信・ピンチの助けは作らない）、段階7 は一言のツール・仕掛けの一覧・サンプルの部屋。→ `.claude/rules/gimmick-party.md`
-- **完了：ティンパニ部屋（Stage_1_3）**。全6段階（①部屋・歩ける範囲・遷移 ②ペグとリズムゲーム ③敵とガードのリチャージ ④アイテムと連動 ⑤会話と流れ・戦闘中の一言 ⑥調整と手順書）。→ `.claude/rules/timpani.md`・`Docs/ティンパニ部屋の作り方と調整.md`。左の出口の先（台本 F1_13・二層）のシーンはまだない。
+- **完了：ティンパニ部屋（Stage_1_Boss）**。全6段階（①部屋・歩ける範囲・遷移 ②ペグとリズムゲーム ③敵とガードのリチャージ ④アイテムと連動 ⑤会話と流れ・戦闘中の一言 ⑥調整と手順書）。→ `.claude/rules/timpani.md`・`Docs/ティンパニ部屋の作り方と調整.md`。左の出口の先（台本 F1_13・二層）のシーンはまだない。
 - **進行中：性能（計測・チューニング）**。段階1（計測の道具）・段階2（点検のスキル `perf-review`）・段階3（Project Auditor）完了。次は ④ 計測で重い所だけ直す。→ `.claude/rules/performance.md`
 - 段階で進める大きな作業は、**1段階ずつ終わったら報告とコミットメッセージを渡す**。
 
@@ -72,7 +72,7 @@
 | ルール | `enemy.md` | 敵・攻撃・ダメージ・スポナー・体力 |
 | ルール | `gimmick-party.md` | 仕掛け・2人・カメラ・調べる・プレイヤー・相棒の一言 |
 | ルール | `save-ui.md` | タイトル・セーブ・メニュー・UI・シーン遷移・**セーブのキーの一覧** |
-| ルール | `timpani.md` | ティンパニ部屋（Stage_1_3）：仕様・6段階のプラン・決めたこと（`Assets/Script/Timpani/**`・`WalkArea`） |
+| ルール | `timpani.md` | ティンパニ部屋（Stage_1_Boss）：仕様・6段階のプラン・決めたこと（`Assets/Script/Timpani/**`・`WalkArea`） |
 | ルール | `event-item-flag-talk.md` | イベント・アイテム・フラグ・プランナー用ツール（シーンチェック・デバッグウィンドウ・GameCondition） |
 | ルール | `signals.md` | 合図（提案 C）：GameSignal・Signals・合図を受けたら・標準の合図・段階（`Signal/**`・`Data/Signals/**`・`Party/Bark/**`） |
 | ルール | `map-room.md` | マップの範囲・部屋づくり（提案 D）：決めたこと・4段階のプラン・MapArea の決め方（`Map/**`・`WalkArea*`・`Camera/**`・`Enemy/Navigation/**`・`PartyRoute`） |
@@ -102,7 +102,7 @@
 
 ## シーン・フォルダ
 
-- **ゲームで使うシーンは `Title` → `Stage1_1` → `Stage1_2` → `Stage_1_3`（ティンパニ部屋。名前に `_` が2つ）、`SceneGameOver`**（Build Settings もこの5つ）。`Stage1`、`Stage2`、`SampleScene`、`kari_*` はファイルだけ残っている。
+- **ゲームで使うシーンは `Title` → `Stage1_0`（砂浜。はじめからは船の上の `Start_Boat` で OP → 奥の出口）→ `Stage1_1` → `Stage1_2` → `Stage_1_Boss`（ティンパニ部屋。2026-11-19 に `Stage_1_3` から名前が変わった。セーブの ID などは `Stage_1_3_〇〇` のまま）、`SceneGameOver`**（Build Settings もこの6つ）。`Stage1`、`Stage2`、`SampleScene`、`kari_*` はファイルだけ残っている。
 - スクリプトは `Assets/Script/<機能>/`、エディタ拡張は各機能の `Editor/`。asmdef はない。書き方は `.claude/rules/coding-style.md`。
 
 ## 文書

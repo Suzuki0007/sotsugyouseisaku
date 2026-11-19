@@ -104,7 +104,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File $pf -History -Label timpani_
 ```
 
 - **同じラベル＝同じ場面**。前回の同じラベルと比べて、悪くなった値に `!!`、良くなった値に `++`。`!!` が出たら、もう一度測ってから判断する（エディタの揺れ）。
-- 基準の場面：`timpani_battle`（Stage_1_3 を start → `event.ps1 -Flag Flag_Sigle_Joined -Value 1` → `-UntilIdle` で戦闘が始まる → `-Measure`）。
+- 基準の場面：`timpani_battle`（Stage_1_Boss を start → `event.ps1 -Flag Flag_Sigle_Joined -Value 1` → `-UntilIdle` で戦闘が始まる → `-Measure`）。
 - **エディタの落とし穴**（GC の確保にエディタの分が入る・メモリは回ごとに動く など）と基準の値は `rules/performance.md`。
 - `PerfLog/` はコミットしてよい（前回との比較の元になる）。テストで作った行は消してよい。
 

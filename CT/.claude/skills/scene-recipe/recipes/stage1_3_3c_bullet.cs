@@ -1,4 +1,4 @@
-// Stage_1_3 段階3：丸い弾のプレハブと、Stage_1_3 の弾のプールの差し替え
+// Stage_1_Boss 段階3：丸い弾のプレハブと、Stage_1_Boss の弾のプールの差し替え
 var sb = new System.Text.StringBuilder();
 // ---- note-like bullet sprite ----
 string spritePath = "Assets/Images/Enemy/Bullet_Timpani_Note_kari.png";
@@ -21,7 +21,7 @@ if (UnityEditor.AssetDatabase.LoadAssetAtPath<UnityEngine.Sprite>(spritePath) ==
 var sprite = UnityEditor.AssetDatabase.LoadAssetAtPath<UnityEngine.Sprite>(spritePath);
 
 // ---- prefab variant of the enemy bullet ----
-var scene = UnityEditor.SceneManagement.EditorSceneManager.OpenScene("Assets/Scenes/Stage_1_3.unity", UnityEditor.SceneManagement.OpenSceneMode.Single);
+var scene = UnityEditor.SceneManagement.EditorSceneManager.OpenScene("Assets/Scenes/Stage_1_Boss.unity", UnityEditor.SceneManagement.OpenSceneMode.Single);
 var pool = UnityEngine.Object.FindAnyObjectByType<EnemyBulletPool>();
 var pso = new UnityEditor.SerializedObject(pool);
 var basePrefab = pso.FindProperty("bulletPrefab").objectReferenceValue as UnityEngine.Component;

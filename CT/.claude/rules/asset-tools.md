@@ -12,7 +12,7 @@ paths:
 
 ## 部品（すべてエディタ用 `Assets/Script/AssetTools/Editor/`）
 - `AssetImportRules`（AssetPostprocessor）：`Assets/Data/AssetTools/取り込み設定.tsv`（フォルダ／種類〔画像・音〕／設定 key=value;／メモ。一番長く一致したフォルダの行）を **File で読む**（取り込み中に AssetDatabase を使わない）。**初めての取り込み（`importSettingsMissing`）と `Assets/__Intake/` から移したファイルにだけ**かける（今ある素材は変えない）。かけ直しは Project 右クリック > 素材 > 取り込み設定をかけ直す。
-  - 決めた値（2026-11-15 に今の素材を集計して合わせた）：画像は Sprite・PPU 100・Bilinear・圧縮・ミップなし・Tight、マップは FullRect、エフェクトは圧縮なし、Max Size は絵の大きさ以上の 2 のべき乗（2048〜8192。絵が縮まない）。音は BGM＝Streaming・Vorbis 70%・裏で読み込む、SE＝読み込み時に展開。Sprite の分け方は指定しなければ Unity の既定（今は Multiple になり、1枚の絵は「名前_0」）。
+  - 決めた値（2026-11-15 に今の素材を集計して合わせた）：画像は Sprite・PPU 100・Bilinear・圧縮・ミップなし・Tight、マップは FullRect、エフェクトは圧縮なし、Max Size は絵の大きさ以上の 2 のべき乗（2048〜8192。絵が縮まない）。音は BGM＝Streaming・Vorbis 70%・裏で読み込む、SE＝読み込み時に展開。**Sprite の分け方は Single**（2026-11-19、ユーザーの指示「大きい画像が勝手に分割される」）。名前に `sheet=` の言葉（`_sheet`・`_animetion`・`_animation`・`_anim`）が入っていれば Multiple（連番。Sprite Editor で切る）。指定がない行は Unity の既定（Multiple で自動に切られ、1枚の絵が「名前_0」とかけらに分かれる）。
 - `AssetWalker`：プレハブ（Assets/Prefab・Resources）→ データ（Assets/Data・Resources の ScriptableObject）→ Build Settings のシーンの部品を見て回る土台。変えた所だけ保存し、最後に元のシーンを開き直す。`AssetKey`（GUID＋ファイル内の番号）で比べ・読み直す（**シーンを開くと先に読んだアセットが消える**ため）。`DirtySceneName()`。
 - `AssetReplacer` ＋ `AssetReplaceWindow`（Tools > 素材 > 仮素材を差し替える）：古い → 新しいの対応（画像は Texture2D と中の Sprite を、名前 → 並びの順で）を作り、ObjectReference を全部付け替える。探すだけもできる。
 - `AssetMapApplier`（Tools > 素材 > 割り当て表を試す／流す、スキルの `apply.ps1`）：`Docs/素材の割り当て/*.tsv` を読む。入れる先 `slot`（確認キーと同じ書き方＋`#n`・`欄[]`・`欄[i]`）・`item`・`bgm`・`bgm-rule`・`event-se`・`chara`・`replace`。欄の型で入れる物を決める（`PPtr<$SeData>` は音から SeData を作る／`PPtr<Sprite>` は画像の中の絵。**Unity の型は `$` が付かない**ので正規化している）。順番：部品の欄（1回の見回り）→ シーンごとの操作 → 表情 → 差し替え（最後）。dryRun は何も変えない。

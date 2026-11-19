@@ -1059,8 +1059,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9ed2a368537c0654d92d5fe2e4d3e51c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TitleMenu
-  firstScene: Stage1_1
-  firstSpawnPointId: 
+  firstScene: Stage1_0
+  firstSpawnPointId: Start_Boat
   mainMenu: {fileID: 616103961}
   newGameButton: {fileID: 1390051196}
   continueButton: {fileID: 710326545}

@@ -16,14 +16,14 @@ paths:
 手順書は `Docs/タイトル画面とセーブの仕組み.md`。ファイルごとの役割は `Docs/code-map.md` の「2. 起動とシーン開始時の流れ」と「3. > イベント・アイテム・フラグ・会話・セーブ」を読む。
 
 ## タイトル・セーブ（`Assets/Script/Title/`、`Assets/Script/Save/`）
-- ゲームは **`Title.unity`** から始まる（Build Settings：Title → Stage1_1 → Stage1_2 → Stage_1_3 → SceneGameOver）。`TitleMenu`：はじめから（スロット選択、使用中なら上書き確認）／つづきから／ゲーム終了。`TitleSceneBuilder`（Tools > タイトル画面）でシーンを作り直せる。背景は `Images/UI/UI_TitleImage.PNG`（Single・最大 4096）を AspectRatioFitter（Envelope Parent）で画面いっぱいに。
+- ゲームは **`Title.unity`** から始まる（Build Settings：Title・Stage1_1・Stage1_2・Stage_1_Boss・SceneGameOver・Stage1_0。**はじめから＝Stage1_0 の `Start_Boat`**〔TitleMenu の First Scene / First Spawn Point Id、2026-11-19〕）。`TitleMenu`：はじめから（スロット選択、使用中なら上書き確認）／つづきから／ゲーム終了。`TitleSceneBuilder`（Tools > タイトル画面）でシーンを作り直せる。背景は `Images/UI/UI_TitleImage.PNG`（Single・最大 4096）を AspectRatioFitter（Envelope Parent）で画面いっぱいに。
 - **セーブの枠（11-13 に変更）**：**オートセーブ枠** `save_auto.json`（`Save.AutoSlot` = -1、画面では一番上の「オートセーブ」）＋ **手動の枠** `save_1.json`〜`save_3.json`（`Application.persistentDataPath`）。
   - **自動で書く（`Save.Write` / `WriteAsync`）のはいつもオートセーブ枠**。手動の枠を書くのは `Save.SaveToSlot`（セーブポイントの手動セーブ）だけ。ユーザーの指示：「手動の枠が上書きされるのは手動セーブだけ、オートセーブが上書きするのはオートセーブ枠だけ」。
   - `Save.HasSlot`（セーブを使っているか。直接再生でスロットを選んでいなければ false → ファイルに書かない）、`Save.CurrentSlot`（最後に読んだ・手動でセーブした枠。表示用）、`LoadSlot` / `StartNewGame`（オートセーブ枠を空にして始める）/ `CloseSlot` / `PeekSlot` / `DeleteSlot` / `SlotPath`。旧 `save.json` は起動時にスロット1へ移す（`MigrateLegacy`）。
 - `Save`：`SetPending` で仮置き → `Commit` で確定（`BeforeCommit` イベントでプレイ時間・保存日時・2人の状態を記録）→ `Write` / `WriteAsync`（オートセーブ枠）。
 - **オートセーブのタイミング**（`GameSession.AutoSaveOnArrival` / `AutoSaveAt`、`AutoSaved` イベントで右上に「オートセーブしました」＝`AutoSaveIndicator`）：シーンに着いたとき（`PlayerPartySpawner.Start`）、`CheckPoint`、イベントの部品「オートセーブ」（`AutoSaveEventAction`：今の位置か指定した場所を再開位置に）。
   - **終了時・タイトルへ戻るとき・シーンを読み込んだときは書かない**（以前は書いていて、「進み具合は新しいのに再開位置はシーンに着いた所」になり、Stage1_2 でガレキの向こう＝入口側から始まって進めなくなった）。
-  - **入口に戻れなくなる・通り道が変わるイベントの最後には必ず部品「オートセーブ」を置く**。置いてある所：Stage1_2 の助けの場面の最後（シグル合流）・Stage1_1 の `OP_はじめ` の最後・Stage_1_3 の `全部調律できたとき（会話）` の最後。
+  - **入口に戻れなくなる・通り道が変わるイベントの最後には必ず部品「オートセーブ」を置く**。置いてある所：Stage1_2 の助けの場面の最後（シグル合流）・Stage1_0 の `OP_はじめ` の最後（11-19 から OP は Stage1_0。Stage1_1 の物は流れない）・Stage_1_Boss の `全部調律できたとき（会話）` の最後。
   - シーンを出るとき（`SceneChange`）は Commit だけ（行き先に着いたときに書く）。
 - **ロードの確かめ（ときどき行う。ユーザーの指示）**：イベントを足したら、イベントの前・途中・後で `GameSession.ReturnToTitle()` → `GameSession.Continue(Save.AutoSlot, "Stage1_1")` を eval で呼び、出た位置から進めるか・イベントが繰り返さないかを見る（`unity-playtest` でバックアップしてから。直接再生のときは先に `Save.StartNewGame()` でセーブを有効にする）。
 - `GameSession`：`StartNewGame` / `Continue` / `ReturnToTitle` / `SaveAt`、プレイ時間（`PlayTimeCounter`）、データ切り替え時の状態リセット（`InventoryManager.ReloadFromSave`、一時フラグ）。

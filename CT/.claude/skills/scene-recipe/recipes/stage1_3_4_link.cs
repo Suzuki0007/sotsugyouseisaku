@@ -1,4 +1,4 @@
-// Stage_1_3 段階4：すぐ効くアイテムのプレハブ（回復・守り）・各ティンパニの TimpaniUnit・部屋の TimpaniRoom とクリアのフラグ
+// Stage_1_Boss 段階4：すぐ効くアイテムのプレハブ（回復・守り）・各ティンパニの TimpaniUnit・部屋の TimpaniRoom とクリアのフラグ
 var sb = new System.Text.StringBuilder();
 // ---- placeholder item sprites ----
 System.Func<string, System.Func<int, int, UnityEngine.Color>, UnityEngine.Sprite> MakeSprite = (path, paint) => {
@@ -54,11 +54,11 @@ var rock = UnityEditor.AssetDatabase.LoadAssetAtPath<UnityEngine.Object>("Assets
 string cfp = "Assets/Data/Flags/Flag_Timpani_Cleared.asset";
 var cleared = UnityEditor.AssetDatabase.LoadAssetAtPath<GameFlag>(cfp);
 if (cleared == null) { cleared = UnityEngine.ScriptableObject.CreateInstance<GameFlag>(); UnityEditor.AssetDatabase.CreateAsset(cleared, cfp); }
-{ var so = new UnityEditor.SerializedObject(cleared); so.FindProperty("id").stringValue = "Timpani_Cleared"; so.FindProperty("memo").stringValue = "ティンパニの部屋（Stage_1_3）を全部調律した（クリア）。セーブする"; so.FindProperty("saved").boolValue = true; so.ApplyModifiedPropertiesWithoutUndo(); }
+{ var so = new UnityEditor.SerializedObject(cleared); so.FindProperty("id").stringValue = "Timpani_Cleared"; so.FindProperty("memo").stringValue = "ティンパニの部屋（Stage_1_Boss）を全部調律した（クリア）。セーブする"; so.FindProperty("saved").boolValue = true; so.ApplyModifiedPropertiesWithoutUndo(); }
 UnityEditor.AssetDatabase.SaveAssets();
 
 // ---- scene ----
-var scene = UnityEditor.SceneManagement.EditorSceneManager.OpenScene("Assets/Scenes/Stage_1_3.unity", UnityEditor.SceneManagement.OpenSceneMode.Single);
+var scene = UnityEditor.SceneManagement.EditorSceneManager.OpenScene("Assets/Scenes/Stage_1_Boss.unity", UnityEditor.SceneManagement.OpenSceneMode.Single);
 var root = UnityEngine.GameObject.Find("ティンパニ部屋");
 foreach (var n in new[]{ "ティンパニ_上", "ティンパニ_左下", "ティンパニ_右下" }) {
   var g = root.transform.Find(n).gameObject;

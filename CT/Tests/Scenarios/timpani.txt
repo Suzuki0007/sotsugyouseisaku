@@ -1,5 +1,5 @@
-# Stage_1_3：戦闘前の会話 → ペグを E キーで回す → 全部調律 → クリアの会話 → ロードしても調律したまま
-scene Stage_1_3
+# Stage_1_Boss：戦闘前の会話 → ペグを E キーで回す → 全部調律 → クリアの会話 → ロードしても調律したまま
+scene Stage_1_Boss
 save on
 flag Flag_Sigle_Joined on       # 2人で（相棒の一言が出るように）
 advance all                     # 着いたとき（戦闘前の会話）→ 戦闘が始まる
@@ -23,7 +23,7 @@ expect eval BgmManager.Instance.CurrentClip != null && BgmManager.Instance.Curre
 expect eval System.Linq.Enumerable.Any(Signals.Log, e => e.id == "timpani/all_calmed")
 expect no-error
 reload
-expect scene Stage_1_3
+expect scene Stage_1_Boss
 expect eval System.Array.TrueForAll(UnityEngine.Object.FindObjectsByType<TimpaniPeg>(), p => p.IsTightened)
 expect idle                     # 戦闘前の会話が繰り返さない
 expect no-error

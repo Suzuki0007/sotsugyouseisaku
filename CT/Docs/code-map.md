@@ -71,7 +71,7 @@
 | `Player/Player_Sigle/SigleShooter.cs` | Sigle の射撃（プール・SE・エフェクト） | ◎ |
 | `Player/FocusPlayer.cs`、`Player_Noah/NoahMapLimit.cs`、`Player_Noah/NoahHistory.cs` | 古い仕組み（Stage1 / Stage2 で使われている） | △ |
 | `CharaBase/CharacterSorting.cs` | Sigle の描画順を Noah との上下で切り替え | ○ |
-| `Gimmick/WalkArea.cs`、`WalkAreaExclude.cs` | （11-13）歩ける範囲を円・四角・多角形の組み合わせで決める（子の Collider2D を形として読み、再生中は無効にする）。**シーンに何個置いてもよい（全部を合わせた範囲）**。多角形の輪郭が2つ以上なら内側は穴（偶奇判定）、子に `WalkAreaExclude`（歩けない形）を付けるとその形は抜ける（⋮「歩けない形を追加（円／四角）」）。`Clamp`（外・歩けない形の中なら一番近い歩ける所へ）・`Contains`・`TryGetBounds`・`TryRandomPoint`・`Signature`（形が変わったかの目印）・`ContainsPoint`／`ShapeCount`（エディタでも使える。シーンチェック用）。プレイヤー（`PlayerMapLimit.ClampToMap` の最後）・敵の移動・敵と相棒の道（`MapArea` 経由）が使う。Stage_1_3 のティンパニ部屋で使用 | ◎ |
+| `Gimmick/WalkArea.cs`、`WalkAreaExclude.cs` | （11-13）歩ける範囲を円・四角・多角形の組み合わせで決める（子の Collider2D を形として読み、再生中は無効にする）。**シーンに何個置いてもよい（全部を合わせた範囲）**。多角形の輪郭が2つ以上なら内側は穴（偶奇判定）、子に `WalkAreaExclude`（歩けない形）を付けるとその形は抜ける（⋮「歩けない形を追加（円／四角）」）。`Clamp`（外・歩けない形の中なら一番近い歩ける所へ）・`Contains`・`TryGetBounds`・`TryRandomPoint`・`Signature`（形が変わったかの目印）・`ContainsPoint`／`ShapeCount`（エディタでも使える。シーンチェック用）。プレイヤー（`PlayerMapLimit.ClampToMap` の最後）・敵の移動・敵と相棒の道（`MapArea` 経由）が使う。Stage_1_Boss のティンパニ部屋で使用 | ◎ |
 | 🛠`Gimmick/Editor/WalkAreaEditor.cs`、`WalkAreaMask.cs` | （11-13 D 段階2）WalkArea の Inspector：「マスク画像から作る」（白い所の輪郭をマーチングスクエアでなぞり、ダグラス・ポイカーで間引いて、子「マスクから作った範囲」の PolygonCollider2D に。内側の輪郭は穴）・「今の形をマスク画像に書き出す」（白黒 PNG）・形を足すボタン。WalkArea にマスク画像・合わせるマップの絵・線の細かさ・白とみなす明るさの欄と `BuildTester`（エディタ用の速い判定） | ◎ |
 | 🛠`AssetTools/Editor/`（`AssetImportRules`・`AssetWalker`〔＋`AssetKey`〕・`AssetReplacer`〔＋`AssetReplaceWindow`〕・`AssetMapApplier`・`SoundListWindow`） | （11-15）**素材の取り込み**：音の一覧（Tools > 素材 > 音の一覧＝試聴・音量・聞こえ方・使っている所）、フォルダごとの取り込みの決まり（`Assets/Data/AssetTools/取り込み設定.tsv`、新しいファイルだけ）、プレハブ・データ・シーンの見回りの土台、仮素材の差し替え（Tools > 素材 > 仮素材を差し替える）、割り当て表（`Docs/素材の割り当て/*.tsv`）でまとめて入れる（Tools > 素材 > 割り当て表を試す／流す）。スキル `asset-intake`・`rules/asset-tools.md`・`Docs/素材の取り込み.md` | ◎ |
 | `Signal/`（`GameSignal`・`Signals`・`SendSignalEventAction`・`SignalListener`、🛠`Editor/SignalMenu`） | （11-14 C1）**合図**：出来事に名前（GameSignal アセット）を付けて送り（`Signals.Send`、部品「合図を出す」）、「合図を受けたら」（送り元の絞り込み・条件・回数・間隔・遅らせる → イベント・フラグ・一言）で受ける。最近の合図の記録（デバッグウィンドウ「合図」）。`rules/signals.md`・`Docs/合図の使い方.md` | ◎ |
@@ -79,13 +79,13 @@
 | `Map/Room.cs`、🛠`Map/Editor/RoomMenu.cs`・`RoomChecks.cs`・`RoomEditor.cs` | （11-13 D 段階3）**部屋**：`Room`（名前・ID・種類・部屋の絵・メモ。目印と点検）。Hierarchy 右クリック > 部屋 > 普通／戦闘／謎解きの部屋（選んだ絵に合わせて、歩ける範囲・カメラの範囲・出現位置・着いたとき〔非表示〕、戦闘エリア＋勝ったときのオートセーブ、スイッチ→答え合わせ→扉＋オートセーブを作る。`RoomMenu.Build`）。Inspector に点検の一覧（`RoomChecks`。シーンチェックの `CheckRooms` も同じ）と「カメラの範囲を部屋の絵に合わせる」 | ◎ |
 | `Map/MapDebugView.cs`、`Map/MapReach.cs` | （11-13 D 段階4）デバッグ用：ゲーム画面に範囲の線（緑＝歩ける範囲・赤＝歩けない形・水色＝マップの範囲。`MapDebugView.Show`）／今いる場所から調べる物・出口・出現位置へ歩いて行けるか（NavMesh2D の小さい体。`MapReach.Check`・`Report`）。デバッグウィンドウ「マップの範囲」と `event.ps1 -ShowArea` / `-Reach` から使う | ◎ |
 | `Map/MapArea.cs` | （11-13 D 段階1）**マップの範囲の窓口**。歩ける範囲＝WalkArea → マップの絵（`MapBounds`）→ Tilemap（`PlayerSceneContext`）、映す範囲＝マップの絵 → Tilemap。`TryGetViewRect`（カメラ）・`TryGetWalkRect`・`HasWalkShape`・`Contains`・`Clamp`。FocusCamera（CameraArea がない所）・Enemy の `ClampToMap`（止められている間は収めない）・NavMesh2D（床：WalkArea があればその形どおりに 0.2 マスの升目で作る）・PartyRoute（まっすぐの線が範囲の外を通らないか）が使う | ◎ |
-| `Party/GuardGauge.cs` | （11-13）守り（弾消し）のゲージ。置いたシーンだけ、弾消しを出せる時間とリチャージを決める（空になると決めた量までたまるまで出せない）。画面の HP の下に「シグルの守り（Q）」のゲージ。`Use`（`NoahBulletDeleteAreaController` が呼ぶ）・`Refill`・`BoostRecharge`・`ResetGauge`・`Emptied`・`Ready`。Stage_1_3 で使用 | ◎ |
+| `Party/GuardGauge.cs` | （11-13）守り（弾消し）のゲージ。置いたシーンだけ、弾消しを出せる時間とリチャージを決める（空になると決めた量までたまるまで出せない）。画面の HP の下に「シグルの守り（Q）」のゲージ。`Use`（`NoahBulletDeleteAreaController` が呼ぶ）・`Refill`・`BoostRecharge`・`ResetGauge`・`Emptied`・`Ready`。Stage_1_Boss で使用 | ◎ |
 | `Item/InstantPickup.cs` | （11-13）触れるとすぐ効くアイテム（回復／守りのゲージ）。持ち物に入らない・セーブしない。決めた時間で点滅して消える。`Spawn`・`Picked`・`Appeared`。プレハブ `Prefab/Gimmicks/Timpani/Item_Heal`・`Item_GuardBoost` | ◎ |
 | `Timpani/TimpaniUnit.cs` | （11-13）ティンパニ1台。ペグが締まるたびに周りの弾を消し敵を止める、全部締まると敵をおとなしくする（`Kill`・絵の差し替え・♪・回復アイテム）。`Calmed`・`AttacksCleared` | ◎ |
 | `Timpani/TimpaniRoom.cs` | （11-13）ティンパニの部屋全体。調律できた数で敵の段階を進めるフラグを立てる、全部でクリアのフラグ・`AllCalmed`・イベント | ◎ |
 | （削除）`Timpani/TimpaniBarks.cs` | 11-14 C3 で削除。ティンパニ戦の一言は一言データ `Resources/Barks/Timpani/`（きっかけ「合図が来た」、条件 `Flag_Timpani_InBattle`） | − |
 | `Timpani/TimpaniPeg.cs` | （11-13）ティンパニのペグ。調べるとリズムゲーム（縮む輪が中心の輪に重なるときに E）、決めた回数の成功で締まり GimmickState が ON。ゲームは止まらない・離れると中断・使えるキャラ（ノアだけ）。色と印（◆◇・♪）で進み具合。`Succeeded`・`Missed`・`Tightened`（static イベント）。プレハブ `Prefab/Gimmicks/Timpani/Peg.prefab` | ◎ |
-| `Scene/SceneChangeEventAction.cs` | （11-13）イベントの部品「シーンを移る」（シーンの `SceneChange.ChangeScene` を呼ぶ。イベントの最後に置く）。Stage1_2 の正面の扉 → Stage_1_3 | ◎ |
+| `Scene/SceneChangeEventAction.cs` | （11-13）イベントの部品「シーンを移る」（シーンの `SceneChange.ChangeScene` を呼ぶ。イベントの最後に置く）。Stage1_2 の正面の扉 → Stage_1_Boss | ◎ |
 | `Camera/CameraShake.cs`、`ShakeEventAction.cs` | （11-13）画面を揺らす。描画の間だけカメラの位置をずらす（`RenderPipelineManager.begin/endCameraRendering`）ので、FocusCamera の追従とぶつからない。イベントの部品「画面を揺らす」 | ◎ |
 | `StageDarkness/DarknessEventAction.cs` | （11-13）イベントの部品「暗さ・視界を変える」（暗さとプレイヤーの明かりの半径を同時に、時間をかけて。セーブから戻るときは最後の値） | ◎ |
 | `Event/Actions/FaceDirectionEventAction.cs`、`MoveObjectEventAction.cs` | （11-13）イベントの部品「キャラの向きを変える」「物を動かす」（ずらした位置から／へ・目的の物へ〔動いていても追う〕。敵が降ってくる・岩がどく・弾が飛ぶ。動かすもの・向かう先にノア／シグルも選べる〔再生中に探す。待機・別行動のときに使う〕） | ◎ |
@@ -158,7 +158,7 @@
 | `Bgm/` | `BgmManager`（クロスフェード、エフェクト）、`SceneBgm`（条件つきルール）、`Conditions/`（Area / Flag / Health）、`Effects/`（進行度で音を変える） | なし |
 | `Se/` | `SeManager`（SeData で再生、ループ、追従）、`SePlayer`、`FootstepSe`（ノア・シグルのプレハブに付いている。鳴らし方＝一歩ずつ〔11-14 から〕／歩いている間ループ）、`SceneFootstep`（11-14。足音の設定＝このシーン・範囲の中だけ足音を替える。外のマップ Stage1_1 は砂の録音のループ。🛠`SceneFootstepMenu`）、`HealthSe`（11-14 ノア・シグルのプレハブに付けた。体力を共有しているとき1回の攻撃で鳴るのは当たったキャラの音だけ）、`SeEventAction`、🛠`SeDataCreator`。素材の置き場所・入れた先は `rules/audio.md` | なし |
 | `Effect/` | `EffectManager`、`EffectData`、`EffectTrigger`（コードなしで出す）、`EffectEventAction`、🛠エディタ一式 | `Effect/README_エフェクトの使い方.md` |
-| `SpriteAnimation/` | `SpriteAnimator` + `SpriteAnimData`（新方式）、`CharacterAnimLink`（移動・体力で自動切り替え）、`AnimEventAction`、🛠エディタ一式。`SpriteAnimation.cs`（Animator 版）は古い | `SpriteAnimation/README_アニメーションの使い方.md` |
+| `SpriteAnimation/` | `SpriteAnimator` + `SpriteAnimData`（新方式）、`SpriteFrameBlend`（11-19。コマの間を混ぜ・水面の高さを合わせて上下・水のゆらぎ。シェーダー `Assets/Shaders/SpriteFrameBlendWave.shader`〔CT/Sprite Frame Blend Wave。明かりなし。「シーンの明るさに合わせる」で Global Light 2D の色×強さを掛ける〕＋`Mat_SpriteFrameBlendWave`。Stage1_0 の波）、`CharacterAnimLink`（移動・体力で自動切り替え）、`AnimEventAction`、🛠エディタ一式。`SpriteAnimation.cs`（Animator 版）は古い | `SpriteAnimation/README_アニメーションの使い方.md` |
 | `StageDarkness/` | `StageDarkness`（ステージを暗くしてプレイヤーの周りだけ明るく）、`LightSource` | なし |
 
 ### プランナー用ツール・その他
@@ -219,8 +219,8 @@
 ### 不具合・不具合の可能性
 | 優先度 | 場所 | 内容 |
 |---|---|---|
-| 低 | 🆕 `Player/PlayerFollower.cs`・`PlayerHistory.cs`・`CharaBase/CharacterSorting.cs`（成田さん。2026-11-14 に再生で再現） | **シグルがノアにぴったり重なって隠れることがある**（ユーザーが報告した「1-3 の戦闘でシグルが消える」は別の原因＝Stage_1_3 を直接再生すると合流のフラグが OFF でシグルが最初からいない。仕様どおり。最初から遊ぶと起きない）。原因：シグルは「ノアの位置の記録の 10 件前」に付いていくが、記録はどんなに小さな動きでも1件増える。ノアが円い歩ける範囲の縁に押し当てて縁に沿ってずれる・音楽生物（Dynamic）に触れて押される間は、1 フレームに 0.001 マスほどの記録が積もり、シグルがノアに 0.001〜0.03 マスまで重なる。シグルの方が少しでも上にいると `CharacterSorting` が描く順番を 99（ノアの 100 の奥）にするので、完全に隠れる。四角い範囲の端では位置が変わらず記録が増えないので、ほかのシーンでは起きにくい。再現：Stage_1_3 で戦闘を始め、右へ歩き続けて右下のティンパニの縁に押し当てる（間隔 0.033・順番 99）。**そもそも普通に歩いているときの間隔も 0.3〜0.55 マス**（10 フレーム分）で、どのシーンでもシグルの体の大部分はノアと重なっている |
-| 低 | 🆕 Stage_1_3 の音楽生物（`Enemy_Base`、Dynamic・半径 0.49） | ノアが触れたまま止まると、少しずつ押し出される（上の不具合のきっかけの1つ）。動かない敵なら Kinematic にするか、プレイヤーとの押し合いをなくすとよい |
+| 低 | 🆕 `Player/PlayerFollower.cs`・`PlayerHistory.cs`・`CharaBase/CharacterSorting.cs`（成田さん。2026-11-14 に再生で再現） | **シグルがノアにぴったり重なって隠れることがある**（ユーザーが報告した「1-3 の戦闘でシグルが消える」は別の原因＝Stage_1_Boss を直接再生すると合流のフラグが OFF でシグルが最初からいない。仕様どおり。最初から遊ぶと起きない）。原因：シグルは「ノアの位置の記録の 10 件前」に付いていくが、記録はどんなに小さな動きでも1件増える。ノアが円い歩ける範囲の縁に押し当てて縁に沿ってずれる・音楽生物（Dynamic）に触れて押される間は、1 フレームに 0.001 マスほどの記録が積もり、シグルがノアに 0.001〜0.03 マスまで重なる。シグルの方が少しでも上にいると `CharacterSorting` が描く順番を 99（ノアの 100 の奥）にするので、完全に隠れる。四角い範囲の端では位置が変わらず記録が増えないので、ほかのシーンでは起きにくい。再現：Stage_1_Boss で戦闘を始め、右へ歩き続けて右下のティンパニの縁に押し当てる（間隔 0.033・順番 99）。**そもそも普通に歩いているときの間隔も 0.3〜0.55 マス**（10 フレーム分）で、どのシーンでもシグルの体の大部分はノアと重なっている |
+| 低 | 🆕 Stage_1_Boss の音楽生物（`Enemy_Base`、Dynamic・半径 0.49） | ノアが触れたまま止まると、少しずつ押し出される（上の不具合のきっかけの1つ）。動かない敵なら Kinematic にするか、プレイヤーとの押し合いをなくすとよい |
 | 低 | 🆕 `Attack/Player/TimingGaugeAttackController.cs`・`UI/AttackArcGauge/TimingGaugeUI.cs`（成田さん） | タイミングゲージ攻撃の**成功・失敗の音を鳴らす欄がない**（素材 SE-09 success / fail はある）。今の Attack Se はゲージを出した瞬間に鳴る欄なので空のまま。判定のところ（パーフェクト・グッド・ミス）に SE の欄を足す必要がある |
 | 低 | 🆕 音の素材（2026-11-14） | 音量の差：音楽生物の攻撃（SE-18）が他より約 10dB 大きい（SeData の音量で 0.34〜0.38 に下げた）。仕掛けのスイッチ（SE-22_switch、RMS -36dB）・床スイッチ・箱を押す・守りの始まり（-28dB）がかなり小さい（音量 1 でも小さいので、素材側で上げてほしい）。追跡の曲 BGM-04 は 5 分（注文は 1 分前後のループ）。BGM-09 は mp3（ループするならつなぎ目に隙間が出やすい） |
 | 中 | `Bgm/Effects/BgmProgress.cs` | 進行度（static）が `SubsystemRegistration` でリセットされない（ドメインリロード無効のエディタで前回の値が残る）。セーブもされず、はじめから・つづきからでも戻らない |
@@ -283,14 +283,14 @@
 ### シーンの設定
 | 場所 | 内容 |
 |---|---|
-| Stage1_1 / Stage1_2 / Stage_1_3 / SampleScene の `MapEntity/OB_TRbox` | 宝箱の Id が空（シーンチェックでエラー。ほかの宝箱と開いた記録が混ざる） |
+| Stage1_0 / Stage1_1 / Stage1_2 / Stage_1_Boss / SampleScene の `MapEntity/OB_TRbox`（と、使っていない `Event`〔EventZone が空〕） | 宝箱の Id が空（シーンチェックでエラー。ほかの宝箱と開いた記録が混ざる） |
 | 🆕 シグルのアニメ（`Data/Animation/Sample/Anim_Sample_Sigle`） | 待機（Idle）しかなく、歩くと絵が止まったまま滑る。ノアも歩き・待機とも仮の絵（res_kari）。素材の一覧は `Docs/素材チェックリスト.xlsx` |
 | 🆕 音の欄で残っている物（2026-11-14 に素材を入れたあと） | ノアのタイミングゲージの成功・失敗（欄がない）、宝箱（古い仕組み）、敵の部位が壊れた・スポナー・やり直す位置の音、Stage1_1 の BGM（砂漠、BGM_Stage1 のまま）。二層の曲（BGM-07〜09）は入れただけ。一覧は `Docs/素材チェックリスト.xlsx` |
-| 🆕 Stage_1_3 の `Event`（Stage1_1 のコピーの残り） | EventZone の中身が空・Is Trigger の Collider2D がない（シーンチェックでエラー。何も起きないので害はない。不要なら消してよい） |
+| 🆕 Stage_1_Boss の `Event`（Stage1_1 のコピーの残り） | EventZone の中身が空・Is Trigger の Collider2D がない（シーンチェックでエラー。何も起きないので害はない。不要なら消してよい） |
 | 同じ3シーンの `Event`（ルート） | 中身が空の EventZone / EventSequence。Is Trigger の Collider2D もない（シーンチェックでエラー・注意が出るが、動作上の害はない。不要なら消す） |
 | 🆕 Stage1_1 の `Event/DialogueEventZone` | 入ると古い会話（非表示の `OB_Text` の Dialogue）を出す EventZone が、マップの右側（-106.8, 17.3）に残っている。OP とは別。要らなければ消す |
-| 🆕 Stage_1_3 の音楽生物・弾・アイテム | 絵は仮（紫の丸い生き物・調律後の水色の絵・丸い弾・ハート・青い菱形）。音は空欄。左の出口の先（台本 F1_13 の階段・二層）のシーンはまだない |
-| 🆕 Stage_1_3（ティンパニ部屋。作りかけ） | Stage1_1 のコピーが元なので、使わない物（`soto_*`・`OB_*`・`Event`・古い `EnemySpawner` など）が非表示で残っている。`SavePoint` は部屋の外にあったので非表示にした。`Grid/room_timpani_yuka_0`（床だけの絵）が `soto_yuka`（部屋全体の絵）の下に少しずれて重なっている。左の出入口は歩ける範囲の外 |
+| 🆕 Stage_1_Boss の音楽生物・弾・アイテム | 絵は仮（紫の丸い生き物・調律後の水色の絵・丸い弾・ハート・青い菱形）。音は空欄。左の出口の先（台本 F1_13 の階段・二層）のシーンはまだない |
+| 🆕 Stage_1_Boss（ティンパニ部屋。作りかけ） | Stage1_1 のコピーが元なので、使わない物（`soto_*`・`OB_*`・`Event`・古い `EnemySpawner` など）が非表示で残っている。`SavePoint` は部屋の外にあったので非表示にした。`Grid/room_timpani_yuka_0`（床だけの絵）が `soto_yuka`（部屋全体の絵）の下に少しずれて重なっている。左の出入口は歩ける範囲の外 |
 | 🆕 Stage1_2 の追跡の敵（`Stage1_2_イベント/塔の化け物`） | 見た目が仮（敵の共通プレハブの絵＝シグルに似た絵）。敵の画像ができたら `EnemyData_Stage1_2_Chaser` の Sprite / Animation に入れる。ランタンも仮の丸（`見た目（仮）`） |
 | 🆕 シグルのアニメのデータ（`Anim_Sample_Sigle`） | 「Walk」の動きがないので、歩いても立ち姿のまま動く（ついてくるとき・Stage1_2 の助けの場面で歩いてくるとき）。ノアのデータには Walk がある |
 | 🆕 Stage1_2 のガレキ・シグルの攻撃 | 仮の絵（四角を並べたガレキ、プレイヤーの弾の絵）。絵ができたら差し替える |

@@ -1,6 +1,6 @@
-// Stage_1_3 段階2：ペグ（各ティンパニに3つ）を置く
+// Stage_1_Boss 段階2：ペグ（各ティンパニに3つ）を置く
 var scene = UnityEditor.SceneManagement.EditorSceneManager.GetActiveScene();
-if (scene.path != "Assets/Scenes/Stage_1_3.unity") scene = UnityEditor.SceneManagement.EditorSceneManager.OpenScene("Assets/Scenes/Stage_1_3.unity", UnityEditor.SceneManagement.OpenSceneMode.Single);
+if (scene.path != "Assets/Scenes/Stage_1_Boss.unity") scene = UnityEditor.SceneManagement.EditorSceneManager.OpenScene("Assets/Scenes/Stage_1_Boss.unity", UnityEditor.SceneManagement.OpenSceneMode.Single);
 var sb = new System.Text.StringBuilder();
 var root = UnityEngine.GameObject.Find("ティンパニ部屋");
 if (root == null) return "no root";
