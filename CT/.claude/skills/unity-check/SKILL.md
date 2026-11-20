@@ -40,4 +40,4 @@ Invoke-UnityEval -Code 'UnityEngine.Application.persistentDataPath'
 
 ## 注意
 - コードを変えた直後はリロード中で `EDITOR_NOT_RUNNING` になることがある → スクリプトが `status --until-ready` で待つ。
-- .ps1 に日本語を書かない（BOM なしだと文字化けして構文エラー）。関数名 `H` は使わない（Get-History の別名）。
+- .ps1 に日本語を書くなら UTF-8 の BOM 付き（BOM なしだと文字化けして構文エラー。Write／Edit のあとフック `bom-ps1` が自動で付ける）。関数名 `H` は使わない（Get-History の別名）。

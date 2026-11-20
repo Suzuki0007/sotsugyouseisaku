@@ -8,12 +8,13 @@
 # During the run the Input System is switched to "all device input goes to the Game view / ignore focus" so "key" lines
 # reach the game even when the editor is in the background; the original settings are restored at the end.
 # Commands (one per line, '#' = comment, "  #" starts a trailing comment):
-#   scene <Scene> | invincible on|off | save on | flag <FlagAsset> on|off | advance all|<n>|battle | wait <sec>|idle|battle|scene <Scene>
+#   scene <Scene> | invincible on|off | save on | flag <FlagAsset> on|off | advance all|<n>|battle
+#   wait <sec>|idle|battle|scene <Scene>|until <sec> <C# bool>
 #   warp x,y | run <Hierarchy/Path> | key <Key> [ms] | button <GameObjectName> | tighten all | kill | autosave | reload | title
 #   capture <name> | eval <C# statements; return value>
 #   expect flag <FlagAsset> on|off | expect party <Together|Waiting|Separated> | expect scene <Scene> | expect near x,y [r]
 #   expect talk <text part> | expect idle | expect reach all|<name part> | expect no-error | expect prompt <text part>
-#   expect selected <GameObjectName> | expect eval <C# bool expression>
+#   expect selected <GameObjectName> | expect eval <C# bool expression> | expect within <sec> <C# bool expression>
 # ASCII only (scenario files are UTF-8 and may contain Japanese).
 param(
     [Parameter(Mandatory = $true)][string]$Name,
@@ -145,6 +146,11 @@ try {
                 switch ($p[0]) {
                     "idle"   { if (-not (WaitUntil $idleCond 30)) { Write-Output "       (still busy after 30 s)" } }
                     "battle" { if (-not (WaitUntil "BattleArea.AnyActive" 30)) { Write-Output "       (no battle after 30 s)" } }
+                    "until"  {
+                        # wait until <sec> <C# bool expression>   (timing-dependent checks: wait for the state, not for a fixed time)
+                        $q = $p[1] -split "\s+", 2
+                        if (-not (WaitUntil $q[1] ([int]$q[0]))) { Write-Output ("       (not true after " + $q[0] + " s)") }
+                    }
                     "scene"  { if (-not (WaitUntil ("UnityEngine.SceneManagement.SceneManager.GetActiveScene().name == `"" + (Esc $p[1]) + "`" && " + $playerReady) 40)) { Write-Output "       (scene not reached)" }; Start-Sleep -Milliseconds 800 }
                     default  { Start-Sleep -Milliseconds ([int]([double]$p[0] * 1000)) }
                 }
@@ -208,6 +214,13 @@ try {
                     "prompt" { $v = E 'var v = UnityEngine.Object.FindAnyObjectByType<InteractPromptView>(); if (v == null) return "(no view)"; var t = v.GetComponentInChildren<TMPro.TextMeshPro>(true); return t.gameObject.activeSelf ? t.text : "(hidden)";'; Record $no $line ("$v".Contains($rest)) $v }
                     "selected" { $v = E 'var es = UnityEngine.EventSystems.EventSystem.current; var s = es != null ? es.currentSelectedGameObject : null; return s != null ? s.name : "(none)";'; Record $no $line ($v -eq $rest) ("is " + $v) }
                     "eval" { $v = E ("return (" + $rest + ") ? `"True`" : `"False`";"); Record $no $line ($v -eq "True") $v }
+                    "within" {
+                        # expect within <sec> <C# bool expression>   PASS as soon as it becomes true (polls every 0.5 s)
+                        $q = $rest -split "\s+", 2
+                        $sw = [Diagnostics.Stopwatch]::StartNew()
+                        $ok = WaitUntil $q[1] ([int]$q[0])
+                        Record $no $line $ok ($(if ($ok) { "true after " + [math]::Round($sw.Elapsed.TotalSeconds, 1) + " s" } else { "not true within " + $q[0] + " s" }))
+                    }
                     default { Record $no $line $false "unknown expect" }
                 }
             }

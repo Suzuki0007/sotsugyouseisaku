@@ -6,8 +6,9 @@ var scene = OpenSceneSafe(ScenePath);
 UnityEditor.AssetDatabase.Refresh();
 System.Func<string, UnityEngine.GameObject> FindRoot = n => { foreach (var g in scene.GetRootGameObjects()) if (g.name == n) return g; return null; };
 var room = FindRoot("T字通路（Stage1_4）"); if (room == null) throw new System.Exception("先に corridor_1_scene");
-if (room.transform.Find("仕掛けとイベント") != null) throw new System.Exception("もう組んである。corridor_1_scene から流し直す");
 var objs = room.transform.Find("物");
+// もう組んであるなら、中身だけ作り直す（11-20。配置を変えたときは corridor_1_scene から）
+{ var built = room.transform.Find("仕掛けとイベント"); if (built != null) { UnityEngine.Object.DestroyImmediate(built.gameObject); StripContents(objs); } }
 
 System.Func<float, float, UnityEngine.Vector3> P = (x, y) => new UnityEngine.Vector3((x - 1080f) / 100f, (720f - y) / 100f, 0f);
 System.Func<string, UnityEngine.Object> A = path => { var o = UnityEditor.AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(path); if (o == null) throw new System.Exception("no asset " + path); return o; };
@@ -84,7 +85,7 @@ React("東の管の震え", new[]{ new object[]{ E, true } }, new[]{ Obj("東の
 React("シグル：E3 から南向き", new[]{ new object[]{ Done, true } }, new[]{ sigleS }, new[]{ sigleN });
 
 // ---------------- E1 入ったとき（書斎から。1回だけ） ----------------
-var arrive = room.transform.Find("着いたとき（使うなら表示する）").gameObject; arrive.name = "E1 入ったとき（1回だけ）"; arrive.SetActive(true);
+var arrive = (room.transform.Find("着いたとき（使うなら表示する）") ?? room.transform.Find("E1 入ったとき（1回だけ）")).gameObject; arrive.name = "E1 入ったとき（1回だけ）"; arrive.SetActive(true);
 foreach (var c in arrive.GetComponents<EventAction>()) UnityEngine.Object.DestroyImmediate(c);
 { var st = arrive.GetComponent<SceneStartEvent>(); var so = new UnityEditor.SerializedObject(st); CondF(so, "condition", new[]{ new object[]{ "Flag_TC_EnterSeen", false } }); so.FindProperty("delay").floatValue = 0.4f; so.ApplyModifiedPropertiesWithoutUndo(); }
 FaceNoah(arrive, 0); AddWait(arrive, 0.3f); Talk(arrive, "F1_TC_Enter"); SetF(arrive, "Flag_TC_EnterSeen", true); AutoSv(arrive);

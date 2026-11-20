@@ -27,7 +27,7 @@ if ($List -or -not $Recipe) {
 $path = Join-Path $dir ($Recipe.Replace(".cs", "") + ".cs")
 if (-not (Test-Path $path)) { Write-Output "[ERROR] no recipe: $path"; exit 2 }
 
-$guard = Invoke-UnityEval -Code 'if (UnityEditor.EditorApplication.isPlaying) return "PLAYING"; var s = UnityEditor.SceneManagement.EditorSceneManager.GetActiveScene(); return s.isDirty ? "DIRTY " + s.path : "OK " + s.path;'
+$guard = Invoke-UnityEval -Code 'if (UnityEditor.EditorApplication.isPlaying) return "PLAYING"; for (int i = 0; i < UnityEditor.SceneManagement.EditorSceneManager.sceneCount; i++) { var d = UnityEditor.SceneManagement.EditorSceneManager.GetSceneAt(i); if (d.isDirty) return "DIRTY " + d.path; } return "OK " + UnityEditor.SceneManagement.EditorSceneManager.GetActiveScene().path;'
 if ($null -eq $guard) { Write-Output "[ERROR] editor not reachable"; exit 3 }
 if ($guard -eq "PLAYING") { Write-Output "[ERROR] stop play mode first (end.ps1)"; exit 4 }
 if ($guard.StartsWith("DIRTY")) { Write-Output "[ERROR] the open scene has unsaved changes ($guard). Ask the user before running a recipe."; exit 5 }

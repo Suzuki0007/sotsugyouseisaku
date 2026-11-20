@@ -78,7 +78,65 @@ public static class SceneChecker
         CheckSignals(ctx);
         CheckAutoSave(ctx);
         CheckStartPositions(ctx);
+        CheckSpawnTriggers(ctx);
         CheckPrompts(ctx);
+    }
+
+    /// <summary>
+    /// 出現位置に立ったとき、ノアの足元の当たり判定が「入ると動く範囲」（出口・エリアに入ったら動くイベント）に重なっている
+    /// （着いた瞬間にそのイベントが動く。シーン移動で着いたときは暗転中で反応しないことが多く、直接再生のときだけ起きるので気づきにくい。11-20 の Stage1_4）
+    /// </summary>
+    private static void CheckSpawnTriggers(Context ctx)
+    {
+        // ノアの足元の当たり判定（プレハブの CircleCollider2D。なければ 11-20 時点の値）
+        Vector2 footOffset = new Vector2(0.0f, -0.61f);
+        float footRadius = 0.40f;
+        var points = new List<KeyValuePair<Transform, string>>();
+        foreach(PlayerPartySpawner spawner in ctx.Find<PlayerPartySpawner>())
+        {
+            var so = new SerializedObject(spawner);
+            var noah = so.FindProperty("noahPrefab").objectReferenceValue as GameObject;
+            if(noah != null && noah.TryGetComponent(out CircleCollider2D circle))
+            {
+                Vector3 s = noah.transform.lossyScale;
+                footOffset = new Vector2(circle.offset.x * s.x, circle.offset.y * s.y);
+                footRadius = circle.radius * Mathf.Max(Mathf.Abs(s.x), Mathf.Abs(s.y));
+            }
+            var def = so.FindProperty("noahSpawnPoint").objectReferenceValue as Transform;
+            if(def != null) { points.Add(new KeyValuePair<Transform, string>(def, "シーンを直接再生したときの位置")); }
+        }
+        foreach(PlayerSpawnPoint point in ctx.Find<PlayerSpawnPoint>())
+        {
+            if(!point.gameObject.activeInHierarchy) { continue; }
+            points.Add(new KeyValuePair<Transform, string>(point.NoahPoint, $"出現位置「{point.SpawnPointId}」"));
+        }
+        if(points.Count == 0) { return; }
+
+        Physics2D.SyncTransforms();
+        foreach(var p in points)
+        {
+            Vector2 center = (Vector2)p.Key.position + footOffset;
+            foreach(Collider2D col in Physics2D.OverlapCircleAll(center, footRadius))
+            {
+                if(col == null || !col.isTrigger || !col.enabled) { continue; }
+                string what = EnterTriggerKind(col);
+                if(what == null) { continue; }
+                ctx.Add(Level.Warning, col, $"{p.Value}に着くと、ノアの足元（中心から下へ約 {-footOffset.y + footRadius:0.0} マス）がこの{what}の範囲に重なり、着いた瞬間に動きます。範囲を離すか、出現位置をずらしてください（直接再生のときだけ起きることが多い）");
+            }
+        }
+    }
+
+    /// <summary> 入ると動く範囲の種類（違えば null） </summary>
+    private static string EnterTriggerKind(Collider2D col)
+    {
+        if(col.GetComponent<SceneChange>() != null) { return "出口（SceneChange）"; }
+        if(col.GetComponent<EventZone>() != null) { return "イベント（EventZone）"; }
+        if(col.TryGetComponent(out ItemInteraction interaction))
+        {
+            var trigger = new SerializedObject(interaction).FindProperty("trigger");
+            if(trigger != null && trigger.enumValueIndex == (int)ItemInteraction.TriggerType.EnterArea) { return "「エリアに入ったとき」の調べる物（ItemInteraction）"; }
+        }
+        return null;
     }
 
     //=====================================================================

@@ -50,6 +50,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .claude/skills/asset-audit/s
 
 - キーの元は `data/keys.tsv`（ID → キー）。キーがない行（今後の素材・質の改善など）は手で確認する。
 - 行を足すとき・キーを直すときは、`keys.tsv` も直して `-SetKeys`（チームがキーを直していないなら `-ForceKeys`）。
+- **代用の記録**（11-20）：ない素材を別の物で代用したら（シグルの後ろ向きの絵がないので正面の絵、など）、レシピで `Substitute("確認キー", "ない素材", "代わりに使った物", "場所")`（`_helpers.cs`）を呼ぶ → `data/substitutes.tsv` に1行。レシピを使わずに代用したときは表に直接書く。`-NewSlots` で「どの行のキーにも入っていない代用」が出る → チェックリストに行を足す（キー列に表の1列目をそのまま）。本物が入って解決した代用は `[resolved]` と出るので表から消す。
 - `-NewSlots` に出したくない欄（空でよい欄：共通の音で代わりに鳴る・使うときだけ入れる・古い仕組み）は `data/ignore.tsv` に理由と一緒に書く。
 
 ## 使い方シートだけ直す（`scripts/howto.ps1`）

@@ -25,7 +25,7 @@ paths:
   - **終了時・タイトルへ戻るとき・シーンを読み込んだときは書かない**（以前は書いていて、「進み具合は新しいのに再開位置はシーンに着いた所」になり、Stage1_2 でガレキの向こう＝入口側から始まって進めなくなった）。
   - **入口に戻れなくなる・通り道が変わるイベントの最後には必ず部品「オートセーブ」を置く**。置いてある所：Stage1_2 の助けの場面の最後（シグル合流）・Stage1_0 の `OP_はじめ` の最後（11-19 から OP は Stage1_0。Stage1_1 の物は流れない）・Stage_1_Boss の `全部調律できたとき（会話）` の最後。
   - シーンを出るとき（`SceneChange`）は Commit だけ（行き先に着いたときに書く）。
-- **ロードの確かめ（ときどき行う。ユーザーの指示）**：イベントを足したら、イベントの前・途中・後で `GameSession.ReturnToTitle()` → `GameSession.Continue(Save.AutoSlot, "Stage1_1")` を eval で呼び、出た位置から進めるか・イベントが繰り返さないかを見る（`unity-playtest` でバックアップしてから。直接再生のときは先に `Save.StartNewGame()` でセーブを有効にする）。
+- **ロードの確かめ（ユーザーの指示）**：ふだんはそのシーンのテストシナリオの `reload` 行で済ませる（合格なら手で試し直さない。11-20 合意）。シナリオがない通り道だけ手で：イベントを足したら、イベントの前・途中・後で `GameSession.ReturnToTitle()` → `GameSession.Continue(Save.AutoSlot, "Stage1_1")` を eval で呼び、出た位置から進めるか・イベントが繰り返さないかを見る（`unity-playtest` でバックアップしてから。直接再生のときは先に `Save.StartNewGame()` でセーブを有効にする）。
 - `GameSession`：`StartNewGame` / `Continue` / `ReturnToTitle` / `SaveAt`、プレイ時間（`PlayTimeCounter`）、データ切り替え時の状態リセット（`InventoryManager.ReloadFromSave`、一時フラグ）。
 - `SaveSlotInfo`：`Meta/Scene`・`Meta/SpawnPoint`・`Meta/HasPos`・`Meta/PosX/Y`・`Meta/PlayTime`・`Meta/SavedAt`。再開は `PlayerSpawnPoint.PendingSpawnPointId` か `PendingPosition`。
 - `AutoSave`：起動時は読み込まない（タイトルで選ぶ）。**エディタでステージから直接再生**したときだけ、デバッグウィンドウの「ステージから再生するとき」（EditorPrefs、初期値 0 = 使わない）のスロットを読む。

@@ -153,12 +153,14 @@ try {
     $nRes = 0; $nNot = 0; $nMan = 0; $nMoved = 0
     $report = New-Object System.Collections.ArrayList
     $coveredSlots = New-Object System.Collections.Generic.HashSet[string]
+    $allKeyTexts = New-Object System.Collections.ArrayList
     for ($r = 2; $r -le $lastRow; $r++) {
         $id = [string]$ws.Cells.Item($r, $col[$A.idHeader]).Value2
         if (-not $id) { continue }
         $name = if ($col.ContainsKey($A.nameHeader)) { [string]$ws.Cells.Item($r, $col[$A.nameHeader]).Value2 } else { "" }
         $progress = [string]$ws.Cells.Item($r, $col[$A.progressHeader]).Value2
         $keyText = if ($col[$A.keyHeader] -gt 0) { [string]$ws.Cells.Item($r, $col[$A.keyHeader]).Value2 } else { "" }
+        if ($keyText) { [void]$allKeyTexts.Add($keyText) }
         if (-not $keyText) {
             $nMan++
             if ($Apply -and $col[$A.resultHeader] -gt 0) { $ws.Cells.Item($r, $col[$A.resultHeader]).Value2 = $A.manual }
@@ -199,6 +201,22 @@ try {
             Where-Object { -not $coveredSlots.Contains($_.comp + "." + $_.field) -and -not $ignore.Contains($_.comp + "." + $_.field) } |
             Group-Object { $_.comp + "." + $_.field + "  @" + $_.where } | Sort-Object Name |
             ForEach-Object { Write-Output ("  {0}  x{1}  e.g. {2}" -f $_.Name, $_.Count, $_.Group[0].obj) }
+
+        # substitutes recorded by recipes (Substitute helper) that no checklist row's key covers yet
+        $subFile = Join-Path $skill "data\substitutes.tsv"
+        if (Test-Path $subFile) {
+            Write-Output ""
+            Write-Output "substitutes (data/substitutes.tsv) not covered by any row's key -> add a row (key column = the first column):"
+            $nSub = 0
+            foreach ($l in (Get-Content $subFile -Encoding UTF8 | Select-Object -Skip 1)) {
+                $p = $l -split "`t"; if (-not $p[0]) { continue }
+                $covered = @($allKeyTexts | Where-Object { ($_ -split ";") -contains $p[0] }).Count -gt 0
+                $t = Test-Key $p[0]
+                if ($t.ok) { Write-Output ("  [resolved] {0} ({1}) -> remove the line from substitutes.tsv" -f $p[0], $p[3]); continue }
+                if (-not $covered) { Write-Output ("  {0} | {1} | instead: {2} | {3} | {4}" -f $p[0], $p[1], $p[2], $p[3], $p[4]); $nSub++ }
+            }
+            if ($nSub -eq 0) { Write-Output "  (none)" }
+        }
     }
 
     if ($Apply -or ($SetKeys -and ($changed -gt 0 -or $hdrChanged))) {

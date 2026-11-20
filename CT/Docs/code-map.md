@@ -1,6 +1,6 @@
 # コード構成と問題点（開発者・Claude 向け）
 
-最終更新：2026-11-20（TimpaniPeg に初めての説明・案内の欄。上陸 Stage1_0〜Stage1_2 入口の問題点。PuzzleCheck の欄・書斎 Stage1_3 の問題点）。2026-11-13（性能の計測 PerfMonitor を追加。性能の点検スキル perf-review と Project Auditor で全体を点検し、問題点に追記：ビルドのコンパイル失敗〔PlayerFollower〕・品質レベル・static のリセット漏れの疑い など）。**毎回は自動で読み込まない**（2026-11-12 から。機能ごとの説明は `.claude/rules/`）。コードを触る前に関係する節を読み、コードを変えたら、この表も更新すること。
+**毎回は自動で読み込まない**（2026-11-12 から。機能ごとの説明は `.claude/rules/`）。コードを触る前に関係する節を読み、コードを変えたら、この表も更新すること。
 ファイルの参照は `Assets/Script/` からの相対パス。行番号は目安。
 
 ---
@@ -164,7 +164,9 @@
 ### プランナー用ツール・その他
 | ファイル | 役割 |
 |---|---|
-| 🛠`Common/Editor/`（SceneChecker / SceneCheckWindow / DebugWindow / SceneLookup / PickerDrawers）、`Common/Attributes/PickerAttributes.cs` | ③④⑤（デバッグウィンドウに「イベント（その場で試す）」〔EventSequence を名前で絞り込んで実行・止める、11-13〕、「敵」：止める・経路の表示・倒す・**攻撃を出させる**・スポナー／グループの状態。シーンチェックに敵・敵の通行設定エリア・倒した記録のキーの重なり・グループ・ウェーブ・スポナー。11-14：合図・オートセーブの置き忘れ・出現位置／やり直す位置が壁や範囲の外・キーの案内が出ない物・会話の長さ〔F2〕。`QuickReferenceBuilder`〔F3〕：Tools > 手順書 > 早見表を作り直す → `Docs/早見表（自動）.md`〔メニュー・イベントの部品・コンポーネントの項目と Tooltip・データ・標準の合図をコードから〕） |
+| 🛠`Common/Editor/`（SceneChecker / SceneCheckWindow / DebugWindow / SceneLookup / PickerDrawers）、`Common/Attributes/PickerAttributes.cs` | ③④⑤（デバッグウィンドウに「イベント（その場で試す）」〔EventSequence を名前で絞り込んで実行・止める、11-13〕、「敵」：止める・経路の表示・倒す・**攻撃を出させる**・スポナー／グループの状態。シーンチェックに敵・敵の通行設定エリア・倒した記録のキーの重なり・グループ・ウェーブ・スポナー。11-14：合図・オートセーブの置き忘れ・出現位置／やり直す位置が壁や範囲の外・キーの案内が出ない物・会話の長さ〔F2〕。11-20：出現位置・直接再生の位置でノアの足元が出口・入ると動く範囲に重なる〔`CheckSpawnTriggers`〕。`QuickReferenceBuilder`〔F3〕：Tools > 手順書 > 早見表を作り直す → `Docs/早見表（自動）.md`〔メニュー・イベントの部品・コンポーネントの項目と Tooltip・データ・標準の合図をコードから〕） |
+| 🛠`Common/Editor/FlowMap.cs` | 仕掛けの流れ図（11-20。Tools > 手順書 > 仕掛けの流れ図を作り直す・`FlowMap.Build()`）。Build Settings の全シーンを重ねて開き（保存しない）、MonoBehaviour の保存される欄を反射でたどって「条件（FlagCondition・ItemCondition〔notHave は届く判定に使わない〕・GimmickCondition）→ EventSequence の中身（SetFlag・ItemGive／Take・Gimmick・Note・SceneChange）」をつなぎ、`Docs/仕掛けの流れ/<シーン>.md`（Mermaid と表）と README に書く。点検：どこからも ON にならないフラグ・条件がそろわない物（そろう物がなくなるまで繰り返す近似。シーンの順番は見ない）・一度に変わる物が多い所（5 以上。見た目だけの物は数えず、同じ親のスイッチは1つ）。例外は `Docs/仕掛けの流れ/_例外.tsv` |
+| 🛠`Common/Editor/MapShot.cs` | 配置の撮影（11-20。Tools > シーンチェック > 配置を撮影する・`MapShot.Capture(パス, 1マスの px)`、`room-build/scripts/mapshot.ps1`）。MapBounds の絵（なければ絵の全部）の範囲を一時カメラで撮り、WalkArea の外を暗く・1 マスの線・Collider2D の範囲を種類の色で重ね、出現位置にノアの足元の丸を描いて PNG（`Temp/MapShot/`）。出現位置の座標（左上基準・中心基準）も返す |
 | `Common/Attributes/LabelAttribute.cs`（`[SerializeReference]` の部品はクラス名を変えるとデータが消える。変えるときは `[MovedFrom]`）、🛠`Common/Editor/LabelDrawer.cs` | `[Label("日本語")]`：Inspector の項目名（InspectorName は enum の値にしか効かないため）。`[Label("名前", min)]` / `[Label("名前", min, max)]` で最小値・スライダー。リストには付けない |
 | `Common/GameCondition.cs` | 条件のまとめ（フラグ・アイテム〔既存の FlagCondition / ItemCondition をそのまま中に持つ〕・操作中のキャラ・パーティーの体力・プレイヤーがいる範囲・**仕掛けの状態** `gimmicks`・**2人の状態** `party`）。`IsMet` / `AllMet` / `AnyMet` |
 | `Gimmick/GimmickState.cs` | **仕掛けの状態**（謎解き段階1）。**時間で戻る**（段階2：戻るまでの秒数・残り時間の音・戻ったときの音、`RemainingTime`。InputBlock の間は進まない、入り直したら最初から）。ON/OFF か 0〜n の段階、最後の次は最初へ、変わったときのイベント、`Changed` イベント、セーブ（`Gimmick/<シーン>/<ID か階層パス>`、固定は `/Locked`）、`Set`（固定中は force のときだけ）/`TurnOn`/`TurnOff`/`Toggle`/`Advance`/`ResetValue`/`SetLocked`、`All` |
@@ -224,7 +226,7 @@
 | 低 | 🆕 上陸の仮の物（11-20） | 砂漠の怪物の見た目は Stage1_2 の化け物と同じ仮（キャラのような絵）。手紙の紙・塔のスチル・Stage1_2 の入口の扉（書斎の扉A の絵を使い回し）は仮。音（音叉の震え＝キーーーン、振動（中）＝地響き短、（大）＝地響き長＋うなり声）は今ある素材の仮。Stage1_0 の歩ける範囲は仮の四角（マスク画像から作り直す）。小舟で岸へ進む間、ノアは歩くアニメになる（部品「物を動かす」でノアを動かすと歩くアニメ） |
 | 低 | 🆕 Stage1_0 の海の当たり判定（`Grid/soto_yuka` の BoxCollider2D 3つ）をオフにした（11-20） | 小舟が海の上を進めるように。代わりに歩ける範囲（WalkArea）で海に入れない。消してはいないので、戻すならオンにする（ただし海の上の小舟の場面でノアが押し出される） |
 | 中 | 🆕 Stage_1_Boss へつながる道がない（11-20） | 書斎の仕様で合流をボスの前へ移したため、Stage1_2 の正面の扉（合流が条件）は使われない。書斎 → T字通路（Stage1_4）まではつながったが、その左右の部屋・扉を開ける大なぞ・合流地点がまだない。ボスは直接再生（`timpani.txt`）でだけ確かめられる |
-| 低 | 🆕 Stage1_2 の追跡で、化け物の足音（moveLoopSe）の確認がよく不合格になる（11-20、未調査） | シナリオ `stage1_2_rescue` の 12 行目。追跡が始まった直後は鳴っておらず、待つと化け物が止まった状態（Paused）になっていた（捕まってやり直しになったのか、動いていないのかは未確認）。ユーザーの指示で調査は保留 |
+| 低 | 🆕 Stage1_2 の追跡で、化け物の足音（moveLoopSe）が鳴っているかの確認がよく不合格になっていた（11-20、未調査） | 追跡が始まった直後は鳴っておらず、待つと化け物が止まった状態（Paused）になっていた（捕まってやり直しになったのか、動いていないのかは未確認）。ユーザーの指示で調査は保留。シナリオ `stage1_2_rescue` は「足音が設定されているか」の確認に変えた（鳴るかは耳で） |
 | 低 | 🆕 T字通路の仮の物（11-20） | シグル（NPC）の後ろ向きの絵がない（北向きも正面の絵）。左右の出口は一言だけ（部屋がない）。`Flag_TC_WestPipeOn`／`EastPipeOn` を立てる所がない。ランプ2つのときの扉・シグルの反応は未定義。歩ける範囲は仮の四角 |
 | 低 | 🆕 非表示の物の GimmickState はセーブから読まれない（11-20 書斎で気づいた） | GimmickState の Awake は表示されたときに走るので、最初から非表示の物の状態を条件（GimmickCondition）に使うと、表示されるまで最初の値のまま。条件に使う状態は表示したままの物に置くか、フラグにする（書斎の T2 調律はフラグにした） |
 | 低 | 🆕 MoveObjectEventAction の「ずらす量」の既定値が (0, 8) | 「目印へ動かす」でも足されるので、レシピ・Inspector で目印へ動かすときは 0 にする（書斎で上へ 8 マス飛んだ） |

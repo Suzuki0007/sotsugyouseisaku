@@ -5,8 +5,9 @@ var scene = OpenSceneSafe(ScenePath);
 UnityEditor.AssetDatabase.Refresh();
 System.Func<string, UnityEngine.GameObject> FindRoot = n => { foreach (var g in scene.GetRootGameObjects()) if (g.name == n) return g; return null; };
 var room = FindRoot("書斎（Stage1_3）"); if (room == null) throw new System.Exception("先に shosai_1_scene");
-if (room.transform.Find("仕掛けとイベント") != null) throw new System.Exception("もう組んである。shosai_1_scene から流し直す");
 var objs = room.transform.Find("物");
+// もう組んであるなら、中身だけ作り直す（11-20。配置を変えたときは shosai_1_scene から）
+{ var built = room.transform.Find("仕掛けとイベント"); if (built != null) { UnityEngine.Object.DestroyImmediate(built.gameObject); StripContents(objs); } }
 
 System.Func<float, float, UnityEngine.Vector3> P = (x, y) => new UnityEngine.Vector3((x - 720f) / 100f, (540f - y) / 100f, 0f);
 System.Func<string, UnityEngine.Object> A = path => { var o = UnityEditor.AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(path); if (o == null) throw new System.Exception("no asset " + path); return o; };
@@ -251,7 +252,7 @@ React("譜面箱の光とメモ：第1問のあと取るまで", new[]{ new obje
   var c = g.AddComponent<UnityEngine.CircleCollider2D>(); c.isTrigger = true; c.radius = 0.55f; Examine(g, "Shosai_SigleTalk", new[]{ t1, t2s }); }
 
 // ---------------- 着いたとき（シグルが仕掛け扉を殴る → 扉がロック） ----------------
-var arrive = room.transform.Find("着いたとき（使うなら表示する）").gameObject; arrive.name = "着いたとき（シグルが扉を殴る → ロック）"; arrive.SetActive(true);
+var arrive = (room.transform.Find("着いたとき（使うなら表示する）") ?? room.transform.Find("着いたとき（シグルが扉を殴る → ロック）")).gameObject; arrive.name = "着いたとき（シグルが扉を殴る → ロック）"; arrive.SetActive(true);
 foreach (var c in arrive.GetComponents<EventAction>()) UnityEngine.Object.DestroyImmediate(c);
 { var st = arrive.GetComponent<SceneStartEvent>(); var so = new UnityEditor.SerializedObject(st); Cond(so, "condition", new[]{ new object[]{ "Flag_Shosai_DoorsLocked", false } }, null, null); so.FindProperty("delay").floatValue = 0.2f; so.ApplyModifiedPropertiesWithoutUndo(); }
 MoveTo(arrive, sigle, mDoor, 0.01f); FaceNoah(arrive, 2); AddWait(arrive, 0.5f);

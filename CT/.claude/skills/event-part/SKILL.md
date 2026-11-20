@@ -67,6 +67,6 @@ public class XxxEventAction : EventAction
 
 ## 4. 文書
 - [ ] 早見表（自動）：`Invoke-UnityEval -Code 'return QuickReferenceBuilder.Build();'`。
-- [ ] `Docs/イベントの順番と待ち時間.md` の部品の表、`Docs/プランナー向け作業手順書.md`（付録の早見表）。
+- [ ] `Docs/イベントの順番と待ち時間.md` の部品の表（早見表は自動の物だけ。`QuickReferenceBuilder.Build()`）。
 - [ ] `Docs/code-map.md` の「3. スクリプト一覧」、`rules/event-item-flag-talk.md` の部品の一覧。
 - [ ] `finish-task` で締める。

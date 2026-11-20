@@ -60,7 +60,7 @@ foreach (var side in new[]{ new object[]{ "西のランプ", 988f }, new object[
   var anim = (SpriteAnimData)new UnityEditor.SerializedObject(sp.GetComponent<SpriteAnimator>()).FindProperty("data").objectReferenceValue;
   var aso = new UnityEditor.SerializedObject(anim);
   System.Func<string, UnityEngine.Sprite> First = prop => { var p = aso.FindProperty(prop); return p != null && p.arraySize > 0 ? (UnityEngine.Sprite)p.GetArrayElementAtIndex(0).objectReferenceValue : null; };
-  var up = First("up"); var down = First("down"); if (down == null) down = psr.sprite; if (up == null) { up = down; Log.Append("WARN Sigle has no up frames\n"); }
+  var up = First("up"); var down = First("down"); if (down == null) down = psr.sprite; if (up == null) { up = down; Substitute("anim:Sigle:up", "シグルの後ろ向き（北向き）の絵", "正面の絵", "Stage1_4 シグル（NPC）の絵_北向き"); }
   foreach (var v in new[]{ new object[]{ "絵_北向き（E3 の前）", up, true }, new object[]{ "絵_南向き（E3 から）", down, false } }) {
     var g = NewGO(t, (string)v[0], P(1245, 315)); var sr = g.AddComponent<UnityEngine.SpriteRenderer>(); sr.sprite = (UnityEngine.Sprite)v[1]; sr.sharedMaterial = psr.sharedMaterial; sr.sortingLayerID = psr.sortingLayerID; sr.sortingOrder = 98; g.transform.localScale = psr.transform.lossyScale; g.SetActive((bool)v[2]); } }
 
