@@ -16,7 +16,7 @@ using UnityEngine.Rendering.Universal;
 /// ・たいまつ：ゆれの強さ 0.15・速さ 3。水面のきらめき：強さ 0.4・速さ 0.7 くらい
 /// ・同じ設定の明かりを並べても、それぞれ違う揺れ方になる
 /// ・Hierarchy 右クリック > マップの見た目 > 明かり（ゆらぐ）で、明かりとまとめて作れる
-[AddComponentMenu("マップの見た目/明かりのゆらぎ（LightFlicker）")]
+[AddComponentMenu("マップの見た目/明かりのゆらぎ")]
 [DisallowMultipleComponent]
 [RequireComponent(typeof(Light2D))]
 public class LightFlicker : MonoBehaviour

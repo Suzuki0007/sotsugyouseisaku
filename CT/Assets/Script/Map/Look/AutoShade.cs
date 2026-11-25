@@ -16,7 +16,7 @@ using UnityEngine.Tilemaps;
 /// ・床のマスのうち、上に壁がある所・左右に壁がある所・壁と同じマス（縁が乗っている所）を薄い影に、角（上と横の両方）を濃い影にする
 /// ・マップを塗り直したら、もう一度押す（前の影は消してから塗る。この Tilemap に手で塗った物も消える）
 /// ・光が届きにくい隅が暗いと、部屋に奥行きが出る（Docs/マップチップの置き方.md）
-[AddComponentMenu("マップの見た目/隅の影（AutoShade）")]
+[AddComponentMenu("マップの見た目/隅の影")]
 [DisallowMultipleComponent]
 [RequireComponent(typeof(Tilemap))]
 public class AutoShade : MonoBehaviour

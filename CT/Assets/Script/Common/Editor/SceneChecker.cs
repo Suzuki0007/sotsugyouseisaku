@@ -80,6 +80,47 @@ public static class SceneChecker
         CheckStartPositions(ctx);
         CheckSpawnTriggers(ctx);
         CheckPrompts(ctx);
+        CheckDepthProps(ctx);
+    }
+
+    /// <summary>
+    /// 奥行きのある物（DepthProp）：前後の境目と当たり判定の関係（11-25。境目が当たり判定の上の端と同じ高さだと、キャラの前後が入れ替わる）
+    /// </summary>
+    private static void CheckDepthProps(Context ctx)
+    {
+        foreach(DepthProp prop in ctx.Find<DepthProp>())
+        {
+            if(!prop.TryGetFootprint(out Rect rect))
+            {
+                ctx.Add(Level.Error, prop, "奥行きのある物の子に絵（SpriteRenderer）がありません");
+                continue;
+            }
+            if(prop.sortMargin < 0.1f)
+            {
+                ctx.Add(Level.Warning, prop, $"前後の境目が当たり判定の上の端に近すぎます（{prop.sortMargin:0.##}）。キャラが当たり判定の上で止まったとき、向きなどで前後が入れ替わります（0.25 くらいに）");
+            }
+            prop.TryGetSortLine(out float line);
+            if(Mathf.Abs(prop.transform.position.y - line) > 0.01f)
+            {
+                ctx.Add(Level.Warning, prop, "奥行きのある物の位置が前後の境目とずれています（数字か絵を変えたあと）。Inspector の「当たり判定と境目を作り直す」を押してください");
+            }
+            if(prop.footprint == null)
+            {
+                ctx.Add(Level.Warning, prop, "奥行きのある物に足元の当たり判定がありません（キャラが中へ入れます）。「当たり判定と境目を作り直す」を押してください");
+            }
+            else
+            {
+                var box = prop.footprint.GetComponent<BoxCollider2D>();
+                if(box != null)
+                {
+                    Vector2 c = prop.footprint.transform.TransformPoint(box.offset);
+                    if(Vector2.Distance(c, rect.center) > 0.05f || Vector2.Distance(Vector2.Scale(box.size, prop.footprint.transform.lossyScale), rect.size) > 0.05f)
+                    {
+                        ctx.Add(Level.Warning, prop, "足元の当たり判定が今の絵・数字と合っていません。「当たり判定と境目を作り直す」を押してください");
+                    }
+                }
+            }
+        }
     }
 
     /// <summary>

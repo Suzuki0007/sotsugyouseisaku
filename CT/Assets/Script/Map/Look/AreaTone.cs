@@ -18,7 +18,7 @@ using UnityEngine.Rendering.Universal;
 /// ・例：浜辺は夕方の暖かい色、遺跡の中は暗く冷たい色（明かり〔Light 2D〕が映える）
 /// ・マップ・キャラ・物（明かりに反応する絵）だけが変わる。UI は変わらない
 /// ・暗いステージ（StageDarkness）があるシーンでは働かない（明るさを取り合わないように）
-[AddComponentMenu("マップの見た目/場所の色味（AreaTone）")]
+[AddComponentMenu("マップの見た目/場所の色味")]
 [DisallowMultipleComponent]
 [RequireComponent(typeof(BoxCollider2D))]
 public class AreaTone : MonoBehaviour

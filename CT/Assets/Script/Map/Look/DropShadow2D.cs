@@ -15,7 +15,7 @@ using UnityEngine;
 /// ・絵を差し替えても・反転しても・アニメで変わっても、影も同じ形についてくる
 /// ・エディタで置いたときから見える（影はシーンに保存しない。部品を外すと消える）
 /// ・影の並び順は、キャラ（100）より下の 4 が基本（マップチップの層の決まり。Docs/マップチップの置き方.md）
-[AddComponentMenu("マップの見た目/影を付ける（DropShadow2D）")]
+[AddComponentMenu("マップの見た目/影を付ける")]
 [DisallowMultipleComponent]
 [ExecuteAlways]
 [RequireComponent(typeof(SpriteRenderer))]

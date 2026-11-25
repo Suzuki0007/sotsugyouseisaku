@@ -181,10 +181,9 @@ Box("廊下 上の縁", OX + 17, 17.95f, OX + 20, 18f + FEET + 0.05f, true);    
 Box("廊下 下の縁", OX + 17, 15f, OX + 20, 15.67f + FEET + 0.05f, true);          // 縁（y15.67〜16）より足が下へ出ない
 
 // ---- 歯車：見せ場（部屋 B の奥）は大きく立てて重ねる（キャラと Y で前後）。ほかは小さく平らに散らす ----
-// 立っている物の当たり判定は「足元の四角」でざっくり（11-25 ユーザーの指示：丸く細かい形は挙動がおかしくなるもと）。
-// 四角＝見た目の幅の 7 割 × 絵の下の端から中心まで（MapLookMenu.FootprintRect）。上の端が中心＝キャラとの前後の境目と同じ。
+// 立っている物は「奥行きのある物」（DepthProp）にする：足元の当たり判定は四角でざっくり（11-25 ユーザーの指示：丸く細かい形は挙動がおかしくなるもと）、
+// キャラとの前後は Sorting Group の位置（前後の境目）で決まる。
 var props = NewGO(room.transform, "歯車（見せ場と散らばり）", UnityEngine.Vector3.zero).transform;
-var walkArea = walk.GetComponent<WalkArea>();
 System.Func<string, UnityEngine.Sprite, float, float, float, float, bool, UnityEngine.Color, UnityEngine.GameObject> Gear = (n, spr, x, y, scale, rot, standing, col) => {
   // ドット絵は 90 度ごとの回転と反転だけにする（斜めに回すと画素がゆがむ）。rot の 90 の倍数に丸め、端数の向きで左右反転を決める
   float r90 = UnityEngine.Mathf.Round(rot / 90f) * 90f; bool flip = UnityEngine.Mathf.Repeat(rot, 90f) > 45f;
@@ -203,16 +202,14 @@ var white = UnityEngine.Color.white; var dull = new UnityEngine.Color(0.82f, 0.7
 var gBig = Gear("見せ場 大歯車", gear1, OX + 30.5f, 20.2f, 4.2f, 12f, true, white);
 var gMid = Gear("見せ場 中歯車", gear2, OX + 26.8f, 19.4f, 2.4f, -24f, true, dull);
 var gSmall = Gear("見せ場 小歯車", gear1, OX + 33.4f, 17.4f, 1.3f, 40f, true, dull);
-// 見せ場の当たり判定：大と中は重なっているので 1 つの四角にまとめる（すき間・へこみを作らない）。小は離れているので別の四角
-{ var a = MapLookMenu.FootprintRect(gBig); var b = MapLookMenu.FootprintRect(gMid);
-  var u = UnityEngine.Rect.MinMaxRect(UnityEngine.Mathf.Min(a.xMin, b.xMin), UnityEngine.Mathf.Min(a.yMin, b.yMin), UnityEngine.Mathf.Max(a.xMax, b.xMax), UnityEngine.Mathf.Max(a.yMax, b.yMax));
-  MapLookMenu.AddFootprintRect(walkArea, "歩けない 足元：見せ場 大歯車と中歯車（まとめて 1 つ）", u, false);
-  Log.Append("footprint big+mid=").Append(u).Append("\n"); }
-Log.Append("footprint small=").Append(MapLookMenu.FootprintRect(gSmall)).Append("\n");
-MapLookMenu.AddFootprint(gSmall, false);
+// 見せ場の「奥行きのある物」（DepthProp）：大と中は重なっているので 1 つにまとめる（当たり判定 1 つ・前後の境目 1 本）。小は別。
+// 赤い四角（足元の当たり判定）＝見た目の幅 7 割 × 下半分、青い線（前後の境目）＝四角の上の端から 0.25 下（11-25：同じ高さだと前後が入れ替わった）
+System.Action<DepthProp> LogProp = p => { UnityEngine.Rect r; float line; p.TryGetFootprint(out r); p.TryGetSortLine(out line); Log.Append("depth ").Append(p.name).Append(" footprint=").Append(r).Append(" line=").Append(line.ToString("0.##")).Append("\n"); };
+LogProp(DepthPropEditor.Wrap(new[]{ gBig, gMid }, "見せ場 大歯車と中歯車（奥行き）", false));
+LogProp(DepthPropEditor.Wrap(new[]{ gSmall }, "見せ場 小歯車（奥行き）", false));
 // 遺跡の入口の脇に倒れた歯車（立てる）
 var gGate = Gear("入口の脇の歯車", gear2, OX + 6.2f, 12.6f, 1.6f, 8f, true, dull);
-MapLookMenu.AddFootprint(gGate, false);
+LogProp(DepthPropEditor.Wrap(new[]{ gGate }, "入口の脇の歯車（奥行き）", false));
 // 部屋 A の隅にまとまって転がる歯車（濃い所）
 Gear("部屋 A 転がる歯車 1", gear2, OX + 14.6f, 19.3f, 0.9f, 30f, false, dull);
 Gear("部屋 A 転がる歯車 2", gear1, OX + 15.5f, 18.6f, 0.6f, -50f, false, dim);
