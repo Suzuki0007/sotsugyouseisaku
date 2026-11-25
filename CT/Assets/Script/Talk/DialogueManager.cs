@@ -20,6 +20,8 @@ using UnityEngine.UI;
 /// ・送りキーで「表示途中 → 全文表示」「全文表示済み → 次の文」「最後の文 → 閉じる」
 /// ・話者（CharacterProfile）と表情に合わせて、左右の立ち絵を切り替える
 /// ・会話中は IsBusy が true になるので、プレイヤーの操作側はこれを見て入力を止める
+/// ・「シネマ演出で出す」がオンなら、会話の枠の代わりに上下の黒い帯を出し、文は下の帯の中に字幕で出す（CinemaMode）
+///   立ち絵は「シネマ演出でも立ち絵を出す」がオンのときだけ出す（今立ち絵が出ている会話の一覧は Docs/シネマ演出で隠した立ち絵.md）
 public class DialogueManager : Singleton<DialogueManager>
 {
     //=====================================================================
@@ -96,6 +98,84 @@ public class DialogueManager : Singleton<DialogueManager>
     [Tooltip("1 なら毎文字。2〜3 にすると、うるさくならない。空白・記号では鳴らさない")]
     private int typeSeEvery = 2;
 
+    [Header("シネマ演出（上下の帯・字幕）")]
+
+    [SerializeField, Label("シネマ演出で出す")]
+    [Tooltip("オン：会話の枠の代わりに、上下に黒い帯を出して文を下の帯に字幕で出す（カメラも少し寄る）／オフ：今までの会話の枠")]
+    private bool useCinema = true;
+
+    [SerializeField, Label("帯の太さ", 0.05f, 0.3f)]
+    [Tooltip("上下それぞれの帯の太さ（マップの映る範囲の高さに対する割合）。字幕が入るので 0.1 以上")]
+    private float cinemaBarSize = 0.12f;
+
+    [SerializeField, Label("寄る強さ", 1.0f, 2.0f)]
+    [Tooltip("会話の間、カメラが寄る強さ。1 で寄らない（操作中のキャラを中心に寄る）")]
+    private float cinemaZoom = 1.1f;
+
+    [SerializeField, Label("帯が出る時間（秒）", 0.0f)]
+    [Tooltip("帯が出る・引っ込む、カメラが寄る・戻るまでの時間")]
+    private float cinemaMoveTime = 1.2f;
+
+    [SerializeField, Label("帯が出てから文字が出るまで（秒）", 0.0f)]
+    [Tooltip("帯が出きってから、最初の文字が出始めるまでの間。帯がもう出ているとき（会話が続くとき）は待たない")]
+    private float cinemaTextDelay = 0.5f;
+
+    [SerializeField, Label("1文字が浮かび上がる時間（秒）", 0.0f)]
+    [Tooltip("シネマ演出のとき、1文字ずつふわっと浮かび上がる時間。0 なら今までどおりパッと出る。出る間隔は「Char Interval」")]
+    private float cinemaCharFade = 0.4f;
+
+    [SerializeField, Label("文が消える時間（秒）", 0.0f)]
+    [Tooltip("シネマ演出のとき、次の文へ送ったときに前の文が溶けるように消える時間。0 ならすぐ入れ替わる")]
+    private float cinemaLineFade = 0.3f;
+
+    [SerializeField, Label("会話の終わりに消える時間（秒）", 0.0f)]
+    [Tooltip("シネマ演出のとき、会話が終わって字幕と立ち絵が溶けるように消える時間。0 ならすぐ消える")]
+    private float cinemaEndFade = 0.5f;
+
+    [SerializeField, Label("話していない立ち絵の色（シネマ）")]
+    [Tooltip("シネマ演出のとき、話していない方の立ち絵の色。灰色にせず、少し透けさせる（右の濃さ＝A を小さくするほど薄い）")]
+    private Color cinemaInactivePortraitColor = new Color(0.85f, 0.85f, 0.9f, 0.45f);
+
+    // 話していない方の立ち絵の色（シネマ演出なら透ける色、そうでなければ今までの暗い色）
+    private Color InactiveColor => cinema != null ? cinemaInactivePortraitColor : inactivePortraitColor;
+
+    [SerializeField, Label("シネマ演出でも立ち絵を出す")]
+    [Tooltip("オン：シネマ演出のときも立ち絵を出す（下の帯の上に立つように出る）／オフ：立ち絵を出さない。" +
+             "立ち絵が出る会話の一覧は Docs/シネマ演出で隠した立ち絵.md")]
+    private bool cinemaShowPortraits = true;
+
+    [SerializeField, Label("立ち絵の大きさ（シネマ）", 0.3f, 1.5f)]
+    [Tooltip("シネマ演出のときの立ち絵の大きさ（1 で会話の枠のときと同じ）。上下の帯の間に収まるように小さめにしている")]
+    private float cinemaPortraitScale = 0.75f;
+
+    [SerializeField, Label("立ち絵の横のずらし（シネマ）")]
+    [Tooltip("シネマ演出のときに、立ち絵を画面の端から内側へずらす量（1920×1080 の基準で。マイナスで外側へ）")]
+    private float cinemaPortraitInset = 0.0f;
+
+    [SerializeField, Label("立ち絵のフェードイン（秒）", 0.0f)]
+    [Tooltip("シネマ演出のときに、立ち絵が出てくるときのフェードの時間。0 ならパッと出る")]
+    private float cinemaPortraitFade = 0.2f;
+
+    // 立ち絵の元の位置と大きさ（シネマ演出の配置から、会話の枠の配置へ戻すため）
+    private Vector2 portraitLeftPos, portraitRightPos;
+    private Vector3 portraitLeftScale, portraitRightScale;
+    private Coroutine portraitLeftFade, portraitRightFade;
+
+    // 今の会話をシネマ演出で出しているときの CinemaMode（枠で出しているときは null）
+    private CinemaMode cinema;
+
+    // シネマ演出で、帯が出きるのを待っているか（最初の文を出す前）
+    private bool waitingStart;
+
+    // シネマ演出で、前の文が溶けて消えている途中か
+    private bool switchingLine;
+
+    // シネマ演出で、今名前の列に出している名前（同じ人が続けて話すときは出し直さない。null なら出していない）
+    private string shownSpeaker;
+
+    // 文を書く先（シネマ演出なら下の帯の字幕、そうでなければ会話の枠）
+    private TMP_Text Body => cinema != null ? cinema.DialogueText() : bodyText;
+
     // 現在の会話
     private DialogueData.Line[] lines;
 
@@ -155,6 +235,10 @@ public class DialogueManager : Singleton<DialogueManager>
         // 立ち絵の縦横比を保つ
         if(portraitLeft != null)  { portraitLeft.preserveAspect = true; }
         if(portraitRight != null) { portraitRight.preserveAspect = true; }
+
+        // 立ち絵の元の位置と大きさを覚えておく（シネマ演出のときだけ動かす）
+        if(portraitLeft != null)  { portraitLeftPos = portraitLeft.rectTransform.anchoredPosition;  portraitLeftScale = portraitLeft.rectTransform.localScale; }
+        if(portraitRight != null) { portraitRightPos = portraitRight.rectTransform.anchoredPosition; portraitRightScale = portraitRight.rectTransform.localScale; }
 
         HideAllPortraits();
         BuildKeyHint();
@@ -227,10 +311,52 @@ public class DialogueManager : Singleton<DialogueManager>
         lines = newLines;
         index = 0;
         onFinished = finished;
+        shownSpeaker = null;
         lastToggleFrame = Time.frameCount;
 
         HideAllPortraits();
-        panel.SetActive(true);
+
+        // シネマ演出：枠は出さずに、上下の帯と字幕で出す（マップのカメラがないシーンでは今までの枠）
+        cinema = useCinema ? CinemaMode.Get() : null;
+        LayoutPortraits(cinema != null);
+        if(cinema != null)
+        {
+            float remaining = cinema.BeginForDialogue(cinemaBarSize, cinemaZoom, cinemaMoveTime);
+
+            // 帯が出ている途中なら、出きってから少し待って最初の文を出す（もう出ていれば、すぐ出す）
+            if(remaining > 0.0f)
+            {
+                cinema.SetSpeaker("", Color.white);
+                cinema.DialogueText().text = "";
+                cinema.SetKeyHint(null);
+                typingCoroutine = StartCoroutine(ShowFirstLineAfter(remaining + cinemaTextDelay));
+                return;
+            }
+
+            // キーの案内は、会話の枠のときと同じ文を帯の右下に
+            cinema.SetKeyHint(showKeyHint ? keyHintText : null);
+        }
+        else { panel.SetActive(true); }
+
+        ShowLine();
+    }
+
+    // 帯が出きるのを待ってから最初の文を出す（待っている間のキーは数えない）
+    private IEnumerator ShowFirstLineAfter(float seconds)
+    {
+        waitingStart = true;
+        float t = 0.0f;
+        while(t < seconds)
+        {
+            t += Time.unscaledDeltaTime;
+            yield return null;
+        }
+        waitingStart = false;
+        typingCoroutine = null;
+
+        if(!IsTalking) { yield break; }
+        if(cinema != null) { cinema.SetKeyHint(showKeyHint ? keyHintText : null); }
+        lastToggleFrame = Time.frameCount;
         ShowLine();
     }
 
@@ -248,9 +374,18 @@ public class DialogueManager : Singleton<DialogueManager>
     {
         if(typingCoroutine != null) { StopCoroutine(typingCoroutine); typingCoroutine = null; }
         isTyping = false;
+        waitingStart = false;
+        switchingLine = false;
 
-        HideAllPortraits();
+        // シネマ演出：立ち絵と字幕は溶けるように消す（会話の枠のときは今までどおりすぐ消す）
+        if(cinema != null && cinemaEndFade > 0.0f) { FadeOutAllPortraits(cinemaEndFade); }
+        else                                     { HideAllPortraits(); }
         if(panel != null) { panel.SetActive(false); }
+
+        // シネマ演出：字幕を消し、イベントが終わったら帯を引っ込める（次の会話の前に閉じる）
+        bool fading = cinema != null && cinemaEndFade > 0.0f;
+        if(cinema != null) { cinema.ReleaseForDialogue(cinemaMoveTime, cinemaEndFade); }
+        cinema = null;
 
         lines = null;
         lastToggleFrame = Time.frameCount;
@@ -258,7 +393,22 @@ public class DialogueManager : Singleton<DialogueManager>
         // コールバックの中で次の会話を始めても大丈夫なように、先に空にしてから呼ぶ
         Action callback = onFinished;
         onFinished = null;
+
+        // シネマ演出：文字と立ち絵が消えきってから、イベントの次の部品へ進む
+        // （会話のすぐあとに揺れ・音などを置いたとき、消えかけの文字の上で起きないように）
+        if(fading && callback != null) { StartCoroutine(InvokeAfter(cinemaEndFade, callback)); return; }
         callback?.Invoke();
+    }
+
+    private static IEnumerator InvokeAfter(float seconds, Action callback)
+    {
+        float t = 0.0f;
+        while(t < seconds)
+        {
+            t += Time.unscaledDeltaTime;
+            yield return null;
+        }
+        callback();
     }
 
     //=====================================================================
@@ -272,6 +422,12 @@ public class DialogueManager : Singleton<DialogueManager>
 
         // 開いたフレームのキー入力で、すぐに送られないようにする
         if(Time.frameCount == lastToggleFrame) { return; }
+
+        // シネマ演出で、帯が出きるのを待っている間は送らない
+        if(waitingStart) { return; }
+
+        // 前の文が溶けて消えている間は送らない
+        if(switchingLine) { return; }
 
         if(AdvancePressed())
         {
@@ -295,6 +451,27 @@ public class DialogueManager : Singleton<DialogueManager>
     private void ShowLine()
     {
         DialogueData.Line line = lines[index];
+
+        if(cinema != null)
+        {
+            // 字幕：名前は文の前にキャラの色で。立ち絵は「シネマ演出でも立ち絵を出す」のときだけ
+            if(cinemaShowPortraits) { UpdatePortraits(line); }
+            else                    { HideAllPortraits(); }
+
+            // 名前は左の名前の列に（本文が折り返しても、2行目は本文の頭にそろう）
+            // 同じ人が続けて話すときは、名前は出したまま（消したり出し直したりしない）
+            string speaker = line.DisplayName ?? "";
+            if(shownSpeaker != speaker)
+            {
+                cinema.SetSpeaker(speaker, line.character != null ? line.character.NameColor : defaultNameColor);
+                if(cinemaCharFade > 0.0f) { cinema.FadeInName(cinemaCharFade); }
+                shownSpeaker = speaker;
+            }
+
+            if(typingCoroutine != null) { StopCoroutine(typingCoroutine); }
+            typingCoroutine = StartCoroutine(TypeLine(line.text ?? ""));
+            return;
+        }
 
         UpdateSpeakerName(line);
         UpdatePortraits(line);
@@ -325,13 +502,25 @@ public class DialogueManager : Singleton<DialogueManager>
     {
         isTyping = true;
         if(nextIcon != null) { nextIcon.SetActive(false); }
+        if(cinema != null) { cinema.SetNextMark(false); }
 
-        bodyText.text = text;
-        bodyText.maxVisibleCharacters = 0;
+        // 書く先（シネマ演出なら字幕、そうでなければ会話の枠）
+        TMP_Text body = Body;
+        body.text = text;
+        body.maxVisibleCharacters = 0;
 
         // リッチテキストのタグを除いた、実際に表示される文字数を取得する
-        bodyText.ForceMeshUpdate();
-        int total = bodyText.textInfo.characterCount;
+        body.ForceMeshUpdate();
+        int total = body.textInfo.characterCount;
+
+        // シネマ演出：1文字ずつふわっと浮かび上がる
+        if(cinema != null && cinemaCharFade > 0.0f && charInterval > 0.0f)
+        {
+            yield return FadeInChars(body, total);
+            typingCoroutine = null;
+            CompleteLine();
+            yield break;
+        }
 
         if(charInterval > 0f)
         {
@@ -340,8 +529,8 @@ public class DialogueManager : Singleton<DialogueManager>
             int sounding = 0;
             for(int i = 1; i <= total; i++)
             {
-                bodyText.maxVisibleCharacters = i;
-                if(se != null && IsSoundingChar(bodyText.textInfo.characterInfo[i - 1].character))
+                body.maxVisibleCharacters = i;
+                if(se != null && IsSoundingChar(body.textInfo.characterInfo[i - 1].character))
                 {
                     if(sounding % every == 0) { SeManager.PlaySe(se); }
                     sounding++;
@@ -352,6 +541,62 @@ public class DialogueManager : Singleton<DialogueManager>
 
         typingCoroutine = null;
         CompleteLine();
+    }
+
+    /// <summary>
+    /// 1文字ずつ、透明から浮かび上がらせる（「Char Interval」おきに次の文字が始まり、「1文字が浮かび上がる時間」で出きる）
+    /// 文字の頂点の色の透明度だけを変える（文字の作り直しはしない）
+    /// </summary>
+    private IEnumerator FadeInChars(TMP_Text body, int total)
+    {
+        body.maxVisibleCharacters = int.MaxValue;
+        body.ForceMeshUpdate();
+        TMP_TextInfo info = body.textInfo;
+
+        SeData se = TypeSeOf(lines != null && index < lines.Length ? lines[index] : null);
+        int every = Mathf.Max(1, typeSeEvery);
+        int sounding = 0;
+        int started = 0;
+
+        float duration = (total - 1) * charInterval + cinemaCharFade;
+        float elapsed = 0.0f;
+        while(true)
+        {
+            // 始まった文字の音（今までの文字送りと同じ鳴らし方）
+            while(started < total && elapsed >= started * charInterval)
+            {
+                if(se != null && IsSoundingChar(info.characterInfo[started].character))
+                {
+                    if(sounding % every == 0) { SeManager.PlaySe(se); }
+                    sounding++;
+                }
+                started++;
+            }
+
+            SetCharAlphas(body, info, total, elapsed);
+            if(elapsed >= duration) { break; }
+
+            yield return null;
+            elapsed += Time.deltaTime;
+        }
+    }
+
+    // 文字ごとの透明度を、経過時間に合わせて頂点の色に入れる
+    private void SetCharAlphas(TMP_Text body, TMP_TextInfo info, int total, float elapsed)
+    {
+        for(int i = 0; i < total && i < info.characterInfo.Length; i++)
+        {
+            TMP_CharacterInfo c = info.characterInfo[i];
+            if(!c.isVisible) { continue; }
+
+            float a = Mathf.Clamp01((elapsed - i * charInterval) / cinemaCharFade);
+            Color32[] colors = info.meshInfo[c.materialReferenceIndex].colors32;
+            if(colors == null || c.vertexIndex + 3 >= colors.Length) { continue; }
+
+            byte alpha = (byte)(c.color.a * a);
+            for(int v = 0; v < 4; v++) { colors[c.vertexIndex + v].a = alpha; }
+        }
+        body.UpdateVertexData(TMP_VertexDataUpdateFlags.Colors32);
     }
 
     /// <summary> その文で鳴らす文字送りの音（キャラの設定が先、なければ全体の設定） </summary>
@@ -375,10 +620,14 @@ public class DialogueManager : Singleton<DialogueManager>
     {
         if(typingCoroutine != null) { StopCoroutine(typingCoroutine); typingCoroutine = null; }
 
-        bodyText.maxVisibleCharacters = int.MaxValue;
+        TMP_Text body = Body;
+        body.maxVisibleCharacters = int.MaxValue;
+        // 1文字ずつのフェードの途中で送られたときも、全部の文字をくっきり出す（頂点の色を作り直す）
+        if(cinema != null) { body.ForceMeshUpdate(); }
         isTyping = false;
 
-        if(nextIcon != null) { nextIcon.SetActive(true); }
+        if(cinema != null) { cinema.SetNextMark(true); }
+        else if(nextIcon != null) { nextIcon.SetActive(true); }
     }
 
     /// <summary>
@@ -390,11 +639,41 @@ public class DialogueManager : Singleton<DialogueManager>
 
         if(index < lines.Length)
         {
+            // シネマ演出：前の文を溶けるように消してから、次の文を浮かび上がらせる
+            if(cinema != null && cinemaLineFade > 0.0f)
+            {
+                if(typingCoroutine != null) { StopCoroutine(typingCoroutine); }
+                typingCoroutine = StartCoroutine(SwitchLine());
+                return;
+            }
+
             ShowLine();
             return;
         }
 
         EndDialogue();
+    }
+
+    private IEnumerator SwitchLine()
+    {
+        switchingLine = true;
+
+        // 次も同じ人が話すなら、名前は残して本文だけ消す
+        string nextSpeaker = lines[index].DisplayName ?? "";
+        bool sameSpeaker = nextSpeaker == shownSpeaker;
+        cinema.FadeOutText(cinemaLineFade, sameSpeaker);
+        if(!sameSpeaker) { shownSpeaker = null; }
+
+        float t = 0.0f;
+        while(t < cinemaLineFade)
+        {
+            t += Time.unscaledDeltaTime;
+            yield return null;
+        }
+
+        switchingLine = false;
+        typingCoroutine = null;
+        if(IsTalking && cinema != null) { ShowLine(); }
     }
 
     //=====================================================================
@@ -413,8 +692,8 @@ public class DialogueManager : Singleton<DialogueManager>
         {
             if(keepPortraitsOnNarration)
             {
-                SetPortraitColor(portraitLeft, inactivePortraitColor);
-                SetPortraitColor(portraitRight, inactivePortraitColor);
+                SetPortraitColor(portraitLeft, InactiveColor);
+                SetPortraitColor(portraitRight, InactiveColor);
             }
             else
             {
@@ -451,14 +730,54 @@ public class DialogueManager : Singleton<DialogueManager>
         CharacterProfile otherCharacter = isLeft ? rightCharacter : leftCharacter;
         if(otherCharacter != null && otherCharacter != character)
         {
-            SetPortraitColor(otherImage, inactivePortraitColor);
+            SetPortraitColor(otherImage, InactiveColor);
         }
+    }
+
+    /// <summary>
+    /// 立ち絵の配置：シネマ演出のときは、小さめにして下の帯の上に立たせる（帯と字幕に重ならない）。そうでなければ元の配置
+    /// </summary>
+    private void LayoutPortraits(bool cinemaLayout)
+    {
+        float lift = 0.0f;
+        float scale = 1.0f;
+        float inset = 0.0f;
+        if(cinemaLayout && cinema != null)
+        {
+            // 下の帯の高さ（立ち絵の Canvas の単位で）＝帯の太さ × マップの映る範囲の高さ
+            Image any = portraitLeft != null ? portraitLeft : portraitRight;
+            if(any != null && any.canvas != null)
+            {
+                var canvasRect = (RectTransform)any.canvas.rootCanvas.transform;
+                lift = canvasRect.rect.height * cinema.ViewportRect.height * cinemaBarSize;
+            }
+            scale = cinemaPortraitScale;
+            inset = cinemaPortraitInset;
+        }
+
+        PlacePortrait(portraitLeft, portraitLeftPos + new Vector2(inset, lift), portraitLeftScale, scale);
+        PlacePortrait(portraitRight, portraitRightPos + new Vector2(-inset, lift), portraitRightScale, scale);
+    }
+
+    private static void PlacePortrait(Image image, Vector2 position, Vector3 originalScale, float scale)
+    {
+        if(image == null) { return; }
+        RectTransform rt = image.rectTransform;
+        rt.anchoredPosition = position;
+
+        // 左右反転（scale.x の向き）はそのまま、大きさだけ変える
+        float sign = rt.localScale.x < 0.0f ? -1.0f : 1.0f;
+        rt.localScale = new Vector3(Mathf.Abs(originalScale.x) * scale * sign, originalScale.y * scale, originalScale.z);
     }
 
     private void ShowPortrait(Image image, Sprite sprite, bool flipX, Color color)
     {
+        bool appearing = !image.gameObject.activeSelf;
+        Color current = image.color;
+
         image.sprite = sprite;
-        image.color = color;
+        // シネマ演出では、色は下のフェードで変える（いったん今の色のまま）
+        image.color = cinema != null && cinemaPortraitFade > 0.0f && !appearing ? current : color;
 
         // Imageには反転の設定がないので、スケールで左右反転する
         Vector3 scale = image.rectTransform.localScale;
@@ -466,12 +785,32 @@ public class DialogueManager : Singleton<DialogueManager>
         image.rectTransform.localScale = scale;
 
         image.gameObject.SetActive(true);
+
+        // シネマ演出：新しく出てくる立ち絵は短いフェードインで、もう出ていれば今の色からなめらかに
+        if(cinema != null && cinemaPortraitFade > 0.0f)
+        {
+            Color from = image.color;
+            if(appearing) { from = color; from.a = 0.0f; }
+            StartPortraitFade(image, from, color, cinemaPortraitFade, false);
+        }
+        else
+        {
+            StopPortraitFade(image);
+        }
     }
 
     private void SetPortraitColor(Image image, Color color)
     {
         if(image == null || !image.gameObject.activeSelf) { return; }
 
+        // シネマ演出：話していない方へ、なめらかに透けていく
+        if(cinema != null && cinemaPortraitFade > 0.0f)
+        {
+            StartPortraitFade(image, image.color, color, cinemaPortraitFade, false);
+            return;
+        }
+
+        StopPortraitFade(image);
         image.color = color;
     }
 
@@ -479,7 +818,53 @@ public class DialogueManager : Singleton<DialogueManager>
     {
         if(image == null) { return; }
 
+        // フェードの途中で消すときは、フェードも止める
+        StopPortraitFade(image);
         image.gameObject.SetActive(false);
+    }
+
+    /// <summary>
+    /// 会話の終わりに、立ち絵を溶けるように消す（消えきったら非表示）
+    /// </summary>
+    private void FadeOutAllPortraits(float seconds)
+    {
+        foreach(Image image in new[] { portraitLeft, portraitRight })
+        {
+            if(image == null || !image.gameObject.activeSelf) { continue; }
+            Color to = image.color;
+            to.a = 0.0f;
+            StartPortraitFade(image, image.color, to, seconds, true);
+        }
+
+        leftCharacter = null;
+        rightCharacter = null;
+    }
+
+    private void StartPortraitFade(Image image, Color from, Color to, float seconds, bool hideAtEnd)
+    {
+        StopPortraitFade(image);
+        Coroutine fade = StartCoroutine(PortraitFade(image, from, to, seconds, hideAtEnd));
+        if(image == portraitLeft) { portraitLeftFade = fade; } else { portraitRightFade = fade; }
+    }
+
+    private void StopPortraitFade(Image image)
+    {
+        if(image == portraitLeft && portraitLeftFade != null)   { StopCoroutine(portraitLeftFade); portraitLeftFade = null; }
+        if(image == portraitRight && portraitRightFade != null) { StopCoroutine(portraitRightFade); portraitRightFade = null; }
+    }
+
+    private IEnumerator PortraitFade(Image image, Color from, Color to, float seconds, bool hideAtEnd)
+    {
+        float t = 0.0f;
+        while(t < seconds)
+        {
+            t += Time.unscaledDeltaTime;
+            image.color = Color.Lerp(from, to, Mathf.Clamp01(t / seconds));
+            yield return null;
+        }
+        image.color = to;
+        if(hideAtEnd) { image.gameObject.SetActive(false); }
+        if(image == portraitLeft) { portraitLeftFade = null; } else { portraitRightFade = null; }
     }
 
     private void HideAllPortraits()

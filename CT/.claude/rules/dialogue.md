@@ -13,6 +13,8 @@ paths:
 ## 仕組み（`Assets/Script/Talk/`）
 - `DialogueData`（文の配列 `lines`：`character`・`expression`・`speakerName`・`text`）、`CharacterProfile`（名前・色・左右・立ち絵の表情ごとの絵。`Data/Characters/Noah.asset`・`Sigle.asset`）、`Expression`（enum。**末尾にだけ追加**＝番号でセーブ・CSV に使う）。
 - `DialogueManager`（シーンごとのシングルトン）。`Assets/Prefab/UI/DialogueSystem.prefab` を置けば使える（Stage1_1 / SampleScene / Stage_1_Boss）。Stage1_2 はシーンの Canvas に直接組んだもの（**両方直す**：枠 1600×260・立ち絵 820×1040）。
+  - **シネマ演出（11-25 kura_study）**：「シネマ演出で出す」`useCinema`（初期値オン＝全部の会話）で、枠を出さずに `Camera/CinemaMode` の上下の帯と下の帯の字幕に出す（名前はキャラの色で文の前・1文字ずつ・▼・カメラが少し寄る）。イベントが続いている間は帯を出したまま。立ち絵は `cinemaShowPortraits`（**11-25 にユーザーの指示でオン**。シネマのときは 0.75 倍・下の帯の上に持ち上げ・0.2 秒のフェードイン〔`LayoutPortraits`・`FadePortrait`〕。11-25 時点で立ち絵が出ていた会話の一覧は `Docs/シネマ演出で隠した立ち絵.md`。Stage1_2 はシーンの Canvas の並び順しだいで立ち絵の下が帯に隠れるので確かめる）。
+  - **テーマは「儚い」**（ユーザー、11-25）：演出は「現れて、溶けるように消える」でそろえる（▼ は明滅・文の切り替えと終わりはフェードアウト・立ち絵は透ける・文字は生成りの白・帯の縁はぼかす）。新しい演出も、元気な動き（はねる・揺れる）より静かなフェードを選ぶ。
   - 送りは E・Space・Enter（`extraAdvanceKeys`）。枠の右下の下にキーの説明（`showKeyHint`・`keyHintText`）。話していない方の立ち絵は暗くなる。
 - `Dialogue`：会話の中身を持つ部品（Intaractable。**作者は成田さん**）。DialogueManager がないシーンでは旧方式で表示。
 - イベントから会話を出すのは `DialogueEventAction`（会話）：**「会話データ」に DialogueData を直接入れる**（11-13〜。子の「会話」オブジェクトは要らない）。空なら前の作り方（子の「会話」に置いた Dialogue）を使う。OP・Stage1_2・Stage_1_Boss の今のイベントは前の作り方のまま。

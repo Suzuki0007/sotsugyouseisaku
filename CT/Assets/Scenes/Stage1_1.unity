@@ -35474,7 +35474,7 @@ MonoBehaviour:
     party: 0
     partnerWithin: 0
   delay: 0
-  startDark: 0
+  startDark: 1
 --- !u!114 &918382032
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -35597,7 +35597,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ScreenFadeEventAction
   type: 0
-  duration: 0.6
+  duration: 0.1
   color: {r: 0, g: 0, b: 0, a: 1}
   waitUntilDone: 1
 --- !u!114 &918382040
@@ -35612,7 +35612,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1d06401cabaabc940bb0f40e1306b877, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WaitEventAction
-  seconds: 0.6
+  seconds: 0.3
   ignoreTimeScale: 0
 --- !u!114 &918382041
 MonoBehaviour:
@@ -38124,6 +38124,7 @@ GameObject:
   - component: {fileID: 1589054276}
   - component: {fileID: 1589054278}
   - component: {fileID: 1589054277}
+  - component: {fileID: 1589054279}
   m_Layer: 0
   m_Name: "\u5854\u306E\u5168\u666F\u30B9\u30C1\u30EB\uFF08\u4EEE\u753B\u50CF\uFF09"
   m_TagString: Untagged
@@ -38150,6 +38151,20 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1589054279
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1589054275}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3c1f0b7e5a2d4e9c8b6a7d1e2f304a5b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CinemaStill
+  barSize: 0.12
+  releaseTime: 1.2
 --- !u!114 &1589054277
 MonoBehaviour:
   m_ObjectHideFlags: 0

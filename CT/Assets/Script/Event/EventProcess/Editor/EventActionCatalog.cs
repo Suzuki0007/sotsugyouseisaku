@@ -35,6 +35,8 @@ public static class EventActionCatalog
         { "ScreenFadeEventAction",     ("会話・演出", "画面の暗転") },
         { "CameraLookEventAction",     ("会話・演出", "カメラを向ける") },
         { "DarknessEventAction",       ("会話・演出", "暗さ・視界を変える") },
+        { "CinemaEventAction",         ("会話・演出", "シネマ演出（上下の帯）") },
+        { "SubtitleEventAction",       ("会話・演出", "字幕") },
         { "BgmFlagEventAction",        ("会話・演出", "BGM のフラグ") },
         { "BgmProgressEventAction",    ("会話・演出", "BGM の進み具合") },
 

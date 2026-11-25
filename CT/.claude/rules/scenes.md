@@ -24,7 +24,7 @@ paths:
 - ルート `OP`（レシピ `stage1_1_op`）：`OP_はじめ`（SceneStartEvent、条件 `Flag_OP_Done` OFF → 待つ → F1_00 → OP_01 → 明転 → OP_02 → フラグ ON → オートセーブ）、`OP_途中`・`OP_塔の入口`（ItemInteraction のエリアに入る・1回だけ、saveId `OP_Bell` / `OP_TowerEntrance`）。会話用の Dialogue は子の「会話」に置く（調べる範囲なし。シーンチェックは DialogueEventAction から使われていれば対象外）。
 - 最初はノア1人（`Flag_Sigle_Joined` が立つまで）。
 - **上陸（2026-11-20、レシピ `landing_2_stage1_1`、ルート `上陸（Stage1_1）`）**：
-  - 着いたとき（SceneStartEvent・`Flag_Land_TowerStill` OFF）：暗くする → 塔の全景スチル（`演出の画像（手紙・スチル）` の Canvas 並び順 95、仮画像 `Images/UI/Still/tower_still_placeholder_lowangle.png`）→ OP_02h → スチルを閉じて明転 → フラグ → オートセーブ（砂漠に入ったときのオートセーブ）。
+  - 着いたとき（SceneStartEvent・`Flag_Land_TowerStill` OFF・**最初から暗転しておく**〔11-25。マップが見えてから塔になるのをやめた〕）：待つ 0.3 → 暗くする 0.1 → 塔の全景スチル（`CinemaStill` 付き＝出たとたん上下の帯が出ている。11-25。**新しい一枚絵の場面にも `CinemaStill` を付ける**）（`演出の画像（手紙・スチル）` の Canvas 並び順 95、仮画像 `Images/UI/Still/tower_still_placeholder_lowangle.png`）→ OP_02h → スチルを閉じて明転 → フラグ → オートセーブ（砂漠に入ったときのオートセーブ）。
   - 鐘の言い伝え（`OP/OP_途中`、y 21.5）は今のまま。**塔の入口の会話 `OP/OP_塔の入口（F1_01）` はオフ**（扉の爪痕に置き換え）。
   - `扉の爪痕（…）`（横いっぱいの帯 y 23.3・1回だけ `Land_DoorMark`）：ルールが2つ＝`Flag_Land_WreckAny` ON なら OP_02j、OFF なら OP_02j_Monster_NoWreck（子の流れが2つ。中身は会話だけ違う）。OP_02i → `Flag_Land_DoorMark` → 地響き長・揺れ（大 0.32・3 秒）→ ノアが下を向く → 怪物を表示・止める・下から 4 マス入ってくる → カメラを怪物へ（戻さない）→ うなり声 → OP_02j → カメラをノアへ戻す → 戦闘エリアを始める → 一言「逃げなきゃ！」。
   - 追跡（BattleArea：ゴール＝塔の階段の上 (-115.55, 27.6)・捕まる 0.9・やり直す位置 (-115.2, 22.4)・目的「塔の入口へ逃げろ」・1回だけ `Land_DesertChase`）→ 勝ったとき＝Stage1_2 の `FromStage1_1`（正面の扉と同じ）。怪物は `EnemyData_Stage1_1_DesertChaser`（攻撃 0 倍・速さ 2.6・見た目は Stage1_2 の化け物と同じ仮）。
@@ -72,7 +72,7 @@ paths:
 - 流れ（ユーザーの指示 2026-11-19、レシピ `stage1_0_flow`）：タイトルの「はじめから」＝ `Stage1_0` の `Start_Boat`（船の上、`PlayerSpawnPoint/出現位置_船の上（はじめから）`）→ `OP/OP_はじめ`（Stage1_1 からのコピー。SceneStartEvent・`Flag_OP_Done` OFF のとき・最後にオートセーブ＝船の上から再開）→ 奥（上の端）の `MapEntity/出口_Stage1_1へ（奥）`（ぶつかると移る SceneChange、横いっぱい）→ `Stage1_1` の `FromStage1_0`（下の端）。Stage1_1 の OP はフラグが立っているので流れない。
 - OP の途中（鐘）・塔の入口の範囲は Stage1_0 ではオフ（Stage1_1 の物を使う）。コピー元の塔の扉 `MapEntity/OB_Door`（Stage1_2 行き）もオフ。
 - **上陸（2026-11-20、指示書 `CT_landing_to_chase_claudecode_instruction_2026-11-20.md`、レシピ `landing_0_assets` → `landing_1_stage1_0`）**：
-  - `OP/OP_はじめ（暗転 → 小舟の上で手紙 → 上陸）`（`Flag_OP_Done` OFF）：F1_00 → OP_01（手紙の行は抜いた）→ 明転 → 手紙の紙（仮。`演出の画像（手紙・スチル）` の Canvas 並び順 95＝暗転の幕 90 より手前・会話 100 より奥）＋ OP_02a → メモ `Note_KairosLetter`（その場では開かない）→ **海の上の小舟とノアを同じずらし・同じ時間で岸へ**（物を動かす ×2）→ 降りる → `Flag_Land_LetterRead` → キーーーン・揺れ（小）→ OP_02b → `Flag_Land_VibeS`・`Flag_OP_Done` → オートセーブ。
+  - `OP/OP_はじめ（暗転 → 小舟の上で手紙 → 上陸）`（`Flag_OP_Done` OFF）：F1_00 → OP_01（手紙の行は抜いた）→ 明転 → 手紙の紙（仮。`演出の画像（手紙・スチル）` の Canvas 並び順 95＝暗転の幕 90 より手前・会話 100 より奥）＋ OP_02a → メモ `Note_KairosLetter`（その場では開かない）→ **海の上の小舟とノアを同じずらし・同じ時間で岸へ**（物を動かす ×2）→ 降りる → `Flag_Land_LetterRead` → OP_02b_Landing（「ついた、、」だけ）→ キーーーン・揺れ（小）→ 待つ → OP_02b_Vibe（「震えてる？」から。11-25 ユーザーの指示で OP_02b を2つに分け、揺れを間に移した）→ `Flag_Land_VibeS`・`Flag_OP_Done` → オートセーブ。
   - 小舟は2つ：`上陸（Stage1_0）/小舟（海の上。上陸するまで）` と岸の `sunahama_hune_0`。`歩ける範囲（砂浜だけ）` の FlagSwitch が `Flag_Land_LetterRead` で切り替える（海の小舟・通り道 ⇔ 岸の小舟・小舟の歩けない形）。**ノアは毎フレーム歩ける範囲に戻されるので、海の上にいる間は「小舟の通り道」が要る**。
   - 出現位置 `Start_Boat` と直接再生の位置（`Spawner/PlayerPartySpawner/NoahSpaenPoint`）は海の上の小舟の上 (-115.2, 12.4)。
   - 海の当たり判定（`Grid/soto_yuka` の BoxCollider2D 3つ。海全体と岸の両側）は**オフにした**（消していない）。代わりに歩ける範囲（砂浜の仮の四角 y 20.3〜38.3＋残骸3つの歩けない形）。本番はマスク画像から。
