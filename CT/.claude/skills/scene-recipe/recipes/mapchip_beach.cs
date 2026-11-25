@@ -153,15 +153,19 @@ for (int lx = 1; lx <= BW; lx++) {
 }
 Box("通り道（試しの場所から）", 23.9f, 8.1f, OX + 1f, 9.9f, false);   // 試しの場所の通り道（x23〜24）と重ねてつなぐ
 // 壁は細い帯だけ抜く（部屋の中は陸の四角に入っている）
+// 歩ける範囲はキャラの「位置」（体の中心）で決まるが、絵は中心から下へ 0.61（シグル 0.64）まで出る。
+// 上下の壁は、足が縁より下へはみ出ないように、縁から FEET（足の分）だけ離して止める（11-25 の不具合：壁の上側を歩くと足が壁の面にはみ出た）。
+// 左右の壁は、体の半分の幅（0.29）が縁の太さ（0.33）に収まるので、縁の太さ＋少しのまま。
+const float FEET = 0.7f;
 System.Action<int, int, int, int, int[], int[], int[]> RoomWalls = (x0, x1, y0, y1, doorsB, doorsL, doorsR) => {
   float X0 = OX + x0, X1 = OX + x1 + 1;
-  Box("壁 面と上の縁", X0, y1 + 1, X1, y1 + 3.45f, true);
+  Box("壁 面と上の縁", X0, y1 + 1, X1, y1 + 3 + FEET + 0.05f, true);   // 上の縁の下の端（y1+3）から足の分だけ上まで
   // 下の辺（扉の所は開ける）
   int run = -1;
   for (int x = x0; x <= x1 + 1; x++) {
     bool open = x > x1 || System.Array.IndexOf(doorsB, x) >= 0;
     if (!open && run < 0) run = x;
-    if (open && run >= 0) { Box("壁 下の縁", OX + run, y0, OX + x, y0 + 0.45f, true); run = -1; } }
+    if (open && run >= 0) { Box("壁 下の縁", OX + run, y0, OX + x, y0 + FEET + 0.05f, true); run = -1; } }   // 部屋の中から：足が下の縁より外へ出ない
   // 左右の辺（扉の行は開ける）
   foreach (var side in new[]{ 0, 1 }) {
     int[] doors = side == 0 ? doorsL : doorsR; float xa = side == 0 ? X0 : X1 - 0.45f; run = -1;
@@ -172,13 +176,16 @@ System.Action<int, int, int, int, int[], int[], int[]> RoomWalls = (x0, x1, y0, 
 };
 RoomWalls(8, 16, 14, 20, new[]{ 11, 12 }, new int[0], new[]{ 16, 17 });
 RoomWalls(20, 35, 15, 22, new[]{ 26, 27, 28 }, new[]{ 16, 17 }, new int[0]);
-foreach (var f in fragments) Box("壁のかけら lx" + f[0], OX + f[0], f[2] - 0.1f, OX + f[1] + 1, f[2] + 1.45f, true);
-Box("廊下 上の縁", OX + 17, 17.95f, OX + 20, 19f, true);
-Box("廊下 下の縁", OX + 17, 15f, OX + 20, 16.05f, true);
+foreach (var f in fragments) Box("壁のかけら lx" + f[0], OX + f[0], f[2] - 0.1f, OX + f[1] + 1, f[2] + 1 + FEET + 0.05f, true);   // 上の縁（f2+1 の下の端）から足の分だけ上まで
+Box("廊下 上の縁", OX + 17, 17.95f, OX + 20, 18f + FEET + 0.05f, true);          // 縁（y18 の下の端）の上を外から歩くとき
+Box("廊下 下の縁", OX + 17, 15f, OX + 20, 15.67f + FEET + 0.05f, true);          // 縁（y15.67〜16）より足が下へ出ない
 
-// ---- 歯車：見せ場（部屋 B の奥）は大きく立てて重ねる（キャラと Y で前後・歩けない円）。ほかは小さく平らに散らす ----
+// ---- 歯車：見せ場（部屋 B の奥）は大きく立てて重ねる（キャラと Y で前後）。ほかは小さく平らに散らす ----
+// 立っている物の当たり判定は「足元の四角」でざっくり（11-25 ユーザーの指示：丸く細かい形は挙動がおかしくなるもと）。
+// 四角＝見た目の幅の 7 割 × 絵の下の端から中心まで（MapLookMenu.FootprintRect）。上の端が中心＝キャラとの前後の境目と同じ。
 var props = NewGO(room.transform, "歯車（見せ場と散らばり）", UnityEngine.Vector3.zero).transform;
-System.Action<string, UnityEngine.Sprite, float, float, float, float, bool, UnityEngine.Color> Gear = (n, spr, x, y, scale, rot, standing, col) => {
+var walkArea = walk.GetComponent<WalkArea>();
+System.Func<string, UnityEngine.Sprite, float, float, float, float, bool, UnityEngine.Color, UnityEngine.GameObject> Gear = (n, spr, x, y, scale, rot, standing, col) => {
   // ドット絵は 90 度ごとの回転と反転だけにする（斜めに回すと画素がゆがむ）。rot の 90 の倍数に丸め、端数の向きで左右反転を決める
   float r90 = UnityEngine.Mathf.Round(rot / 90f) * 90f; bool flip = UnityEngine.Mathf.Repeat(rot, 90f) > 45f;
   var g = NewGO(props, n, new UnityEngine.Vector3(x, y, 0f)); g.transform.localScale = new UnityEngine.Vector3(scale, scale, 1f); g.transform.rotation = UnityEngine.Quaternion.Euler(0, 0, r90);
@@ -188,16 +195,24 @@ System.Action<string, UnityEngine.Sprite, float, float, float, float, bool, Unit
   SetProp(ds, "strength", standing ? 0.32f : 0.22f);
   SetProp(ds, "offset", new UnityEngine.Vector2(0.08f * scale, -(standing ? 0.14f : 0.06f) * scale));
   SetProp(ds, "shadowOrder", 4);
-  // A 立っている物は明かりをさえぎる（円の Shadow Caster 2D）
-  if (standing) MapLookMenu.AddCircle(g, scale * 0.42f, 12);
-  if (standing) { var e = NewGO(walk, "歩けない " + n, new UnityEngine.Vector3(x, y, 0f)); var c = e.AddComponent<UnityEngine.CircleCollider2D>(); c.isTrigger = true; c.radius = scale * 0.42f; e.AddComponent<WalkAreaExclude>(); } };
+  // A 立っている物は明かりをさえぎる（8 角形の Shadow Caster 2D。見た目の影なので、ざっくりでよい）
+  if (standing) MapLookMenu.AddCircle(g, scale * 0.42f, 8);
+  return g; };
 var white = UnityEngine.Color.white; var dull = new UnityEngine.Color(0.82f, 0.78f, 0.72f, 1f); var dim = new UnityEngine.Color(0.7f, 0.66f, 0.6f, 1f);
 // 見せ場：大きな歯車の残骸（3 枚を重ねる）
-Gear("見せ場 大歯車", gear1, OX + 30.5f, 20.2f, 4.2f, 12f, true, white);
-Gear("見せ場 中歯車", gear2, OX + 26.8f, 19.4f, 2.4f, -24f, true, dull);
-Gear("見せ場 小歯車", gear1, OX + 33.4f, 17.4f, 1.3f, 40f, true, dull);
+var gBig = Gear("見せ場 大歯車", gear1, OX + 30.5f, 20.2f, 4.2f, 12f, true, white);
+var gMid = Gear("見せ場 中歯車", gear2, OX + 26.8f, 19.4f, 2.4f, -24f, true, dull);
+var gSmall = Gear("見せ場 小歯車", gear1, OX + 33.4f, 17.4f, 1.3f, 40f, true, dull);
+// 見せ場の当たり判定：大と中は重なっているので 1 つの四角にまとめる（すき間・へこみを作らない）。小は離れているので別の四角
+{ var a = MapLookMenu.FootprintRect(gBig); var b = MapLookMenu.FootprintRect(gMid);
+  var u = UnityEngine.Rect.MinMaxRect(UnityEngine.Mathf.Min(a.xMin, b.xMin), UnityEngine.Mathf.Min(a.yMin, b.yMin), UnityEngine.Mathf.Max(a.xMax, b.xMax), UnityEngine.Mathf.Max(a.yMax, b.yMax));
+  MapLookMenu.AddFootprintRect(walkArea, "歩けない 足元：見せ場 大歯車と中歯車（まとめて 1 つ）", u, false);
+  Log.Append("footprint big+mid=").Append(u).Append("\n"); }
+Log.Append("footprint small=").Append(MapLookMenu.FootprintRect(gSmall)).Append("\n");
+MapLookMenu.AddFootprint(gSmall, false);
 // 遺跡の入口の脇に倒れた歯車（立てる）
-Gear("入口の脇の歯車", gear2, OX + 6.2f, 12.6f, 1.6f, 8f, true, dull);
+var gGate = Gear("入口の脇の歯車", gear2, OX + 6.2f, 12.6f, 1.6f, 8f, true, dull);
+MapLookMenu.AddFootprint(gGate, false);
 // 部屋 A の隅にまとまって転がる歯車（濃い所）
 Gear("部屋 A 転がる歯車 1", gear2, OX + 14.6f, 19.3f, 0.9f, 30f, false, dull);
 Gear("部屋 A 転がる歯車 2", gear1, OX + 15.5f, 18.6f, 0.6f, -50f, false, dim);

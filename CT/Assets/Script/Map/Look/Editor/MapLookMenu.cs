@@ -18,6 +18,8 @@ using UnityEngine.Tilemaps;
 /// ・明かり（ゆらぐ）：Light 2D（点の明かり・影あり）＋明かりのゆらぎ。たいまつ・窓の光・水面のきらめきに
 /// ・場所の色味：入ると全体の色・明るさが変わる四角
 /// ・壁の影：壁の Tilemap の塗ってあるマスから、明かりをさえぎる形（Shadow Caster 2D）を作る（横に続くマスは 1 つにまとめる）
+/// ・足元の歩けない形：選んだ物（歯車・柱・木など）の絵の大きさから、足元の四角（幅 7 割 × 下の端から中心まで）を歩ける範囲から抜く。
+///   丸い物でも当たり判定は四角でざっくり（細かい形はキャラが引っかかったり、ぶるぶるしたりするもと）
 public static class MapLookMenu
 {
     public const string ShadowRootName = "壁の影（Shadow Caster 2D・自動）";
@@ -43,6 +45,21 @@ public static class MapLookMenu
         box.size = new Vector2(10.0f, 8.0f);
         go.AddComponent<AreaTone>();
         Place(go, cmd);
+    }
+
+    [MenuItem("GameObject/マップの見た目/足元の歩けない形を付ける", false, 42)]
+    private static void MenuFootprint(MenuCommand cmd)
+    {
+        // 複数選んだときは 1 つずつ呼ばれる（cmd.context）。右クリックでなくメニューから呼んだときは選んでいる物すべて
+        var targets = new List<GameObject>();
+        if(cmd.context is GameObject one) { targets.Add(one); }
+        else { targets.AddRange(Selection.gameObjects); }
+
+        foreach(GameObject go in targets)
+        {
+            GameObject box = AddFootprint(go, true);
+            if(box != null) { Debug.Log($"{go.name}：足元の歩けない形を作りました（{box.transform.parent.name} の子）。大きさは BoxCollider2D で直せます", box); }
+        }
     }
 
     [MenuItem("CONTEXT/Tilemap/壁の影（Shadow Caster 2D）を作り直す")]
@@ -175,6 +192,87 @@ public static class MapLookMenu
         }
         SetShapePath(sc, path.ToArray());
         return sc;
+    }
+
+    //=====================================================================
+    // 足元の歩けない形（丸い物・大きな物の当たり判定をざっくりと）
+    //=====================================================================
+
+    /// <summary> 足元の四角の幅（見た目の幅に対する割合） </summary>
+    public const float FootprintWidth = 0.7f;
+
+    /// <summary>
+    /// 物の絵の大きさから「足元の四角」を求める（見た目の幅の 7 割 × 絵の下の端から中心まで）
+    /// </summary>
+    /// ・上の端を中心に合わせるのは、キャラと物の前後が上下の位置（中心）で決まるから。四角より上なら後ろ、下なら前になり、ずれない
+    public static Rect FootprintRect(GameObject target)
+    {
+        Renderer r = target.GetComponentInChildren<SpriteRenderer>();
+        if(r == null) { r = target.GetComponentInChildren<Renderer>(); }
+        if(r == null) { return new Rect(target.transform.position, Vector2.zero); }
+        Bounds b = r.bounds;
+        float w = b.size.x * FootprintWidth;
+        return new Rect(b.center.x - w * 0.5f, b.min.y, w, b.center.y - b.min.y);
+    }
+
+    /// <summary>
+    /// 物の足元に歩けない四角（BoxCollider2D＋WalkAreaExclude）を作り、物のある歩ける範囲の子にする。作った物を返す
+    /// </summary>
+    public static GameObject AddFootprint(GameObject target, bool undo)
+    {
+        Rect rect = FootprintRect(target);
+        if(rect.width <= 0.0f || rect.height <= 0.0f)
+        {
+            Debug.LogWarning($"{target.name}：絵（SpriteRenderer）がないので、足元の形を作れません", target);
+            return null;
+        }
+        WalkArea area = FindWalkArea(rect.center);
+        if(area == null)
+        {
+            Debug.LogWarning($"{target.name}：シーンに歩ける範囲（WalkArea）がないので、足元の形を作れません", target);
+            return null;
+        }
+        return AddFootprintRect(area, "歩けない 足元：" + target.name, rect, undo);
+    }
+
+    /// <summary>
+    /// 歩ける範囲の子に、歩けない四角を作る（いくつかの物をまとめて 1 つの四角にするときにも使う）
+    /// </summary>
+    public static GameObject AddFootprintRect(WalkArea area, string name, Rect rect, bool undo)
+    {
+        Transform old = area.transform.Find(name);
+        if(old != null)
+        {
+            if(undo) { Undo.DestroyObjectImmediate(old.gameObject); }
+            else     { Object.DestroyImmediate(old.gameObject); }
+        }
+
+        var go = new GameObject(name);
+        go.transform.SetParent(area.transform, false);
+        go.transform.position = new Vector3(rect.center.x, rect.center.y, 0.0f);
+        go.transform.rotation = Quaternion.identity;
+        go.transform.localScale = Vector3.one;
+        var box = go.AddComponent<BoxCollider2D>();
+        box.isTrigger = true;
+        Vector3 s = go.transform.lossyScale;
+        box.size = new Vector2(rect.width / Mathf.Max(0.0001f, s.x), rect.height / Mathf.Max(0.0001f, s.y));
+        go.AddComponent<WalkAreaExclude>();
+        if(undo) { Undo.RegisterCreatedObjectUndo(go, "足元の歩けない形"); }
+        return go;
+    }
+
+    /// <summary> その点を含む歩ける範囲（なければいちばん近い物） </summary>
+    private static WalkArea FindWalkArea(Vector2 point)
+    {
+        WalkArea best = null;
+        float bestDist = float.MaxValue;
+        foreach(WalkArea a in Object.FindObjectsByType<WalkArea>())
+        {
+            if(a.ContainsPoint(point)) { return a; }
+            float d = Vector2.Distance(point, a.transform.position);
+            if(d < bestDist) { bestDist = d; best = a; }
+        }
+        return best;
     }
 
     private static void SetShapePath(ShadowCaster2D sc, Vector3[] path)

@@ -18,6 +18,39 @@ expect eval !NavMesh2D.Instance.SamplePosition(new UnityEngine.Vector2(38f, 22.2
 warp 50,17                               # 部屋 B の中、大きな歯車（56.5, 20.2）の左下
 key RightArrow 2500
 expect eval UnityEngine.Vector2.Distance(UnityEngine.Object.FindAnyObjectByType<PlayerSwitchManager>().CurrentPlayer.transform.position, new UnityEngine.Vector2(56.5f, 20.2f)) > 1.2f   # 大きな歯車の中に入っていない
+# 足が壁の縁からはみ出ない（11-25 の不具合）：ノアの絵は位置から 0.61 下まで。縁の下の端より足が下へ出ないか
+warp 52,27.5                             # 部屋 B の上の壁（上の縁の下の端 y25）の外側
+key DownArrow 2000
+expect eval UnityEngine.Object.FindAnyObjectByType<PlayerSwitchManager>().CurrentPlayer.transform.position.y - 0.61f > 24.98f   # 足が上の壁の縁より下へ出ていない
+warp 58,18                               # 部屋 B の中（下の縁 y15〜15.33）
+key DownArrow 2000
+expect eval UnityEngine.Object.FindAnyObjectByType<PlayerSwitchManager>().CurrentPlayer.transform.position.y - 0.61f > 14.98f   # 足が下の壁の縁より外へ出ていない
+warp 44.5,20.5                           # 廊下の上の壁（縁の下の端 y18）の外側
+key DownArrow 2000
+expect eval UnityEngine.Object.FindAnyObjectByType<PlayerSwitchManager>().CurrentPlayer.transform.position.y - 0.61f > 17.98f
+warp 44.5,17.6                           # 廊下の中（下の縁 y15.67〜16）
+key DownArrow 2000
+expect eval UnityEngine.Object.FindAnyObjectByType<PlayerSwitchManager>().CurrentPlayer.transform.position.y - 0.61f > 15.65f
+warp 42.5,27.6                           # 崩れた壁のかけら（lx15〜17・面 y25・縁の下の端 y26）の外側
+key DownArrow 2000
+expect eval UnityEngine.Object.FindAnyObjectByType<PlayerSwitchManager>().CurrentPlayer.transform.position.y - 0.61f > 25.98f
+# 歯車の当たり判定は足元の四角でざっくり（11-25）：大と中＝x51.96〜57.97・y18.1〜20.2 の 1 つ、小＝x58.95〜59.86・y16.75〜17.4
+warp 51,21.5                             # 大歯車の後ろ（四角より上）の左
+key RightArrow 3000
+expect eval UnityEngine.Object.FindAnyObjectByType<PlayerSwitchManager>().CurrentPlayer.transform.position.x > 58.5f   # 歯車の後ろを通り抜けられる
+warp 55,16.3                             # 大歯車の前（四角より下）
+key UpArrow 1500
+expect eval UnityEngine.Object.FindAnyObjectByType<PlayerSwitchManager>().CurrentPlayer.transform.position.y < 18.12f   # 前からは入れない
+# 押し続けても位置が行ったり来たりしない（右へ押したまま 2 回測る）
+warp 50.5,19.2                           # 四角の左（y は四角の中ほど）
+eval UnityEngine.InputSystem.InputSystem.QueueStateEvent(UnityEngine.InputSystem.Keyboard.current, new UnityEngine.InputSystem.LowLevel.KeyboardState(UnityEngine.InputSystem.Key.RightArrow)); return "hold right";
+wait 1.2
+eval UnityEditor.SessionState.SetVector3("ct_mapchip_p1", UnityEngine.Object.FindAnyObjectByType<PlayerSwitchManager>().CurrentPlayer.transform.position); return "p1";
+wait 0.7
+expect eval UnityEngine.Vector3.Distance(UnityEditor.SessionState.GetVector3("ct_mapchip_p1", UnityEngine.Vector3.zero), UnityEngine.Object.FindAnyObjectByType<PlayerSwitchManager>().CurrentPlayer.transform.position) < 0.02f   # 押したまま止まっている（ぶるぶるしない）
+expect eval UnityEngine.Object.FindAnyObjectByType<PlayerSwitchManager>().CurrentPlayer.transform.position.x < 51.98f   # 四角に入っていない
+eval UnityEngine.InputSystem.InputSystem.QueueStateEvent(UnityEngine.InputSystem.Keyboard.current, new UnityEngine.InputSystem.LowLevel.KeyboardState()); return "release";
+warp 50,17                               # 部屋 B の中へ戻る
 wait 1.5                                 # 場所の色味が「遺跡の中」に切り替わるまで（0.8 秒）
 expect eval System.Array.Find(UnityEngine.Object.FindObjectsByType<UnityEngine.Rendering.Universal.Light2D>(), l => l.lightType == UnityEngine.Rendering.Universal.Light2D.LightType.Global).intensity < 0.5f  # 遺跡の中は暗い（場所の色味 0.42）
 expect eval UnityEngine.GameObject.Find("浜辺と遺跡（Test_Mapchip_Beach）/歯車（見せ場と散らばり）/見せ場 大歯車").transform.childCount >= 1   # 影を付ける（DropShadow2D）の影と、明かりをさえぎる形がある

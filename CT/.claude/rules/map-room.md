@@ -53,6 +53,7 @@ paths:
 - **A 明かり**：URP 2D の Light 2D（レンダラーは Renderer2D なので使える）。`LightFlicker`（明るさ・大きさをノイズでゆらす）。`MapLookMenu.CreateLight`（点・影あり・内側の半径 12%・falloff 0.6・影の濃さ 0.75）。壁の影は `MapLookMenu.BuildShadowCasters(Tilemap)`（横に続くマスを 1 つの四角に）・`AddCircle`（立っている物）。
   - Shadow Caster 2D の形：絵も当たり判定もない物に `AddComponent` すると Awake で 1×1 の四角（ShapeEditor）になる → 付けたあとで大きさを変える。円などは SerializedObject で `m_ShapePath` と `m_ShapePathHash`（前と違う値にすると作り直される）。形の元を選ぶ欄（`m_ShadowCastingSource`）は internal。
   - **エディタの一時カメラ（cam.Render）では点の明かりが写らなかった**（Global Light は写る）。明かりの見え方は再生して `capture` で撮る。一時カメラは try/finally で必ず消す（残るとゲームビューを覆う。`unity-check` の SKILL.md）。
+- **足元の歩けない形**（11-25 ユーザーの指示「丸い物に細かい判定を付けると挙動がおかしくなるもと。違和感がない程度にざっくり」）：`MapLookMenu.FootprintRect`（幅＝見た目の 7 割・下の端から中心まで）・`AddFootprint`（物のある WalkArea の子に BoxCollider2D＋WalkAreaExclude）・`AddFootprintRect`（重なる物をまとめた四角）。Hierarchy 右クリック > マップの見た目 > 足元の歩けない形を付ける。**上の端を中心にするのは、Y で前後が決まる（Transparency Sort Axis＝Y、並び順 100 どうし）ので、四角より上＝後ろ・下＝前がずれないため**。明かりをさえぎる形（AddCircle）は 8 角形に。
 - **B 影を付ける** `DropShadow2D`：隠れた子（HideAndDontSave）に影の SpriteRenderer を作る（シーンに保存しない・OnDisable で消す）。並び順は既定 4（床の影）。
 - **C 隅の影** `AutoShade`＋`AutoShadeEditor.Rebuild`：床のマスごとに、上が壁＝薄い、上と横（左右・同じマスに縁）＝濃い。マスはワールド座標経由で合わせる（Grid が違っても合う）。影の層は「床の上の砂」より下（砂に埋もれた床に影が出ないように）。
 - **E 場所の色味** `AreaTone`：範囲は OnEnable で BoxCollider2D から Rect に（再生中は当たり判定を切る）。`AreaToneDriver` が操作中のキャラの位置で優先度の大きい範囲を選び、Global Light 2D をなめらかに変える。最初の Global Light の値が「元」。`StageDarkness` があるシーンでは止まる（明るさの取り合いを避ける）。シーンに Global Light 2D がないと警告。

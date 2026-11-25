@@ -96,7 +96,7 @@
 | `Map/Look/AutoShade.cs`、`Map/Look/Editor/AutoShadeEditor.cs` | （11-25）**隅の影**：影用の Tilemap に付け、床・壁の Tilemap から、壁ぎわ（上・左右・縁の乗ったマス）を薄い影、角を濃い影で塗る（Inspector の「影を塗り直す」・`AutoShadeEditor.Rebuild`） | ◎ |
 | `Map/Look/AreaTone.cs`、`Map/Look/AreaToneDriver.cs` | （11-25）**場所の色味**：四角（BoxCollider2D、再生中は当たり判定を切る）に操作中のキャラが入ると、Global Light 2D の色・明るさをなめらかに変える（優先度・秒数）。出ると元の値。`AreaToneDriver` は再生中に自動で 1 つ作られる。`StageDarkness` があるシーンでは働かない | ◎ |
 | `Map/Look/LightFlicker.cs` | （11-25）**明かりのゆらぎ**：Light 2D の明るさ・大きさをパーリンノイズでゆらす（たいまつ・水面のきらめき）。位置で種を変える | ◎ |
-| 🛠`Map/Look/Editor/MapLookMenu.cs` | （11-25）Hierarchy 右クリック > マップの見た目 > 明かり（ゆらぐ）／場所の色味。Tilemap の ⋮ > 壁の影（Shadow Caster 2D）を作り直す（塗ったマスを横にまとめた四角。絵も当たり判定もない物に付けると 1×1 の形ができるので引き伸ばす）。`CreateLight`・`BuildShadowCasters`・`AddBox`・`AddCircle`（形の点を m_ShapePath に入れる）はレシピからも使う | ◎ |
+| 🛠`Map/Look/Editor/MapLookMenu.cs` | （11-25）Hierarchy 右クリック > マップの見た目 > 明かり（ゆらぐ）／場所の色味。Tilemap の ⋮ > 壁の影（Shadow Caster 2D）を作り直す（塗ったマスを横にまとめた四角。絵も当たり判定もない物に付けると 1×1 の形ができるので引き伸ばす）。`CreateLight`・`BuildShadowCasters`・`AddBox`・`AddCircle`（形の点を m_ShapePath に入れる）はレシピからも使う。**足元の歩けない形を付ける**（11-25。`FootprintRect`＝見た目の幅 7 割 × 下の端から中心まで、`AddFootprint`／`AddFootprintRect`＝物のある WalkArea の子に BoxCollider2D＋WalkAreaExclude） | ◎ |
 | `Camera/MapchipViewTester.cs` | （11-25）**マップチップの見え方を試すシーン（`Test_Mapchip`）だけで使う**。P＝Pixel Perfect Camera のオン・オフ、Z＝ズーム（Pixel Perfect のときは基準の解像度を変える）、左下に状態（OnGUI。試すとき専用なので IMGUI のまま）。ふつうのステージには置かない | ◎ |
 | `Camera/FocusCamera.cs` | プレイヤーを追い、マップの範囲で止める（11-13 から `MapArea.TryGetViewRect`＝マップの絵 → Tilemap。前は Tilemap で、絵の外が映っていた）。**カメラの範囲**（`CameraArea`）の中ならその範囲で止める。`BeginBlend`（なめらかに移る。範囲が変わったとき・`SetTarget(t, true)`）、`LookAt`（決めた場所を映す）（謎解き段階4） | ◎ |
 | `Camera/CameraArea.cs` | カメラの範囲（Is Trigger の BoxCollider2D。`Find` で位置を含む範囲〔優先度〕） | ◎ |
