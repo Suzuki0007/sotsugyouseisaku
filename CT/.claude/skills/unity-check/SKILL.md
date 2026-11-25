@@ -23,8 +23,13 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .claude/skills/unity-check/s
 `[ERROR] Unity Editor is not ready` が出たら、ユーザーに断ってから起動する（数分かかるので裏で待つ）：
 
 ```powershell
-$env:Path = "C:\Users\uhiro\AppData\Local\Unity\bin;" + $env:Path; unity open . ; unity status --until-ready --timeout 600
+$env:Path = "$env:LOCALAPPDATA\Unity\bin;" + $env:Path; unity open . ; unity status --until-ready --timeout 600
 ```
+
+## Unity CLI の場所（PC が2台）
+- 家の PC（ユーザー uhiro）と学校の PC（ユーザー amg）の両方で作業する。CLI はどちらも `%LOCALAPPDATA%\Unity\bin\unity.exe`（公式の入れ方の既定の場所）。`scripts/lib.ps1` はユーザー名を書かずにここを探す（`UNITY_CLI_HOME` があればそちらが先、なければ PATH の `unity`）。
+- CLI がない PC では `[ERROR] Unity CLI not found` が出る → `irm https://unity.com/install.ps1 | iex` で入れる（ユーザーに断ってから。2026-11-25 に学校の PC へ入れた、1.0.1）。
+- スクリプトに **ユーザー名の入ったパスを書かない**（`$env:LOCALAPPDATA`・`$env:USERPROFILE` を使う）。Fork の Git も `%LOCALAPPDATA%\Fork\gitInstance` から探している。
 
 ## 結果の読み方
 - コンパイルのエラー・警告は `recompile` の表（severity / file / line / message）に出る。**自分が書いたファイルのものだけ直す。**既存のものは報告して `Docs/code-map.md` の「4. 問題点」へ。

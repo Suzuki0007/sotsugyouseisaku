@@ -328,32 +328,34 @@ public static class SceneChecker
     private static void CheckWalkAreaAndTimpani(Context ctx)
     {
         // 歩ける範囲：形があるか・出現位置や調べる物が範囲の中か
+        // 歩ける範囲はシーンに何個置いてもよく、全部を合わせた範囲になる（WalkArea の説明）。
+        // 判定も全部の範囲で行う（11-25：前は最初の1つだけを見ていて、2つ目の範囲の中の出現位置をエラーにしていた）
         List<WalkArea> areas = new List<WalkArea>(ctx.Find<WalkArea>());
-        if(areas.Count > 1) { ctx.Add(Level.Warning, areas[1], "歩ける範囲（WalkArea）が2つ以上あります（使われるのは1つだけです）"); }
-
-        WalkArea area = areas.Count > 0 ? areas[0] : null;
-        if(area != null)
+        foreach(WalkArea a in areas)
         {
-            if(area.ShapeCount == 0)
+            if(a.ShapeCount == 0)
             {
-                ctx.Add(Level.Error, area, "歩ける範囲（WalkArea）に形がありません。子に Circle / Box / Polygon Collider 2D の付いた物を置いてください（このままだとどこへでも歩けます）");
+                ctx.Add(Level.Error, a, "歩ける範囲（WalkArea）に形がありません。子に Circle / Box / Polygon Collider 2D の付いた物を置いてください（このままだとどこへでも歩けます）");
             }
-            else
+        }
+
+        List<WalkArea> shaped = areas.FindAll(a => a.ShapeCount > 0);
+        if(shaped.Count > 0)
+        {
+            System.Func<Vector3, bool> inside = p => shaped.Exists(a => a.ContainsPoint(p));
+            foreach(PlayerSpawnPoint point in ctx.Find<PlayerSpawnPoint>())
             {
-                foreach(PlayerSpawnPoint point in ctx.Find<PlayerSpawnPoint>())
+                if(!inside(point.transform.position))
                 {
-                    if(!area.ContainsPoint(point.transform.position))
-                    {
-                        ctx.Add(Level.Error, point, $"出現位置「{point.SpawnPointId}」が歩ける範囲の外にあります（出たとたんに範囲のふちへ動かされます）");
-                    }
+                    ctx.Add(Level.Error, point, $"出現位置「{point.SpawnPointId}」が歩ける範囲の外にあります（出たとたんに範囲のふちへ動かされます）");
                 }
-                foreach(TimpaniPeg peg in ctx.Find<TimpaniPeg>())
-                {
-                    Collider2D col = peg.GetComponent<Collider2D>();
-                    bool reachable = area.ContainsPoint(peg.transform.position) ||
-                                     (col != null && area.ContainsPoint(col.bounds.ClosestPoint(peg.transform.position + Vector3.down * 10.0f)));
-                    if(!reachable) { ctx.Add(Level.Warning, peg, "ペグが歩ける範囲の外にあります（近づけないかもしれません）"); }
-                }
+            }
+            foreach(TimpaniPeg peg in ctx.Find<TimpaniPeg>())
+            {
+                Collider2D col = peg.GetComponent<Collider2D>();
+                bool reachable = inside(peg.transform.position) ||
+                                 (col != null && inside(col.bounds.ClosestPoint(peg.transform.position + Vector3.down * 10.0f)));
+                if(!reachable) { ctx.Add(Level.Warning, peg, "ペグが歩ける範囲の外にあります（近づけないかもしれません）"); }
             }
         }
 

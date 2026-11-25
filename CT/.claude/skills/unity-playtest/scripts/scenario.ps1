@@ -119,6 +119,9 @@ try {
                     Start-Sleep -Milliseconds 800
                     $orig = E 'var s = UnityEngine.InputSystem.InputSystem.settings; string o = s.editorInputBehaviorInPlayMode + "|" + s.backgroundBehavior; s.editorInputBehaviorInPlayMode = UnityEngine.InputSystem.InputSettings.EditorInputBehaviorInPlayMode.AllDeviceInputAlwaysGoesToGameView; s.backgroundBehavior = UnityEngine.InputSystem.InputSettings.BackgroundBehavior.IgnoreFocus; return o;'
                     $inputChanged = $true
+                    # Play started while the Editor was in the background: the keyboard can stay disabled even after IgnoreFocus
+                    # (seen on the school PC 2026-11-25: no key reached the game until EnableDevice). Harmless when it is already on.
+                    [void](E 'if (UnityEngine.InputSystem.Keyboard.current != null) UnityEngine.InputSystem.InputSystem.EnableDevice(UnityEngine.InputSystem.Keyboard.current); return "ok";')
                     $errBase = [int](E 'var t = System.Type.GetType("UnityEditor.LogEntries,UnityEditor"); int n = (int)t.GetMethod("StartGettingEntries").Invoke(null, null); t.GetMethod("EndGettingEntries").Invoke(null, null); return n;')
                 } else {
                     [void](E ("UnityEngine.SceneManagement.SceneManager.LoadScene(`"" + (Esc $arg) + "`"); return `"ok`";"))

@@ -62,7 +62,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File $sc -Name all               
 
 - 書き方は `Docs/テストシナリオの書き方.md`（プランナー向け）と、`scenario.ps1` の先頭のコメント（命令の一覧）。
 - `scene` の最初の行で `start.ps1` を呼び、最後に必ず `end.ps1`（セーブを戻す）。`-KeepPlaying` で再生を止めない。`-StopOnFail` で最初の不合格で止まる。
-- **本当のキー入力**：実行中だけ `InputSystem.settings.editorInputBehaviorInPlayMode = AllDeviceInputAlwaysGoesToGameView`・`backgroundBehavior = IgnoreFocus` にして `QueueStateEvent` で押す（エディタが手前になくても届く。E で調べる・Enter で UI の決定まで確かめた）。終わったら元の設定（`PointersAndKeyboardsRespectGameViewFocus`・`ResetAndDisableNonBackgroundDevices`）に戻す。press.ps1 を単体で使うときは設定を変えないので届かない。
+- **本当のキー入力**：実行中だけ `InputSystem.settings.editorInputBehaviorInPlayMode = AllDeviceInputAlwaysGoesToGameView`・`backgroundBehavior = IgnoreFocus` にして `QueueStateEvent` で押す（エディタが手前になくても届く。E で調べる・Enter で UI の決定まで確かめた）。終わったら元の設定（`PointersAndKeyboardsRespectGameViewFocus`・`ResetAndDisableNonBackgroundDevices`）に戻す。press.ps1 を単体で使うときは設定を変えないので届かない。設定を変えたあと `InputSystem.EnableDevice(Keyboard.current)` も呼ぶ（2026-11-25、学校の PC：エディタが裏のまま再生を始めると、設定を変えてもキーボードが止まったままで、どのキーも届かなかった）。
 - 追跡は `advance battle`（戦闘エリアが始まった瞬間に止まる）のすぐ後に `warp`。遅いと捕まって最初からやり直しになる。
 - 戦闘中に `invincible off` で会話を送ると倒れる。倒す確認は `kill`（自分で無敵を切る）。
 - `expect no-error` は、始めてからのコンソールのエラー（Pipeline・Account API の通信のエラーは除く）。

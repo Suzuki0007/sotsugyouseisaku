@@ -88,8 +88,9 @@
 
 ## 環境
 
-- **Git**：PATH にはないが、Fork に同梱の Git が使える：`C:\Users\uhiro\AppData\Local\Fork\gitInstance\2.50.1\cmd\git.exe`（Fork を更新すると版のフォルダ名が変わることがある → `Fork\gitInstance\` の下を探す）。今の変更の一覧と差分の要約は `finish-task` スキルの `scripts/changes.ps1`。リポジトリは GitHub。**リポジトリの一番上は CT の1つ上**（`C:\tokeitou\sotsugyouseisaku`。Git の表示は `CT/...`）。**ユーザーが触るブランチは `ueeyama_home` と `Uh_School` の2つだけ。**ほかのブランチ（`narita` など、他の人のもの）は触らない。頼まれて Git を操作するときも、この2つ以外への切り替え・コミット・マージ・push はしない（頼まれた内容がほかのブランチに及ぶなら、実行せずに確かめる）。今どのブランチかは決めつけずに `changes.ps1` で確かめる。
-- **Unity CLI**：`C:\Users\uhiro\AppData\Local\Unity\bin\unity.exe`（PowerShell では `$env:Path = "C:\Users\uhiro\AppData\Local\Unity\bin;" + $env:Path` を先に。スキルのスクリプトは自分で設定する）。`com.unity.pipeline`（0.10.0-exp.1）。エディタが開いていれば `unity command ...` で操作できる。起動していなければ `unity open .`（ユーザーに断ってから）。
+- **PC は2台**（家＝ユーザー uhiro・プロジェクト `C:\tokeitou\sotsugyouseisaku\CT`、学校＝ユーザー amg・`D:\sotugyouseisaku\sotsugyouseisaku\CT`）。どちらでも動くように、**スクリプトにユーザー名・ドライブの入ったパスを書かない**（`$env:LOCALAPPDATA`・スクリプトの場所から求める）。
+- **Git**：PATH にはないが、Fork に同梱の Git が使える：`%LOCALAPPDATA%\Fork\gitInstance\<版>\cmd\git.exe`（Fork を更新すると版のフォルダ名が変わることがある → `Fork\gitInstance\` の下を探す）。今の変更の一覧と差分の要約は `finish-task` スキルの `scripts/changes.ps1`。リポジトリは GitHub。**リポジトリの一番上は CT の1つ上**（Git の表示は `CT/...`）。**ユーザーが触るブランチは `ueeyama_home` と `Uh_School` の2つだけ。**ほかのブランチ（`narita` など、他の人のもの）は触らない。頼まれて Git を操作するときも、この2つ以外への切り替え・コミット・マージ・push はしない（頼まれた内容がほかのブランチに及ぶなら、実行せずに確かめる）。今どのブランチかは決めつけずに `changes.ps1` で確かめる。
+- **Unity CLI**：`%LOCALAPPDATA%\Unity\bin\unity.exe`（両方の PC。PowerShell では `$env:Path = "$env:LOCALAPPDATA\Unity\bin;" + $env:Path` を先に。スキルのスクリプトは自分で設定する〔`unity-check/scripts/lib.ps1`〕。ない PC では `irm https://unity.com/install.ps1 | iex`）。`com.unity.pipeline`（0.10.0-exp.1）。エディタが開いていれば `unity command ...` で操作できる。起動していなければ `unity open .`（ユーザーに断ってから）。
 - **ユーザーも同じエディタでテストプレイしていることがある。** オートセーブ枠とスロット1〜3（`persistentDataPath/save_*.json`）はすべてユーザーのデータ。
 - **ロードしても困らないかを確かめる**（ユーザーの指示）。イベントやシーンの通り道を変えたら、そのシーンのシナリオに `reload`（タイトル → つづきから）とその後の `expect` を入れて流す。**シナリオの `reload` で確かめた通り道は、手で試し直さない**（11-20 合意）。シナリオがない通り道だけ手で（手順は `rules/save-ui.md`）。再生テストは `unity-playtest` で（バックアップ・復元をする）。
 - テストで作るアセットは `Assets/__ClaudeTest/` に置き、最後に削除する。eval 用の .cs は `Assets/` の外に置く（中だとインポートが走る）。**シーンは勝手に保存しない**（必要なときは理由を伝える）。
@@ -98,7 +99,7 @@
 
 ## シーン・フォルダ
 
-- **ゲームで使うシーンは `Title` → `Stage1_0`（砂浜。はじめからは海の上の小舟の `Start_Boat` で OP・手紙 → 上陸 → 奥の振動）→ `Stage1_1`（塔のスチル → 怪物から逃げて塔へ） → `Stage1_2` → `Stage1_3`（書斎。11-20〜）→ `Stage1_4`（T字通路。11-20〜。左右の部屋・扉を開ける大なぞはまだない）、`Stage_1_Boss`（ティンパニ部屋。2026-11-19 に `Stage_1_3` から名前が変わった。セーブの ID などは `Stage_1_3_〇〇` のまま。**合流をボスの前に移したので、今はどこからもつながっていない**）、`SceneGameOver`**（Build Settings もこの8つ）。`Stage1`、`Stage2`、`SampleScene`、`kari_*` はファイルだけ残っている。
+- **ゲームで使うシーンは `Title` → `Stage1_0`（砂浜。はじめからは海の上の小舟の `Start_Boat` で OP・手紙 → 上陸 → 奥の振動）→ `Stage1_1`（塔のスチル → 怪物から逃げて塔へ） → `Stage1_2` → `Stage1_3`（書斎。11-20〜）→ `Stage1_4`（T字通路。11-20〜。左右の部屋・扉を開ける大なぞはまだない）、`Stage_1_Boss`（ティンパニ部屋。2026-11-19 に `Stage_1_3` から名前が変わった。セーブの ID などは `Stage_1_3_〇〇` のまま。**合流をボスの前に移したので、今はどこからもつながっていない**）、`SceneGameOver`**（Build Settings もこの8つ）。`Stage1`、`Stage2`、`SampleScene`、`kari_*` はファイルだけ残っている。`Test_Mapchip`（2026-11-25）はマップチップの見え方を試すシーン（Build Settings に入れない。`rules/scenes.md`）。
 - スクリプトは `Assets/Script/<機能>/`、エディタ拡張は各機能の `Editor/`。asmdef はない。書き方は `.claude/rules/coding-style.md`。
 
 ## 文書
@@ -108,7 +109,7 @@
 - プランナー向けの通しの手順書：`Docs/プランナー向け作業手順書.md`（食い違うときはこちらが新しい）。**プランナーが使う機能を足したり、メニュー名・Inspector の項目名を変えたりしたときだけ**、個別の手順書に加えてこちらも更新する。メニュー・部品の早見表は手で書かず、付録から `Docs/早見表（自動）.md` へ案内するだけ（11-20 合意）。
 - **自動の早見表**：`Docs/早見表（自動）.md`（直接直さない。コードを変えたら `QuickReferenceBuilder.Build()` で作り直す。finish-task に入れてある）。
 - **MUSE.AI（指示書を書く側）に渡す資料**：`Docs/MUSE向け/`（1＝指示書を書くときの決まり、2＝今のゲームの状態、3＝キャラと会話の確定事項〔会話の全文は CSV から書き出した写し〕。2026-11-20 作成）。シーン・フラグ・キャラ設定・会話を大きく変えたら 2・3 を更新する（3 の全文は書き出し直す）。指示書を実装したら「指示書との違いの報告」を返す（1 の 5 章）。
-- 個別の手順書：`Docs/素材の取り込み.md`、`Docs/素材の渡し方.md`（作る人向け）、`Docs/合図の使い方.md`、`Docs/テストシナリオの書き方.md`、`Docs/ティンパニ部屋の作り方と調整.md`、`Docs/敵の作り方.md`、`謎解きと2人の仕掛けの作り方.md`、`タイトル画面とセーブの仕組み.md`、`アイテム連動イベントの作り方.md`、`フラグの使い方.md`、`イベントの順番と待ち時間.md`、`プランナー用ツールの使い方.md`。
+- 個別の手順書：`Docs/素材の取り込み.md`、`Docs/マップチップの置き方.md`（11-25）、`Docs/素材の渡し方.md`（作る人向け）、`Docs/合図の使い方.md`、`Docs/テストシナリオの書き方.md`、`Docs/ティンパニ部屋の作り方と調整.md`、`Docs/敵の作り方.md`、`謎解きと2人の仕掛けの作り方.md`、`タイトル画面とセーブの仕組み.md`、`アイテム連動イベントの作り方.md`、`フラグの使い方.md`、`イベントの順番と待ち時間.md`、`プランナー用ツールの使い方.md`。
 - **素材チェックリスト**：`Docs/素材チェックリスト.xlsx`（2026-11-13 作成。足りない素材・仮素材・今後必要な素材 92 件。区分・状態・優先度・進み具合のプルダウン、集計シート）。一番左の「済」の列に ✓（素材ができた）、既定の並びは区分→優先度→ID（見た目は `asset-audit` の `format.ps1`）。素材を入れたら `asset-audit` スキルで点検する（行ごとの「確認キー（自動）」で解決したかを判定し、「自動の点検」に書く）。
 - 共有用（Claude Docs）：プランナー向け作業手順書 https://claude.ai/artifact/HawxoKhE7Pz73WdbUbxwt4 、引き継ぎ資料 https://claude.ai/artifact/MZz5A9WgmQNB8owyj3yxeW 。**Markdown と自動で同期はしない**ので、Markdown を大きく直したら共有用にも反映する（頼まれたとき）。
 

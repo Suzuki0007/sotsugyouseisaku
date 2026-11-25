@@ -1,7 +1,16 @@
 # Shared helpers for the CT project's Unity CLI skills.
 # ASCII only (Windows PowerShell 5.1 reads BOM-less files as ANSI).
 
-$env:Path = "C:\Users\uhiro\AppData\Local\Unity\bin;" + $env:Path
+# Unity CLI: the installer puts it in %LOCALAPPDATA%\Unity\bin on every PC (home: uhiro, school: amg).
+# UNITY_CLI_HOME (installer option) wins; otherwise fall back to whatever "unity" is already on PATH.
+$Script:UnityBin = $null
+foreach ($d in @($(if ($env:UNITY_CLI_HOME) { Join-Path $env:UNITY_CLI_HOME "bin" }), (Join-Path $env:LOCALAPPDATA "Unity\bin"))) {
+    if ($d -and (Test-Path (Join-Path $d "unity.exe"))) { $Script:UnityBin = $d; break }
+}
+if ($Script:UnityBin) { $env:Path = $Script:UnityBin + ";" + $env:Path }
+elseif (-not (Get-Command unity -ErrorAction SilentlyContinue)) {
+    Write-Output "[ERROR] Unity CLI not found. Install it with: irm https://unity.com/install.ps1 | iex"
+}
 $env:UNITY_NO_BANNER = "1"
 $env:UNITY_NO_PAGER = "1"
 

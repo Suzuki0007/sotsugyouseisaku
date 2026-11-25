@@ -40,6 +40,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File $r -Recipe stage1_2_door  # 
 | 音（全シーン・データ・プレハブ） | `audio_1_sedata` → `audio_2_assets` → `audio_3_scenes` → `audio_4_footstep_outdoor`（Stage1_1 の外の足音）。**11-15 から同じことを割り当て表 `Docs/素材の割り当て/2026-11-14_BGM_SE.tsv` で流せる**（`asset-intake` の `apply.ps1`。素材の入れ直しはこちらを使う） | 2026-11-14 の BGM・SE の素材。1＝SeData を作る（音量をそろえる）、2＝プレハブ・データの欄、3＝5 シーンの欄・BGM の条件（保存する）。何度実行しても同じ。**Stage1_2・Stage_1_Boss のイベントのレシピで作り直したら `audio_3_scenes` をもう一度**（演出の音・足した鐘やうなり声の部品が消えるため） |
 | Stage_1_Boss | `stage1_3_1_room` → `2_pegs` → `3b_enemies` → `3c_bullet` → `4_link` → `4b_calmsprite` → `5_flow` → `autosave_points` | 1_room は「ティンパニ部屋」を消して作るので、**後の全部をやり直す**。`3a_enemydata` はアセット（EnemyData・行動・攻撃・フラグ）を作る/上書きするので、ふだんは実行しない。`6_barks`（11-14）は TimpaniBarks を一言データに移した一度きりのレシピ（スクリプトは削除済みなので、もう実行できない。`5_flow` は戦闘エリアの戦闘中フラグ `Flag_Timpani_InBattle` を入れる形に直した） |
 | SceneGameOver | `gameover_keyboard` | |
+| Test_Mapchip（マップチップの見え方を試す・東に見本の「浜辺と遺跡」。11-25） | `mapchip_tiles` → `mapchip_test` → `mapchip_beach` | tiles＝追加タイル（Kabe.2・Umi.2 の向き違い、ランダム反転の Rule Tile、影）とパレットの下の段（アセットだけ・何度でも）。test＝なければ Stage1_4 をコピー、ルート「マップチップの試し（Test_Mapchip）」と「Grid（Mapchip）」を消して作る。beach＝「浜辺と遺跡（Test_Mapchip_Beach）」と「Grid（浜辺と遺跡）」を消して作る（**test を流したら beach も**＝通り道・MapBounds がそろう）。Build Settings には入れない。値は `rules/scenes.md` |
 | （アセット） | `portrait_and_title` | Sigle.asset・UI_TitleImage の取り込み設定・Title の背景 |
 
 **レシピに入っていない、後から変えた値**（作り直すと戻る → 作り直したら入れ直す）：

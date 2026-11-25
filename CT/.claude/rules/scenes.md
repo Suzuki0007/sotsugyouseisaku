@@ -83,6 +83,25 @@ paths:
 - 11-19：波は **SpriteFrameBlend**（コマの間を混ぜる・水面の高さを合わせて上下・ゆらぎ）で動かしている。SpriteAnimator は付いたまま止めてある（戻すときは SpriteFrameBlend を外す・SpriteAnimator を有効・Material を Sprite-Lit-Default に）。データの Fps はユーザーが 0.3 にした（1コマ約 3.3 秒）。確かめ方：一時的なカメラで `EvaluateAt(秒)` ごとに撮る（シーンを保存せずに見られる）。3枚は Single・ピボット下の真ん中（3枚目だけ 3 ピクセル低いので下でそろえる）。前に付いていた Animator（`sunahama_nami_1_size_0.controller`・`NamiAnim.anim`）は外した（アセットは残っている）。
 - OP の会話の範囲 `OP/OP_途中（鐘の言い伝え）`・`OP/OP_塔の入口（F1_01）` は Stage1_1 と同じ物がある。
 
+### Test_Mapchip（マップチップの見え方を試すシーン。2026-11-25）
+- **Build Settings に入れない**（試すとき専用）。レシピ `mapchip_test`（なければ Stage1_4 をコピーし、T字通路・古い Grid・MapEntity を外して作る。何度流しても同じ）。シナリオ `mapchip_test.txt`。
+- マップ 24×18 マス（1 マス＝64px＝PPU 64、左下のマスが (0,0)）。下から海（Umi.1/Umi.2 の市松、y0〜2）／床（左 x1〜11 砂・右 x12〜22 Yuka、Yuka の中に砂の 3×3〔x16〜18・y6〜8〕）／上の壁 Kabe.1（y16〜17）／左右の壁 Kabe.1＋部屋の側の縁（x0・x23。11-25 から。前は Kabe.2）。歯車は飾りの層。Tilemap は「床」0・「壁」1・「飾り」2、当たり判定なし（歩ける範囲で決める）。Grid のセルの大きさ 1・すき間 0（変えない）。
+- 部屋の型（Room `Test_Mapchip`）：部屋の絵＝**マップの範囲（見えない絵。Suna.1 を 24×18 に引き伸ばして透明・MapBounds）**。プレイヤーの初期化が MapBounds を必ず使う（ないとエラーで一時停止）。歩ける範囲＝壁の内側（x1〜23・y3〜16）、カメラの範囲＝マップ全体。出現位置 (12, 5.5)。
+- カメラ：**Pixel Perfect Camera**（URP。Assets PPU 64・基準 920×690・Crop Frame＝Stretch Fill・Grid Snapping＝Pixel Snapping、Upscale Render Texture は使わない）＋ `MapchipViewTester`（P＝オン・オフ、Z＝ズーム）。
+  - 920×690 にした理由：ステージは縦 10.8 マス（Orthographic Size 5.4）・中央 4:3。64px のチップで同じ高さ＝691px → 4:3 で 920×690（Size 5.39）。指示書の候補（320×180 など）は 16px くらいの絵向けで、寄りすぎる。
+  - 1920×1080 で確かめた（11-25、描画先を 1920×1080 にして撮影）：Stretch Fill は 4:3 の `Camera.rect`（MapCameraAspect）を保ち、Size 5.39。Crop Frame＝None は画面全体（1920×1080）に広がって Size 8.44（縦 16.9 マス）になる＝使えない。1080p では 1.565 倍の引き伸ばし（整数倍ではない）なので、継ぎ目の対策の中心はアトラスの余白・Point・Clamp・圧縮なし。
+  - ゲームビューが 920×690 より小さいと、Pixel Perfect Camera が「Target resolution is smaller than the reference resolution」を出して効かない（学校の PC のゲームビューは 640×480）。見比べるときはゲームビューを 1920×1080 などに。
+  - **今のステージ（Stage1_0〜Stage_1_Boss）には付けていない**。付けるかはユーザーがこのシーンで見てから決める。
+- シグルは出ない（`Flag_Sigle_Joined` が立っていない。2人で試すならデバッグウィンドウでフラグを立てる）。
+- **東の「浜辺と遺跡」（マップチップの見本。11-25）**：レシピは `mapchip_tiles`（追加タイル・パレット）→ `mapchip_test`（試しの場所。右の壁 x23 の y8〜9 に通り道、MapBounds はシーン全体 66×28）→ `mapchip_beach`（x26〜66・y0〜28＝40×28 マス。ルート「浜辺と遺跡（Test_Mapchip_Beach）」・「Grid（浜辺と遺跡）」）。シナリオ `mapchip_beach.txt`。
+  - 中身：段々の海岸線と入り江（Umi.2 の4方向）・沖ほど暗い海（影のタイル）・砂浜（ランダム反転）・途切れた石畳の道・遺跡の部屋 A（lx8〜16・床 y14〜20）と B（lx20〜35・床 y15〜22、下の辺 lx26〜28 は崩れて砂が入り込む）を廊下（lx17〜19・y16〜17）でつなぐ・崩れた壁のかけら 5 つ・見せ場の大きな歯車（部屋 B）・散らばった歯車（影つき）。
+  - 層の並び順：海と砂 0・床 1・床の上の砂 2・影 3（物の影 4）・壁の面 4・平らな小物 5・キャラと立っている物 100・壁の縁 110／111。
+  - 歩ける範囲：海岸線の段ごとの四角（波打ち際は砂の半分だけ）＋通り道。壁は細い帯だけ `WalkAreaExclude`（部屋の中は陸の四角に入っている）。立っている歯車は円で抜く。カメラの範囲は x23.8〜66（試しの場所の 0〜24 と少し重ねる）。
+  - 歯車はドット絵なので 90 度ごとの回転＋反転だけ（斜めに回すと画素がゆがんだ）。影は `DropShadow2D`、立っている歯車は円の Shadow Caster 2D。
+  - 見た目（11-25 提案 A・B・C・E）：子「見た目（明かり・場所の色味）」＝たいまつの明かり 4（ゆらぐ・影あり）・水面のきらめき 3（影なし）・場所の色味（夕方の浜辺 0.85／遺跡の中 0.42・優先度 1）。「隅の影（自動・AutoShade）」の層（並び順 2）。壁の面の Tilemap の子に「壁の影（Shadow Caster 2D・自動）」。
+  - 歩ける範囲が 2 つ（試しの場所・浜辺と遺跡）あるシーン。シーンチェックは全部の範囲を合わせて判定する（11-25 に直した。前は最初の 1 つだけを見て、浜辺の出現位置をエラーにしていた）。
+  - コツとタイルの使い方は `Docs/マップチップの置き方.md`。
+
 ### Title・SceneGameOver
 - Title：`TitleSceneBuilder`（Tools > タイトル画面）で作り直せる。背景 `Images/UI/UI_TitleImage.PNG`（AspectRatioFitter で画面いっぱい）。
 - SceneGameOver：Canvas に `MenuKeyboardNav`（レシピ `gameover_keyboard`）。

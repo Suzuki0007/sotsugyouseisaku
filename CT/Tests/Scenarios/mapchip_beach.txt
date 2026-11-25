@@ -1,0 +1,31 @@
+# Test_Mapchip の東「浜辺と遺跡」（マップチップの見本）：試しの場所の右の壁の通り道から本当のキーで東へ歩いて入れる → 海に入れない → 遺跡の部屋の壁（面）に入れない → 部屋 A から廊下を通って部屋 B（見せ場）へ行ける・大きな歯車には入れない（2026-11-25）
+scene Test_Mapchip
+wait 1
+expect eval !UnityEditor.EditorApplication.isPaused                     # 始めたときのエラーで止まっていない
+warp 21,9                                # 試しの場所の右の壁の手前（通り道 y8〜9 の前）
+key RightArrow 2500                      # 東へ歩いて通り道を抜ける
+expect eval UnityEngine.Object.FindAnyObjectByType<PlayerSwitchManager>().CurrentPlayer.transform.position.x > 26.5f
+warp 35,8.5                              # 浜辺の石畳の上（この列の波打ち際は y5）
+key DownArrow 3000                       # 海へ向かって歩き続ける
+expect eval UnityEngine.Object.FindAnyObjectByType<PlayerSwitchManager>().CurrentPlayer.transform.position.y > 5.4f   # 海に入っていない
+expect eval UnityEngine.Object.FindAnyObjectByType<PlayerSwitchManager>().CurrentPlayer.transform.position.y < 6.5f   # 波打ち際までは歩けた
+warp 38,17.5                             # 部屋 A の中（床 y14〜20、壁の面は y21 から）
+key UpArrow 2500                         # 北の壁へ向かって歩く
+expect eval UnityEngine.Object.FindAnyObjectByType<PlayerSwitchManager>().CurrentPlayer.transform.position.y < 21.05f  # 壁の面に入っていない
+expect eval NavMesh2D.Instance.IsReachable(new UnityEngine.Vector2(38f, 17.5f), new UnityEngine.Vector2(54f, 17f), EnemySize.Small)   # 部屋 A から廊下を通って部屋 B（見せ場の前）へ道がつながっている
+expect eval NavMesh2D.Instance.IsReachable(new UnityEngine.Vector2(38f, 17.5f), new UnityEngine.Vector2(35f, 8.5f), EnemySize.Small)   # 部屋 A の下の扉から浜辺へ出られる
+expect eval !NavMesh2D.Instance.SamplePosition(new UnityEngine.Vector2(38f, 22.2f), 0.05f, EnemySize.Small, out UnityEngine.Vector2 _)   # 壁の面（壁の中）に床がない
+warp 50,17                               # 部屋 B の中、大きな歯車（56.5, 20.2）の左下
+key RightArrow 2500
+expect eval UnityEngine.Vector2.Distance(UnityEngine.Object.FindAnyObjectByType<PlayerSwitchManager>().CurrentPlayer.transform.position, new UnityEngine.Vector2(56.5f, 20.2f)) > 1.2f   # 大きな歯車の中に入っていない
+wait 1.5                                 # 場所の色味が「遺跡の中」に切り替わるまで（0.8 秒）
+expect eval System.Array.Find(UnityEngine.Object.FindObjectsByType<UnityEngine.Rendering.Universal.Light2D>(), l => l.lightType == UnityEngine.Rendering.Universal.Light2D.LightType.Global).intensity < 0.5f  # 遺跡の中は暗い（場所の色味 0.42）
+expect eval UnityEngine.GameObject.Find("浜辺と遺跡（Test_Mapchip_Beach）/歯車（見せ場と散らばり）/見せ場 大歯車").transform.childCount >= 1   # 影を付ける（DropShadow2D）の影と、明かりをさえぎる形がある
+capture mapchip_beach_ruins
+warp 38,8.5                              # 浜辺へ出る
+wait 1.5
+expect eval System.Array.Find(UnityEngine.Object.FindObjectsByType<UnityEngine.Rendering.Universal.Light2D>(), l => l.lightType == UnityEngine.Rendering.Universal.Light2D.LightType.Global).intensity > 0.75f && System.Array.Find(UnityEngine.Object.FindObjectsByType<UnityEngine.Rendering.Universal.Light2D>(), l => l.lightType == UnityEngine.Rendering.Universal.Light2D.LightType.Global).intensity < 0.95f   # 浜辺は夕方（0.85）
+warp 12,6                                # 試しの場所（色味の範囲の外）
+wait 1.5
+expect eval System.Array.Find(UnityEngine.Object.FindObjectsByType<UnityEngine.Rendering.Universal.Light2D>(), l => l.lightType == UnityEngine.Rendering.Universal.Light2D.LightType.Global).intensity > 0.95f  # 元の明るさ（1）に戻る
+expect no-error
