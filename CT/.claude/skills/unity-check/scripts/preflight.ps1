@@ -34,6 +34,14 @@ foreach ($l in ($state -split "`n")) {
     elseif ($l -eq "COMPILE-OK") { Write-Output "[OK] no compile errors" }
 }
 
+# hidden cameras left behind (a temporary capture camera draws over the Main Camera in the Game view)
+$stray = Find-StrayCameras -Remove
+foreach ($s in $stray) {
+    if ($s -match "\(removed\)") { Write-Output "[FIXED] leftover temporary camera removed: $s" }
+    else { Write-Output "[ASK] hidden camera in the editor: $s (it may cover the Game view). Ours? destroy it. Not ours? ask."; $need = 1 }
+}
+if ($stray.Count -eq 0) { Write-Output "[OK] no leftover hidden cameras" }
+
 # git branch (read only)
 $git = Get-ChildItem (Join-Path $env:LOCALAPPDATA "Fork\gitInstance") -Directory -ErrorAction SilentlyContinue | Sort-Object Name -Descending | Select-Object -First 1
 if ($git) {

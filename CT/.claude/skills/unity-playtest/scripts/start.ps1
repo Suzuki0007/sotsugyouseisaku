@@ -69,6 +69,8 @@ r
 }
 
 # --- 3. play
+# a leftover temporary capture camera would cover the Main Camera (player looks missing, nothing moves)
+foreach ($s in (Find-StrayCameras -Remove)) { Write-Output "[WARN] hidden camera: $s" }
 unity command editor.playmode set_run_in_background --enabled true --result-only 2>$null | Out-Null
 unity command editor.playmode start --result-only 2>$null | Out-Null
 

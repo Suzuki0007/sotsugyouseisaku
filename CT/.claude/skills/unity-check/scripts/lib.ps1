@@ -45,6 +45,31 @@ function Show-UnityConsole {
     }
 }
 
+# Hidden cameras left in the Editor (HideAndDontSave, enabled, not the Scene view camera).
+# A temporary capture camera that was not destroyed (an exception before DestroyImmediate) draws over the Main Camera
+# in the Game view: the player seems missing and nothing moves (2026-11-25, Test_Mapchip).
+# -Remove destroys the ones whose name starts with "tmp" (made by Claude's eval snippets). Returns one line per camera.
+function Find-StrayCameras {
+    param([switch]$Remove)
+    $rm = if ($Remove) { "true" } else { "false" }
+    $code = @"
+var sb = new System.Text.StringBuilder();
+foreach (var c in UnityEngine.Resources.FindObjectsOfTypeAll<UnityEngine.Camera>()) {
+  if (UnityEditor.EditorUtility.IsPersistent(c) || c == null) continue;
+  if ((c.gameObject.hideFlags & UnityEngine.HideFlags.DontSave) == 0) continue;
+  if (c.name == "SceneCamera" || c.name == "Preview Camera" || !c.enabled) continue;
+  bool tmp = c.name.StartsWith("tmp");
+  sb.Append(c.name).Append(" at ").Append(c.transform.position);
+  if ($rm && tmp) { UnityEngine.Object.DestroyImmediate(c.gameObject); sb.Append(" (removed)"); }
+  sb.Append("\n");
+}
+return sb.ToString();
+"@
+    $r = Invoke-UnityEval -Quiet -Code $code
+    if ($r) { return ($r -split "`n" | Where-Object { $_ }) }
+    return @()
+}
+
 # Runs C# in the Editor and returns the parsed result object (or $null on failure).
 function Invoke-UnityEval {
     param(

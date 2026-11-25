@@ -43,6 +43,10 @@ $env:Path = "$env:LOCALAPPDATA\Unity\bin;" + $env:Path; unity open . ; unity sta
 Invoke-UnityEval -Code 'UnityEngine.Application.persistentDataPath'
 ```
 
+## 一時カメラ（撮影用）を残さない
+- eval で撮影用のカメラを作るときは、名前を `tmp` で始め、**`try { … } finally { DestroyImmediate(カメラ) }`** で必ず消す（Global Light などを一時的に変えたときも finally で戻す）。
+- 2026-11-25：撮影の途中でエラーになり、Hierarchy に出ないカメラ（HideAndDontSave）が残った → メインカメラより手前に描かれ、ゲームビューが前の場所の絵のまま（「プレイヤーがいない・動かない」）。`lib.ps1` の `Find-StrayCameras [-Remove]` で見つける（`tmp` で始まる物だけ消す）。**preflight.ps1 と start.ps1 が毎回見る**（消したら `[FIXED]`／`[WARN]`、ほかの名前なら `[ASK]`）。
+
 ## 注意
 - コードを変えた直後はリロード中で `EDITOR_NOT_RUNNING` になることがある → スクリプトが `status --until-ready` で待つ。
 - .ps1 に日本語を書くなら UTF-8 の BOM 付き（BOM なしだと文字化けして構文エラー。Write／Edit のあとフック `bom-ps1` が自動で付ける）。関数名 `H` は使わない（Get-History の別名）。
