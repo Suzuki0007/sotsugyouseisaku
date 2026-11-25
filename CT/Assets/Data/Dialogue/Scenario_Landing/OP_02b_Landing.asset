@@ -17,15 +17,3 @@ MonoBehaviour:
     expression: 0
     speakerName: 
     text: "(\u3064\u3044\u305F\u3001\u3001)"
-  - character: {fileID: 11400000, guid: 5dd6beef385447d41b6fb1926a5d911e, type: 2}
-    expression: 4
-    speakerName: 
-    text: "(\u3001\u3001\u9707\u3048\u3066\u308B\uFF1F)"
-  - character: {fileID: 11400000, guid: 5dd6beef385447d41b6fb1926a5d911e, type: 2}
-    expression: 5
-    speakerName: 
-    text: "(\u97F3\u53C9\u3060\u3051\u3058\u3083\u306A\u3044\u3002\u8EAB\u4F53\u306B\u3082\u3001\u3001)"
-  - character: {fileID: 11400000, guid: 5dd6beef385447d41b6fb1926a5d911e, type: 2}
-    expression: 0
-    speakerName: 
-    text: "(\u3053\u306E\u5CF6\u3001\u666E\u901A\u3058\u3083\u306A\u3044)"

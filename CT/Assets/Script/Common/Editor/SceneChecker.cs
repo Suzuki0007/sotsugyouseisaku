@@ -77,6 +77,7 @@ public static class SceneChecker
         CheckRooms(ctx);
         CheckSignals(ctx);
         CheckAutoSave(ctx);
+        CheckCinema(ctx);
         CheckStartPositions(ctx);
         CheckSpawnTriggers(ctx);
         CheckPrompts(ctx);
@@ -161,6 +162,33 @@ public static class SceneChecker
             if(moves && !saves)
             {
                 ctx.Add(Level.Info, sequence, "2人を移す・2人の状態を変えるイベントにオートセーブがありません。通り道が変わる（入口に戻れなくなる）なら、最後に部品「オートセーブ」を置いてください（ロードで進めなくなるのを防ぐ）");
+            }
+        }
+    }
+
+    /// <summary>
+    /// シネマ演出（上下の帯）：「始める」のあとに「終える」がない（帯が出たまま・カメラが寄ったままになる）、寄る物が空、字幕の文が空
+    /// </summary>
+    private static void CheckCinema(Context ctx)
+    {
+        foreach(EventSequence sequence in ctx.Find<EventSequence>())
+        {
+            bool open = false;
+            foreach(EventAction action in sequence.GetActions())
+            {
+                if(action is CinemaEventAction cinema)
+                {
+                    open = cinema.IsBegin;
+                    if(cinema.MissingObject) { ctx.Add(Level.Warning, cinema, "シネマ演出の寄る先が「物」なのに、寄る物が空です（カメラは寄る先なしで動きます）"); }
+                }
+                if(action is SubtitleEventAction subtitle && subtitle.IsEmpty)
+                {
+                    ctx.Add(Level.Warning, subtitle, "字幕の会話データも字幕の文も空です（何も出ません）");
+                }
+            }
+            if(open)
+            {
+                ctx.Add(Level.Warning, sequence, "シネマ演出を「始める」のあとに「終える」がありません。流れの最後に部品「シネマ演出」の「終える」を置いてください（帯が出たまま・カメラが寄ったままになる）");
             }
         }
     }

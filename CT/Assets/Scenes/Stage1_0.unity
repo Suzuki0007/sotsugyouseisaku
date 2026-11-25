@@ -35266,10 +35266,11 @@ GameObject:
   - component: {fileID: 941290376}
   - component: {fileID: 941290375}
   - component: {fileID: 941290374}
+  - component: {fileID: 941290370}
   - component: {fileID: 941290373}
   - component: {fileID: 941290372}
   - component: {fileID: 941290371}
-  - component: {fileID: 941290370}
+  - component: {fileID: 941290392}
   - component: {fileID: 941290369}
   - component: {fileID: 941290368}
   - component: {fileID: 941290367}
@@ -35368,6 +35369,23 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DialogueEventAction
   dialogueData: {fileID: 11400000, guid: d76356fd839aa4b4f8832ec52ed764d2, type: 2}
+  dialogue: {fileID: 0}
+  closeMode: 0
+  waitUntilClosed: 1
+  closeKey: 19
+--- !u!114 &941290392
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 941290365}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 399965c7902ef0f40952c6d622c87f01, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DialogueEventAction
+  dialogueData: {fileID: 11400000, guid: 7e4d7486e9774d01882c5b4f04d50a89, type: 2}
   dialogue: {fileID: 0}
   closeMode: 0
   waitUntilClosed: 1

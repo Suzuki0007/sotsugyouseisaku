@@ -109,11 +109,12 @@ AddWait(op, 0.4f);
 { var a = op.AddComponent<MoveObjectEventAction>(); SetProp(a, "targetKind", 1); SetProp(a, "type", 1); SetProp(a, "offset", new UnityEngine.Vector2(0f, stepUp)); SetProp(a, "duration", 0.9f); SetProp(a, "ease", 0); SetProp(a, "waitUntilDone", true); }
 AddFlags(op, new[]{ letterRead }); // 海の小舟 → 岸の小舟、通り道 → 歩けない形
 AddWait(op, 0.4f);
-// 振動（小）
+// 「ついた」→ 振動（小）→「震えてる？」（2026-11-25 ユーザーの指示：揺れは「ついた」と「震えてる？」の間）
+AddTalk(op, L("OP_02b_Landing"));
 AddSe(op, Se("Se_kiiin"));
 AddShake(op, shakeS, shakeSTime, false);
 AddWait(op, 0.5f);
-AddTalk(op, L("OP_02b_Landing"));
+AddTalk(op, L("OP_02b_Vibe"));
 AddFlags(op, new[]{ Flag("Flag_Land_VibeS"), opDone });
 op.AddComponent<AutoSaveEventAction>();
 { var se = op.AddComponent<SceneStartEvent>(); var so = new UnityEditor.SerializedObject(se); so.FindProperty("sequence").objectReferenceValue = opSeq; so.FindProperty("startDark").boolValue = true;

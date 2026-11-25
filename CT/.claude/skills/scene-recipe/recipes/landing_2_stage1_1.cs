@@ -34,13 +34,16 @@ var fx = NewGO(null, "演出の画像（手紙・スチル）", UnityEngine.Vect
 var still = new UnityEngine.GameObject("塔の全景スチル（仮画像）", typeof(UnityEngine.RectTransform)); still.transform.SetParent(fx.transform, false);
 { var rt = (UnityEngine.RectTransform)still.transform; rt.anchorMin = UnityEngine.Vector2.zero; rt.anchorMax = UnityEngine.Vector2.one; rt.offsetMin = UnityEngine.Vector2.zero; rt.offsetMax = UnityEngine.Vector2.zero;
   var img = still.AddComponent<UnityEngine.UI.Image>(); img.sprite = UnityEditor.AssetDatabase.LoadAssetAtPath<UnityEngine.Sprite>("Assets/Images/UI/Still/tower_still_placeholder_lowangle.png"); img.preserveAspect = true; }
+still.AddComponent<CinemaStill>();         // 出たとたん上下の帯が出ている（11-25）
 still.SetActive(false);
 
 // ---- E6：着いたとき（塔の全景スチル） ----
+// 11-25 ユーザーの指示：シーンに着いたときにマップが見えてから塔のスチルになると「移動先 → 塔」になってわかりにくいので、
+// 最初から暗転しておき（startDark）、暗いまますぐスチルへ
 var arrive = NewGO(root.transform, "着いたとき（塔の全景スチル → OP_02h → オートセーブ）", new UnityEngine.Vector3(-115.2f, 11f, 0f));
 var arriveSeq = MakeSeq(arrive, true);
-AddWait(arrive, 0.6f);
-AddFade(arrive, 0, 0.6f);                 // 暗くして
+AddWait(arrive, 0.3f);
+AddFade(arrive, 0, 0.1f);                 // 暗くして（最初から暗いので、念のため）
 AddShowHide(arrive, new UnityEngine.Object[]{ still }, new UnityEngine.Object[0]);   // スチル（暗転の幕より手前）
 AddWait(arrive, 1.5f);
 AddTalk(arrive, L("OP_02h_TowerStill"));
@@ -48,7 +51,7 @@ AddShowHide(arrive, new UnityEngine.Object[0], new UnityEngine.Object[]{ still }
 AddFade(arrive, 1, 1.0f);                 // マップへ
 AddFlags(arrive, new[]{ Flag("Flag_Land_TowerStill") });
 arrive.AddComponent<AutoSaveEventAction>();
-{ var se = arrive.AddComponent<SceneStartEvent>(); var so = new UnityEditor.SerializedObject(se); so.FindProperty("sequence").objectReferenceValue = arriveSeq;
+{ var se = arrive.AddComponent<SceneStartEvent>(); var so = new UnityEditor.SerializedObject(se); so.FindProperty("sequence").objectReferenceValue = arriveSeq; so.FindProperty("startDark").boolValue = true;
   var fl = so.FindProperty("condition.flags"); fl.arraySize = 1; fl.GetArrayElementAtIndex(0).FindPropertyRelative("flag").objectReferenceValue = Flag("Flag_Land_TowerStill"); fl.GetArrayElementAtIndex(0).FindPropertyRelative("state").enumValueIndex = 1;
   so.ApplyModifiedPropertiesWithoutUndo(); }
 
