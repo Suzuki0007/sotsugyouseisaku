@@ -98,5 +98,14 @@ expect prompt 全部戻す
 key E
 wait 3
 expect eval PresentationDirector.CurrentMoodName == "" && PresentationDirector.CurrentWeatherName == "" && PresentationDirector.CurrentLightName == "Light_夜"
+# 場所の色味（北西の角）：光を変えていないときは、入ると夕方の色（全体の光 0.9）→ 出ると夜に戻る
+warp -120.5,36.5
+wait 2
+expect eval PresentationDirector.CurrentLightName == "場所の色味"
+expect eval System.Array.Exists(UnityEngine.Object.FindObjectsByType<UnityEngine.Rendering.Universal.Light2D>(), l => l.lightType == UnityEngine.Rendering.Universal.Light2D.LightType.Global && UnityEngine.Mathf.Abs(l.intensity - 0.9f) < 0.01f)
+capture test_area_tone
+warp -117.5,31.5
+wait 2
+expect eval PresentationDirector.CurrentLightName == "Light_夜"
 expect idle
 expect no-error

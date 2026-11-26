@@ -38,7 +38,7 @@ public class DialogueMoodLayer : MonoBehaviour
     private static readonly int GrainId = Shader.PropertyToID("_Grain");
     private static readonly int GrainSeedId = Shader.PropertyToID("_GrainSeed");
     private static readonly int GrainAmountId = Shader.PropertyToID("_GrainAmount");
-    private static readonly int FaceColorId = Shader.PropertyToID("_FaceColor");
+
 
     private Material portraitMaterial;
 
@@ -46,7 +46,7 @@ public class DialogueMoodLayer : MonoBehaviour
     private readonly List<Image> portraits = new List<Image>();
     private readonly List<Material> portraitOriginals = new List<Material>();
     private readonly List<TMP_Text> texts = new List<TMP_Text>();
-    private readonly List<Material> textOriginals = new List<Material>();
+    private readonly List<TMP_SubMeshUI> subMeshes = new List<TMP_SubMeshUI>();
     private readonly List<Image> collectPortraits = new List<Image>();
     private readonly List<TMP_Text> collectTexts = new List<TMP_Text>();
 
@@ -67,6 +67,7 @@ public class DialogueMoodLayer : MonoBehaviour
     private byte[] grainThreshold;
     private Color32[] grainPixels;
     private float grainBuiltDensity = -1.0f;
+    private float retintWait;
 
     /// <summary> 粒子の点の割合（0〜1） </summary>
     private float DotDensity => PresentationEase.IsLowQuality ? 0.0f : Mathf.Clamp01(values.grain * values.uiAmount * DotDensityPerGrain);
@@ -100,6 +101,19 @@ public class DialogueMoodLayer : MonoBehaviour
             UpdateMaterials();
         }
         wasBusy = busy;
+
+        // 会話の途中で文字が足される（アトラスが増えて子の文字ができる）ことがあるので、会話中は 0.25 秒ごとに色をかけ直す
+        if(applied && busy)
+        {
+            retintWait -= dt;
+            if(retintWait <= 0.0f)
+            {
+                retintWait = 0.25f;
+                Color face = MoodTint(values, values.uiAmount);
+                face.a = 1.0f;
+                for(int i = 0; i < texts.Count; i++) { if(texts[i] != null) { TintText(texts[i], face); } }
+            }
+        }
 
         float target = busy && values.uiAmount > 0.001f ? 1.0f : 0.0f;
         if(target > 0.0f && overlayRoot == null) { BuildOverlay(); }
@@ -162,11 +176,9 @@ public class DialogueMoodLayer : MonoBehaviour
         {
             TMP_Text t = collectTexts[i];
             if(t == null || texts.Contains(t)) { continue; }
+            // 文字は表示の色（CanvasRenderer の色）で色をかける。マテリアルは複製しない
+            // （11-26：複製すると、フォントに文字が足されてアトラスが 2 枚目に増えたときに TMP がエラーになり、会話が止まった）
             texts.Add(t);
-            textOriginals.Add(t.fontSharedMaterial);
-            // 文字ごとの複製のマテリアル（_FaceColor で色をかける。文字の色〔頂点の色〕は会話の仕組みのまま）
-            Material copy = t.fontMaterial;
-            copy.name = "会話画面の色調（文字・実行中）";
         }
         applied = true;
     }
@@ -179,17 +191,20 @@ public class DialogueMoodLayer : MonoBehaviour
         }
         for(int i = 0; i < texts.Count; i++)
         {
-            TMP_Text t = texts[i];
-            if(t == null) { continue; }
-            Material instance = t.fontSharedMaterial;
-            t.fontSharedMaterial = textOriginals[i];
-            if(instance != null && instance != textOriginals[i]) { Destroy(instance); }
+            if(texts[i] != null) { TintText(texts[i], Color.white); }
         }
         portraits.Clear();
         portraitOriginals.Clear();
         texts.Clear();
-        textOriginals.Clear();
         applied = false;
+    }
+
+    /// <summary> 文字（と、足されたアトラスの分の子の文字）の表示の色を変える </summary>
+    private void TintText(TMP_Text t, Color color)
+    {
+        t.canvasRenderer.SetColor(color);
+        t.GetComponentsInChildren(true, subMeshes);
+        for(int k = 0; k < subMeshes.Count; k++) { subMeshes[k].canvasRenderer.SetColor(color); }
     }
 
     private void UpdateMaterials()
@@ -214,8 +229,7 @@ public class DialogueMoodLayer : MonoBehaviour
         face.a = 1.0f;
         for(int i = 0; i < texts.Count; i++)
         {
-            TMP_Text t = texts[i];
-            if(t != null && t.fontSharedMaterial != null && t.fontSharedMaterial.HasProperty(FaceColorId)) { t.fontSharedMaterial.SetColor(FaceColorId, face); }
+            if(texts[i] != null) { TintText(texts[i], face); }
         }
     }
 
@@ -319,7 +333,6 @@ public class DialogueMoodLayer : MonoBehaviour
         portraits.Clear();
         portraitOriginals.Clear();
         texts.Clear();
-        textOriginals.Clear();
         applied = false;
         wasBusy = false;
         overlayShow = 0.0f;

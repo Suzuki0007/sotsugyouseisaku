@@ -32,8 +32,13 @@ if (!System.IO.File.Exists(stillPath))
     sb.Append("made " + stillPath + "\n");
 }
 
-UnityEditor.AssetDatabase.DeleteAsset(dst);
-if (!UnityEditor.AssetDatabase.CopyAsset("Assets/Scenes/Stage1_0.unity", dst)) return "!! copy failed";
+// 作り直しても GUID（.meta）が変わらないように、あればファイルの中身だけ Stage1_0 で上書きする（11-26）
+if (System.IO.File.Exists(dst))
+{
+    System.IO.File.Copy("Assets/Scenes/Stage1_0.unity", dst, true);
+    UnityEditor.AssetDatabase.ImportAsset(dst, UnityEditor.ImportAssetOptions.ForceUpdate);
+}
+else if (!UnityEditor.AssetDatabase.CopyAsset("Assets/Scenes/Stage1_0.unity", dst)) return "!! copy failed";
 var s = UnityEditor.SceneManagement.EditorSceneManager.OpenScene(dst, UnityEditor.SceneManagement.OpenSceneMode.Single);
 
 // アセットはシーンを開いてから読む（scene-recipe の落とし穴）
@@ -177,12 +182,12 @@ var box2 = wa.AddComponent<UnityEngine.BoxCollider2D>(); box2.isTrigger = true; 
 wa.AddComponent<WeatherArea>();
 Label(wa.transform, "天候の範囲\n（入ると止む）", V(-109.5f, 36.6f), 2.6f);
 
-// 場所の色味（北西の角。遺跡の代わり＝暗く青く）
-var at = Child("場所の色味（遺跡の代わり・暗く青く）", root.transform, V(-120.5f, 36.8f));
-var box3 = at.AddComponent<UnityEngine.BoxCollider2D>(); box3.isTrigger = true; box3.size = new UnityEngine.Vector2(3f, 2.6f);
+// 場所の色味（北西の角。夕方の色＝夜とはっきり違う色。11-26：前の「暗く青く」は夜の光とほぼ同じ値で、入っても変わらないように見えた）
+var at = Child("場所の色味（夕方の色）", root.transform, V(-120.5f, 36.5f));
+var box3 = at.AddComponent<UnityEngine.BoxCollider2D>(); box3.isTrigger = true; box3.size = new UnityEngine.Vector2(3.2f, 3.4f);
 var tone = at.AddComponent<AreaTone>();
-{ var so = new UnityEditor.SerializedObject(tone); so.FindProperty("color").colorValue = new UnityEngine.Color(0.55f, 0.65f, 0.95f, 1f); so.FindProperty("intensity").floatValue = 0.35f; so.FindProperty("priority").intValue = 0; so.FindProperty("blendSeconds").floatValue = 0.8f; so.ApplyModifiedPropertiesWithoutUndo(); }
-Label(at.transform, "場所の色味\n（入ると暗く青く）", V(-120.5f, 36.8f), 2.6f);
+{ var so = new UnityEditor.SerializedObject(tone); so.FindProperty("color").colorValue = new UnityEngine.Color(1f, 0.62f, 0.4f, 1f); so.FindProperty("intensity").floatValue = 0.9f; so.FindProperty("priority").intValue = 0; so.FindProperty("blendSeconds").floatValue = 0.8f; so.ApplyModifiedPropertiesWithoutUndo(); }
+Label(at.transform, "場所の色味\n（入ると夕方の色）", V(-120.5f, 36.5f), 2.6f);
 
 // 回想中だけ出す物（回想の台座の上。残骸の絵を借りる）
 var ghost = Child("回想中だけの物（仮）", root.transform, V(-113.5f, 37.0f));

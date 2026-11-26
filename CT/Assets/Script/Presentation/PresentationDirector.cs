@@ -509,7 +509,16 @@ public class PresentationDirector : MonoBehaviour
     //=====================================================================
 
     public static string CurrentMoodName => instance == null ? "" : NameOf(instance.TopMood(out _));
-    public static string CurrentLightName => instance == null ? "" : NameOf(instance.TopLight(out _).preset);
+    public static string CurrentLightName
+    {
+        get
+        {
+            if(instance == null) { return ""; }
+            LightLayer top = instance.TopLight(out _);
+            // 場所の色味（範囲の層）はプリセットではないので名前で出す（11-26：右上の表示が「シーンのまま」になり、効いていないように見えた）
+            return top.custom ? "場所の色味" : NameOf(top.preset);
+        }
+    }
     public static string CurrentWeatherName => instance == null ? "" : NameOf(instance.TopWeather(out _));
 
     /// <summary> 層ごとの中身（1行） </summary>
