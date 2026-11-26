@@ -1,0 +1,50 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 052b736d88f04434f96b76de4728e18b, type: 3}
+  m_Name: "Mood_P2_\u590F\u306E\u3046\u3061\u306B\u578B"
+  m_EditorClassIdentifier: Assembly-CSharp::MoodPreset
+  memo: "\u7B2C\u4E00\u5C64\u30FB\u65E5\u5E38\u3001\u30AB\u30A4\u30ED\u30B9\u3068\u306E\u518D\u4F1A\uFF08\u306A\u3081\u3089\u304B\u30FB\u85CD\u3068\u674F\u8272\u30FB\u7269\u306E\u8272\u304C\u5C11\u3057\u6B8B\u308B\uFF09"
+  saturation: 0
+  contrast: 0
+  brightness: 0
+  colorFilter: {r: 0.86, g: 0.9, b: 1, a: 1}
+  temperature: 0
+  tint: 0
+  shadowsColor: {r: 0.18, g: 0.3, b: 0.9, a: 1}
+  highlightsColor: {r: 0.66, g: 0.56, b: 0.4, a: 1}
+  splitBalance: 35
+  shadowLiftColor: {r: 0.1, g: 0.12, b: 0.38, a: 1}
+  shadowLift: 0.45
+  vignette: 0.18
+  vignetteSmoothness: 0.4
+  vignetteColor: {r: 0, g: 0, b: 0, a: 1}
+  grain: 0.06
+  grainType: 1
+  bloom: 0.2
+  bloomThreshold: 0.8
+  remap: 1
+  remapMode: 1
+  remapStops:
+  - from: 0
+    color: {r: 0.05490196, g: 0.078431375, b: 0.21176471, a: 1}
+  - from: 0.35
+    color: {r: 0.23529412, g: 0.28235295, b: 0.42352942, a: 1}
+  - from: 0.6
+    color: {r: 0.41568628, g: 0.43529412, b: 0.5882353, a: 1}
+  - from: 0.78
+    color: {r: 0.7882353, g: 0.7254902, b: 0.65882355, a: 1}
+  - from: 1
+    color: {r: 0.9882353, g: 0.84705883, b: 0.65882355, a: 1}
+  keepOriginal: 0.5
+  remapStrength: 0.25
+  applyToDialogue: 0
+  dialogueStrength: 0.8

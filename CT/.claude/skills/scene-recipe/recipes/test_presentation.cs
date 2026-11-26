@@ -206,6 +206,25 @@ var fade = ff.AddComponent<FlagFade>();
     so.ApplyModifiedPropertiesWithoutUndo();
 }
 
+// ===== 青と黄色の哀愁（11-26 依頼書 CT_mood_blue_yellow）：塗り替えの色調 P1〜P6 と、強い場面の光（最初は消えている。光のプリセット「青い夜」で点く） =====
+var byRoot = Child("青と黄色の光", root.transform, V(0f, 0f));
+PresentationMenu.BuildBlueYellowLight(PresentationMenu.BlueYellowLight.Window, V(-110.8f, 27.6f), byRoot.transform);   // 残骸2 の上から床へ（残骸の影が光の中に落ちる）
+PresentationMenu.BuildBlueYellowLight(PresentationMenu.BlueYellowLight.Lamp, V(-117.2f, 24.2f), byRoot.transform);     // 出現位置の左
+PresentationMenu.BuildBlueYellowLight(PresentationMenu.BlueYellowLight.Moon, V(-118.0f, 37.6f), byRoot.transform);     // 北の空
+PresentationMenu.BuildBlueYellowLight(PresentationMenu.BlueYellowLight.TowerTop, V(-112.8f, 38.0f), byRoot.transform); // 北の遠く
+PresentationMenu.BuildBlueYellowLight(PresentationMenu.BlueYellowLight.Watch, V(-121.0f, 25.2f), byRoot.transform);    // 西の手元
+// 残骸2 に影の形（光の中に青い影を落とす）
+var wreck2 = UnityEngine.GameObject.Find("sunahama_object_2_0");
+if (wreck2 != null && wreck2.GetComponent<UnityEngine.Rendering.Universal.ShadowCaster2D>() == null) { MapLookMenu.AddCircle(wreck2, 0.8f, 8); sb.Append("shadow caster: sunahama_object_2_0\n"); }
+
+var byLight = Load<LightPreset>(R + "Light/Light_青い夜（塗り替え用）.asset");
+var byStation = Station("青と黄色\n（P1〜P6）", PresentationStation.Kind.Mood, V(-119.0f, 22.5f), new UnityEngine.Color(0.95f, 0.85f, 0.35f),
+    All<MoodPreset>("Mood", "Mood_P1_ファミレス型", "Mood_P2_夏のうちに型", "Mood_P3_月夜の砂浜", "Mood_P4_回想ぬくもり", "Mood_P5_喪失", "Mood_P6_夜明け"));
+Set(byStation, "withLight", byLight);
+// 案ごとの光（11-26：光が主役。全体の光＝案の青、場面の光＝案の黄色）
+{ var so = new UnityEditor.SerializedObject(byStation); var wl = so.FindProperty("withLights"); var ln = new[] { "Light_P1_ファミレス型", "Light_P2_夏のうちに型", "Light_P3_月夜の砂浜", "Light_P4_回想ぬくもり", "Light_P5_喪失", "Light_P6_夜明け" }; wl.arraySize = ln.Length; for (int i = 0; i < ln.Length; i++) wl.GetArrayElementAtIndex(i).objectReferenceValue = Load<LightPreset>(R + "Light/" + ln[i] + ".asset"); so.ApplyModifiedPropertiesWithoutUndo(); }
+Station("塗り替えの\n境目を表示", PresentationStation.Kind.Bands, V(-108.8f, 24.6f), new UnityEngine.Color(0.3f, 0.9f, 0.9f));
+
 // 見本のイベント（1枚絵の台座が使う。デバッグウィンドウの「イベント（その場で試す）」・event.ps1 -Run でも動く）
 var events = Child("見本のイベント", root.transform, V(0f, 0f));
 UnityEngine.GameObject Seq(string name)

@@ -1,0 +1,48 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 052b736d88f04434f96b76de4728e18b, type: 3}
+  m_Name: "Mood_P3_\u6708\u591C\u306E\u7802\u6D5C"
+  m_EditorClassIdentifier: Assembly-CSharp::MoodPreset
+  memo: "\u4E0A\u9678\u3001\u6642\u8A08\u3001\u57CB\u846C\u306E\u7D42\u308F\u308A\uFF08\u6BB5\u968E\u30FB\u7D3A\u3068\u6DE1\u3044\u9EC4\u8272\uFF09"
+  saturation: 0
+  contrast: 0
+  brightness: 0
+  colorFilter: {r: 0.85, g: 0.9, b: 1, a: 1}
+  temperature: 0
+  tint: 0
+  shadowsColor: {r: 0.16, g: 0.28, b: 0.82, a: 1}
+  highlightsColor: {r: 0.66, g: 0.64, b: 0.45, a: 1}
+  splitBalance: 35
+  shadowLiftColor: {r: 0.06, g: 0.14, b: 0.32, a: 1}
+  shadowLift: 0.45
+  vignette: 0.25
+  vignetteSmoothness: 0.4
+  vignetteColor: {r: 0, g: 0, b: 0, a: 1}
+  grain: 0
+  grainType: 4
+  bloom: 0.15
+  bloomThreshold: 0.85
+  remap: 1
+  remapMode: 0
+  remapStops:
+  - from: 0
+    color: {r: 0.043137256, g: 0.08627451, b: 0.14901961, a: 1}
+  - from: 0.2
+    color: {r: 0.16470589, g: 0.2901961, b: 0.44705883, a: 1}
+  - from: 0.55
+    color: {r: 0.29803923, g: 0.46666667, b: 0.627451, a: 1}
+  - from: 0.85
+    color: {r: 0.9019608, g: 0.8862745, b: 0.65882355, a: 1}
+  keepOriginal: 0.5
+  remapStrength: 0.25
+  applyToDialogue: 0
+  dialogueStrength: 0.8

@@ -46,6 +46,14 @@ public class PresentationDirector : MonoBehaviour
     //=====================================================================
 
     private static PresentationDirector instance;
+    private static float sceneGlobalScale = 1.0f;
+
+    /// <summary> シーンの「全体の光の倍率」（ScenePresentation が入れる。光のプリセットの全体の光にだけ掛かる） </summary>
+    public static float SceneGlobalLightScale
+    {
+        get => sceneGlobalScale;
+        set { sceneGlobalScale = Mathf.Max(0.01f, value); if(instance != null) { instance.StartLight(0.0f, PresentationCurve.Smooth); } }
+    }
     private static bool quitting;
 
     // 色調
@@ -65,6 +73,22 @@ public class PresentationDirector : MonoBehaviour
     private Vignette vignette;
     private FilmGrain filmGrain;
     private Bloom bloom;
+    private ColorLookup colorLookup;
+
+    // 明るさ → 色の塗り替え（色の対応表 LUT を実行中に作る。11-26 依頼書「青と黄色の哀愁」）
+    private const int LutSize = 32;
+    private Texture2D lutTexture;
+    private Color32[] lutPixels;
+    private readonly Color[] rampFrom = new Color[256];
+    private readonly Color[] rampTo = new Color[256];
+    private readonly Color[] rampCurrent = new Color[256];
+    private MoodPreset rampPreset;
+    private float rampT = 1.0f;
+    private float builtRampT = -1.0f;
+    private float builtKeep = -1.0f;
+    private bool rampDirty = true;
+    private static bool showBands;
+    private static bool identityLut;
 
     private Camera cam;
     private UniversalAdditionalCameraData camData;
@@ -84,6 +108,8 @@ public class PresentationDirector : MonoBehaviour
     private readonly List<SceneLight> blendLights = new List<SceneLight>();
     private readonly List<float> blendFrom = new List<float>();
     private readonly List<float> blendTo = new List<float>();
+    private readonly List<Color> blendColorFrom = new List<Color>();
+    private readonly List<Color> blendColorTo = new List<Color>();
     private Color writtenColor;
     private float writtenIntensity = -1.0f;
 
@@ -122,6 +148,7 @@ public class PresentationDirector : MonoBehaviour
     {
         instance = null;
         quitting = false;
+        sceneGlobalScale = 1.0f;
         presetsByName = null;
         Save.BeforeCommit -= OnBeforeCommit;
         SceneManager.sceneLoaded -= OnSceneLoaded;
@@ -182,6 +209,12 @@ public class PresentationDirector : MonoBehaviour
         vignette = profile.Add<Vignette>(true);
         filmGrain = profile.Add<FilmGrain>(true);
         bloom = profile.Add<Bloom>(true);
+        colorLookup = profile.Add<ColorLookup>(true);
+        lutTexture = new Texture2D(LutSize * LutSize, LutSize, TextureFormat.RGBA32, false, true) { name = "演出の塗り替え（実行中）", filterMode = FilterMode.Bilinear, wrapMode = TextureWrapMode.Clamp };
+        lutPixels = new Color32[LutSize * LutSize * LutSize];
+        for(int i = 0; i < 256; i++) { rampCurrent[i] = rampFrom[i] = rampTo[i] = new Color(i / 255.0f, i / 255.0f, i / 255.0f, 1.0f); }
+        colorLookup.texture.value = lutTexture;
+        colorLookup.contribution.value = 0.0f;
         vignette.center.value = new Vector2(0.5f, 0.5f);
         vignette.rounded.value = false;
         filmGrain.response.value = 0.8f;
@@ -212,6 +245,7 @@ public class PresentationDirector : MonoBehaviour
         if(profile != null) { Destroy(profile); }
         if(hazeSprite != null) { Destroy(hazeSprite); }
         if(hazeTexture != null) { Destroy(hazeTexture); }
+        if(lutTexture != null) { Destroy(lutTexture); }
     }
 
     //=====================================================================
@@ -221,6 +255,7 @@ public class PresentationDirector : MonoBehaviour
     private void ResetForScene(Scene scene)
     {
         boundOnce = true;
+        sceneGlobalScale = 1.0f;
         if(dialogueMood != null) { dialogueMood.ResetForScene(); }
 
         // 回想は持ち越さない
@@ -367,7 +402,8 @@ public class PresentationDirector : MonoBehaviour
         PresentationDirector d = Get();
         if(d == null) { return; }
         d.moodLayers[(int)PresentationLayer.Base] = new MoodLayer { set = true, preset = mood };
-        d.lightLayers[(int)PresentationLayer.Base] = new LightLayer { set = true, preset = light };
+        // 光が空なら既定の層は入れない（シーンの Global Light のまま＝入れていないのと同じ。暗いステージの色の扱いも前のまま）
+        d.lightLayers[(int)PresentationLayer.Base] = light != null ? new LightLayer { set = true, preset = light } : default;
         d.weatherLayers[(int)PresentationLayer.Base] = new WeatherLayer { set = true, preset = weather };
         d.StartMood(seconds, PresentationCurve.Smooth, false);
         d.StartLight(seconds, PresentationCurve.Smooth);
@@ -569,10 +605,19 @@ public class PresentationDirector : MonoBehaviour
         moodCurve = curve;
         moodTime = 0.0f;
 
+        // 塗り替えの色の段：今の色 → 次の色（次が塗り替えなしなら今の色のまま強さだけ下げる。今が塗り替えなしなら色は動かさず強さだけ上げる）
+        System.Array.Copy(rampCurrent, rampFrom, 256);
+        if(top != null && top.Remaps) { System.Array.Copy(top.Ramp, rampTo, 256); } else { System.Array.Copy(rampCurrent, rampTo, 256); }
+        if(moodCurrent.remap <= 0.0001f) { System.Array.Copy(rampTo, rampFrom, 256); }
+        rampPreset = top != null && top.Remaps ? top : rampPreset;
+        rampT = 0.0f;
+        rampDirty = true;
+
         if(seconds <= 0.0f)
         {
             moodCurrent = target;
             moodBlending = false;
+            rampT = 1.0f;
             ApplyMood();
             return;
         }
@@ -599,14 +644,15 @@ public class PresentationDirector : MonoBehaviour
         moodTime += dt;
         if(moodUseMid)
         {
-            if(moodTime < moodDur1) { moodCurrent = MoodValues.Lerp(moodFrom, moodMid, PresentationEase.Apply(moodCurve, moodTime / moodDur1)); }
-            else if(moodTime < moodDur1 + moodDur2) { moodCurrent = MoodValues.Lerp(moodMid, moodTo, PresentationEase.Apply(moodCurve, (moodTime - moodDur1) / moodDur2)); }
-            else { moodCurrent = moodTo; moodBlending = false; }
+            // 灰色の途中は塗り替えが 0 になるので、色の段は前半＝今の色・後半＝次の色
+            if(moodTime < moodDur1) { moodCurrent = MoodValues.Lerp(moodFrom, moodMid, PresentationEase.Apply(moodCurve, moodTime / moodDur1)); rampT = 0.0f; }
+            else if(moodTime < moodDur1 + moodDur2) { moodCurrent = MoodValues.Lerp(moodMid, moodTo, PresentationEase.Apply(moodCurve, (moodTime - moodDur1) / moodDur2)); rampT = 1.0f; }
+            else { moodCurrent = moodTo; moodBlending = false; rampT = 1.0f; }
         }
         else
         {
-            if(moodTime < moodDur1) { moodCurrent = MoodValues.Lerp(moodFrom, moodTo, PresentationEase.Apply(moodCurve, moodTime / moodDur1)); }
-            else { moodCurrent = moodTo; moodBlending = false; }
+            if(moodTime < moodDur1) { rampT = PresentationEase.Apply(moodCurve, moodTime / moodDur1); moodCurrent = MoodValues.Lerp(moodFrom, moodTo, rampT); }
+            else { moodCurrent = moodTo; moodBlending = false; rampT = 1.0f; }
         }
         ApplyMood();
     }
@@ -637,13 +683,127 @@ public class PresentationDirector : MonoBehaviour
         bloom.intensity.value = low ? 0.0f : v.bloom;
         bloom.threshold.value = v.bloomThreshold;
 
+        // 明るさ → 色の塗り替え
+        UpdateLut(v);
+
         // 何も加工しないときはポストプロセスを切る（軽くするため）
-        bool need = camOriginalPost || moodBlending || !v.IsNeutral;
+        bool need = camOriginalPost || moodBlending || !v.IsNeutral || identityLut;
         if(camData != null && need != postOn)
         {
             camData.renderPostProcessing = need;
             postOn = need;
         }
+    }
+
+    //=====================================================================
+    // 明るさ → 色の塗り替え（色の対応表）
+    //=====================================================================
+
+    /// <summary> 境目の表示：塗り替える色の代わりに、色の段ごとにはっきりした色（紺・青・水色・黄・橙・赤…）で塗る（光の強さを決めるとき用） </summary>
+    public static bool ShowRemapBands
+    {
+        get => showBands;
+        set { showBands = value; if(instance != null) { instance.rampDirty = true; instance.ApplyMood(); } }
+    }
+
+    /// <summary> 確かめ用：何もしない対応表を強さ 1 で当てる（見た目が変わらなければ、対応表の向き・色の空間が正しい） </summary>
+    public static bool IdentityLutTest
+    {
+        get => identityLut;
+        set { identityLut = value; if(instance != null) { instance.rampDirty = true; instance.ApplyMood(); } }
+    }
+
+    /// <summary> 色調のプリセットを Inspector で変えたとき（今使っている物なら、すぐ反映する） </summary>
+    public static void NotifyMoodPresetChanged(MoodPreset preset)
+    {
+        if(instance == null || preset == null) { return; }
+        if(instance.TopMood(out _) == preset) { instance.StartMood(0.0f, PresentationCurve.Smooth, false); }
+    }
+
+    private static readonly Color[] BandColors =
+    {
+        new Color(0.10f, 0.10f, 0.35f), new Color(0.15f, 0.40f, 1.00f), new Color(0.20f, 0.95f, 0.95f), new Color(1.00f, 0.90f, 0.10f),
+        new Color(1.00f, 0.50f, 0.10f), new Color(1.00f, 0.15f, 0.15f), new Color(0.90f, 0.20f, 0.90f), Color.white,
+    };
+
+    private float builtRemap = -1.0f, builtLift = -1.0f;
+    private Color builtLiftColor;
+
+    private void UpdateLut(MoodValues v)
+    {
+        if(colorLookup == null) { return; }
+        // 塗り替えと「暗い所の色」は、どちらも対応表の中で混ぜる（強さも表に焼き込む）。どちらもなければ対応表を使わない
+        bool use = identityLut || v.remap > 0.0001f || v.lift > 0.0001f;
+        colorLookup.contribution.value = use ? 1.0f : 0.0f;
+        if(!use && !rampDirty) { return; }
+
+        float keep = v.keepOriginal;
+        bool same = !rampDirty && Mathf.Approximately(rampT, builtRampT) && Mathf.Abs(keep - builtKeep) < 0.002f &&
+                    Mathf.Abs(v.remap - builtRemap) < 0.002f && Mathf.Abs(v.lift - builtLift) < 0.002f && v.liftColor == builtLiftColor;
+        if(same) { return; }
+        rampDirty = false;
+        builtRampT = rampT;
+        builtKeep = keep;
+        builtRemap = v.remap;
+        builtLift = v.lift;
+        builtLiftColor = v.liftColor;
+
+        for(int i = 0; i < 256; i++) { rampCurrent[i] = Color.Lerp(rampFrom[i], rampTo[i], rampT); }
+        BuildLut(keep, v.remap, v.lift, v.liftColor);
+    }
+
+    // 暗い所の色が効く明るさの上限（これより明るい所には効かない）
+    private const float LiftRange = 0.45f;
+
+    /// <summary>
+    /// 対応表（横 32×32・縦 32 の帯）を作る。入る色（sRGB の値）の明るさで色の段を引き、元の色を残す割合・塗り替えの強さで混ぜ、
+    /// 最後に暗い所ほど「暗い所の色」を足す（黒 → 紺。明るさ 0.45 より上には効かない）
+    /// </summary>
+    private void BuildLut(float keep, float remapAmount, float lift, Color liftColor)
+    {
+        const float inv = 1.0f / (LutSize - 1);
+        bool bands = showBands && rampPreset != null;
+        for(int b = 0; b < LutSize; b++)
+        {
+            for(int g = 0; g < LutSize; g++)
+            {
+                for(int r = 0; r < LutSize; r++)
+                {
+                    float rf = r * inv, gf = g * inv, bf = b * inv;
+                    var orig = new Color(rf, gf, bf);
+                    Color c;
+                    if(identityLut) { c = orig; }
+                    else
+                    {
+                        float l = Mathf.Clamp01(0.2126f * rf + 0.7152f * gf + 0.0722f * bf);
+                        if(bands)
+                        {
+                            int k = rampPreset.StopIndexAt(l);
+                            c = BandColors[Mathf.Clamp(k, 0, BandColors.Length - 1)];
+                        }
+                        else
+                        {
+                            c = orig;
+                            if(remapAmount > 0.0001f)
+                            {
+                                Color m = rampCurrent[Mathf.Clamp(Mathf.RoundToInt(l * 255.0f), 0, 255)];
+                                if(keep > 0.0f) { m = Color.Lerp(m, orig, keep); }
+                                c = Color.Lerp(orig, m, remapAmount);
+                            }
+                            if(lift > 0.0001f)
+                            {
+                                float w = 1.0f - Mathf.Clamp01(l / LiftRange);
+                                w = w * w * lift;
+                                c = new Color(c.r + liftColor.r * w, c.g + liftColor.g * w, c.b + liftColor.b * w);
+                            }
+                        }
+                    }
+                    c.a = 1.0f;
+                    lutPixels[g * LutSize * LutSize + b * LutSize + r] = c;
+                }
+            }
+        }        lutTexture.SetPixels32(lutPixels);
+        lutTexture.Apply(false);
     }
 
     //=====================================================================
@@ -663,7 +823,7 @@ public class PresentationDirector : MonoBehaviour
         Color toColor = originalColor;
         float toIntensity = originalIntensity;
         if(top.custom) { toColor = top.color; toIntensity = top.intensity; }
-        else if(top.preset != null) { toColor = top.preset.LightColor; toIntensity = top.preset.Intensity; }
+        else if(top.preset != null) { toColor = top.preset.LightColor; toIntensity = top.preset.Intensity * sceneGlobalScale; }
 
         lightFromColor = lightColor;
         lightFromIntensity = lightIntensity;
@@ -678,6 +838,8 @@ public class PresentationDirector : MonoBehaviour
         blendLights.Clear();
         blendFrom.Clear();
         blendTo.Clear();
+        blendColorFrom.Clear();
+        blendColorTo.Clear();
         IReadOnlyList<SceneLight> all = SceneLight.All;
         for(int i = 0; i < all.Count; i++)
         {
@@ -686,13 +848,21 @@ public class PresentationDirector : MonoBehaviour
             blendLights.Add(s);
             blendFrom.Add(s.Factor);
             blendTo.Add(s.Resolve(preset != null ? preset.FactorOf(s.Group) : -1.0f));
+            blendColorFrom.Add(s.CurrentColor);
+            blendColorTo.Add(preset != null && preset.TryGetColor(s.Group, out Color pc) ? pc : s.BaseColor);
         }
+
+        // キャラの周りの光
+        glowFrom = glowCurrent;
+        glowTo = preset != null ? preset.PlayerGlow : 0.0f;
+        glowRadius = preset != null ? preset.PlayerGlowRadius : glowRadius;
 
         if(seconds <= 0.0f)
         {
             lightColor = toColor;
             lightIntensity = toIntensity;
-            for(int i = 0; i < blendLights.Count; i++) { blendLights[i].SetFactor(blendTo[i]); }
+            for(int i = 0; i < blendLights.Count; i++) { blendLights[i].SetFactor(blendTo[i]); blendLights[i].SetColor(blendColorTo[i]); }
+            glowCurrent = glowTo;
             lightBlending = false;
         }
         else { lightBlending = true; }
@@ -707,13 +877,50 @@ public class PresentationDirector : MonoBehaviour
             float t = PresentationEase.Apply(lightCurve, lightDur > 0.0f ? lightTime / lightDur : 1.0f);
             lightColor = Color.Lerp(lightFromColor, lightToColor, t);
             lightIntensity = Mathf.Lerp(lightFromIntensity, lightToIntensity, t);
+            glowCurrent = Mathf.Lerp(glowFrom, glowTo, t);
             for(int i = 0; i < blendLights.Count; i++)
             {
-                if(blendLights[i] != null) { blendLights[i].SetFactor(Mathf.Lerp(blendFrom[i], blendTo[i], t)); }
+                if(blendLights[i] != null) { blendLights[i].SetFactor(Mathf.Lerp(blendFrom[i], blendTo[i], t)); blendLights[i].SetColor(Color.Lerp(blendColorFrom[i], blendColorTo[i], t)); }
             }
             if(lightTime >= lightDur) { lightBlending = false; }
         }
         ApplyLight();
+        UpdatePlayerGlow();
+    }
+
+    //=====================================================================
+    // キャラの周りの光（光のプリセットの「キャラの周りを明るく」）
+    //=====================================================================
+
+    private float glowFrom, glowTo, glowCurrent;
+    private float glowRadius = 1.6f;
+    private Light2D glowLight;
+
+    private void UpdatePlayerGlow()
+    {
+        bool want = glowCurrent > 0.001f;
+        if(!want) { if(glowLight != null && glowLight.enabled) { glowLight.enabled = false; } return; }
+        PlayerSwitchManager psm = PlayerSwitchManager.Instance;
+        GameObject player = psm != null ? psm.CurrentPlayer : null;
+        if(player == null) { return; }
+        if(glowLight == null)
+        {
+            var go = new GameObject("キャラの周りの光（演出・自動）");
+            go.transform.SetParent(transform, false);
+            glowLight = go.AddComponent<Light2D>();
+            glowLight.lightType = Light2D.LightType.Point;
+            glowLight.falloffIntensity = 0.7f;
+            var layers = SortingLayer.layers;
+            var ids = new int[layers.Length];
+            for(int i = 0; i < layers.Length; i++) { ids[i] = layers[i].id; }
+            glowLight.targetSortingLayers = ids;
+        }
+        if(!glowLight.enabled) { glowLight.enabled = true; }
+        glowLight.intensity = glowCurrent;
+        glowLight.pointLightOuterRadius = glowRadius;
+        glowLight.pointLightInnerRadius = glowRadius * 0.15f;
+        Vector3 pp = player.transform.position;
+        glowLight.transform.position = new Vector3(pp.x, pp.y + 0.4f, 0.0f);
     }
 
     private void ApplyLight()

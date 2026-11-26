@@ -16,6 +16,7 @@ using UnityEngine;
 /// ・「条件で変える」に、フラグの条件と変える物を書いておくと、条件を満たしている間はそちらになる（優先度の大きいほうが勝つ）
 /// ・フラグが変わったら、ルールの秒数でなめらかに変わる
 /// ・部品「色調を戻す」「光を戻す」「天候を変える（シーンの既定に戻す）」は、ここで決まった物へ戻す
+/// ・「全体の光の倍率」：光のプリセットを使っている間だけ、全体の光を何倍にするか（絵が暗いシーンで上げる）
 /// ・Hierarchy 右クリック > 演出 > シーンの演出の既定 で作れる
 [AddComponentMenu("演出/シーンの演出の既定")]
 [DisallowMultipleComponent]
@@ -77,6 +78,12 @@ public class ScenePresentation : MonoBehaviour
     [Tooltip("このシーンの天候。空なら天候なし")]
     private WeatherPreset weather;
 
+    [Header("このシーンの光の合わせ方")]
+
+    [SerializeField, Label("全体の光の倍率", 0.1f, 4.0f)]
+    [Tooltip("光のプリセット（青い夜など）を使っている間だけ、全体の光の強さをこの倍率にする。絵が暗いシーン（塔の中など）で、同じプリセットでも青い夜に見えるように上げる。光のプリセットを使っていないときは効かない（今の見た目は変わらない）")]
+    private float globalLightScale = 1.0f;
+
     [Header("条件で変える")]
 
     [SerializeField]
@@ -116,6 +123,7 @@ public class ScenePresentation : MonoBehaviour
     private void Start()
     {
         GameFlags.OnChanged += OnFlagsChanged;
+        PresentationDirector.SceneGlobalLightScale = globalLightScale;
         Evaluate(out appliedMood, out appliedLight, out appliedWeather, out _);
         PresentationDirector.SetBase(appliedMood, appliedLight, appliedWeather, 0.0f);
         started = true;

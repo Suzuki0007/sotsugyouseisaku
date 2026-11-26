@@ -1,0 +1,45 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a6481e345b1f9364ea5d36f51e68ac1a, type: 3}
+  m_Name: "Light_P3_\u6708\u591C\u306E\u7802\u6D5C"
+  m_EditorClassIdentifier: Assembly-CSharp::LightPreset
+  memo: "\u6708\u591C\u306E\u7802\u6D5C\u306E\u5149\uFF1A\u7D3A\u306E\u591C\u306B\u6DE1\u3044\u9EC4\u8272\u306E\u6708\u30FB\u660E\u304B\u308A"
+  color: {r: 0.3, g: 0.45, b: 0.86, a: 1}
+  intensity: 0.58
+  playerGlow: 0.2
+  playerGlowRadius: 1.6
+  sceneLights:
+  - group: "\u7A93"
+    on: 1
+    intensity: 0.45
+    changeColor: 1
+    color: {r: 0.9019608, g: 0.8862745, b: 0.65882355, a: 1}
+  - group: "\u30E9\u30F3\u30D7"
+    on: 1
+    intensity: 0.45
+    changeColor: 1
+    color: {r: 0.9019608, g: 0.8862745, b: 0.65882355, a: 1}
+  - group: "\u6708"
+    on: 1
+    intensity: 0.45
+    changeColor: 1
+    color: {r: 0.9019608, g: 0.8862745, b: 0.65882355, a: 1}
+  - group: "\u9802\u4E0A"
+    on: 1
+    intensity: 0.45
+    changeColor: 1
+    color: {r: 0.9019608, g: 0.8862745, b: 0.65882355, a: 1}
+  - group: "\u6642\u8A08"
+    on: 1
+    intensity: 0.45
+    changeColor: 1
+    color: {r: 0.9019608, g: 0.8862745, b: 0.65882355, a: 1}

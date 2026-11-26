@@ -29,6 +29,7 @@ public class SceneLight : MonoBehaviour
     private Light2D light2D;
     private LightFlicker flicker;
     private float baseIntensity;
+    private Color baseColor = Color.white;
     private float factor = 1.0f;
     private bool initialOn = true;
     private bool initialized;
@@ -78,8 +79,23 @@ public class SceneLight : MonoBehaviour
         light2D = GetComponent<Light2D>();
         TryGetComponent(out flicker);
         baseIntensity = light2D.intensity;
+        baseColor = light2D.color;
         initialOn = light2D.enabled;
         factor = initialOn ? 1.0f : 0.0f;
+    }
+
+    /// <summary> 置いたときの色 </summary>
+    public Color BaseColor { get { Init(); return baseColor; } }
+
+    /// <summary> 今の色 </summary>
+    public Color CurrentColor { get { Init(); return light2D.color; } }
+
+    /// <summary> 光の色を変える（光のプリセットの「色を変える」） </summary>
+    public void SetColor(Color c)
+    {
+        Init();
+        c.a = 1.0f;
+        light2D.color = c;
     }
 
     /// <summary>

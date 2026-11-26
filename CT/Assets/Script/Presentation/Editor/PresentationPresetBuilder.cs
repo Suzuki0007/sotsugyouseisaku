@@ -91,6 +91,11 @@ public static class PresentationPresetBuilder
         Mood("Mood_夜明け", "ヴェルツィーの墓・エピローグの手前（暗い所は青・明るい所は淡い桃色・彩度 -10・にじみ 弱）", v, overwrite, log);
         _ = gray; _ = nightAlone;
 
+        // 青と黄色の哀愁（11-26 依頼書 CT_mood_blue_yellow。明るさ → 色の塗り替え。値は presets.json から）
+        BuildBlueYellow(overwrite, log);
+        BuildBlueYellowLights(overwrite, log);
+        if(overwrite) { SoftenBlueYellowMoods(); TintBlueYellowMoods(); }
+
         // 光
         LightPreset("Light_昼", "白・強さ 1（今の昼の値）", Color.white, 1.0f, null, overwrite, log);
         LightPreset("Light_夜", "今の Stage1_0・Stage1_1 の夜の値（レシピ night_stage1_0_1）", new Color(0.5f, 0.6f, 0.9f, 1.0f), 0.45f, null, overwrite, log);
@@ -102,6 +107,12 @@ public static class PresentationPresetBuilder
         LightPreset("Light_塔の中の暗がり", "暗い灰青・強さ 0.3。グループ「ランタン」の場面の光を点ける", new Color(0.55f, 0.6f, 0.7f, 1.0f), 0.3f,
             new List<LightPreset.SceneLightSetting> { new LightPreset.SceneLightSetting { group = "ランタン", on = true, intensity = 1.0f } }, overwrite, log);
         _ = dawn;
+
+        // 青と黄色の色調に合わせる光：全体の光は白で暗め（白い物でも黄色の段に届かない）、場面の光（窓・ランプ・月・頂上・時計）は強く点ける
+        var byLights = new List<LightPreset.SceneLightSetting>();
+        foreach(string g in new[] { "窓", "ランプ", "月", "頂上", "時計" }) { byLights.Add(new LightPreset.SceneLightSetting { group = g, on = true, intensity = 1.0f }); }
+        LightPreset by = LightPreset("Light_青い夜（塗り替え用）", "青と黄色の色調（P1〜P6）と組み合わせる。全体の光は白・暗め、窓・ランプ・月・頂上・時計の光を点ける、キャラの周りを少し明るく", Color.white, 0.25f, byLights, overwrite, log);
+        if(by != null && (overwrite || by.PlayerGlow <= 0.0f)) { by.EditorSetPlayerGlow(0.35f, 1.6f); EditorUtility.SetDirty(by); }
 
         // 天候
         var rainColor = new Color(0.8f, 0.86f, 1.0f, 0.8f);
@@ -120,6 +131,140 @@ public static class PresentationPresetBuilder
         AssetDatabase.SaveAssets();
         AssetDatabase.Refresh();
         return log.Length > 0 ? log.ToString() : "演出のプリセット：すべてそろっている（作った物なし）";
+    }
+
+    //=====================================================================
+    // 青と黄色の哀愁（P1〜P6）
+    //=====================================================================
+
+    private static void BuildBlueYellow(bool overwrite, System.Text.StringBuilder log)
+    {
+        MoodValues v;
+        v = MoodValues.Neutral;
+        RemapMood("Mood_P1_ファミレス型", "塔を止める・中庭の光（段階・青と平らな黄色・青緑の縁・加工なし）", v, RemapMode.Step, 0.0f,
+            S(0.0f, "#111F2B"), S(0.18f, "#36689B"), S(0.55f, "#5E8FA6"), S(0.72f, "#F0E478"), overwrite, log);
+        v = MoodValues.Neutral; v.vignette = 0.18f; v.grain = 0.06f; v.grainType = FilmGrainLookup.Thin2; v.bloom = 0.2f; v.bloomThreshold = 0.8f;
+        RemapMood("Mood_P2_夏のうちに型", "第一層・日常、カイロスとの再会（なめらか・藍と杏色・物の色が少し残る）", v, RemapMode.Smooth, 0.15f,
+            S(0.0f, "#0E1436"), S(0.35f, "#3C486C"), S(0.6f, "#6A6F96"), S(0.78f, "#C9B9A8"), S(1.0f, "#FCD8A8"), overwrite, log);
+        v = MoodValues.Neutral; v.vignette = 0.25f; v.bloom = 0.15f; v.bloomThreshold = 0.85f;
+        RemapMood("Mood_P3_月夜の砂浜", "上陸、時計、埋葬の終わり（段階・紺と淡い黄色）", v, RemapMode.Step, 0.0f,
+            S(0.0f, "#0B1626"), S(0.2f, "#2A4A72"), S(0.55f, "#4C77A0"), S(0.85f, "#E6E2A8"), overwrite, log);
+        v = MoodValues.Neutral; v.vignette = 0.35f; v.grain = 0.12f; v.grainType = FilmGrainLookup.Thin2; v.bloom = 0.2f; v.bloomThreshold = 0.8f;
+        RemapMood("Mood_P4_回想ぬくもり", "地下の記憶、埋葬の始まり（なめらか・明るい所が広く温かい）", v, RemapMode.Smooth, 0.1f,
+            S(0.0f, "#2B3550"), S(0.3f, "#5A6A8A"), S(0.55f, "#E8D9B0"), S(1.0f, "#FFF3C4"), overwrite, log);
+        v = MoodValues.Neutral; v.vignette = 0.35f; v.grain = 0.06f; v.grainType = FilmGrainLookup.Thin2;
+        RemapMood("Mood_P5_喪失", "カイロスの死のあと、中庭（なめらか・黄色が消える）", v, RemapMode.Smooth, 0.0f,
+            S(0.0f, "#0D1622"), S(0.5f, "#2E4A6C"), S(1.0f, "#7E9AB2"), overwrite, log);
+        v = MoodValues.Neutral; v.vignette = 0.18f; v.bloom = 0.4f; v.bloomThreshold = 0.8f;
+        RemapMood("Mood_P6_夜明け", "ヴェルツィーの墓、エピローグ（なめらか・薄紫と桃色から黄色へ）", v, RemapMode.Smooth, 0.1f,
+            S(0.0f, "#1C2340"), S(0.35f, "#4A5C8C"), S(0.6f, "#A69BC0"), S(0.8f, "#F2C9B0"), S(1.0f, "#F8EBA0"), overwrite, log);
+    }
+
+    /// <summary>
+    /// 案ごとの光（11-26 ユーザーの指示「元の絵に光で色味と雰囲気を加える」）：全体の光を案の青に、場面の光（窓・ランプ・月・頂上・時計）を案の黄色にする
+    /// </summary>
+    public static void BuildBlueYellowLights(bool overwrite, System.Text.StringBuilder log)
+    {
+        CaseLight("Light_P1_ファミレス型", "ファミレス型の光：明るめの青い夜にレモン色の明かり", new Color(0.32f, 0.50f, 0.95f), 0.72f, "#F6E87A", 0.55f, 0.2f, overwrite, log);
+        CaseLight("Light_P2_夏のうちに型", "夏のうちに型の光：藍色に沈む部屋に杏色の明かり", new Color(0.36f, 0.40f, 0.82f), 0.65f, "#FCD8A8", 0.55f, 0.2f, overwrite, log);
+        CaseLight("Light_P3_月夜の砂浜", "月夜の砂浜の光：紺の夜に淡い黄色の月・明かり", new Color(0.30f, 0.45f, 0.86f), 0.58f, "#E6E2A8", 0.45f, 0.2f, overwrite, log);
+        CaseLight("Light_P4_回想ぬくもり", "回想の光：やわらかい青に温かいクリーム色の明かり", new Color(0.55f, 0.62f, 0.90f), 0.82f, "#FFF0C4", 0.60f, 0.15f, overwrite, log);
+        CaseLight("Light_P5_喪失", "喪失の光：黄色が消える。明かりも青白く弱い", new Color(0.38f, 0.52f, 0.74f), 0.58f, "#9FB8CC", 0.30f, 0.0f, overwrite, log);
+        CaseLight("Light_P6_夜明け", "夜明けの光：薄紫の空に桃色〜黄色の明かり", new Color(0.55f, 0.52f, 0.86f), 0.78f, "#F8D0B0", 0.55f, 0.15f, overwrite, log);
+    }
+
+    private static void CaseLight(string name, string memo, Color global, float globalIntensity, string lightHex, float lightFactor, float glow, bool overwrite, System.Text.StringBuilder log)
+    {
+        ColorUtility.TryParseHtmlString(lightHex, out Color lc);
+        var lights = new List<LightPreset.SceneLightSetting>();
+        foreach(string g in new[] { "窓", "ランプ", "月", "頂上", "時計" })
+        {
+            lights.Add(new LightPreset.SceneLightSetting { group = g, on = true, intensity = lightFactor, changeColor = true, color = lc });
+        }
+        LightPreset p = LightPreset(name, memo, global, globalIntensity, lights, overwrite, log);
+        if(p != null && (overwrite || p.PlayerGlow <= 0.0f)) { p.EditorSetPlayerGlow(glow, 1.6f); EditorUtility.SetDirty(p); }
+    }
+
+    /// <summary>
+    /// P1〜P6 の色調に「暗い所を案の青・明るい所を案の黄色」へ寄せる色分けを入れる（11-26：暗い絵の場所では、青い光を掛けても青くならなかったため）
+    /// </summary>
+    public static string TintBlueYellowMoods()
+    {
+        var sb = new System.Text.StringBuilder();
+        Tint("Mood_P1_ファミレス型",   new Color(0.20f, 0.36f, 0.85f), new Color(0.70f, 0.66f, 0.38f), 30f, new Color(0.88f, 0.93f, 1.0f), new Color(0.10f, 0.22f, 0.42f), sb);
+        Tint("Mood_P2_夏のうちに型",   new Color(0.18f, 0.30f, 0.90f), new Color(0.66f, 0.56f, 0.40f), 35f, new Color(0.86f, 0.90f, 1.0f), new Color(0.10f, 0.12f, 0.38f), sb);
+        Tint("Mood_P3_月夜の砂浜",     new Color(0.16f, 0.28f, 0.82f), new Color(0.66f, 0.64f, 0.45f), 35f, new Color(0.85f, 0.90f, 1.0f), new Color(0.06f, 0.14f, 0.32f), sb);
+        Tint("Mood_P4_回想ぬくもり",   new Color(0.36f, 0.42f, 0.74f), new Color(0.72f, 0.64f, 0.46f), 20f, new Color(0.95f, 0.95f, 1.0f), new Color(0.18f, 0.22f, 0.36f), sb);
+        Tint("Mood_P5_喪失",           new Color(0.20f, 0.32f, 0.72f), new Color(0.50f, 0.56f, 0.62f), 30f, new Color(0.86f, 0.90f, 1.0f), new Color(0.06f, 0.12f, 0.22f), sb);
+        Tint("Mood_P6_夜明け",         new Color(0.32f, 0.30f, 0.76f), new Color(0.74f, 0.58f, 0.50f), 25f, new Color(0.92f, 0.90f, 1.0f), new Color(0.14f, 0.14f, 0.34f), sb);
+        AssetDatabase.SaveAssets();
+        return sb.ToString();
+    }
+
+    private static void Tint(string name, Color shadows, Color highlights, float balance, Color filter, Color lift, System.Text.StringBuilder sb)
+    {
+        var p = AssetDatabase.LoadAssetAtPath<MoodPreset>($"{Root}/Mood/{name}.asset");
+        if(p == null) { return; }
+        var so = new SerializedObject(p);
+        so.FindProperty("shadowsColor").colorValue = shadows;
+        so.FindProperty("highlightsColor").colorValue = highlights;
+        so.FindProperty("splitBalance").floatValue = balance;
+        so.FindProperty("colorFilter").colorValue = filter;
+        // 暗い所の色（黒を案の紺に沈める。11-26 ユーザーの指示「青の色合いで暗くなるように」）
+        so.FindProperty("shadowLiftColor").colorValue = lift;
+        so.FindProperty("shadowLift").floatValue = 0.45f;
+        so.ApplyModifiedPropertiesWithoutUndo();
+        sb.Append(name).Append(' ');
+    }
+
+    /// <summary> P1〜P6 の色調を「光が主役」に合わせて控えめにする（塗り替えの強さ 0.25・元の色を残す 0.5） </summary>
+    public static string SoftenBlueYellowMoods()
+    {
+        var sb = new System.Text.StringBuilder();
+        foreach(string n in new[] { "Mood_P1_ファミレス型", "Mood_P2_夏のうちに型", "Mood_P3_月夜の砂浜", "Mood_P4_回想ぬくもり", "Mood_P5_喪失", "Mood_P6_夜明け" })
+        {
+            var p = AssetDatabase.LoadAssetAtPath<MoodPreset>($"{Root}/Mood/{n}.asset");
+            if(p == null) { continue; }
+            var so = new SerializedObject(p);
+            so.FindProperty("remapStrength").floatValue = 0.25f;
+            so.FindProperty("keepOriginal").floatValue = 0.5f;
+            so.ApplyModifiedPropertiesWithoutUndo();
+            sb.Append(n).Append(' ');
+        }
+        AssetDatabase.SaveAssets();
+        return sb.ToString();
+    }
+
+    private static RemapStop S(float from, string hex)
+    {
+        ColorUtility.TryParseHtmlString(hex, out Color c);
+        return new RemapStop { from = from, color = c };
+    }
+
+    private static void RemapMood(string name, string memo, MoodValues v, RemapMode mode, float keep, params object[] rest)
+    {
+        var stops = new List<RemapStop>();
+        bool overwrite = false;
+        System.Text.StringBuilder log = null;
+        foreach(object o in rest)
+        {
+            if(o is RemapStop s) { stops.Add(s); }
+            else if(o is bool b) { overwrite = b; }
+            else if(o is System.Text.StringBuilder sb) { log = sb; }
+        }
+        string path = $"{Root}/Mood/{name}.asset";
+        MoodPreset p = LoadOrCreate<MoodPreset>(path, out bool created);
+        if(created || overwrite)
+        {
+            p.EditorSet(memo, v);
+            // 11-26 ユーザーの指示「元の絵に光で色味と雰囲気を加える」：光が主役なので、色調の塗り替えは控えめ（強さ 0.25・元の色を半分以上残す）
+            p.EditorSetRemap(mode, stops, Mathf.Max(keep, 0.5f));
+            var so = new SerializedObject(p);
+            so.FindProperty("remapStrength").floatValue = 0.25f;
+            so.ApplyModifiedPropertiesWithoutUndo();
+            EditorUtility.SetDirty(p);
+            log?.Append(created ? "作った " : "戻した ").Append(name).Append('\n');
+        }
     }
 
     //=====================================================================

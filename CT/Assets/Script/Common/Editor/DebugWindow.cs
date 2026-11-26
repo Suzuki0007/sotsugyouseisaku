@@ -154,7 +154,18 @@ public class DebugWindow : EditorWindow
                 if(GUILayout.Button("戻る")) { PresentationDirector.ExitFlashback(presentationSeconds, FlashbackTransition.Dissolve); }
                 GUI.enabled = true;
             }
-            EditorGUILayout.LabelField("プリセットの値を Inspector で変えたら、もう一度押すと反映されます。", EditorStyles.miniLabel);
+            StageDarkness stage = StageDarkness.Active;
+            if(stage != null)
+            {
+                float dark = EditorGUILayout.Slider("暗いステージの暗さ（試すだけ）", stage.Darkness, 0.0f, 1.0f);
+                if(!Mathf.Approximately(dark, stage.Darkness)) { stage.SetDarkness(dark); }
+            }
+            float scale = EditorGUILayout.Slider("全体の光の倍率（このシーン・試すだけ）", PresentationDirector.SceneGlobalLightScale, 0.1f, 4.0f);
+            if(!Mathf.Approximately(scale, PresentationDirector.SceneGlobalLightScale)) { PresentationDirector.SceneGlobalLightScale = scale; }
+
+            bool bands = EditorGUILayout.ToggleLeft("塗り替えの境目を表示（色の段ごとに 紺・青・水色・黄・橙・赤 で塗る。光の中が黄色の段に入っているかを見る）", PresentationDirector.ShowRemapBands);
+            if(bands != PresentationDirector.ShowRemapBands) { PresentationDirector.ShowRemapBands = bands; }
+            EditorGUILayout.LabelField("色調の「塗り替え」の値は、今使っている色調ならいじるとすぐ反映されます。ほかの値は、もう一度押すと反映されます。", EditorStyles.miniLabel);
         }
         EditorGUILayout.EndFoldoutHeaderGroup();
     }

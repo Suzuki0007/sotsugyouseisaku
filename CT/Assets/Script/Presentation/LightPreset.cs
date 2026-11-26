@@ -33,6 +33,13 @@ public class LightPreset : ScriptableObject
         [Label("強さ（元の何倍）", 0.0f, 4.0f)]
         [Tooltip("シーンに置いたときの強さに掛ける。1 でそのまま")]
         public float intensity = 1.0f;
+
+        [Label("色を変える")]
+        [Tooltip("オンにすると、このグループの光の色を下の色にする（杏色・レモン色など）。オフなら置いたときの色")]
+        public bool changeColor = false;
+
+        [Label("色")]
+        public Color color = Color.white;
     }
 
     [Header("説明（メモ）")]
@@ -51,6 +58,16 @@ public class LightPreset : ScriptableObject
     [Tooltip("全体の光の強さ（1＝昼。夜 0.45）")]
     private float intensity = 1.0f;
 
+    [Header("キャラの周り")]
+
+    [SerializeField, Label("キャラの周りを明るく", 0.0f, 3.0f)]
+    [Tooltip("操作中のキャラについていく弱い光の強さ。青の中でキャラの形と向きを読み取りやすくする（塗り替えで縁の段に持ち上げる）。0 でなし")]
+    private float playerGlow = 0.0f;
+
+    [SerializeField, Label("キャラの周りの光の大きさ", 0.2f, 6.0f)]
+    [Tooltip("キャラについていく光の届く半径（マス）")]
+    private float playerGlowRadius = 1.6f;
+
     [Header("場面の光（グループごと）")]
 
     [SerializeField]
@@ -64,6 +81,8 @@ public class LightPreset : ScriptableObject
     public string Memo => memo;
     public Color LightColor => color;
     public float Intensity => intensity;
+    public float PlayerGlow => playerGlow;
+    public float PlayerGlowRadius => playerGlowRadius;
 
     /// <summary>
     /// グループの強さ（元の何倍か。0 で消す）。書いていなければ -1（置いたときのまま）
@@ -81,6 +100,19 @@ public class LightPreset : ScriptableObject
 
     public IReadOnlyList<SceneLightSetting> SceneLights => sceneLights;
 
+    /// <summary> グループの光の色（書いていない・色を変えないなら false） </summary>
+    public bool TryGetColor(string group, out Color color)
+    {
+        color = Color.white;
+        if(string.IsNullOrEmpty(group)) { return false; }
+        for(int i = 0; i < sceneLights.Count; i++)
+        {
+            SceneLightSetting s = sceneLights[i];
+            if(s != null && s.group == group && s.changeColor) { color = s.color; return true; }
+        }
+        return false;
+    }
+
 #if UNITY_EDITOR
     public void EditorSet(string memoText, Color c, float i, List<SceneLightSetting> lights)
     {
@@ -88,6 +120,12 @@ public class LightPreset : ScriptableObject
         color = c;
         intensity = i;
         sceneLights = lights ?? new List<SceneLightSetting>();
+    }
+
+    public void EditorSetPlayerGlow(float glow, float radius)
+    {
+        playerGlow = glow;
+        playerGlowRadius = radius;
     }
 #endif
 }
