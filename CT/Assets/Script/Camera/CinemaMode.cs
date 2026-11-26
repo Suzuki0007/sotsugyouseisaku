@@ -35,8 +35,20 @@ public class CinemaMode : MonoBehaviour
     // 会話が終わってから帯を引っ込めるまでの間（続けて次の会話が始まるときに、帯がちらつかないように）
     private const float DialogueReleaseDelay = 0.25f;
 
-    // 字幕の文字の大きさ（どの文も同じ大きさ。1920×1080 の基準で。帯 0.12 なら2行まで入る）
-    private const float SubtitleFontSize = 30.0f;
+    // 字幕の文字の大きさ（どの文も同じ大きさ。1920×1080 の基準で）
+    private const float SubtitleFontSize = 32.0f;
+
+    // 字幕（文字とその後ろのぼかし）の並び順：会話の立ち絵（100）より手前（立ち絵の足元に文字が重なっても読める）
+    private const int TextSortingOrder = 102;
+
+    // 文字の後ろのぼかしを、マップの範囲の左右の外へはみ出させる幅（画面の端まで届くように）
+    private const float BackdropSideExtend = 600.0f;
+
+    // 字幕を置くのは、字幕の場所の下からこの割合まで
+    private const float TextTopInArea = 0.7f;
+
+    // 文字の後ろのぼかしが、下からこの割合までは同じ濃さ（そこから上へ透明に）
+    private const float BackdropSolid = 0.45f;
 
     // 名前の列の幅・名前と本文の間・帯の中の余白
     private const float NameWidth = 200.0f;
@@ -83,6 +95,7 @@ public class CinemaMode : MonoBehaviour
     private RectTransform nextMarkRect;
     private TextMeshProUGUI nextMarkText;
     private Texture2D featherTexture;
+    private Texture2D backdropTexture;
     private RawImage topFeather;
     private RawImage bottomFeather;
     private float nextMarkShownAt;
@@ -94,8 +107,14 @@ public class CinemaMode : MonoBehaviour
     // 帯を最初から出しておいてほしい一枚絵の数（CinemaStill）
     private int stillHolds;
 
-    // 今の帯の太さ（マップの映る範囲の高さに対する割合）
+    // 今の帯の太さ（マップの映る範囲の高さに対する割合）と、出しきったときの太さ
     private float barRatio;
+    private float targetRatio = 0.07f;
+
+    // 字幕の場所の高さ（マップの映る範囲の高さに対する割合）と、文字の後ろのぼかしの濃さ
+    private float textHeight = 0.22f;
+    private float backdropStrength = 0.8f;
+    private RawImage backdrop;
 
     // シネマ演出を始める前のカメラの大きさ
     private float baseSize;
@@ -185,6 +204,7 @@ public class CinemaMode : MonoBehaviour
         if(current == this) { current = null; }
         if(root != null) { Destroy(root); }
         if(featherTexture != null) { Destroy(featherTexture); }
+        if(backdropTexture != null) { Destroy(backdropTexture); }
         if(waitingKey) { waitingKey = false; closedFrame = Time.frameCount; }
     }
 
@@ -257,8 +277,9 @@ public class CinemaMode : MonoBehaviour
         }
 
         float size = baseSize / Mathf.Max(0.1f, zoom);
-        SetTextArea(Mathf.Clamp01(ratio));
-        StartTransition(Mathf.Clamp01(ratio), size, seconds);
+        targetRatio = Mathf.Clamp01(ratio);
+        SetTextArea(Mathf.Max(targetRatio, textHeight));
+        StartTransition(targetRatio, size, seconds);
     }
 
     /// <summary>
@@ -309,7 +330,18 @@ public class CinemaMode : MonoBehaviour
         transition = null;
     }
 
-    // 字幕を置く場所を、下の帯が出きったときの大きさにする（帯の動きの間も動かない）
+    /// <summary>
+    /// 字幕の場所の高さ（マップの映る範囲の高さに対する割合。帯より高く、文字の後ろにぼかしが入る）と、ぼかしの濃さ（0〜1）
+    /// （DialogueManager から。次に帯を出すときから効く）
+    /// </summary>
+    public void SetTextLayout(float height, float backdrop)
+    {
+        textHeight = Mathf.Clamp(height, 0.05f, 0.5f);
+        backdropStrength = Mathf.Clamp01(backdrop);
+        if(IsActive) { SetTextArea(Mathf.Max(targetRatio, textHeight)); SetBars(barRatio); }
+    }
+
+    // 字幕を置く場所を、帯が出きったときの大きさで固定する（帯の動きの間も動かない）
     private void SetTextArea(float ratio)
     {
         if(textArea == null) { return; }
@@ -337,6 +369,13 @@ public class CinemaMode : MonoBehaviour
         float featherAlpha = Mathf.Clamp01(ratio / 0.04f);
         if(topFeather != null)    { topFeather.color = new Color(1.0f, 1.0f, 1.0f, featherAlpha); }
         if(bottomFeather != null) { bottomFeather.color = new Color(1.0f, 1.0f, 1.0f, featherAlpha); }
+
+        // 文字の後ろのぼかし：帯と一緒に濃くなり、帯と一緒に消える
+        if(backdrop != null)
+        {
+            float open = Mathf.Clamp01(ratio / Mathf.Max(0.01f, targetRatio));
+            backdrop.color = new Color(1.0f, 1.0f, 1.0f, backdropStrength * open);
+        }
 
         root.SetActive(ratio > 0.0001f || subtitleGroup.alpha > 0.0f);
     }
@@ -374,8 +413,9 @@ public class CinemaMode : MonoBehaviour
         if(!IsActive) { autoByDialogue = true; baseSize = cam.orthographicSize; }
         IsActive = true;
         if(transition != null) { StopCoroutine(transition); transition = null; }
-        SetTextArea(Mathf.Clamp01(ratio));
-        SetBars(Mathf.Clamp01(ratio));
+        targetRatio = Mathf.Clamp01(ratio);
+        SetTextArea(Mathf.Max(targetRatio, textHeight));
+        SetBars(targetRatio);
     }
 
     /// <summary> 一枚絵が消えたとき </summary>
@@ -645,21 +685,35 @@ public class CinemaMode : MonoBehaviour
         topBar = NewBar("Top", new Vector2(0.0f, 1.0f), new Vector2(1.0f, 1.0f));
         bottomBar = NewBar("Bottom", new Vector2(0.0f, 0.0f), new Vector2(1.0f, 0.0f));
 
-        // マップの映る範囲（字幕はこの中。帯より手前に描く）
+        // マップの映る範囲（字幕はこの中）。立ち絵（会話の Canvas 100）より手前に文字を出すため、ここだけ並び順 102 の Canvas にする
         viewport = NewRect("Viewport", root.transform);
         Stretch(viewport, Vector2.zero, Vector2.one);
+        Canvas textCanvas = viewport.gameObject.AddComponent<Canvas>();
+        textCanvas.overrideSorting = true;
+        textCanvas.sortingOrder = TextSortingOrder;
 
-        // 字幕を置く場所：下の帯が「出きったときの大きさ」に固定する（帯の動きにつられて文字が下から上がってこないように）
+        // 字幕を置く場所：下の端から「字幕の場所の高さ」まで。帯が出きったときの大きさで固定する（帯の動きにつられて文字が動かないように）
         textArea = NewRect("TextArea", viewport);
-        SetTextArea(0.12f);
+        SetTextArea(textHeight);
 
-        // 字幕（下の帯の中）：左に名前の列、その右に本文の列。本文が折り返しても、2行目は本文の頭にそろう
+        // 文字の後ろの黒いぼかし（下が濃く、上へ向かって透明に。左右は画面の端まで）
+        RectTransform shade = NewRect("Backdrop", textArea);
+        Stretch(shade, Vector2.zero, Vector2.one);
+        shade.offsetMin = new Vector2(-BackdropSideExtend, 0.0f);
+        shade.offsetMax = new Vector2(BackdropSideExtend, 0.0f);
+        backdrop = shade.gameObject.AddComponent<RawImage>();
+        backdrop.texture = BackdropTexture();
+        backdrop.raycastTarget = false;
+        backdrop.color = new Color(1.0f, 1.0f, 1.0f, 0.0f);
+
+        // 字幕：左に名前の列、その右に本文の列。本文が折り返しても、2行目は本文の頭にそろう
         //   名前　ああああああああああああああああああ
         //   　　　ああああ
+        // 字幕の場所の下から 7 割の所までに置く（上のほうはぼかしが薄いので、文字は濃い所に）
         RectTransform group = NewRect("Subtitle", textArea);
-        Stretch(group, Vector2.zero, Vector2.one);
+        Stretch(group, Vector2.zero, new Vector2(1.0f, TextTopInArea));
         group.offsetMin = new Vector2(SideMargin, BottomMargin);
-        group.offsetMax = new Vector2(-SideMargin, -TopMargin);
+        group.offsetMax = new Vector2(-SideMargin, 0.0f);
 
         subtitleGroup = group.gameObject.AddComponent<CanvasGroup>();
         subtitleGroup.alpha = 0.0f;
@@ -748,6 +802,24 @@ public class CinemaMode : MonoBehaviour
         feather.uvRect = isTop ? new Rect(0.0f, 0.0f, 1.0f, 1.0f) : new Rect(0.0f, 1.0f, 1.0f, -1.0f);
         if(isTop) { topFeather = feather; } else { bottomFeather = feather; }
         return rt;
+    }
+
+    // 文字の後ろのぼかし：下から半分くらいまではしっかり黒く、そこから上へなめらかに透明へ（1×64。下が y=0）
+    private Texture2D BackdropTexture()
+    {
+        if(backdropTexture != null) { return backdropTexture; }
+
+        const int h = 64;
+        backdropTexture = new Texture2D(1, h, TextureFormat.RGBA32, false);
+        backdropTexture.wrapMode = TextureWrapMode.Clamp;
+        for(int y = 0; y < h; y++)
+        {
+            float v = y / (float)(h - 1);
+            float a = 1.0f - Mathf.SmoothStep(0.0f, 1.0f, Mathf.InverseLerp(BackdropSolid, 1.0f, v));
+            backdropTexture.SetPixel(0, y, new Color(0.0f, 0.0f, 0.0f, a));
+        }
+        backdropTexture.Apply();
+        return backdropTexture;
     }
 
     // 下が透明・上が黒のなめらかなグラデーション（1×64）

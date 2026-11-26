@@ -104,9 +104,17 @@ public class DialogueManager : Singleton<DialogueManager>
     [Tooltip("オン：会話の枠の代わりに、上下に黒い帯を出して文を下の帯に字幕で出す（カメラも少し寄る）／オフ：今までの会話の枠")]
     private bool useCinema = true;
 
-    [SerializeField, Label("帯の太さ", 0.05f, 0.3f)]
-    [Tooltip("上下それぞれの帯の太さ（マップの映る範囲の高さに対する割合）。字幕が入るので 0.1 以上")]
-    private float cinemaBarSize = 0.12f;
+    [SerializeField, Label("帯の太さ", 0.0f, 0.3f)]
+    [Tooltip("上下それぞれの黒い帯の太さ（マップの映る範囲の高さに対する割合）。細めにして、字幕は帯の上のぼかしの中に出す")]
+    private float cinemaBarSize = 0.07f;
+
+    [SerializeField, Label("字幕の場所の高さ", 0.1f, 0.5f)]
+    [Tooltip("下の端から、黒いぼかしの高さ（マップの映る範囲の高さに対する割合）。会話の枠はこのすぐ上に出るので、小さくすると枠が下がる")]
+    private float cinemaFadeHeight = 0.13f;
+
+    [SerializeField, Label("文字の後ろのぼかしの濃さ", 0.0f, 1.0f)]
+    [Tooltip("字幕の後ろの黒いぼかしの濃さ（下がいちばん濃く、上へ向かって透明になる）。0 でぼかしなし")]
+    private float cinemaBackdrop = 0.8f;
 
     [SerializeField, Label("寄る強さ", 1.0f, 2.0f)]
     [Tooltip("会話の間、カメラが寄る強さ。1 で寄らない（操作中のキャラを中心に寄る）")]
@@ -159,7 +167,58 @@ public class DialogueManager : Singleton<DialogueManager>
     // 立ち絵の元の位置と大きさ（シネマ演出の配置から、会話の枠の配置へ戻すため）
     private Vector2 portraitLeftPos, portraitRightPos;
     private Vector3 portraitLeftScale, portraitRightScale;
+    private Vector2 portraitLeftSize, portraitRightSize;
+
+    // 立ち絵をシネマ演出の配置にしているか（画面の一番下を基準に、絵の縦横比に合わせる）
+    private bool portraitCompact;
     private Coroutine portraitLeftFade, portraitRightFade;
+
+    /// <summary> シネマ演出のときの文の出し方 </summary>
+    public enum CinemaTextStyle
+    {
+        [InspectorName("会話の枠（下の黒いぼかしの上に、小さめの枠）")]
+        Box = 0,
+
+        [InspectorName("字幕（下の黒いぼかしの中に、白い文字だけ）")]
+        Subtitle = 1,
+    }
+
+    [SerializeField, Label("シネマ演出の文の出し方")]
+    [Tooltip("会話の枠：今までの会話の枠を小さめにして、下の黒いぼかしにかからない所に出す／字幕：枠を出さずに、ぼかしの中に白い文字で出す")]
+    private CinemaTextStyle cinemaTextStyle = CinemaTextStyle.Box;
+
+    [SerializeField, Label("会話の枠の大きさ（シネマ）", 0.3f, 1.0f)]
+    [Tooltip("シネマ演出のときの会話の枠の大きさ（1 で会話の枠のときと同じ 1600×260）。見た目・色・文字の配置は今までの枠のまま、全体を縮める")]
+    private float cinemaBoxScale = 0.8f;
+
+    [SerializeField, Label("帯と枠の間（シネマ）", 0.0f)]
+    [Tooltip("下の黒い帯の上の端から、会話の枠の下の端までのすき間（1920×1080 の基準で）")]
+    private float cinemaBoxOffset = 70.0f;
+
+    // 会話の枠の元の配置（シネマ演出の配置から戻すため）
+    private Vector2 panelAnchorMin, panelAnchorMax, panelPivot, panelPos, panelSize, panelRectSize;
+    private Vector3 panelScale = Vector3.one;
+    private bool panelLayoutSaved;
+
+    // 枠の中の物の元の配置・大きさ・色
+    private RectSnapshot bodyRectOrig, nameRectOrig, iconRectOrig;
+    private float bodyFontOrig, nameFontOrig, iconFontOrig;
+    private Image panelImage;
+    private Color panelColorOrig;
+
+    private struct RectSnapshot
+    {
+        public Vector2 anchorMin, anchorMax, pivot, pos, size;
+        public static RectSnapshot Of(RectTransform rt) => new RectSnapshot { anchorMin = rt.anchorMin, anchorMax = rt.anchorMax, pivot = rt.pivot, pos = rt.anchoredPosition, size = rt.sizeDelta };
+        public void Apply(RectTransform rt) { rt.anchorMin = anchorMin; rt.anchorMax = anchorMax; rt.pivot = pivot; rt.anchoredPosition = pos; rt.sizeDelta = size; }
+    }
+    private CanvasGroup panelGroup;
+    private Coroutine panelFade;
+    private Coroutine bodyFade;
+
+    // シネマ演出で、帯の中に字幕で出しているか／会話の枠で出しているか
+    private bool SubtitleMode => cinema != null && cinemaTextStyle == CinemaTextStyle.Subtitle;
+    private bool BoxMode => cinema != null && cinemaTextStyle == CinemaTextStyle.Box;
 
     // 今の会話をシネマ演出で出しているときの CinemaMode（枠で出しているときは null）
     private CinemaMode cinema;
@@ -174,7 +233,7 @@ public class DialogueManager : Singleton<DialogueManager>
     private string shownSpeaker;
 
     // 文を書く先（シネマ演出なら下の帯の字幕、そうでなければ会話の枠）
-    private TMP_Text Body => cinema != null ? cinema.DialogueText() : bodyText;
+    private TMP_Text Body => SubtitleMode ? cinema.DialogueText() : bodyText;
 
     // 現在の会話
     private DialogueData.Line[] lines;
@@ -249,8 +308,32 @@ public class DialogueManager : Singleton<DialogueManager>
         if(portraitRight != null) { portraitRight.preserveAspect = true; }
 
         // 立ち絵の元の位置と大きさを覚えておく（シネマ演出のときだけ動かす）
-        if(portraitLeft != null)  { portraitLeftPos = portraitLeft.rectTransform.anchoredPosition;  portraitLeftScale = portraitLeft.rectTransform.localScale; }
-        if(portraitRight != null) { portraitRightPos = portraitRight.rectTransform.anchoredPosition; portraitRightScale = portraitRight.rectTransform.localScale; }
+        if(portraitLeft != null)  { portraitLeftPos = portraitLeft.rectTransform.anchoredPosition;  portraitLeftScale = portraitLeft.rectTransform.localScale;  portraitLeftSize = portraitLeft.rectTransform.sizeDelta; }
+        if(portraitRight != null) { portraitRightPos = portraitRight.rectTransform.anchoredPosition; portraitRightScale = portraitRight.rectTransform.localScale; portraitRightSize = portraitRight.rectTransform.sizeDelta; }
+
+        // 会話の枠の元の配置と、フェード用の CanvasGroup
+        if(panel != null)
+        {
+            var rt = (RectTransform)panel.transform;
+            panelAnchorMin = rt.anchorMin; panelAnchorMax = rt.anchorMax; panelPivot = rt.pivot;
+            panelPos = rt.anchoredPosition; panelSize = rt.sizeDelta;
+            panelScale = rt.localScale;
+            panelRectSize = rt.rect.size;
+            if(panelRectSize.x <= 0.0f || panelRectSize.y <= 0.0f) { panelRectSize = new Vector2(1600.0f, 260.0f); }
+            panelLayoutSaved = true;
+            if(bodyText != null)    { bodyRectOrig = RectSnapshot.Of(bodyText.rectTransform); bodyFontOrig = bodyText.fontSize; }
+            if(speakerText != null) { nameRectOrig = RectSnapshot.Of(speakerText.rectTransform); nameFontOrig = speakerText.fontSize; }
+            if(nextIcon != null)
+            {
+                iconRectOrig = RectSnapshot.Of((RectTransform)nextIcon.transform);
+                TMP_Text iconText = nextIcon.GetComponent<TMP_Text>();
+                iconFontOrig = iconText != null ? iconText.fontSize : 0.0f;
+            }
+            panelImage = panel.GetComponent<Image>();
+            if(panelImage != null) { panelColorOrig = panelImage.color; }
+            panelGroup = panel.GetComponent<CanvasGroup>();
+            if(panelGroup == null) { panelGroup = panel.AddComponent<CanvasGroup>(); }
+        }
 
         HideAllPortraits();
         BuildKeyHint();
@@ -329,28 +412,222 @@ public class DialogueManager : Singleton<DialogueManager>
         HideAllPortraits();
 
         // シネマ演出：枠は出さずに、上下の帯と字幕で出す（マップのカメラがないシーンでは今までの枠）
-        cinema = useCinema ? CinemaMode.Get() : null;
-        LayoutPortraits(cinema != null);
+        // 調べて始まった会話は、帯もフェードもなしで、小さい枠をすぐ出す（何度も調べるので、待たせない）
+        bool examine = useCinema && IsExamineStart();
+
+        cinema = useCinema && !examine ? CinemaMode.Get() : null;
+        LayoutPortraits(useCinema);
+        if(examine)
+        {
+            LayoutPanel(true);
+            ShowPanel();
+            ShowLine();
+            return;
+        }
         if(cinema != null)
         {
+            cinema.SetTextLayout(cinemaFadeHeight, cinemaBackdrop);
             float remaining = cinema.BeginForDialogue(cinemaBarSize, cinemaZoom, cinemaMoveTime);
+            LayoutPanel(BoxMode);
 
             // 帯が出ている途中なら、出きってから少し待って最初の文を出す（もう出ていれば、すぐ出す）
             if(remaining > 0.0f)
             {
-                cinema.SetSpeaker("", Color.white);
-                cinema.DialogueText().text = "";
+                if(SubtitleMode)
+                {
+                    cinema.SetSpeaker("", Color.white);
+                    cinema.DialogueText().text = "";
+                }
+                else
+                {
+                    HidePanelNow();
+                }
                 cinema.SetKeyHint(null);
                 typingCoroutine = StartCoroutine(ShowFirstLineAfter(remaining + cinemaTextDelay));
                 return;
             }
 
-            // キーの案内は、会話の枠のときと同じ文を帯の右下に
-            cinema.SetKeyHint(showKeyHint ? keyHintText : null);
+            // 字幕：キーの案内は、会話の枠のときと同じ文を帯の右下に／会話の枠：枠をふわっと出す（キーの案内は枠の下）
+            if(SubtitleMode) { cinema.SetKeyHint(showKeyHint ? keyHintText : null); }
+            else             { cinema.SetKeyHint(null); ShowPanel(); }
         }
-        else { panel.SetActive(true); }
+        else
+        {
+            LayoutPanel(false);
+            ShowPanel();
+        }
 
         ShowLine();
+    }
+
+    //=====================================================================
+    // 調べて始まった会話か（帯・フェードなしで出すため）
+    //=====================================================================
+
+    // 調べるキー（E）が押されてから、その出来事（イベント・会話）が終わるまで true
+    private bool examineActive;
+    private float examineStart;
+    private bool examineSeenBusy;
+
+    // 調べたあと、何も始まらなかったら見張るのをやめるまでの秒数（調べてから会話までの待ちより長く）
+    private const float ExamineTimeout = 2.0f;
+
+    /// <summary>
+    /// 調べるキーを見張る：操作できるときに E が押されたら「調べた」。そのあと操作が止まり（イベント・会話）、また動けるようになったら終わり
+    /// （調べる物はすべて Intaractable の E キーから始まるので、どの部品から会話が出ても同じように見分けられる）
+    /// </summary>
+    private void TrackExamine()
+    {
+        Keyboard kb = Keyboard.current;
+        if(!examineActive)
+        {
+            if(kb != null && kb[advanceKey].wasPressedThisFrame && !InputBlock.IsBlocked && !IsTalking)
+            {
+                examineActive = true;
+                examineStart = Time.unscaledTime;
+                examineSeenBusy = false;
+            }
+            return;
+        }
+
+        if(InputBlock.IsBlocked || IsTalking) { examineSeenBusy = true; return; }
+        if(examineSeenBusy || Time.unscaledTime - examineStart > ExamineTimeout) { examineActive = false; }
+    }
+
+    /// <summary>
+    /// 今始まる会話が、調べて始まったものか
+    /// （調べる処理が先に動いて、このフレームの見張りより前に会話が始まることもあるので、このフレームの E も見る。
+    ///   ただし会話を送った E で次の会話が始まった場合は除く）
+    /// </summary>
+    private bool IsExamineStart()
+    {
+        if(examineActive) { return true; }
+
+        Keyboard kb = Keyboard.current;
+        bool pressedNow = kb != null && kb[advanceKey].wasPressedThisFrame && Time.frameCount != lastToggleFrame && !DialogueManager.IsBusy;
+        if(pressedNow)
+        {
+            examineActive = true;
+            examineStart = Time.unscaledTime;
+            examineSeenBusy = true;
+        }
+        return pressedNow;
+    }
+
+    //=====================================================================
+    // 会話の枠（シネマ演出のときの配置・フェード）
+    //=====================================================================
+
+    /// <summary>
+    /// 会話の枠の配置：シネマ演出の「会話の枠」なら、小さめにして下の黒いぼかしの上に置く。そうでなければ元の配置
+    /// </summary>
+    private void LayoutPanel(bool cinemaBox)
+    {
+        if(panel == null || !panelLayoutSaved) { return; }
+        var rt = (RectTransform)panel.transform;
+
+        // 枠の中身（色・文字の大きさ・配置）は、どちらのときも今までの枠のまま
+        RestoreBoxContents();
+
+        if(!cinemaBox)
+        {
+            rt.anchorMin = panelAnchorMin; rt.anchorMax = panelAnchorMax; rt.pivot = panelPivot;
+            rt.anchoredPosition = panelPos; rt.sizeDelta = panelSize;
+            rt.localScale = panelScale;
+            return;
+        }
+
+        // 下の黒いぼかしの上の端（会話の Canvas の単位で）＝ マップの映る範囲の下の端 ＋ その高さ × 字幕の場所の高さ
+        float canvasHeight = 1080.0f;
+        Canvas canvas = panel.GetComponentInParent<Canvas>();
+        if(canvas != null) { canvasHeight = ((RectTransform)canvas.rootCanvas.transform).rect.height; }
+        Rect vp = CompactViewport();
+        // 枠の下の端は、下の黒い帯の上の端から「帯と枠の間」だけ上（黒いぼかしの濃い所には少しかかる）
+        float fadeTop = canvasHeight * (vp.yMin + vp.height * cinemaBarSize);
+
+        // 今までの枠をそのまま（元の大きさで）下の真ん中に置き、全体を縮める（文字・名前・▼も一緒に小さくなる）
+        rt.anchorMin = new Vector2(0.5f, 0.0f);
+        rt.anchorMax = new Vector2(0.5f, 0.0f);
+        rt.pivot = new Vector2(0.5f, 0.0f);
+        rt.sizeDelta = panelRectSize;
+        rt.localScale = new Vector3(panelScale.x * cinemaBoxScale, panelScale.y * cinemaBoxScale, panelScale.z);
+        rt.anchoredPosition = new Vector2(0.0f, fadeTop + cinemaBoxOffset);
+    }
+
+    // 枠の中身を元に戻す（シネマ演出でない会話）
+    private void RestoreBoxContents()
+    {
+        if(panelImage != null) { panelImage.color = panelColorOrig; }
+        if(bodyText != null)    { bodyRectOrig.Apply(bodyText.rectTransform); bodyText.fontSize = bodyFontOrig; }
+        if(speakerText != null) { nameRectOrig.Apply(speakerText.rectTransform); speakerText.fontSize = nameFontOrig; }
+        if(nextIcon != null)
+        {
+            iconRectOrig.Apply((RectTransform)nextIcon.transform);
+            TMP_Text iconText = nextIcon.GetComponent<TMP_Text>();
+            if(iconText != null && iconFontOrig > 0.0f) { iconText.fontSize = iconFontOrig; }
+        }
+    }
+
+    // 会話の枠を出す（シネマ演出ならふわっと）
+    private void ShowPanel()
+    {
+        if(panel == null) { return; }
+        if(panelFade != null) { StopCoroutine(panelFade); panelFade = null; }
+        panel.SetActive(true);
+        if(panelGroup == null) { return; }
+
+        if(cinema != null && cinemaPortraitFade > 0.0f)
+        {
+            panelGroup.alpha = 0.0f;
+            panelFade = StartCoroutine(FadePanel(1.0f, cinemaPortraitFade, false));
+        }
+        else
+        {
+            panelGroup.alpha = 1.0f;
+        }
+    }
+
+    // 会話の枠をすぐ隠す
+    private void HidePanelNow()
+    {
+        if(panel == null) { return; }
+        if(panelFade != null) { StopCoroutine(panelFade); panelFade = null; }
+        panel.SetActive(false);
+    }
+
+    private IEnumerator FadePanel(float to, float seconds, bool hideAtEnd)
+    {
+        float from = panelGroup.alpha;
+        float t = 0.0f;
+        while(t < seconds)
+        {
+            t += Time.unscaledDeltaTime;
+            panelGroup.alpha = Mathf.Lerp(from, to, Mathf.Clamp01(t / seconds));
+            yield return null;
+        }
+        panelGroup.alpha = to;
+        panelFade = null;
+        if(hideAtEnd) { panel.SetActive(false); }
+    }
+
+    // 会話の枠の本文（と名前）だけを消す（次の文に切り替える前）
+    private IEnumerator FadeBox(float seconds, bool keepName)
+    {
+        if(nextIcon != null) { nextIcon.SetActive(false); }
+        float from = bodyText.alpha;
+        float fromName = speakerText != null ? speakerText.alpha : 1.0f;
+        float t = 0.0f;
+        while(t < seconds)
+        {
+            t += Time.unscaledDeltaTime;
+            float k = Mathf.Clamp01(t / seconds);
+            bodyText.alpha = Mathf.Lerp(from, 0.0f, k);
+            if(!keepName && speakerText != null) { speakerText.alpha = Mathf.Lerp(fromName, 0.0f, k); }
+            yield return null;
+        }
+        bodyText.alpha = 0.0f;
+        if(!keepName && speakerText != null) { speakerText.alpha = 0.0f; }
+        bodyFade = null;
     }
 
     // 帯が出きるのを待ってから最初の文を出す（待っている間のキーは数えない）
@@ -367,7 +644,8 @@ public class DialogueManager : Singleton<DialogueManager>
         typingCoroutine = null;
 
         if(!IsTalking) { yield break; }
-        if(cinema != null) { cinema.SetKeyHint(showKeyHint ? keyHintText : null); }
+        if(SubtitleMode)  { cinema.SetKeyHint(showKeyHint ? keyHintText : null); }
+        else if(BoxMode)  { ShowPanel(); }
         lastToggleFrame = Time.frameCount;
         ShowLine();
     }
@@ -392,7 +670,18 @@ public class DialogueManager : Singleton<DialogueManager>
         // シネマ演出：立ち絵と字幕は溶けるように消す（会話の枠のときは今までどおりすぐ消す）
         if(cinema != null && cinemaEndFade > 0.0f) { FadeOutAllPortraits(cinemaEndFade); }
         else                                     { HideAllPortraits(); }
-        if(panel != null) { panel.SetActive(false); }
+        if(bodyFade != null) { StopCoroutine(bodyFade); bodyFade = null; }
+
+        // 会話の枠：シネマ演出の「会話の枠」なら溶けるように消す
+        if(BoxMode && cinemaEndFade > 0.0f && panel != null && panel.activeSelf && panelGroup != null)
+        {
+            if(panelFade != null) { StopCoroutine(panelFade); }
+            panelFade = StartCoroutine(FadePanel(0.0f, cinemaEndFade, true));
+        }
+        else
+        {
+            HidePanelNow();
+        }
 
         // シネマ演出：字幕を消し、イベントが終わったら帯を引っ込める（次の会話の前に閉じる）
         bool fading = cinema != null && cinemaEndFade > 0.0f;
@@ -429,6 +718,8 @@ public class DialogueManager : Singleton<DialogueManager>
 
     private void Update()
     {
+        TrackExamine();
+
         if(!IsTalking) { return; }
         if(Keyboard.current == null) { return; }
 
@@ -464,6 +755,26 @@ public class DialogueManager : Singleton<DialogueManager>
     {
         DialogueData.Line line = lines[index];
 
+        // シネマ演出の「会話の枠」：名前は枠の名前欄に。同じ人が続けて話すときは名前を出したまま、変わったらふわっと出す
+        if(BoxMode)
+        {
+            if(cinemaShowPortraits) { UpdatePortraits(line); }
+            else                    { HideAllPortraits(); }
+
+            string boxSpeaker = line.DisplayName ?? "";
+            if(shownSpeaker != boxSpeaker)
+            {
+                UpdateSpeakerName(line);
+                if(speakerText != null) { speakerText.alpha = 1.0f; }
+                if(speakerText != null && cinemaCharFade > 0.0f) { StartCoroutine(FadeInText(speakerText, cinemaCharFade)); }
+                shownSpeaker = boxSpeaker;
+            }
+
+            if(typingCoroutine != null) { StopCoroutine(typingCoroutine); }
+            typingCoroutine = StartCoroutine(TypeLine(line.text ?? ""));
+            return;
+        }
+
         if(cinema != null)
         {
             // 字幕：名前は文の前にキャラの色で。立ち絵は「シネマ演出でも立ち絵を出す」のときだけ
@@ -486,10 +797,25 @@ public class DialogueManager : Singleton<DialogueManager>
         }
 
         UpdateSpeakerName(line);
+        if(speakerText != null && speakerText.alpha < 1.0f) { speakerText.alpha = 1.0f; }
         UpdatePortraits(line);
 
         if(typingCoroutine != null) { StopCoroutine(typingCoroutine); }
         typingCoroutine = StartCoroutine(TypeLine(line.text ?? ""));
+    }
+
+    // 文字をふわっと出す（名前欄）
+    private static IEnumerator FadeInText(TMP_Text text, float seconds)
+    {
+        text.alpha = 0.0f;
+        float t = 0.0f;
+        while(t < seconds)
+        {
+            t += Time.unscaledDeltaTime;
+            text.alpha = Mathf.Clamp01(t / seconds);
+            yield return null;
+        }
+        text.alpha = 1.0f;
     }
 
     /// <summary>
@@ -514,10 +840,12 @@ public class DialogueManager : Singleton<DialogueManager>
     {
         isTyping = true;
         if(nextIcon != null) { nextIcon.SetActive(false); }
-        if(cinema != null) { cinema.SetNextMark(false); }
+        if(SubtitleMode) { cinema.SetNextMark(false); }
 
-        // 書く先（シネマ演出なら字幕、そうでなければ会話の枠）
+        // 書く先（シネマ演出の字幕なら帯の中の字幕、そうでなければ会話の枠）
         TMP_Text body = Body;
+        if(bodyFade != null) { StopCoroutine(bodyFade); bodyFade = null; }
+        if(body.alpha < 1.0f) { body.alpha = 1.0f; }
         body.text = text;
         body.maxVisibleCharacters = 0;
 
@@ -638,7 +966,7 @@ public class DialogueManager : Singleton<DialogueManager>
         if(cinema != null) { body.ForceMeshUpdate(); }
         isTyping = false;
 
-        if(cinema != null) { cinema.SetNextMark(true); }
+        if(SubtitleMode) { cinema.SetNextMark(true); }
         else if(nextIcon != null) { nextIcon.SetActive(true); }
     }
 
@@ -673,7 +1001,12 @@ public class DialogueManager : Singleton<DialogueManager>
         // 次も同じ人が話すなら、名前は残して本文だけ消す
         string nextSpeaker = lines[index].DisplayName ?? "";
         bool sameSpeaker = nextSpeaker == shownSpeaker;
-        cinema.FadeOutText(cinemaLineFade, sameSpeaker);
+        if(SubtitleMode) { cinema.FadeOutText(cinemaLineFade, sameSpeaker); }
+        else
+        {
+            if(bodyFade != null) { StopCoroutine(bodyFade); }
+            bodyFade = StartCoroutine(FadeBox(cinemaLineFade, sameSpeaker));
+        }
         if(!sameSpeaker) { shownSpeaker = null; }
 
         float t = 0.0f;
@@ -747,28 +1080,71 @@ public class DialogueManager : Singleton<DialogueManager>
     }
 
     /// <summary>
-    /// 立ち絵の配置：シネマ演出のときは、小さめにして下の帯の上に立たせる（帯と字幕に重ならない）。そうでなければ元の配置
+    /// 立ち絵の配置：シネマ演出のときは、小さめにして画面の一番下を基準に立たせる（足元は黒いぼかし・帯に重なるが、立ち絵のほうが手前）。
+    /// そうでなければ元の配置
     /// </summary>
     private void LayoutPortraits(bool cinemaLayout)
     {
+        portraitCompact = cinemaLayout;
         float lift = 0.0f;
         float scale = 1.0f;
         float inset = 0.0f;
-        if(cinemaLayout && cinema != null)
+        if(cinemaLayout)
         {
-            // 下の帯の高さ（立ち絵の Canvas の単位で）＝帯の太さ × マップの映る範囲の高さ
-            Image any = portraitLeft != null ? portraitLeft : portraitRight;
-            if(any != null && any.canvas != null)
-            {
-                var canvasRect = (RectTransform)any.canvas.rootCanvas.transform;
-                lift = canvasRect.rect.height * cinema.ViewportRect.height * cinemaBarSize;
-            }
             scale = cinemaPortraitScale;
             inset = cinemaPortraitInset;
         }
 
         PlacePortrait(portraitLeft, portraitLeftPos + new Vector2(inset, lift), portraitLeftScale, scale);
         PlacePortrait(portraitRight, portraitRightPos + new Vector2(-inset, lift), portraitRightScale, scale);
+        FitPortrait(portraitLeft, portraitLeftSize);
+        FitPortrait(portraitRight, portraitRightSize);
+
+        // シネマ演出：立ち絵はいちばん手前（下の黒いぼかし・会話の枠より手前）
+        SetPortraitOnTop(portraitLeft, cinemaLayout);
+        SetPortraitOnTop(portraitRight, cinemaLayout);
+    }
+
+    // マップの映る範囲（シネマ演出の配置の計算用。帯を出していない「調べる」の会話でも同じ配置にする）
+    private Rect CompactViewport()
+    {
+        CinemaMode mode = cinema != null ? cinema : CinemaMode.Get();
+        return mode != null ? mode.ViewportRect : new Rect(0.0f, 0.0f, 1.0f, 1.0f);
+    }
+
+    // 立ち絵の並び順：いちばん手前にするときだけ、立ち絵に入れ子の Canvas を付けて並び順を上書きする
+    private const int PortraitTopSortingOrder = 103;
+
+    private static void SetPortraitOnTop(Image image, bool onTop)
+    {
+        if(image == null) { return; }
+        Canvas c = image.GetComponent<Canvas>();
+        if(!onTop)
+        {
+            if(c != null) { c.overrideSorting = false; }
+            return;
+        }
+        if(c == null) { c = image.gameObject.AddComponent<Canvas>(); }
+        c.overrideSorting = true;
+        c.sortingOrder = PortraitTopSortingOrder;
+    }
+
+    /// <summary>
+    /// シネマ演出のとき、立ち絵の枠を絵の縦横比に合わせる（縦横比を保つ絵は枠の中で上下の真ん中に寄るので、
+    /// 枠が絵より縦長だと足元が浮く。枠の高さはそのまま、幅を絵に合わせて、足元を画面の一番下にそろえる）
+    /// </summary>
+    private void FitPortrait(Image image, Vector2 originalSize)
+    {
+        if(image == null) { return; }
+        RectTransform rt = image.rectTransform;
+        if(!portraitCompact || image.sprite == null || originalSize.y <= 0.0f)
+        {
+            if(originalSize.y > 0.0f) { rt.sizeDelta = originalSize; }
+            return;
+        }
+        Rect r = image.sprite.rect;
+        if(r.height <= 0.0f) { return; }
+        rt.sizeDelta = new Vector2(originalSize.y * r.width / r.height, originalSize.y);
     }
 
     private static void PlacePortrait(Image image, Vector2 position, Vector3 originalScale, float scale)
@@ -788,6 +1164,8 @@ public class DialogueManager : Singleton<DialogueManager>
         Color current = image.color;
 
         image.sprite = sprite;
+        // 絵が変わったら、枠を絵の縦横比に合わせ直す（足元を一番下にそろえる）
+        FitPortrait(image, image == portraitLeft ? portraitLeftSize : portraitRightSize);
         // シネマ演出では、色は下のフェードで変える（いったん今の色のまま）
         image.color = cinema != null && cinemaPortraitFade > 0.0f && !appearing ? current : color;
 

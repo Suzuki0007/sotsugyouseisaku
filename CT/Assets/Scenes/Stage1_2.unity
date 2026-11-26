@@ -31831,7 +31831,7 @@ MonoBehaviour:
   typeSe: {fileID: 11400000, guid: b2c00df1d5c5d9840a7018131637c22f, type: 2}
   typeSeEvery: 2
   useCinema: 1
-  cinemaBarSize: 0.12
+  cinemaBarSize: 0.07
   cinemaZoom: 1.1
   cinemaMoveTime: 1.2
   cinemaTextDelay: 0.5
