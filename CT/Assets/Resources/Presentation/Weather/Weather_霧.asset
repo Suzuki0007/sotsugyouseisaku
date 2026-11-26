@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0df63a619fdfc3042aa73e80a0b00609, type: 3}
+  m_Name: "Weather_\u9727"
+  m_EditorClassIdentifier: Assembly-CSharp::WeatherPreset
+  memo: "\u3086\u3063\u304F\u308A\u6D41\u308C\u308B\u534A\u900F\u660E\u306E\u5C64\uFF08\u5854\u306E\u4E2D\u30FB\u591C\u660E\u3051\uFF09"
+  texture: {fileID: 2800000, guid: 2fdd23629c4e4e8419fe453fe2916e1a, type: 3}
+  rate: 3
+  maxParticles: 40
+  lifetime: 9
+  sizeMin: 6
+  sizeMax: 10
+  color: {r: 0.85, g: 0.88, b: 0.92, a: 0.18}
+  fallSpeed: 0
+  wind: 0.5
+  speedVariation: 0.4
+  sway: 0.3
+  spin: 0
+  stretch: 0
+  splash: 0
+  splashTexture: {fileID: 0}
+  haze: 0.06
+  hazeColor: {r: 0.8, g: 0.84, b: 0.9, a: 1}
+  order: 0
+  lit: 1
+  loopSe: {fileID: 0}

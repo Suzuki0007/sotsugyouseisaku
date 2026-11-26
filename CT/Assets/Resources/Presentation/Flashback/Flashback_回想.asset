@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7f901db2c381aee4b98997c226fc6b45, type: 3}
+  m_Name: "Flashback_\u56DE\u60F3"
+  m_EditorClassIdentifier: Assembly-CSharp::FlashbackPreset
+  memo: "\u57FA\u672C\u306E\u56DE\u60F3\uFF08\u8272\u8ABF\uFF1D\u56DE\u60F3\u30FB\u5929\u5019\uFF1D\u5149\u306E\u7C92\u30FB\u8272\u304C\u629C\u3051\u3066\u304B\u3089\u5DEE\u3059\u30FB\u30B3\u30DE\u843D\u3061
+    8\uFF09"
+  mood: {fileID: 11400000, guid: 9cd43d2039284704688f62531bddce5f, type: 2}
+  light: {fileID: 0}
+  weatherUse: 2
+  weather: {fileID: 11400000, guid: e1cd013495070954e9188eea1084e099, type: 2}
+  flag: {fileID: 11400000, guid: 42e7e76cb539a694bb5789e6bc90e825, type: 2}
+  transition: 0
+  frameStepFps: 8

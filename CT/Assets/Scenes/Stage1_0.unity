@@ -35373,23 +35373,6 @@ MonoBehaviour:
   closeMode: 0
   waitUntilClosed: 1
   closeKey: 19
---- !u!114 &941290392
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 941290365}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 399965c7902ef0f40952c6d622c87f01, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::DialogueEventAction
-  dialogueData: {fileID: 11400000, guid: 7e4d7486e9774d01882c5b4f04d50a89, type: 2}
-  dialogue: {fileID: 0}
-  closeMode: 0
-  waitUntilClosed: 1
-  closeKey: 19
 --- !u!114 &941290371
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -35727,6 +35710,23 @@ MonoBehaviour:
   playMode: 0
   lockPlayer: 1
   actions: []
+--- !u!114 &941290392
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 941290365}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 399965c7902ef0f40952c6d622c87f01, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DialogueEventAction
+  dialogueData: {fileID: 11400000, guid: 7e4d7486e9774d01882c5b4f04d50a89, type: 2}
+  dialogue: {fileID: 0}
+  closeMode: 0
+  waitUntilClosed: 1
+  closeKey: 19
 --- !u!1 &969795960
 GameObject:
   m_ObjectHideFlags: 0
@@ -35834,6 +35834,54 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 993645945}
   m_CullTransparentMesh: 1
+--- !u!1 &1001010085
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1001010087}
+  - component: {fileID: 1001010086}
+  m_Layer: 0
+  m_Name: "\u30B7\u30FC\u30F3\u306E\u6F14\u51FA\u306E\u65E2\u5B9A"
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1001010086
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1001010085}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e4030f8eedbddcb4fa916e9176f130f9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ScenePresentation
+  mood: {fileID: 0}
+  lightPreset: {fileID: 11400000, guid: 4ff99d12c7af6f644bc9aef8cff3c2a6, type: 2}
+  weather: {fileID: 0}
+  rules: []
+--- !u!4 &1001010087
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1001010085}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1011388515
 GameObject:
   m_ObjectHideFlags: 0
@@ -40791,3 +40839,4 @@ SceneRoots:
   - {fileID: 1205009029}
   - {fileID: 2061282531}
   - {fileID: 276888515}
+  - {fileID: 1001010087}

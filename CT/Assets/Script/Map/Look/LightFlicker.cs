@@ -55,6 +55,15 @@ public class LightFlicker : MonoBehaviour
         seed = Mathf.Repeat(transform.position.x * 12.9898f + transform.position.y * 78.233f, 1000.0f);
     }
 
+    /// <summary>
+    /// ゆらす元の明るさを変える（光のプリセットで場面の光の強さを変えたとき。SceneLight が呼ぶ）
+    /// </summary>
+    public void SetBaseIntensity(float value)
+    {
+        if(light2D == null) { Awake(); }
+        baseIntensity = Mathf.Max(0.0f, value);
+    }
+
     private void OnDisable()
     {
         if(light2D == null) { return; }

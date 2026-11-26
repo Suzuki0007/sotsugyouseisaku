@@ -217,6 +217,18 @@ public class DialogueManager : Singleton<DialogueManager>
     public static bool IsBusy =>
         Instance != null && (Instance.IsTalking || Instance.JustClosed);
 
+    /// <summary>
+    /// 会話画面の色調（演出の DialogueMoodLayer）をかける立ち絵と文字を渡す（11-26）
+    /// </summary>
+    public void GetMoodTargets(System.Collections.Generic.List<Image> portraits, System.Collections.Generic.List<TMP_Text> texts)
+    {
+        if(portraitLeft != null)  { portraits.Add(portraitLeft); }
+        if(portraitRight != null) { portraits.Add(portraitRight); }
+        if(speakerText != null)   { texts.Add(speakerText); }
+        if(bodyText != null)      { texts.Add(bodyText); }
+        if(keyHint != null)       { texts.Add(keyHint); }
+    }
+
     //=====================================================================
     // 初期化
     //=====================================================================

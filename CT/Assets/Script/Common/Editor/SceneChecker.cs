@@ -82,6 +82,66 @@ public static class SceneChecker
         CheckSpawnTriggers(ctx);
         CheckPrompts(ctx);
         CheckDepthProps(ctx);
+        CheckPresentation(ctx);
+    }
+
+    /// <summary>
+    /// 演出（2026-11-26）：シーンの既定が2つ以上・回想の「入る／戻る」の対・回想の中のオートセーブ・プリセットや絵の入れ忘れ・場面の光のグループ名
+    /// </summary>
+    private static void CheckPresentation(Context ctx)
+    {
+        List<ScenePresentation> defaults = ctx.Find<ScenePresentation>();
+        if(defaults.Count > 1)
+        {
+            foreach(ScenePresentation d in defaults) { ctx.Add(Level.Error, d, $"シーンの演出の既定が {defaults.Count} 個あります（1 つだけにしてください。どれが使われるか決まりません）"); }
+        }
+
+        bool anyEnter = false, anyExit = false, anyStillByAction = false, anyStillClose = false;
+        foreach(EventSequence sequence in ctx.Find<EventSequence>())
+        {
+            bool inFlashback = false;
+            foreach(EventAction action in sequence.GetActions())
+            {
+                switch(action)
+                {
+                    case FlashbackEnterEventAction enter:
+                        anyEnter = true;
+                        inFlashback = true;
+                        if(enter.Preset == null) { ctx.Add(Level.Error, enter, "部品「回想に入る」の回想のプリセットが空です（何も起きません）"); }
+                        break;
+                    case FlashbackExitEventAction _:
+                        anyExit = true;
+                        inFlashback = false;
+                        break;
+                    case AutoSaveEventAction save when inFlashback:
+                        ctx.Add(Level.Warning, save, "回想の中にオートセーブがあります。回想の途中のセーブは回想に入る前の状態で記録されるので、ロードすると回想の外から始まります（「回想から戻る」のあとに置いてください）");
+                        break;
+                    case WeatherEventAction weather when weather.CurrentMode == WeatherEventAction.Mode.Set && weather.Preset == null:
+                        ctx.Add(Level.Warning, weather, "部品「天候を変える」が「指定した天候にする」なのに、天候が空です（天候が止まります。止めるなら「止める（なし）」に）");
+                        break;
+                    case StillShowEventAction still:
+                        if(still.Sprite == null) { ctx.Add(Level.Error, still, "部品「1枚絵を出す」の絵が空です（背景の色だけが出ます）"); }
+                        if(still.Close == StillShowEventAction.CloseMode.ByAction) { anyStillByAction = true; }
+                        break;
+                    case StillCloseEventAction _:
+                        anyStillClose = true;
+                        break;
+                }
+            }
+        }
+        if(anyEnter && !anyExit)
+        {
+            ctx.Add(Level.Warning, null, "部品「回想に入る」はありますが「回想から戻る」がこのシーンにありません（回想の見た目のまま・回想中フラグが立ったままになります）");
+        }
+        if(anyStillByAction && !anyStillClose)
+        {
+            ctx.Add(Level.Warning, null, "部品「1枚絵を出す」（部品で閉じる）はありますが「1枚絵を閉じる」がこのシーンにありません（絵が出たままになります）");
+        }
+
+        foreach(SceneLight light in ctx.Find<SceneLight>())
+        {
+            if(string.IsNullOrEmpty(light.Group)) { ctx.Add(Level.Warning, light, "場面の光のグループ名が空です（光のプリセットから変えられません）"); }
+        }
     }
 
     /// <summary>

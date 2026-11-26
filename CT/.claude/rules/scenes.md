@@ -78,10 +78,15 @@ paths:
   - 海の当たり判定（`Grid/soto_yuka` の BoxCollider2D 3つ。海全体と岸の両側）は**オフにした**（消していない）。代わりに歩ける範囲（砂浜の仮の四角 y 20.3〜38.3＋残骸3つの歩けない形）。本番はマスク画像から。
   - 残骸＝もとからある絵 `sunahama_object_1`（西）・`sunahama_object_2_0`（東）・`sunahama_object_3`（奥の歯車）。調べる範囲は手前、何度でも（`Land_Wreck1〜3`）、`Flag_Land_Wreck1〜3` と `Flag_Land_WreckAny`。足跡（床の絵に描いてある）は横いっぱいの帯 y 23.8・1回だけ。奥の帯 y 36.4 で振動（中：揺れ＋地響き短 ×3、間隔 0.65 秒）→ OP_02g → `Flag_Land_VibeM` → Stage1_1 の `FromStage1_0`。奥の出口（ぶつかると移る）は残してある。
   - 海の中の `SavePoint`（-115.4, 10.6。丸い絵）が海の上の場面で小舟のそばに見える（前からある物。触っていない）。
-- **夜（Stage1_0・Stage1_1、2026-11-19 ユーザーの指示）**：各シーンの `Global Light 2D` を色 (0.5, 0.6, 0.9)・強さ 0.45（昼は白・1）。レシピ `night_stage1_0_1`。マップ・物・ノア・シグルは Sprite-Lit-Default なので一緒に暗くなる。UI は暗くならない。明かりに反応しない絵（SpriteFrameBlend の波）は「シーンの明るさに合わせる」で同じ色にしている。新しく置く絵も Sprite-Lit-Default にする（Unlit だと夜でも明るいまま）。明るさを試すときは、一時的なカメラで色・強さを何通りか撮って並べる（`Global Light 2D` を変えて撮り、シーンを開き直して捨てる）。
+- **夜（Stage1_0・Stage1_1、2026-11-19 ユーザーの指示）**：各シーンの `Global Light 2D` を色 (0.5, 0.6, 0.9)・強さ 0.45（昼は白・1）。レシピ `night_stage1_0_1`。マップ・物・ノア・シグルは Sprite-Lit-Default なので一緒に暗くなる。UI は暗くならない。明かりに反応しない絵（SpriteFrameBlend の波）は「シーンの明るさに合わせる」で同じ色にしている。新しく置く絵も Sprite-Lit-Default にする（Unlit だと夜でも明るいまま）。明るさを試すときは、一時的なカメラで色・強さを何通りか撮って並べる（`Global Light 2D` を変えて撮り、シーンを開き直して捨てる）。**（11-26）光のプリセット「夜」（`Resources/Presentation/Light/Light_夜`、同じ値）を、各シーンのルート「シーンの演出の既定」（ScenePresentation）で指定した**（レシピ `presentation_night_default`）。Global Light 2D の値も残してある。夜の値を変えるならプリセットとシーンの両方を（シナリオ `presentation_save` が 0.45 を見ている）。
 - 波 `sunahama_nami_1_size_0`：SpriteAnimator。**今のデータは `Anim_Sunahama_Nami_Renban`**（連番 `sunahama_nami_animetion.png` を 1440×622 の4コマに切った物・基準は下の真ん中・4fps ループ）。前の `Anim_Sunahama_Nami`（`sunahama_nami_1〜3_size` の3枚）も残してあり、SpriteAnimator の Data を替えれば戻せる。並びは 1,2,3,4,3,2 のループ（ユーザーの指示「1234321」）。**波の SpriteRenderer の Order in Layer は 1**：床 `Grid/soto_yuka` と同じ 0 だと、コマによって床が手前に描かれて波が消えて見えた（2・4コマ目。撮影して確かめた）。マップの絵どうしが重なるときは並び順を変えておく。
 - 11-19：波は **SpriteFrameBlend**（コマの間を混ぜる・水面の高さを合わせて上下・ゆらぎ）で動かしている。SpriteAnimator は付いたまま止めてある（戻すときは SpriteFrameBlend を外す・SpriteAnimator を有効・Material を Sprite-Lit-Default に）。データの Fps はユーザーが 0.3 にした（1コマ約 3.3 秒）。確かめ方：一時的なカメラで `EvaluateAt(秒)` ごとに撮る（シーンを保存せずに見られる）。3枚は Single・ピボット下の真ん中（3枚目だけ 3 ピクセル低いので下でそろえる）。前に付いていた Animator（`sunahama_nami_1_size_0.controller`・`NamiAnim.anim`）は外した（アセットは残っている）。
 - OP の会話の範囲 `OP/OP_途中（鐘の言い伝え）`・`OP/OP_塔の入口（F1_01）` は Stage1_1 と同じ物がある。
+
+### Test_Presentation（演出を試すマップ。2026-11-26）
+- Build Settings に入れない。レシピ `test_presentation`（Stage1_0 をコピーし、OP・上陸（Stage1_0）・演出の画像・Event と、上端の出口 `MapEntity/出口_Stage1_1へ（奥）`（11-26。試している途中で砂漠へ移らないように）を非表示に〔上陸の中の歩ける範囲はルートへ出して残す〕。作り直すとコピーし直す。シーンの演出の既定は Stage1_0 から来た物＝光は夜）。
+- **直接再生で見本の広場 (-115.2, 22.0) から始まる**（PlayerPartySpawner の noahSpawnPoint・sigleSpawnPoint を広場の点へ）。ルート「演出の見本」：台座 9 つ・場面の光（月・ランタン・夕日）・天候の範囲（北東）・場所の色味（北西）・回想中だけの物・暗いステージ（非表示）・右上の表示・見本のイベント。配置は `rules/presentation.md`、遊び方は `Docs/演出の作り方.md` 7 章。
+- シーンチェックに Stage1_0 から来た指摘（`OB_TRbox`・使っていない `Event`）が出る（害はない）。Build Settings にないので `reload` は使えない → ロードの確かめは Stage1_0 のシナリオ `presentation_save`。シナリオ `presentation_test`。
 
 ### Test_Mapchip（マップチップの見え方を試すシーン。2026-11-25）
 - **Build Settings に入れない**（試すとき専用）。レシピ `mapchip_test`（なければ Stage1_4 をコピーし、T字通路・古い Grid・MapEntity を外して作る。何度流しても同じ）。シナリオ `mapchip_test.txt`。

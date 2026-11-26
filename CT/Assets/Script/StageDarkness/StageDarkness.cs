@@ -97,7 +97,8 @@ public class StageDarkness : MonoBehaviour
     {
         if (active == this) active = null;
 
-        // コンポーネントを切ったら元の明るさに戻す
+        // コンポーネントを切ったら元の明るさに戻す（再生中は演出の窓口が全体の光を書くので、窓口に知らせるだけ）
+        if (PresentationDirector.ReportDarknessEnd(this)) { if (playerLight != null) playerLight.enabled = false; return; }
         if (globalLight != null)
         {
             globalLight.intensity = originalGlobalIntensity;
@@ -190,7 +191,9 @@ public class StageDarkness : MonoBehaviour
 
     void Apply()
     {
-        if (globalLight != null)
+        // 再生中は、暗さを演出の窓口（PresentationDirector）に渡し、窓口が光のプリセットの上に掛けて全体の光を書く
+        if (PresentationDirector.ReportDarkness(this, darkness, ambientColor, globalLight)) { }
+        else if (globalLight != null)
         {
             globalLight.intensity = originalGlobalIntensity * (1f - darkness);
             globalLight.color = ambientColor;

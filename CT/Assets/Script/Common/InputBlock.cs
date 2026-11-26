@@ -23,5 +23,6 @@ public static class InputBlock
         EventSequence.IsBusy ||
         GameMenu.IsBusy ||
         PuzzleUI.IsBusy ||
-        CinemaMode.IsBusy;
+        CinemaMode.IsBusy ||
+        StillView.IsBusy;
 }

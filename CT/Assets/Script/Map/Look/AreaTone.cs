@@ -1,4 +1,4 @@
-/*********************************************************************/
+﻿/*********************************************************************/
 // * \file   AreaTone.cs
 // * \brief  場所の色味：操作中のキャラがこの四角に入ると、画面全体の明るさ・色（Global Light 2D）をなめらかに変える
 // *
@@ -17,7 +17,7 @@ using UnityEngine.Rendering.Universal;
 /// ・出ると元の値（シーンを始めたときの Global Light 2D）に戻る。範囲が重なる所は「優先度」の大きいほうが勝つ
 /// ・例：浜辺は夕方の暖かい色、遺跡の中は暗く冷たい色（明かり〔Light 2D〕が映える）
 /// ・マップ・キャラ・物（明かりに反応する絵）だけが変わる。UI は変わらない
-/// ・暗いステージ（StageDarkness）があるシーンでは働かない（明るさを取り合わないように）
+/// ・演出の窓口（PresentationDirector）の「範囲」の層：シーンの既定の光より強く、部品「光を変える」・回想より弱い。暗いステージ（StageDarkness）の暗さはこの上に掛かる
 [AddComponentMenu("マップの見た目/場所の色味")]
 [DisallowMultipleComponent]
 [RequireComponent(typeof(BoxCollider2D))]
@@ -83,7 +83,7 @@ public class AreaTone : MonoBehaviour
         if(Application.isPlaying) { box.enabled = false; }
 
         if(!active.Contains(this)) { active.Add(this); }
-        AreaToneDriver.Ensure();
+        PresentationDirector.Ensure();
     }
 
     private void OnDisable()

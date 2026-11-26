@@ -58,7 +58,7 @@ paths:
   - 前回の「当たり判定の上の端＝前後の境目」は、キャラがちょうど境目に立って引き分けになり、向き（絵の切り替え）で入れ替わった → 境目を 0.25 下げた。
 - **B 影を付ける** `DropShadow2D`：隠れた子（HideAndDontSave）に影の SpriteRenderer を作る（シーンに保存しない・OnDisable で消す）。並び順は既定 4（床の影）。
 - **C 隅の影** `AutoShade`＋`AutoShadeEditor.Rebuild`：床のマスごとに、上が壁＝薄い、上と横（左右・同じマスに縁）＝濃い。マスはワールド座標経由で合わせる（Grid が違っても合う）。影の層は「床の上の砂」より下（砂に埋もれた床に影が出ないように）。
-- **E 場所の色味** `AreaTone`：範囲は OnEnable で BoxCollider2D から Rect に（再生中は当たり判定を切る）。`AreaToneDriver` が操作中のキャラの位置で優先度の大きい範囲を選び、Global Light 2D をなめらかに変える。最初の Global Light の値が「元」。`StageDarkness` があるシーンでは止まる（明るさの取り合いを避ける）。シーンに Global Light 2D がないと警告。
+- **E 場所の色味** `AreaTone`：範囲は OnEnable で BoxCollider2D から Rect に（再生中は当たり判定を切る）。（11-26 から）演出の窓口 `PresentationDirector` が操作中のキャラの位置で優先度の大きい範囲を選び、光の「範囲」の層に入れる（`AreaToneDriver` は消した。`rules/presentation.md`）。最初の Global Light の値が「元」。`StageDarkness` があるシーンでも働く（暗さはこの上に掛かる）。
 - 見本：Test_Mapchip の「浜辺と遺跡」（たいまつ 4・水面のきらめき 3・夕方の浜辺 0.85・遺跡の中 0.42〔優先度 1〕・隅の影 94 マス・壁の影 9）。シナリオ `mapchip_beach` で色味の切り替えを確かめている。
 
 ## 注意

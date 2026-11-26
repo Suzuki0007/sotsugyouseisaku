@@ -126,7 +126,28 @@ public class SpriteAnimator : MonoBehaviour
 
         float dt = ignoreTimeScale ? Time.unscaledDeltaTime : Time.deltaTime;
         time += dt * speed;
+
+        // コマ落ち（回想の間）：時間は進めたまま、絵を替えるのを1秒に決まった回数だけにする
+        if(GlobalStepFps > 0.0f && !ignoreTimeScale)
+        {
+            stepWait += dt;
+            if(stepWait < 1.0f / GlobalStepFps) { return; }
+            stepWait = 0.0f;
+        }
         Evaluate(true);
+    }
+
+    /// <summary>
+    /// コマ落ち：0 より大きいと、すべての SpriteAnimator が絵を替えるのを1秒にこの回数だけにする（回想。演出の窓口が設定する）
+    /// </summary>
+    public static float GlobalStepFps;
+
+    private float stepWait;
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetStepStatics()
+    {
+        GlobalStepFps = 0.0f;
     }
 
     //=====================================================================

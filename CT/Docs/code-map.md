@@ -94,8 +94,8 @@
 | `Camera/MapCameraAspect.cs` | （11-13）マップを写すカメラを画面の中央の 4:3 にし（`Camera.rect`）、左右（上下）に帯（並び順 -1000 の Overlay Canvas）を出す。FocusCamera の付いたカメラにシーン読み込み時に自動で付く。比率・帯の色は Inspector。UI は画面全体（16:9）を使う | ◎ |
 | `Map/Look/DropShadow2D.cs` | （11-25）**影を付ける**：絵（SpriteRenderer）と同じ形を黒く半透明にして右下にずらして描く（隠れた子＝シーンに保存しない、`[ExecuteAlways]` でエディタでも見える）。絵・反転が変わったら合わせる。濃さ・ずらす量・縦の長さ・並び順 | ◎ |
 | `Map/Look/AutoShade.cs`、`Map/Look/Editor/AutoShadeEditor.cs` | （11-25）**隅の影**：影用の Tilemap に付け、床・壁の Tilemap から、壁ぎわ（上・左右・縁の乗ったマス）を薄い影、角を濃い影で塗る（Inspector の「影を塗り直す」・`AutoShadeEditor.Rebuild`） | ◎ |
-| `Map/Look/AreaTone.cs`、`Map/Look/AreaToneDriver.cs` | （11-25）**場所の色味**：四角（BoxCollider2D、再生中は当たり判定を切る）に操作中のキャラが入ると、Global Light 2D の色・明るさをなめらかに変える（優先度・秒数）。出ると元の値。`AreaToneDriver` は再生中に自動で 1 つ作られる。`StageDarkness` があるシーンでは働かない | ◎ |
-| `Map/Look/LightFlicker.cs` | （11-25）**明かりのゆらぎ**：Light 2D の明るさ・大きさをパーリンノイズでゆらす（たいまつ・水面のきらめき）。位置で種を変える | ◎ |
+| `Map/Look/AreaTone.cs` | （11-25）**場所の色味**：四角（BoxCollider2D、再生中は当たり判定を切る）に操作中のキャラが入ると、全体の光の色・明るさをなめらかに変える（優先度・秒数）。出ると元の値。（11-26）反映は演出の窓口 `PresentationDirector` の「範囲」の層（シーンの既定の光より強く、部品「光を変える」・回想より弱い）。前の `AreaToneDriver` は消した。`StageDarkness` があるシーンでも働く（暗さはこの上に掛かる） | ◎ |
+| `Map/Look/LightFlicker.cs` | （11-25）**明かりのゆらぎ**：Light 2D の明るさ・大きさをパーリンノイズでゆらす（たいまつ・水面のきらめき）。位置で種を変える。（11-26）`SetBaseIntensity`（場面の光 `SceneLight` が光のプリセットで強さを変えるとき、ゆらす元を変える） | ◎ |
 | 🛠`Map/Look/Editor/MapLookMenu.cs` | （11-25）Hierarchy 右クリック > マップの見た目 > 明かり（ゆらぐ）／場所の色味。Tilemap の ⋮ > 壁の影（Shadow Caster 2D）を作り直す（塗ったマスを横にまとめた四角。絵も当たり判定もない物に付けると 1×1 の形ができるので引き伸ばす）。`CreateLight`・`BuildShadowCasters`・`AddBox`・`AddCircle`（形の点を m_ShapePath に入れる）はレシピからも使う。`AddFootprintRect`（WalkArea の子に歩けない四角）・`FindWalkAreaFor` は奥行きのある物が使う | ◎ |
 | `Map/Look/DepthProp.cs`、🛠`Map/Look/Editor/DepthPropEditor.cs` | （11-25）**奥行きのある物**：物を足元の親（Sorting Group）でくるみ、親の位置＝前後の境目（当たり判定の上の端から 0.25 下）、足元の当たり判定＝見た目の幅 7 割 × 下半分（歩ける範囲の子）。Hierarchy 右クリック > マップの見た目 > 奥行きのある物にする（`DepthPropEditor.Wrap`）、Inspector「当たり判定と境目を作り直す」（`Rebuild`）、ギズモ（赤・青・黄）。シーンチェック `CheckDepthProps`。**前後を上下の位置で決めるのは `Assets/Settings/Renderer2D.asset` の Transparency Sort Mode＝Custom Axis（11-25 に Default から変えた）** | ◎ |
 | `Camera/MapchipViewTester.cs` | （11-25）**マップチップの見え方を試すシーン（`Test_Mapchip`）だけで使う**。P＝Pixel Perfect Camera のオン・オフ、Z＝ズーム（Pixel Perfect のときは基準の解像度を変える）、左下に状態（OnGUI。試すとき専用なので IMGUI のまま）。ふつうのステージには置かない | ◎ |
@@ -152,7 +152,7 @@
 | `UI/GameMenu/`（メニューに「メモ」：`noteButton`、`NoteBook.OpenList`）  | `GameMenu.cs`（Tab のメニュー：アイテム・ロード・タイトルへ、セーブポイントからのセーブの流れ、メッセージ）、🛠`Editor/GameMenuBuilder.cs`（`Resources/UI/GameMenu.prefab` を作る） |
 | `UI/Common/` | `SaveSlotPanel.cs`（セーブデータ選択画面。NewGame / Continue / Load / Save。一番上にオートセーブ枠の行を実行中に複製して足す〔セーブのときは出さない・はじめからはこの行だけ〕。`AnySaveExists`）、`MenuKeyboardNav.cs`（ボタンの並びをキーボードで選ぶ：最初のボタンを選ぶ・↑↓で回る・外れたらキーで戻す・選ばれた色。SceneGameOver の Canvas に付けた）、`ConfirmDialog.cs`（はい／いいえ。左右移動は2つの間だけ）、`UISubmitKeys.cs`（UI の決定に Space を足す・キー操作で選択が動いたら選択の SE。起動時に自動生成）、`UISound.cs` / `UISoundSettings.cs`（UI の効果音。`Resources/UISounds.asset`）、`UIButtonSound.cs`（ボタンに付けると押したときに鳴る）、🛠`Editor/UISoundGenerator.cs`（仮の電子音を `Assets/SE/UI/` に作る）、`PlaceNameTable.cs`（場所の表示名、`Resources/PlaceNames.asset`）、🛠`Editor/MenuUIBuilder.cs`（メニュー系 UI を作る共通処理） |
 | `SavePoint/` | `SavePoint.cs`（調べるとセーブ。Intaractable。戦闘エリアの戦闘中はセーブできない）、🛠`Editor/SavePointCreator.cs`（Hierarchy 右クリック > セーブポイント） |
-| `Common/InputBlock.cs` | プレイヤーの操作を止める判定（会話・暗転・アイテム画面・イベント・メニュー・謎解きの画面） |
+| `Common/InputBlock.cs` | プレイヤーの操作を止める判定（会話・暗転・アイテム画面・イベント・メニュー・謎解きの画面・シネマ演出の字幕・1枚絵のキー待ち） |
 | `Intaract/Intaractable.cs` | 「調べる」の基底（範囲に入って E）。範囲の中のプレイヤーを覚え、**操作中のキャラだけ**を player にする（ついてくる相棒・待たせている相棒には反応しない。キャラを切り替えると入れ直す）。`OnPlayerEnter` / `OnPlayerExit` も操作中のキャラだけ（謎解き段階3） |
 | `Intaract/InteractPrompt.cs` | **キーの案内**（11-13）：`IInteractPrompt`（`PromptVisible`・`PromptLabel`）と `InteractPromptView`（自動生成・シーンをまたぐ。操作中のキャラが範囲にいる調べる物のうち一番近い物の上に「[E] 調べる」など。入力停止中は出さない）。IInteractPrompt を持つ物（ItemInteraction〔調べたとき・実行できるルールがあるときだけ・文は Inspector〕、GimmickInteractable〔使えるキャラだけ・`CanPrompt`〕、NotePickup「読む」、TimpaniPeg「締める」）はその判断、持たない物は種類ごとの文（ItemPickup「拾う」・SavePoint「セーブ」・Dialogue／DefeatedTalk「話す」・Treasure「開ける」・KeyItem）で、Intaractable の player をリフレクションで見る |
 | `Manager/InventoryManager.cs` | 所持品（シングルトン、シーンをまたぐ、セーブ） |
@@ -169,7 +169,8 @@
 | `Se/` | `SeManager`（SeData で再生、ループ、追従）、`SePlayer`、`FootstepSe`（ノア・シグルのプレハブに付いている。鳴らし方＝一歩ずつ〔11-14 から〕／歩いている間ループ）、`SceneFootstep`（11-14。足音の設定＝このシーン・範囲の中だけ足音を替える。外のマップ Stage1_1 は砂の録音のループ。🛠`SceneFootstepMenu`）、`HealthSe`（11-14 ノア・シグルのプレハブに付けた。体力を共有しているとき1回の攻撃で鳴るのは当たったキャラの音だけ）、`SeEventAction`、🛠`SeDataCreator`。素材の置き場所・入れた先は `rules/audio.md` | なし |
 | `Effect/` | `EffectManager`、`EffectData`、`EffectTrigger`（コードなしで出す）、`EffectEventAction`、🛠エディタ一式 | `Effect/README_エフェクトの使い方.md` |
 | `SpriteAnimation/` | `SpriteAnimator` + `SpriteAnimData`（新方式）、`SpriteFrameBlend`（11-19。コマの間を混ぜ・水面の高さを合わせて上下・水のゆらぎ。シェーダー `Assets/Shaders/SpriteFrameBlendWave.shader`〔CT/Sprite Frame Blend Wave。明かりなし。「シーンの明るさに合わせる」で Global Light 2D の色×強さを掛ける〕＋`Mat_SpriteFrameBlendWave`。Stage1_0 の波）、`CharacterAnimLink`（移動・体力で自動切り替え）、`AnimEventAction`、🛠エディタ一式。`SpriteAnimation.cs`（Animator 版）は古い | `SpriteAnimation/README_アニメーションの使い方.md` |
-| `StageDarkness/` | `StageDarkness`（ステージを暗くしてプレイヤーの周りだけ明るく）、`LightSource` | なし |
+| `StageDarkness/` | `StageDarkness`（ステージを暗くしてプレイヤーの周りだけ明るく）、`LightSource`。（11-26）再生中は全体の光を自分で書かず、暗さと暗い所の色を `PresentationDirector.ReportDarkness` に渡す（窓口が光の層の上に掛ける。光の層がないときは前と同じ値） | なし |
+| `Presentation/`（11-26） | **演出の基盤**（指示書 CT_presentation_mood_light_weather_still）。`PresentationDirector`（窓口。再生で自動・DontDestroyOnLoad。色調・光・天候の層〔既定＜範囲＜イベント＜回想、天候は既定＜イベント＜範囲＜回想〕を重ね、今の見た目から次へなめらかに。色調＝実行中に作る Volume〔ColorAdjustments・WhiteBalance・SplitToning・Vignette・FilmGrain・Bloom〕、加工がないときはカメラのポストプロセスを切る。光＝Global Light 2D と `SceneLight`。品質「軽い」で粒子・にじみを外し天候の粒を半分。セーブ `Presentation/<シーン>/Mood・Light・Weather`＝イベントの層の名前〔回想は記録しない〕。`Set〜`／`Clear〜`／`SetBase`／`EnterFlashback`／`ExitFlashback`／`Describe`。S4 の時代プリセットはここから呼ぶ）、`PresentationTypes`、プリセット `MoodPreset`・`LightPreset`・`WeatherPreset`・`FlashbackPreset`（**`Assets/Resources/Presentation/` に置く**＝セーブから名前で探す）、`ScenePresentation`（シーンの演出の既定・フラグの条件）、`SceneLight`（場面の光・グループ）、`WeatherView`（天候の粒。カメラについてくる・World 空間・はね・かすみ・環境音）、`WeatherArea`（天候の範囲）、`FlagFade`（フラグでなめらかに出す）、`StillView`（1枚絵の画面。並び順 95・`IsBusy` は InputBlock）、`DialogueMoodLayer`（11-26。色調の「会話画面にもかける」：立ち絵に `CT/UI Mood`〔`Assets/Shaders/UIMood.shader`・`Resources/Presentation/Materials/Mat_UI_Mood` の複製〕、文字は TMP の複製のマテリアルの _FaceColor、会話中だけ並び順 101 に粒子と周辺の暗さ。対象は `DialogueManager.GetMoodTargets`・`CinemaMode.GetMoodTexts`）、試し用の `PresentationStation`（演出の台座：調べるたびに次のプリセット・回想・暗さ・全部戻す。GimmickInteractable）・`PresentationStatusView`（右上に今の状態。エディタと Development Build だけ）、部品 `Events/`（色調を変える・戻す、光を変える・戻す、天候を変える、回想に入る・戻る、1枚絵を出す・閉じる）、🛠`Editor/PresentationPresetBuilder`（Tools > 演出 > 最初のプリセットを作る）・`PresentationMenu`（Hierarchy 右クリック > 演出）。コマ落ちは `SpriteAnimator.GlobalStepFps` | `Docs/演出の作り方.md` |
 
 ### プランナー用ツール・その他
 | ファイル | 役割 |
@@ -323,6 +324,8 @@
 | Stage1_1 / Stage1_2 の `OtherSystem/SceneChange`、SceneGameOver の SceneChange | 遷移先が空（シーンチェックで「参考」）。死亡時・リトライでコードから `ChangeScene` を呼ぶためのもので、問題なし |
 
 ### 設計上の注意（不具合ではない）
+- 🆕（11-26）色調（ポストプロセス）はマップのカメラ全体にかかるので、世界の中に出している物（調べる案内「[E] 調べる」・敵の攻撃の予告・相棒の目印など）の色も変わる。会話・メニュー・HUD（Overlay の Canvas）は変わらない。外したい物が出たら、別のカメラに分けるか Overlay の UI に移す。
+- 🆕（11-26）試し用のシーン `Test_Presentation` は Stage1_0 のコピーなので、シーンチェックに Stage1_0 から来た指摘（`OB_TRbox` の Id が空・使っていない `Event`）が出る（害はない）。Build Settings にないので、シナリオの `reload` は使えない。
 - ItemPickup / ItemInteraction / KeyItem は、ID が空だと階層パスでセーブする → 名前や親を変えると記録がリセットされる。
 - `EventZone` の「1回だけ」はセーブされない（シーンに戻ると再発動）。
 - 最後のセーブ以降に手に入れたものは、タイトルに戻る・終了すると失われる（セーブはシーンに着いたとき・チェックポイント）。

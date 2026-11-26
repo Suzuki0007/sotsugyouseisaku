@@ -14,6 +14,7 @@
 - **仮組み：上陸（Stage1_0〜Stage1_2 入口）**（2026-11-20、指示書 `CT_landing_to_chase_claudecode_instruction_2026-11-20.md`）。仮素材で全部動く。本番の絵・音・怪物の見た目・砂浜の歩ける範囲のマスクはまだ。→ `rules/scenes.md` の Stage1_0・Stage1_1・Stage1_2。
 - **仮組み：T字通路（Stage1_4）**（2026-11-20、指示書 `CT_T_corridor_claudecode_instruction_2026-11-20.md`）。入室 → 扉の前のイベントまで仮素材で動く。左右の部屋・扉を開ける大なぞ・2人操作の開始はまだ（受け口だけ）。→ `rules/scenes.md` の Stage1_4。
 - **仮組み：書斎（Stage1_3）**（2026-11-20）。仮素材で全部動く（2問・調律・紹介・ロード）。本番の絵・音・出口の先（廊下・楽器倉庫・合流地点）はまだ。→ `rules/scenes.md` の Stage1_3。
+- **完了：演出の基盤**（2026-11-26、指示書 `CT_presentation_mood_light_weather_still_claudecode_instruction_2026-11-25`）：色調・光・天候・回想・1枚絵。窓口 `PresentationDirector`、プリセットは `Assets/Resources/Presentation/`、試し用のシーン `Test_Presentation`。次は S4（時代・季節の切り替え）。→ `.claude/rules/presentation.md`・`Docs/演出の作り方.md`
 - **進行中：性能（計測・チューニング）**。段階1（計測の道具）・段階2（点検のスキル `perf-review`）・段階3（Project Auditor）完了。次は ④ 計測で重い所だけ直す。→ `.claude/rules/performance.md`
 - 段階で進める大きな作業は、**1段階ずつ終わったら報告とコミットメッセージを渡す**。
 
@@ -78,6 +79,7 @@
 | ルール | `scenes.md` | シーンを開く・組み立てる・保存するとき（`Assets/Scenes/**`・`Images/**`）：保存の約束・レシピ・シーンごとのメモ（OP・Stage1_2 の流れ）・仮の素材 |
 | ルール | `team-code.md` | 成田さん・鈴木さんが書いたファイル（`\author` から作った一覧）：勝手に直さない・名前を変えない・コミットメッセージに説明 |
 | ルール | `player-combat.md` | プレイヤーの操作・攻撃・弾・プール（`Player/**`・`Attack/**`・`Bullet/**`・`Pool/**`・`CharaBase/**`）：キー・LateUpdate の順番・弾の約束 |
+| ルール | `presentation.md` | 演出の基盤（`Presentation/**`・`Resources/Presentation/**`・`StageDarkness/**`・`AreaTone`・`LightFlicker`）：窓口と層・セーブ・1枚絵の並び順・天候・性能 |
 | ルール | `audio.md` | BGM・SE（`Bgm/**`・`Se/**`・`Assets/BGM`・`Assets/SE`）：仕組み・足音の鳴らし方・BGM は Streaming・既知の問題・耳での確認はユーザーに |
 | ルール | `asset-tools.md` | 素材の取り込みの道具（`AssetTools/**`・取り込み設定.tsv・`Docs/素材の割り当て/**`）：取り込みの決まり・見回りの土台（AssetWalker・AssetKey）・差し替え・割り当て表の入れる先 |
 | ルール | `tests.md` | テストシナリオ（`Tests/**`）：1本に1つの通り道・最後に reload と no-error・`key E` で調べる |
@@ -99,7 +101,7 @@
 
 ## シーン・フォルダ
 
-- **ゲームで使うシーンは `Title` → `Stage1_0`（砂浜。はじめからは海の上の小舟の `Start_Boat` で OP・手紙 → 上陸 → 奥の振動）→ `Stage1_1`（塔のスチル → 怪物から逃げて塔へ） → `Stage1_2` → `Stage1_3`（書斎。11-20〜）→ `Stage1_4`（T字通路。11-20〜。左右の部屋・扉を開ける大なぞはまだない）、`Stage_1_Boss`（ティンパニ部屋。2026-11-19 に `Stage_1_3` から名前が変わった。セーブの ID などは `Stage_1_3_〇〇` のまま。**合流をボスの前に移したので、今はどこからもつながっていない**）、`SceneGameOver`**（Build Settings もこの8つ）。`Stage1`、`Stage2`、`SampleScene`、`kari_*` はファイルだけ残っている。`Test_Mapchip`（2026-11-25）はマップチップの見え方を試すシーン（Build Settings に入れない。`rules/scenes.md`）。
+- **ゲームで使うシーンは `Title` → `Stage1_0`（砂浜。はじめからは海の上の小舟の `Start_Boat` で OP・手紙 → 上陸 → 奥の振動）→ `Stage1_1`（塔のスチル → 怪物から逃げて塔へ） → `Stage1_2` → `Stage1_3`（書斎。11-20〜）→ `Stage1_4`（T字通路。11-20〜。左右の部屋・扉を開ける大なぞはまだない）、`Stage_1_Boss`（ティンパニ部屋。2026-11-19 に `Stage_1_3` から名前が変わった。セーブの ID などは `Stage_1_3_〇〇` のまま。**合流をボスの前に移したので、今はどこからもつながっていない**）、`SceneGameOver`**（Build Settings もこの8つ）。`Stage1`、`Stage2`、`SampleScene`、`kari_*` はファイルだけ残っている。`Test_Mapchip`（2026-11-25）はマップチップの見え方を試すシーン、`Test_Presentation`（2026-11-26）は演出を試すシーン（どちらも Build Settings に入れない。`rules/scenes.md`）。
 - スクリプトは `Assets/Script/<機能>/`、エディタ拡張は各機能の `Editor/`。asmdef はない。書き方は `.claude/rules/coding-style.md`。
 
 ## 文書
@@ -109,7 +111,7 @@
 - プランナー向けの通しの手順書：`Docs/プランナー向け作業手順書.md`（食い違うときはこちらが新しい）。**プランナーが使う機能を足したり、メニュー名・Inspector の項目名を変えたりしたときだけ**、個別の手順書に加えてこちらも更新する。メニュー・部品の早見表は手で書かず、付録から `Docs/早見表（自動）.md` へ案内するだけ（11-20 合意）。
 - **自動の早見表**：`Docs/早見表（自動）.md`（直接直さない。コードを変えたら `QuickReferenceBuilder.Build()` で作り直す。finish-task に入れてある）。
 - **MUSE.AI（指示書を書く側）に渡す資料**：`Docs/MUSE向け/`（1＝指示書を書くときの決まり、2＝今のゲームの状態、3＝キャラと会話の確定事項〔会話の全文は CSV から書き出した写し〕。2026-11-20 作成）。シーン・フラグ・キャラ設定・会話を大きく変えたら 2・3 を更新する（3 の全文は書き出し直す）。指示書を実装したら「指示書との違いの報告」を返す（1 の 5 章）。
-- 個別の手順書：`Docs/素材の取り込み.md`、`Docs/マップチップの置き方.md`（11-25）、`Docs/素材の渡し方.md`（作る人向け）、`Docs/合図の使い方.md`、`Docs/テストシナリオの書き方.md`、`Docs/ティンパニ部屋の作り方と調整.md`、`Docs/敵の作り方.md`、`謎解きと2人の仕掛けの作り方.md`、`タイトル画面とセーブの仕組み.md`、`アイテム連動イベントの作り方.md`、`フラグの使い方.md`、`イベントの順番と待ち時間.md`、`プランナー用ツールの使い方.md`。
+- 個別の手順書：`Docs/演出の作り方.md`（11-26）、`Docs/素材の取り込み.md`、`Docs/マップチップの置き方.md`（11-25）、`Docs/素材の渡し方.md`（作る人向け）、`Docs/合図の使い方.md`、`Docs/テストシナリオの書き方.md`、`Docs/ティンパニ部屋の作り方と調整.md`、`Docs/敵の作り方.md`、`謎解きと2人の仕掛けの作り方.md`、`タイトル画面とセーブの仕組み.md`、`アイテム連動イベントの作り方.md`、`フラグの使い方.md`、`イベントの順番と待ち時間.md`、`プランナー用ツールの使い方.md`。
 - **素材チェックリスト**：`Docs/素材チェックリスト.xlsx`（2026-11-13 作成。足りない素材・仮素材・今後必要な素材 92 件。区分・状態・優先度・進み具合のプルダウン、集計シート）。一番左の「済」の列に ✓（素材ができた）、既定の並びは区分→優先度→ID（見た目は `asset-audit` の `format.ps1`）。素材を入れたら `asset-audit` スキルで点検する（行ごとの「確認キー（自動）」で解決したかを判定し、「自動の点検」に書く）。
 - 共有用（Claude Docs）：プランナー向け作業手順書 https://claude.ai/artifact/HawxoKhE7Pz73WdbUbxwt4 、引き継ぎ資料 https://claude.ai/artifact/MZz5A9WgmQNB8owyj3yxeW 。**Markdown と自動で同期はしない**ので、Markdown を大きく直したら共有用にも反映する（頼まれたとき）。
 

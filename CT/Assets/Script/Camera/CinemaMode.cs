@@ -429,6 +429,17 @@ public class CinemaMode : MonoBehaviour
     }
 
     /// <summary>
+    /// 会話画面の色調（演出の DialogueMoodLayer）をかける文字を渡す（字幕・名前・キーの案内・▼。まだ作っていなければ何も足さない。11-26）
+    /// </summary>
+    public void GetMoodTexts(System.Collections.Generic.List<TMP_Text> texts)
+    {
+        if(subtitle != null)     { texts.Add(subtitle); }
+        if(nameText != null)     { texts.Add(nameText); }
+        if(keyHint != null)      { texts.Add(keyHint); }
+        if(nextMarkText != null) { texts.Add(nextMarkText); }
+    }
+
+    /// <summary>
     /// 会話の文を書く字幕の文字（DialogueManager が1文字ずつ出す）。出したまま見えるようにしてから返す
     /// </summary>
     public TMP_Text DialogueText()

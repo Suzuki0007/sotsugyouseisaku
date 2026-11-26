@@ -96,12 +96,90 @@ public class DebugWindow : EditorWindow
             DrawEvents();
             DrawSignals();
             DrawMapArea();
+            DrawPresentation();
         }
 
         DrawStartState();
         DrawSave();
 
         EditorGUILayout.EndScrollView();
+    }
+
+    //=====================================================================
+    // 演出（色調・光・天候・回想。2026-11-26）
+    //=====================================================================
+
+    private bool foldPresentation = true;
+    private float presentationSeconds = 1.0f;
+    private List<MoodPreset> moodPresets;
+    private List<LightPreset> lightPresets;
+    private List<WeatherPreset> weatherPresets;
+    private List<FlashbackPreset> flashbackPresets;
+
+    /// <summary>
+    /// 色調・光・天候・回想のプリセットを一覧から選んで、その場で切り替える（部品と同じ「イベント」の層に入れる）
+    /// </summary>
+    private void DrawPresentation()
+    {
+        foldPresentation = EditorGUILayout.BeginFoldoutHeaderGroup(foldPresentation, "演出（その場で試す：色調・光・天候・回想）");
+        if(foldPresentation)
+        {
+            if(moodPresets == null || GUILayout.Button("プリセットを読み直す", GUILayout.Width(160)))
+            {
+                moodPresets = PresentationDirector.All<MoodPreset>();
+                lightPresets = PresentationDirector.All<LightPreset>();
+                weatherPresets = PresentationDirector.All<WeatherPreset>();
+                flashbackPresets = PresentationDirector.All<FlashbackPreset>();
+            }
+
+            EditorGUILayout.HelpBox(PresentationDirector.Describe(), MessageType.None);
+            presentationSeconds = EditorGUILayout.Slider("かける時間（秒）", presentationSeconds, 0.0f, 10.0f);
+            PresentationLayer layer = PresentationDirector.EventLayer;
+
+            PresetRow("色調", moodPresets, p => PresentationDirector.SetMood(layer, p, presentationSeconds),
+                      "戻す", () => PresentationDirector.ResetMoodForEvent(presentationSeconds, PresentationCurve.Smooth));
+            PresetRow("光", lightPresets, p => PresentationDirector.SetLight(layer, p, presentationSeconds),
+                      "戻す", () => PresentationDirector.ResetLightForEvent(presentationSeconds, PresentationCurve.Smooth));
+            PresetRow("天候", weatherPresets, p => PresentationDirector.SetWeather(layer, p, presentationSeconds),
+                      "なし", () => PresentationDirector.SetWeather(layer, null, presentationSeconds));
+
+            using(new EditorGUILayout.HorizontalScope())
+            {
+                EditorGUILayout.LabelField("回想", GUILayout.Width(40));
+                foreach(FlashbackPreset p in flashbackPresets)
+                {
+                    if(p != null && GUILayout.Button(p.name.Replace("Flashback_", ""))) { PresentationDirector.EnterFlashback(p, presentationSeconds, p.Transition); }
+                }
+                GUI.enabled = PresentationDirector.InFlashback;
+                if(GUILayout.Button("戻る")) { PresentationDirector.ExitFlashback(presentationSeconds, FlashbackTransition.Dissolve); }
+                GUI.enabled = true;
+            }
+            EditorGUILayout.LabelField("プリセットの値を Inspector で変えたら、もう一度押すと反映されます。", EditorStyles.miniLabel);
+        }
+        EditorGUILayout.EndFoldoutHeaderGroup();
+    }
+
+    private static void PresetRow<T>(string label, List<T> presets, System.Action<T> apply, string resetLabel, System.Action reset) where T : ScriptableObject
+    {
+        EditorGUILayout.LabelField(label, EditorStyles.boldLabel);
+        const int perRow = 4;
+        for(int i = 0; i < presets.Count; i += perRow)
+        {
+            using(new EditorGUILayout.HorizontalScope())
+            {
+                for(int k = i; k < Mathf.Min(i + perRow, presets.Count); k++)
+                {
+                    T p = presets[k];
+                    if(p == null) { continue; }
+                    string name = p.name;
+                    int u = name.IndexOf('_');
+                    if(u >= 0) { name = name.Substring(u + 1); }
+                    if(GUILayout.Button(name)) { apply(p); }
+                }
+                if(i + perRow >= presets.Count && GUILayout.Button(resetLabel, GUILayout.Width(50))) { reset(); }
+            }
+        }
+        if(presets.Count == 0 && GUILayout.Button(resetLabel, GUILayout.Width(50))) { reset(); }
     }
 
     //=====================================================================

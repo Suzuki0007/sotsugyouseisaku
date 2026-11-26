@@ -1,0 +1,102 @@
+# 演出の試し用マップ Test_Presentation（Build Settings に入れない。直接再生）：見本の広場で台座を本当の E キーで調べて回る（2026-11-26 改）
+# 色調・光・天候は調べるたびに次へ・天候の範囲で止む・場所の色味の範囲・回想に入る／戻る（回想中だけの物）・暗さ・1枚絵を Space で閉じる・全部戻す
+scene Test_Presentation
+wait 2
+expect near -115.2,22.0 1.5          # 直接再生は見本の広場の南から（船の上ではない）
+expect eval PresentationDirector.CurrentLightName == "Light_夜"
+# 色調の台座
+warp -120.5,33.5
+wait 1
+expect prompt 色調を変える
+key E
+wait 2
+expect eval PresentationDirector.CurrentMoodName == "Mood_夜・一人"
+key E
+wait 2
+expect eval PresentationDirector.CurrentMoodName == "Mood_温かい日常"
+# 光の台座
+warp -117.5,33.5
+wait 1
+expect prompt 光を変える
+key E
+wait 2
+expect eval PresentationDirector.CurrentLightName == "Light_昼"
+# 天候の台座 → 天候の範囲（北東の角）で止む → 出ると戻る
+warp -114.5,33.5
+wait 1
+key E
+wait 2
+expect eval PresentationDirector.CurrentWeatherName == "Weather_雨・弱"
+warp -109.5,36.6                # 天候の範囲の中
+wait 2
+expect eval PresentationDirector.CurrentWeatherName == ""
+warp -114.5,31.5
+wait 2
+expect eval PresentationDirector.CurrentWeatherName == "Weather_雨・弱"
+# 上端（Stage1_0 では Stage1_1 への出口がある所）へ行っても移らない
+warp -115.0,38.0
+wait 2
+expect scene Test_Presentation
+key UpArrow 800
+wait 2
+expect scene Test_Presentation
+# 場所の色味の範囲（北西の角）：範囲の層に入る（部品の光「昼」のほうが強いので見た目は昼のまま）
+warp -120.5,36.8
+wait 2
+expect eval PresentationDirector.Describe().Contains("範囲=場所の色味")
+# 回想の台座：入る → 回想中だけの物が出る → もう一度で戻る
+warp -111.5,33.5
+wait 1
+expect prompt 回想に入る
+key E
+wait 5
+expect flag Flag_Flashback_Active on
+expect eval UnityEngine.GameObject.Find("演出の見本").transform.Find("回想中だけの物（仮）").gameObject.activeSelf
+capture test_flashback
+key E
+wait 4
+expect flag Flag_Flashback_Active off
+expect eval PresentationDirector.CurrentMoodName == "Mood_温かい日常" && PresentationDirector.CurrentLightName == "Light_昼"
+# 暗さの台座：暗くする → 戻す
+warp -113.0,29.5
+wait 1
+expect prompt 暗くする
+key E
+wait 2
+expect eval StageDarkness.IsDarkStage
+capture test_dark
+key E
+wait 3
+expect eval !StageDarkness.IsDarkStage
+# 1枚絵の台座（寄る・キーで閉じる）：本当の Space で閉じる
+warp -121.0,29.5
+wait 1
+key E
+wait 6
+expect eval StillView.IsShowing && StillView.IsBusy
+capture test_still
+key Space
+wait 3
+expect eval !StillView.IsShowing
+# 回想の中の会話：会話画面にもかける（立ち絵が UI 用の色調のマテリアル）→ 戻ると元のマテリアル
+warp -109.0,28.8
+wait 1
+key E
+wait 4
+expect talk 塔
+expect eval PresentationDirector.DialogueMoodAmount > 0.5f
+expect eval System.Array.Exists(UnityEngine.Object.FindObjectsByType<UnityEngine.UI.Image>(), i => i.name == "PortraitLeft" && i.material != null && i.material.shader.name == "CT/UI Mood")
+capture test_flashback_talk
+advance all
+wait 4
+expect eval PresentationDirector.DialogueMoodAmount < 0.001f && !PresentationDirector.InFlashback
+expect eval !System.Array.Exists(UnityEngine.Object.FindObjectsByType<UnityEngine.UI.Image>(), i => i.material != null && i.material.shader.name == "CT/UI Mood")
+# 全部戻す
+warp -111.5,22.5
+wait 1
+expect prompt 全部戻す
+key E
+wait 3
+expect eval PresentationDirector.CurrentMoodName == "" && PresentationDirector.CurrentWeatherName == "" && PresentationDirector.CurrentLightName == "Light_夜"
+expect idle
+expect no-error

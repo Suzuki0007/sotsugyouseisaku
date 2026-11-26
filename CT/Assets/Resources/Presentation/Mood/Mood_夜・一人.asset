@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 052b736d88f04434f96b76de4728e18b, type: 3}
+  m_Name: "Mood_\u591C\u30FB\u4E00\u4EBA"
+  m_EditorClassIdentifier: Assembly-CSharp::MoodPreset
+  memo: "\u7802\u6D5C\u306B\u4E0A\u9678\uFF08\u5F69\u5EA6 -30\u30FB\u5BD2\u8272\u30FB\u5468\u8FBA\u3092\u6697\u304F
+    \u5F31\u301C\u4E2D\uFF09"
+  saturation: -30
+  contrast: 0
+  brightness: 0
+  colorFilter: {r: 0.92, g: 0.95, b: 1, a: 1}
+  temperature: -25
+  tint: 0
+  shadowsColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  highlightsColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  splitBalance: 0
+  vignette: 0.3
+  vignetteSmoothness: 0.4
+  vignetteColor: {r: 0, g: 0, b: 0, a: 1}
+  grain: 0
+  grainType: 4
+  bloom: 0
+  bloomThreshold: 0.9

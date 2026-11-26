@@ -1,0 +1,32 @@
+# 演出の基盤：Stage1_0（砂浜・夜）で、夜の見た目が変わらない・色調と天候をイベントの層で変える → 回想に入った途中でセーブ → ロードすると回想に入る前の状態に戻る（2026-11-26）
+scene Stage1_0
+save on
+wait 2
+advance all                     # OP → 手紙 → 上陸
+wait idle
+# 夜（光のプリセット「夜」＝シーンの演出の既定）の値が、前と同じ (0.5, 0.6, 0.9) × 0.45
+expect eval PresentationDirector.CurrentLightName == "Light_夜"
+expect eval System.Array.Exists(UnityEngine.Object.FindObjectsByType<UnityEngine.Rendering.Universal.Light2D>(), l => l.lightType == UnityEngine.Rendering.Universal.Light2D.LightType.Global && UnityEngine.Mathf.Abs(l.intensity - 0.45f) < 0.001f && UnityEngine.Mathf.Abs(l.color.b - 0.9f) < 0.001f)
+# イベントの層で色調・天候を変える（部品「色調を変える」「天候を変える」と同じ呼び方）
+eval PresentationDirector.SetMood(PresentationLayer.Event, PresentationDirector.Find<MoodPreset>("Mood_夜・一人"), 0f)
+eval PresentationDirector.SetWeather(PresentationLayer.Event, PresentationDirector.Find<WeatherPreset>("Weather_雨・弱"), 0f)
+wait 1
+expect eval PresentationDirector.CurrentMoodName == "Mood_夜・一人"
+# 回想に入る（3 秒）→ 回想中フラグ・コマ落ち
+eval PresentationDirector.EnterFlashback(PresentationDirector.Find<FlashbackPreset>("Flashback_回想"), 3f, FlashbackTransition.GrayThenTint)
+wait 4
+expect flag Flag_Flashback_Active on
+expect eval PresentationDirector.CurrentMoodName == "Mood_回想" && PresentationDirector.CurrentWeatherName == "Weather_光の粒" && SpriteAnimator.GlobalStepFps > 0f
+capture presentation_flashback
+# 回想の途中でセーブ → ロード：回想に入る前（夜・一人／雨・弱）、回想中フラグは OFF
+autosave
+reload
+expect scene Stage1_0
+wait 1
+expect flag Flag_Flashback_Active off
+expect eval !PresentationDirector.InFlashback && SpriteAnimator.GlobalStepFps == 0f
+expect eval PresentationDirector.CurrentMoodName == "Mood_夜・一人"
+expect eval PresentationDirector.CurrentWeatherName == "Weather_雨・弱"
+expect eval PresentationDirector.CurrentLightName == "Light_夜"
+expect idle
+expect no-error
