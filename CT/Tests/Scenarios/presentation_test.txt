@@ -91,6 +91,29 @@ advance all
 wait 4
 expect eval PresentationDirector.DialogueMoodAmount < 0.001f && !PresentationDirector.InFlashback
 expect eval !System.Array.Exists(UnityEngine.Object.FindObjectsByType<UnityEngine.UI.Image>(), i => i.material != null && i.material.shader.name == "CT/UI Mood")
+# 室内（Stage1_2 の通路の絵を砂浜の北につないだ）：本当の上キーで砂浜から歩いて入る
+warp -115.2,30.0                # 広場の真ん中（始まる場所の真上。まっすぐ上へ歩くと室内）
+wait 1
+key UpArrow 4000
+wait 1
+expect eval PlayerSwitchManager.Instance.CurrentPlayer.transform.position.y > 40.0f
+expect reach 室内の明るさ
+# 室内の明るさの台座：明るい → 薄暗い（0.6）→ 暗い（0.85）→ 真っ暗（0.97・明かりの半径 1）→ 明るい
+warp -119.2,41.4                # 室内の明るさの台座
+wait 1
+expect prompt 明るさを変える
+key E
+wait 2.5
+expect eval StageDarkness.IsDarkStage && UnityEngine.Mathf.Abs(StageDarkness.Active.Darkness - 0.6f) < 0.02f
+key E
+wait 2.5
+key E
+wait 2.5
+expect eval UnityEngine.Mathf.Abs(StageDarkness.Active.Darkness - 0.97f) < 0.02f && UnityEngine.Mathf.Abs(StageDarkness.Active.Radius - 1f) < 0.05f
+capture test_room_dark
+key E
+wait 3
+expect eval !StageDarkness.IsDarkStage
 # 全部戻す
 warp -111.5,22.5
 wait 1

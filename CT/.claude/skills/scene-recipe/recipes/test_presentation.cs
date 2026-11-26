@@ -225,6 +225,117 @@ Set(byStation, "withLight", byLight);
 { var so = new UnityEditor.SerializedObject(byStation); var wl = so.FindProperty("withLights"); var ln = new[] { "Light_P1_ファミレス型", "Light_P2_夏のうちに型", "Light_P3_月夜の砂浜", "Light_P4_回想ぬくもり", "Light_P5_喪失", "Light_P6_夜明け" }; wl.arraySize = ln.Length; for (int i = 0; i < ln.Length; i++) wl.GetArrayElementAtIndex(i).objectReferenceValue = Load<LightPreset>(R + "Light/" + ln[i] + ".asset"); so.ApplyModifiedPropertiesWithoutUndo(); }
 Station("塗り替えの\n境目を表示", PresentationStation.Kind.Bands, V(-108.8f, 24.6f), new UnityEngine.Color(0.3f, 0.9f, 0.9f));
 
+// ===== 室内（11-27 ユーザーの依頼）：Stage1_2 の通路の絵を砂浜の北につなぐ。歩いてそのまま入れる。青と黄色の光・明るさの台座 =====
+// Stage1_2 の通路の絵 Room_1_Rouka（中心 (-115.7, 13.9)・28.8×10.8・下の端 y 8.5・下の入口 x -109.2〜-105.7）を、
+// 入口の真ん中が広場の真ん中（始まる場所の真上、x -115.2）、下の端が砂浜の上の端 (38.43) に来るようにずらす（11-27：前は x -113 で、広場からまっすぐ上へ歩くと入れなかった）
+var roomOffset = new UnityEngine.Vector3(-7.75f, 29.95f, 0f);
+const float cx = -115.2f;   // 入口の真ん中
+var stage12 = UnityEditor.SceneManagement.EditorSceneManager.OpenScene("Assets/Scenes/Stage1_2.unity", UnityEditor.SceneManagement.OpenSceneMode.Additive);
+UnityEngine.GameObject srcRoom = null;
+foreach (var r in stage12.GetRootGameObjects()) { var t = r.transform.Find("Room_1_Rouka"); if (t != null) { srcRoom = t.gameObject; break; } }
+UnityEngine.GameObject room = null;
+if (srcRoom == null) sb.Append("!! Stage1_2 に Room_1_Rouka がない\n");
+else
+{
+    room = UnityEngine.Object.Instantiate(srcRoom);
+    UnityEngine.SceneManagement.SceneManager.MoveGameObjectToScene(room, s);
+    room.name = "室内（Stage1_2 の通路の絵）";
+    room.transform.SetParent(root.transform, true);
+    room.transform.position = srcRoom.transform.position + roomOffset;
+    var mbCopy = room.GetComponent<MapBounds>(); if (mbCopy != null) UnityEngine.Object.DestroyImmediate(mbCopy);
+    // 壁：絵の下の端（ずらした後の y 38.43）より下にはみ出した分を切る（砂浜をふさがないように）
+    float bottom = room.GetComponent<UnityEngine.SpriteRenderer>().bounds.min.y;
+    foreach (var bc in room.GetComponents<UnityEngine.BoxCollider2D>())
+    {
+        var b = bc.bounds;
+        if (b.size.x < 0.01f) continue;
+        if (b.min.y < bottom)
+        {
+            float newMin = bottom, max = b.max.y;
+            var center = new UnityEngine.Vector2(b.center.x, (newMin + max) * 0.5f);
+            var local = (UnityEngine.Vector2)room.transform.InverseTransformPoint(center);
+            var sc = room.transform.lossyScale;
+            bc.offset = local;
+            bc.size = new UnityEngine.Vector2(bc.size.x, (max - newMin) / sc.y);
+        }
+    }
+    sb.Append("room copied: " + room.GetComponent<UnityEngine.SpriteRenderer>().bounds + "\n");
+}
+UnityEditor.SceneManagement.EditorSceneManager.CloseScene(stage12, true);
+
+if (room != null)
+{
+    var rb = room.GetComponent<UnityEngine.SpriteRenderer>().bounds;
+    // 歩ける範囲：通路の入口（砂浜とつなぐ）と床
+    var walkRoom = Child("歩ける範囲（室内）", root.transform, V(0f, 0f));
+    var wa2 = walkRoom.AddComponent<WalkArea>();
+    void WalkRect(string name, float x0, float y0, float x1, float y1)
+    {
+        var go = Child(name, walkRoom.transform, V((x0 + x1) * 0.5f, (y0 + y1) * 0.5f));
+        var bc = go.AddComponent<UnityEngine.BoxCollider2D>(); bc.isTrigger = true; bc.size = new UnityEngine.Vector2(x1 - x0, y1 - y0);
+    }
+    WalkRect("入口（砂浜とつなぐ）", cx - 1.6f, 37.9f, cx + 1.6f, 40.4f);
+    WalkRect("床", rb.min.x + 0.2f, 40.2f, rb.max.x - 0.2f, 45.7f);
+
+    // マップの範囲：砂浜と室内の両方を覆う見えない絵に移す（プレイヤーが出られる範囲。PlayerSceneContext の MapBounds もつなぎ替える）
+    var beachMb = UnityEngine.Object.FindAnyObjectByType<MapBounds>(UnityEngine.FindObjectsInactive.Include);
+    var beachSr = beachMb != null ? beachMb.GetComponent<UnityEngine.SpriteRenderer>() : null;
+    if (beachSr != null)
+    {
+        var bb = beachSr.bounds;
+        float x0 = UnityEngine.Mathf.Min(bb.min.x, rb.min.x), x1 = UnityEngine.Mathf.Max(bb.max.x, rb.max.x), y0 = UnityEngine.Mathf.Min(bb.min.y, rb.min.y), y1 = UnityEngine.Mathf.Max(bb.max.y, rb.max.y);
+        var areaGo = Child("マップの範囲（砂浜と室内・見えない絵）", root.transform, V((x0 + x1) * 0.5f, (y0 + y1) * 0.5f));
+        var asr = areaGo.AddComponent<UnityEngine.SpriteRenderer>(); asr.sprite = beachSr.sprite; asr.color = new UnityEngine.Color(1f, 1f, 1f, 0f);
+        var ss = beachSr.sprite.bounds.size;
+        areaGo.transform.localScale = new UnityEngine.Vector3((x1 - x0) / ss.x, (y1 - y0) / ss.y, 1f);
+        var newMb = areaGo.AddComponent<MapBounds>();
+        UnityEngine.Object.DestroyImmediate(beachMb);
+        var ctx = UnityEngine.Object.FindAnyObjectByType<PlayerSceneContext>(UnityEngine.FindObjectsInactive.Include);
+        if (ctx != null) { Set(ctx, "mapBounds", newMb); sb.Append("map bounds → 砂浜と室内\n"); } else sb.Append("!! PlayerSceneContext がない\n");
+
+        // カメラの範囲：砂浜と室内それぞれ（カメラはそれぞれの絵の中で止まる）
+        void CamArea(string name, UnityEngine.Bounds b2)
+        {
+            var go = Child(name, root.transform, V(b2.center.x, b2.center.y));
+            var bc = go.AddComponent<UnityEngine.BoxCollider2D>(); bc.isTrigger = true; bc.size = new UnityEngine.Vector2(b2.size.x, b2.size.y);
+            go.AddComponent<CameraArea>();
+        }
+        // 砂浜のカメラの範囲は上へ 3 マス広げる（砂浜の上の端から、通路の入口と室内の下が見えるように）。重なる所では室内のほうを優先
+        var bbUp = bb; bbUp.SetMinMax(bb.min, new UnityEngine.Vector3(bb.max.x, bb.max.y + 3f, bb.max.z));
+        CamArea("カメラの範囲（砂浜・上へ 3 マス広げる）", bbUp);
+        CamArea("カメラの範囲（室内）", rb);
+        foreach (var ca in root.GetComponentsInChildren<CameraArea>(true)) if (ca.name == "カメラの範囲（室内）") Set(ca, "priority", 1);
+    }
+
+    // 室内の光：壁のランタン 3 つにランプ、左に窓（Stage1_2 と同じ置き方・強さ）
+    var roomLights = Child("室内の光（青と黄色）", root.transform, V(0f, 0f));
+    foreach (var x in new[] { -117.96f, -110.1f, -102.06f })
+        PresentationMenu.BuildBlueYellowLight(PresentationMenu.BlueYellowLight.Lamp, new UnityEngine.Vector3(x, 16.9f, 0f) + roomOffset, roomLights.transform);
+    PresentationMenu.BuildBlueYellowLight(PresentationMenu.BlueYellowLight.Window, new UnityEngine.Vector3(-123.5f, 15.0f, 0f) + roomOffset, roomLights.transform);
+    foreach (var l in roomLights.GetComponentsInChildren<UnityEngine.Rendering.Universal.Light2D>(true))
+    {
+        bool window = l.transform.parent != null && l.transform.parent.name == "窓の光";
+        if (l.name == "光") l.intensity = window ? 2.4f : 3f;
+        else if (l.name == "縁") l.intensity = window ? 0.6f : 0.8f;
+    }
+
+    // 室内の台座（通路の入口を上がった所）：明るさ（4 段）・青と黄色・塗り替えの境目
+    var roomDark = Station("室内の明るさ", PresentationStation.Kind.Darkness, V(cx - 4.0f, 41.4f), new UnityEngine.Color(0.45f, 0.45f, 0.65f));
+    Set(roomDark, "darkness", sd);
+    {
+        var so = new UnityEditor.SerializedObject(roomDark); var lv = so.FindProperty("darknessLevels");
+        var names = new[] { "明るい", "薄暗い", "暗い", "真っ暗" }; var ds = new[] { 0f, 0.6f, 0.85f, 0.97f }; var rs = new[] { 3f, 3f, 2f, 1f };
+        lv.arraySize = 4;
+        for (int i = 0; i < 4; i++) { var e = lv.GetArrayElementAtIndex(i); e.FindPropertyRelative("name").stringValue = names[i]; e.FindPropertyRelative("darkness").floatValue = ds[i]; e.FindPropertyRelative("radius").floatValue = rs[i]; }
+        so.ApplyModifiedPropertiesWithoutUndo();
+    }
+    var roomBy = Station("青と黄色\n（P1〜P6）", PresentationStation.Kind.Mood, V(cx + 4.0f, 41.4f), new UnityEngine.Color(0.95f, 0.85f, 0.35f),
+        All<MoodPreset>("Mood", "Mood_P1_ファミレス型", "Mood_P2_夏のうちに型", "Mood_P3_月夜の砂浜", "Mood_P4_回想ぬくもり", "Mood_P5_喪失", "Mood_P6_夜明け"));
+    { var so = new UnityEditor.SerializedObject(roomBy); var wl = so.FindProperty("withLights"); var ln = new[] { "Light_P1_ファミレス型", "Light_P2_夏のうちに型", "Light_P3_月夜の砂浜", "Light_P4_回想ぬくもり", "Light_P5_喪失", "Light_P6_夜明け" }; wl.arraySize = ln.Length; for (int i = 0; i < ln.Length; i++) wl.GetArrayElementAtIndex(i).objectReferenceValue = Load<LightPreset>(R + "Light/" + ln[i] + ".asset"); so.ApplyModifiedPropertiesWithoutUndo(); }
+    Station("塗り替えの\n境目を表示", PresentationStation.Kind.Bands, V(cx - 7.0f, 41.4f), new UnityEngine.Color(0.3f, 0.9f, 0.9f));
+    Label(root.transform, "室内：入口の台座で明るさ・青と黄色を切り替える", V(cx, 44.2f), 2.8f);
+}
+
 // 見本のイベント（1枚絵の台座が使う。デバッグウィンドウの「イベント（その場で試す）」・event.ps1 -Run でも動く）
 var events = Child("見本のイベント", root.transform, V(0f, 0f));
 UnityEngine.GameObject Seq(string name)

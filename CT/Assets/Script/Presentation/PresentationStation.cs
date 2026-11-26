@@ -15,7 +15,7 @@ using UnityEngine;
 ///
 /// ・色調・光・天候：調べるたびに「プリセット」の上から順に変わり、最後の次で元（シーンの既定）に戻る。キーの案内に次の名前が出る
 /// ・回想：調べると回想に入り、もう一度調べると戻る
-/// ・暗さ：調べると暗いステージ（StageDarkness の付いた物を表示）にし、もう一度調べると戻す
+/// ・暗さ：調べると暗いステージ（StageDarkness の付いた物を表示）にし、もう一度調べると戻す。「暗さの段」を書くと、調べるたびに段を進める（明るい → 薄暗い → 暗い → 真っ暗）
 /// ・全部戻す：色調・光・天候・回想・暗さを最初の状態へ
 /// ・塗り替えの境目を表示：塗り替える色の代わりに、色の段ごとにはっきりした色で塗る（光の中が黄色の段に入っているかを見る）
 /// ・色調の台座に「一緒に変える光」を入れると、色調と一緒にその光にする（青と黄色の色調を見るとき）
@@ -75,6 +75,28 @@ public class PresentationStation : GimmickInteractable
     [Tooltip("暗くしたときの暗さ（StageDarkness の Darkness と同じ）")]
     private float darknessValue = 0.85f;
 
+    [System.Serializable]
+    public class DarkLevel
+    {
+        [Label("名前")]
+        [Tooltip("キーの案内に出す名前（明るい・薄暗い・暗い・真っ暗 など）")]
+        public string name = "";
+
+        [Label("暗さ", 0.0f, 1.0f)]
+        [Tooltip("0 で暗くしない（暗いステージを消す）、1 で真っ暗")]
+        public float darkness = 0.0f;
+
+        [Label("プレイヤーの明かりの半径", 0.0f)]
+        [Tooltip("暗いときにプレイヤーの周りを照らす範囲（マス）")]
+        public float radius = 3.0f;
+    }
+
+    [SerializeField]
+    [Tooltip("暗さの台座：調べるたびに上から順にこの段にする（最後の次は最初へ）。空なら「暗さ」のオン／オフだけ")]
+    private List<DarkLevel> darknessLevels = new List<DarkLevel>();
+
+    private int darkIndex;
+
     private int index = -1;
     private Coroutine darknessRoutine;
 
@@ -101,7 +123,9 @@ public class PresentationStation : GimmickInteractable
                 case Kind.Light:     return "光を変える（次：" + NextName("シーンの既定") + "）";
                 case Kind.Weather:   return "天候を変える（次：" + NextName("なし") + "）";
                 case Kind.Flashback: return PresentationDirector.InFlashback ? "回想から戻る" : "回想に入る";
-                case Kind.Darkness:  return IsDark ? "明るく戻す" : "暗くする";
+                case Kind.Darkness:
+                    if(darknessLevels.Count > 0) { DarkLevel n = darknessLevels[(darkIndex + 1) % darknessLevels.Count]; return "明るさを変える（次：" + (n != null ? n.name : "") + "）"; }
+                    return IsDark ? "明るく戻す" : "暗くする";
                 case Kind.Bands:     return PresentationDirector.ShowRemapBands ? "境目の表示をやめる" : "塗り替えの境目を表示";
                 default:             return "全部戻す";
             }
@@ -173,7 +197,13 @@ public class PresentationStation : GimmickInteractable
                 break;
 
             case Kind.Darkness:
-                SetDark(!IsDark);
+                if(darknessLevels.Count > 0)
+                {
+                    darkIndex = (darkIndex + 1) % darknessLevels.Count;
+                    DarkLevel lv = darknessLevels[darkIndex];
+                    if(lv != null) { SetDarkLevel(lv.darkness, lv.radius); }
+                }
+                else { SetDark(!IsDark); }
                 break;
 
             case Kind.Bands:
@@ -201,6 +231,7 @@ public class PresentationStation : GimmickInteractable
         for(int i = 0; i < all.Count; i++)
         {
             all[i].index = -1;
+            all[i].darkIndex = 0;
             if(all[i].kind == Kind.Darkness) { all[i].SetDark(false); }
         }
         if(darkness != null) { SetDark(false); }
@@ -227,6 +258,37 @@ public class PresentationStation : GimmickInteractable
             darkness.SetDarkness(0.0f, seconds);
             darknessRoutine = StartCoroutine(HideAfter(seconds));
         }
+    }
+
+    /// <summary> 暗さとプレイヤーの明かりの半径を、かける時間でいっしょに変える（暗さ 0 なら暗いステージを消す） </summary>
+    private void SetDarkLevel(float value, float radius)
+    {
+        if(darkness == null) { return; }
+        if(darknessRoutine != null) { StopCoroutine(darknessRoutine); darknessRoutine = null; }
+        if(value <= 0.001f) { SetDark(false); return; }
+        if(!darkness.gameObject.activeSelf)
+        {
+            darkness.SetDarkness(0.0f);
+            darkness.gameObject.SetActive(true);
+        }
+        darknessRoutine = StartCoroutine(FadeDark(value, radius));
+    }
+
+    // StageDarkness の SetDarkness・SetRadius は続けて呼ぶと前の変化を止めるので、ここで少しずつ変える
+    private IEnumerator FadeDark(float toDark, float toRadius)
+    {
+        float fromDark = darkness.Darkness;
+        float fromRadius = darkness.Radius;
+        for(float t = 0.0f; t < seconds; t += Time.deltaTime)
+        {
+            float k = Mathf.SmoothStep(0.0f, 1.0f, t / seconds);
+            darkness.SetDarkness(Mathf.Lerp(fromDark, toDark, k));
+            darkness.SetRadius(Mathf.Lerp(fromRadius, toRadius, k));
+            yield return null;
+        }
+        darkness.SetDarkness(toDark);
+        darkness.SetRadius(toRadius);
+        darknessRoutine = null;
     }
 
     private IEnumerator HideAfter(float wait)
