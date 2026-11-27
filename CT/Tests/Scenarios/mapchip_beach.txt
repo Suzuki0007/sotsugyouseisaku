@@ -25,12 +25,20 @@ expect eval UnityEngine.Object.FindAnyObjectByType<PlayerSwitchManager>().Curren
 warp 58,18                               # 部屋 B の中（下の縁 y15〜15.33）
 key DownArrow 2000
 expect eval UnityEngine.Object.FindAnyObjectByType<PlayerSwitchManager>().CurrentPlayer.transform.position.y - 0.61f > 14.98f   # 足が下の壁の縁より外へ出ていない
-warp 44.5,20.5                           # 廊下の上の壁（縁の下の端 y18）の外側
+warp 44.5,22.5                           # 廊下の奥の壁（面 y18〜20・上面の縁の下の端 y20。11-27 段階 1）の外側
 key DownArrow 2000
-expect eval UnityEngine.Object.FindAnyObjectByType<PlayerSwitchManager>().CurrentPlayer.transform.position.y - 0.61f > 17.98f
-warp 44.5,17.6                           # 廊下の中（下の縁 y15.67〜16）
+expect eval UnityEngine.Object.FindAnyObjectByType<PlayerSwitchManager>().CurrentPlayer.transform.position.y - 0.61f > 19.98f
+warp 44.5,17.6                           # 廊下の中（手前の壁の縁 y16〜16.33）
 key DownArrow 2000
-expect eval UnityEngine.Object.FindAnyObjectByType<PlayerSwitchManager>().CurrentPlayer.transform.position.y - 0.61f > 15.65f
+expect eval UnityEngine.Object.FindAnyObjectByType<PlayerSwitchManager>().CurrentPlayer.transform.position.y - 0.61f > 15.98f
+# 手前の壁の外側の面（11-27 段階 1）：外から歩いても面に乗らない（足が面の下の端 y12 より上へ行かない）
+warp 35,10                               # 部屋 A の手前の壁（面 y12〜14、扉は x37〜39）の下の砂浜
+key UpArrow 2000
+expect eval UnityEngine.Object.FindAnyObjectByType<PlayerSwitchManager>().CurrentPlayer.transform.position.y - 0.61f < 12.05f
+expect eval UnityEngine.Object.FindAnyObjectByType<PlayerSwitchManager>().CurrentPlayer.transform.position.y > 11.5f   # 面の前までは歩けた
+warp 38,10                               # 扉の列の下
+key UpArrow 2500
+expect eval UnityEngine.Object.FindAnyObjectByType<PlayerSwitchManager>().CurrentPlayer.transform.position.y > 14.5f   # 扉から部屋 A へ入れる
 warp 42.5,27.6                           # 崩れた壁のかけら（lx15〜17・面 y25・縁の下の端 y26）の外側
 key DownArrow 2000
 expect eval UnityEngine.Object.FindAnyObjectByType<PlayerSwitchManager>().CurrentPlayer.transform.position.y - 0.61f > 25.98f

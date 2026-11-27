@@ -78,13 +78,22 @@ System.Action<int, int, int, int, int[], int[], int[]> BuildRoom = (x0, x1, y0, 
   // 下の角は縁を 2 枚重ねて L 字に
   if (!dB.Contains(x0)) Put(lRimB, x0, y0, rimD);
   if (!dB.Contains(x1)) Put(lRimB, x1, y0, rimD);
+  // 手前（下）の壁の外側の面（11-27 段階 1）：見下ろし（3/4）では手前の壁は「上面（縁）＋外側の面」が見える。
+  // 縁（y0 の下の端）の真下に、奥の壁と同じ高さ 2 段の面を置き、その下の砂に薄い影。扉の列は開ける
+  for (int x = x0; x <= x1; x++) {
+    if (dB.Contains(x)) continue;
+    Put(lFace, x, y0 - 1, face); Put(lFace, x, y0 - 2, face); Put(lShade, x, y0 - 3, shadeL); }
 };
 // 部屋 A（西の小部屋）：下の扉 lx11〜12、右の辺の y16〜17 が廊下へ
 BuildRoom(8, 16, 14, 20, new[]{ 11, 12 }, new int[0], new[]{ 16, 17 });
 // 部屋 B（奥の広間・見せ場）：左の辺の y16〜17 が廊下から、下の辺 lx26〜28 は崩れて開いている
 BuildRoom(20, 35, 15, 22, new[]{ 26, 27, 28 }, new[]{ 16, 17 }, new int[0]);
-// 廊下 A↔B（lx17〜19・y16〜17）：上下に細い壁の縁
-for (int x = 17; x <= 19; x++) { Put(lFloor, x, 16, stone); Put(lFloor, x, 17, stone); Put(lRimA, x, 18, rimD); Put(lRimA, x, 15, rimU); }
+// 廊下 A↔B（lx17〜19・床 y16〜17）：部屋と同じ形の壁（11-27 段階 1。前は上下とも細い縁だけで、線に見えた）
+//  奥＝面 2 段（y18〜19）＋上面の縁（y20 の下の端）、手前＝上面の縁（y16 の下の端）＋外側の面 2 段（y14〜15）＋その下の影
+for (int x = 17; x <= 19; x++) {
+  Put(lFloor, x, 16, stone); Put(lFloor, x, 17, stone);
+  Put(lFace, x, 18, face); Put(lFace, x, 19, face); Put(lRimA, x, 20, rimD);
+  Put(lRimA, x, 16, rimD); Put(lFace, x, 15, face); Put(lFace, x, 14, face); Put(lShade, x, 13, shadeL); }
 
 // ---- 入り込んだ砂（部屋 B の崩れた所から・部屋 A の左下）：床の上に砂を重ねる（ふちはランダムに欠けさせる） ----
 System.Action<float, float, float> SandBlob = (cx, cy, r) => {
@@ -100,13 +109,15 @@ for (int x = 0; x <= 12; x++) { path.Add(new UnityEngine.Vector2Int(x, 8)); path
 for (int y = 10; y <= 13; y++) { path.Add(new UnityEngine.Vector2Int(11, y)); path.Add(new UnityEngine.Vector2Int(12, y)); }
 foreach (var p in path) { bool edge = p.x >= 3 && Hash(p.x * 3, p.y * 7) < 0.16f; if (!edge) Put(lFloor, p.x, p.y, stone); }
 // 道のまわりに残った敷石（遺跡のかけら）
-foreach (var p in new[]{ new UnityEngine.Vector2Int(5, 10), new UnityEngine.Vector2Int(9, 7), new UnityEngine.Vector2Int(14, 11), new UnityEngine.Vector2Int(13, 9), new UnityEngine.Vector2Int(18, 12), new UnityEngine.Vector2Int(24, 13), new UnityEngine.Vector2Int(25, 13), new UnityEngine.Vector2Int(31, 12) }) Put(lFloor, p.x, p.y, stone);
+// （11-27：部屋 B の手前の壁の面の下になる (24,13)(25,13)(31,12) は外した）
+foreach (var p in new[]{ new UnityEngine.Vector2Int(5, 10), new UnityEngine.Vector2Int(9, 7), new UnityEngine.Vector2Int(14, 11), new UnityEngine.Vector2Int(13, 9), new UnityEngine.Vector2Int(18, 12) }) Put(lFloor, p.x, p.y, stone);
 
-// ---- 崩れた壁のかけら（何もない砂浜に目印を置く）：壁の面 1 段＋上の縁＋左右の縁。歩けない形はあとで ----
-var fragments = new System.Collections.Generic.List<int[]>{ new[]{ 2, 4, 22 }, new[]{ 30, 31, 11 }, new[]{ 37, 38, 18 }, new[]{ 15, 17, 25 }, new[]{ 4, 5, 15 } };
+// ---- 崩れた壁のかけら（何もない砂浜に目印を置く）：壁の面 1 段＋上面の縁。歩けない形はあとで ----
+// 11-27 段階 1：面の段の左右にも縁を描いていた（上面ではない所に上面が出て、線で囲んだように見えた）のをやめた。
+// lx30〜31 のかけらは部屋 B の手前の壁の面（y13〜14）とくっつくので y11 → y9 へ
+var fragments = new System.Collections.Generic.List<int[]>{ new[]{ 2, 4, 22 }, new[]{ 30, 31, 9 }, new[]{ 37, 38, 18 }, new[]{ 15, 17, 25 }, new[]{ 4, 5, 15 } };
 foreach (var f in fragments) {
   for (int x = f[0]; x <= f[1]; x++) { Put(lFace, x, f[2], face); Put(lRimA, x, f[2] + 1, rimD); Put(lShade, x, f[2] - 1, shadeL); }
-  Put(lRimA, f[0], f[2], rimL); Put(lRimA, f[1], f[2], rimR);
 }
 
 // ---- 西の端（lx0）は崖の縁。y8〜9 だけ試しの場所からの通り道（x24〜25 は暗い中の細い通路） ----
@@ -157,6 +168,8 @@ Box("通り道（試しの場所から）", 23.9f, 8.1f, OX + 1f, 9.9f, false); 
 // 上下の壁は、足が縁より下へはみ出ないように、縁から FEET（足の分）だけ離して止める（11-25 の不具合：壁の上側を歩くと足が壁の面にはみ出た）。
 // 左右の壁は、体の半分の幅（0.29）が縁の太さ（0.33）に収まるので、縁の太さ＋少しのまま。
 const float FEET = 0.7f;
+const float FRONT_FEET = 0.61f;   // 手前の壁の面の前に立つとき：足（位置の 0.61 下）が面の下の端に来るまで
+
 System.Action<int, int, int, int, int[], int[], int[]> RoomWalls = (x0, x1, y0, y1, doorsB, doorsL, doorsR) => {
   float X0 = OX + x0, X1 = OX + x1 + 1;
   Box("壁 面と上の縁", X0, y1 + 1, X1, y1 + 3 + FEET + 0.05f, true);   // 上の縁の下の端（y1+3）から足の分だけ上まで
@@ -165,7 +178,8 @@ System.Action<int, int, int, int, int[], int[], int[]> RoomWalls = (x0, x1, y0, 
   for (int x = x0; x <= x1 + 1; x++) {
     bool open = x > x1 || System.Array.IndexOf(doorsB, x) >= 0;
     if (!open && run < 0) run = x;
-    if (open && run >= 0) { Box("壁 下の縁", OX + run, y0, OX + x, y0 + FEET + 0.05f, true); run = -1; } }   // 部屋の中から：足が下の縁より外へ出ない
+    // 部屋の中から：足が下の縁より外へ出ない／外から：足が手前の壁の面（y0-2〜y0）に乗らない（面の下の端から足の分 0.61 上まで歩ける）
+    if (open && run >= 0) { Box("壁 手前（面と縁）", OX + run, y0 - 2 + FRONT_FEET, OX + x, y0 + FEET + 0.05f, true); run = -1; } }
   // 左右の辺（扉の行は開ける）
   foreach (var side in new[]{ 0, 1 }) {
     int[] doors = side == 0 ? doorsL : doorsR; float xa = side == 0 ? X0 : X1 - 0.45f; run = -1;
@@ -177,8 +191,8 @@ System.Action<int, int, int, int, int[], int[], int[]> RoomWalls = (x0, x1, y0, 
 RoomWalls(8, 16, 14, 20, new[]{ 11, 12 }, new int[0], new[]{ 16, 17 });
 RoomWalls(20, 35, 15, 22, new[]{ 26, 27, 28 }, new[]{ 16, 17 }, new int[0]);
 foreach (var f in fragments) Box("壁のかけら lx" + f[0], OX + f[0], f[2] - 0.1f, OX + f[1] + 1, f[2] + 1 + FEET + 0.05f, true);   // 上の縁（f2+1 の下の端）から足の分だけ上まで
-Box("廊下 上の縁", OX + 17, 17.95f, OX + 20, 18f + FEET + 0.05f, true);          // 縁（y18 の下の端）の上を外から歩くとき
-Box("廊下 下の縁", OX + 17, 15f, OX + 20, 15.67f + FEET + 0.05f, true);          // 縁（y15.67〜16）より足が下へ出ない
+Box("廊下 奥の壁（面と縁）", OX + 17, 18f, OX + 20, 20f + FEET + 0.05f, true);        // 面（y18〜20）と上面の縁（y20 の下の端）。外から：足が縁より下へ出ない
+Box("廊下 手前の壁（面と縁）", OX + 17, 14f + FRONT_FEET, OX + 20, 16f + FEET + 0.05f, true);   // 中から：足が縁（y16〜16.33）より下へ出ない／外から：面（y14〜16）に乗らない
 
 // ---- 歯車：見せ場（部屋 B の奥）は大きく立てて重ねる（キャラと Y で前後）。ほかは小さく平らに散らす ----
 // 立っている物は「奥行きのある物」（DepthProp）にする：足元の当たり判定は四角でざっくり（11-25 ユーザーの指示：丸く細かい形は挙動がおかしくなるもと）、
