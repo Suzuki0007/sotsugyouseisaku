@@ -154,7 +154,8 @@ public static class MapOverlayMaker
             {
                 float v = Fbm(x, y, 4, 4, 11);
                 float d = Mathf.Clamp((v - 0.5f) * 2.6f, -1.0f, 1.0f);
-                Color c = d < 0.0f ? new Color(0.0f, 0.0f, 0.0f, -d) : new Color(warm.r, warm.g, warm.b, d * 0.7f);
+                // 明るい側は弱く（11-27 段階 4：暗い部屋の中では明るい所が白いもやに見えた）
+                Color c = d < 0.0f ? new Color(0.0f, 0.0f, 0.0f, -d) : new Color(warm.r, warm.g, warm.b, d * 0.3f);
                 px[y * TexSize + x] = c;
             }
         }

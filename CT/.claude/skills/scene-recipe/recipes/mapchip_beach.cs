@@ -276,8 +276,13 @@ Gear("道ばたの歯車", gear1, OX + 9.8f, 10.9f, 0.4f, -35f, false, dim);
 // ---- A 明かり（ゆらぐ）・E 場所の色味 ----
 var look = NewGO(room.transform, "見た目（明かり・場所の色味）", UnityEngine.Vector3.zero).transform;
 var torch = new UnityEngine.Color(1f, 0.62f, 0.3f); var seaGlow = new UnityEngine.Color(0.6f, 0.9f, 1f);
-foreach (var p in new[]{ new UnityEngine.Vector2(OX + 12.5f, 20.2f), new UnityEngine.Vector2(OX + 22.6f, 22.2f), new UnityEngine.Vector2(OX + 34.4f, 22.2f), new UnityEngine.Vector2(OX + 18.5f, 17f) }) {
-  var l = MapLookMenu.CreateLight("たいまつの明かり", p, torch, 1.3f, 5f, true); l.transform.SetParent(look, true); }
+// 段階 4（11-27）：光だまりを部屋ごとに絞る。見せ場のそばだけ強く、ほかのたいまつは弱く小さく（どこを見ればよいかわかる）
+foreach (var t in new[]{ new UnityEngine.Vector4(OX + 12.5f, 20.2f, 1.3f, 5f), new UnityEngine.Vector4(OX + 22.6f, 22.2f, 0.8f, 3.8f), new UnityEngine.Vector4(OX + 34.4f, 22.2f, 0.8f, 3.8f), new UnityEngine.Vector4(OX + 18.5f, 17f, 0.7f, 3.5f) }) {
+  var l = MapLookMenu.CreateLight("たいまつの明かり", new UnityEngine.Vector2(t.x, t.y), torch, t.z, t.w, true); l.transform.SetParent(look, true); }
+// 部屋 B の見せ場（大きな歯車）に上から差す光だまり（絵の明かり＝影を作らない・軽い）
+{ var l = MapLightSpriteMaker.CreatePool("見せ場の光だまり（部屋 B）", new UnityEngine.Vector3(OX + 30.5f, 19.2f, 0f), new UnityEngine.Color(1f, 0.84f, 0.6f), 0.9f, 4f); l.transform.SetParent(look, true); }
+// 部屋 A：奥の壁の高い窓から、床に窓枠の形の光が落ちる（型抜き）
+{ var l = MapLightSpriteMaker.CreateWindow("窓の光（部屋 A）", new UnityEngine.Vector3(OX + 13.6f, 18.4f, 0f), new UnityEngine.Color(0.85f, 0.92f, 1f), 0.7f, 1.6f); l.transform.SetParent(look, true); }
 foreach (var p in new[]{ new UnityEngine.Vector2(OX + 6f, 2.2f), new UnityEngine.Vector2(OX + 19f, 1.2f), new UnityEngine.Vector2(OX + 33f, 2.6f) }) {
   var l = MapLookMenu.CreateLight("水面のきらめき", p, seaGlow, 0.35f, 3.5f, true); l.transform.SetParent(look, true);
   var lr = l.GetComponent<UnityEngine.Rendering.Universal.Light2D>(); lr.shadowsEnabled = false;
