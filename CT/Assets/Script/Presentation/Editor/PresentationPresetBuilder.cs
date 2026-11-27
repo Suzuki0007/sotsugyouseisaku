@@ -58,6 +58,7 @@ public static class PresentationPresetBuilder
         MakeMaterial("Mat_Weather_Lit", "Universal Render Pipeline/2D/Sprite-Lit-Default", log);
         MakeMaterial("Mat_Weather_Unlit", "Universal Render Pipeline/2D/Sprite-Unlit-Default", log);
         MakeMaterial("Mat_UI_Mood", "CT/UI Mood", log);
+        MakeMaterial("Mat_UI_Screen", "CT/UI Screen", log);
 
         // 回想中フラグ（セーブしない）
         GameFlag flag = AssetDatabase.LoadAssetAtPath<GameFlag>(FlagPath);

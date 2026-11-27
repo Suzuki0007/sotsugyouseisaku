@@ -28,7 +28,8 @@ paths:
 - `ScreenLensLayer`（窓口が `AddComponent`）。**色調のプリセットの値（`MoodValues`）として持つ**＝層・切り替え・回想・セーブは色調のまま。ポストプロセスではなく UI の絵（Screen Space - Overlay、並び順 `ScreenLensLayer.SortingOrder` = -10：帯 -1000 の上・シーンの HUD 0・暗転の幕 90・1枚絵 95 の下）。範囲はカメラの `pixelRect`（変わったときだけ合わせ直す）。CanvasScaler なし（画素の単位）。
 - 段階 1：画面の縁（`edgeFade`・`edgeRound`＝9 分割の絵、角の大きさ＝`pixelsPerUnitMultiplier`。絵は丸み 0.05 刻みで作り直す）・上下のグラデーション（1×64 の絵、下は scale.y=-1）。色は帯の色 `MapCameraAspect.BarColor`。
 - `MoodValues.Lerp` の縁・グラデーションの形と色は、強さ 0 の側の値に引っぱられないよう**強さがある側の値**を使う（`Pick`）。`IsNeutral`（ポストプロセスを切るか）には入れない。`IsEdgeNeutral` で層を隠す。
-- 確かめ用：`PresentationDirector.LensVisible`、`MoodPreset.EditorSetEdge(MoodValues)`。
+- 段階 2：光漏れ（`leak`＝全体の強さ、左右の帯・角の焼け `LeakCorner`〔番号で保存、末尾にだけ足す〕・縦の筋・揺れ・一瞬光る回数）。絵は実行中にコードで作る（横の帯 64×128・角 128×128・筋 256×32）。重ね方は **`CT/UI Screen`**（`Assets/Shaders/UIScreen.shader`、`Blend One OneMinusSrcColor`＝スクリーン。マテリアル `Resources/Presentation/Materials/Mat_UI_Screen`、`PresentationPresetBuilder` が作る）。並びは グラデーション → 光漏れ → 縁（はみ出した光は縁で消える）。範囲の物に **RectMask2D**（揺れてずれた帯が左右の帯の上に出たため）。`Lerp` は全体の強さだけを混ぜ、形と色は光漏れのある側。揺れは `Time.unscaledTime`＋Perlin、一瞬光るは間をばらつかせる（`System.Random` を 1 つ使い回す）。`IsLensNeutral` で層を隠す。
+- 確かめ用：`PresentationDirector.LensVisible`・`LeakFlashAmount`・`FlashLeakNow()`、`MoodPreset.EditorSetEdge` / `EditorSetLeak(MoodValues)`。
 
 ## 書くときの注意
 - イベントの部品は **1ファイル1クラス**（MonoBehaviour はファイル名とクラス名が合わないとシーンに保存できない）。

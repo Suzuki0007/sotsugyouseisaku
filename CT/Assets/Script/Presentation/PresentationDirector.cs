@@ -233,6 +233,15 @@ public class PresentationDirector : MonoBehaviour
     /// <summary> 画面のレンズの層（縁など）を出しているか（確かめ用） </summary>
     public static bool LensVisible => instance != null && instance.lens != null && instance.lens.Visible;
 
+    /// <summary> 光漏れの「一瞬光る」の今の強さ（確かめ用） </summary>
+    public static float LeakFlashAmount => instance != null && instance.lens != null ? instance.lens.FlashAmount : 0.0f;
+
+    /// <summary> 確かめ用：光漏れをすぐに一瞬光らせる </summary>
+    public static void FlashLeakNow()
+    {
+        if(instance != null && instance.lens != null) { instance.lens.FlashNow(); }
+    }
+
     private void Awake()
     {
         dialogueMood = gameObject.AddComponent<DialogueMoodLayer>();

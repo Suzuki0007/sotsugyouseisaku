@@ -126,6 +126,56 @@ public class MoodPreset : ScriptableObject
     [Tooltip("下からどこまでかかるか（画面の高さに対する割合）")]
     private float bottomShadeHeight = 0.35f;
 
+    [Header("光漏れ（古いフィルム・思い出。画面の端から光が差し込む）")]
+
+    [SerializeField, Label("光漏れの強さ", 0.0f, 1.0f)]
+    [Tooltip("光漏れ全体の強さ。0 でなし、0.3 弱（ふだんの場面）、0.6 中、1 強（回想・思い出）")]
+    private float leak = 0.0f;
+
+    [SerializeField, Label("右の帯の強さ", 0.0f, 1.0f)]
+    [Tooltip("画面の右の端から差し込む光の帯の濃さ")]
+    private float leakRight = 1.0f;
+
+    [SerializeField, Label("右の帯の色")]
+    [Tooltip("右の帯の色。橙・赤でフィルムの光漏れらしくなる")]
+    private Color leakRightColor = new Color(1.0f, 0.42f, 0.12f, 1.0f);
+
+    [SerializeField, Label("左の帯の強さ", 0.0f, 1.0f)]
+    [Tooltip("画面の左の端から差し込む光の帯の濃さ")]
+    private float leakLeft = 0.5f;
+
+    [SerializeField, Label("左の帯の色")]
+    [Tooltip("左の帯の色。青緑にすると、右の橙と合わせて古い写真のような色になる")]
+    private Color leakLeftColor = new Color(0.25f, 0.85f, 0.85f, 1.0f);
+
+    [SerializeField, Label("帯の幅", 0.05f, 0.6f)]
+    [Tooltip("帯が画面の内側へ伸びる幅（マップの映る範囲の横幅に対する割合）")]
+    private float leakWidth = 0.3f;
+
+    [SerializeField, Label("角の焼けの強さ", 0.0f, 1.0f)]
+    [Tooltip("画面の角が白く焼けたようになる強さ。0 でなし")]
+    private float leakBurn = 0.6f;
+
+    [SerializeField, Label("角の焼けの色")]
+    [Tooltip("焼けた角の色。白〜薄い橙")]
+    private Color leakBurnColor = new Color(1.0f, 0.88f, 0.72f, 1.0f);
+
+    [SerializeField, Label("焼ける角")]
+    [Tooltip("どの角が焼けるか")]
+    private LeakCorner leakBurnCorner = LeakCorner.BottomLeft;
+
+    [SerializeField, Label("縦の筋", 0.0f, 1.0f)]
+    [Tooltip("縦に走る細い光の筋の強さ（品質「軽い」では出さない）。0 でなし")]
+    private float leakStreaks = 0.3f;
+
+    [SerializeField, Label("揺れ", 0.0f, 1.0f)]
+    [Tooltip("光がゆっくり揺れる・強くなったり弱くなったりする大きさ。0 で止まったまま")]
+    private float leakSway = 0.5f;
+
+    [SerializeField, Label("一瞬光る回数（1 分に）", 0.0f, 12.0f)]
+    [Tooltip("ときどき一瞬だけ強く光る（ピッと入る）回数の目安。0 で光らない。2〜4 くらいがさりげない")]
+    private float leakFlash = 2.0f;
+
     [Header("重い項目（品質「軽い」では外す）")]
 
     [SerializeField, Label("粒子（Film Grain）", 0.0f, 1.0f)]
@@ -207,6 +257,18 @@ public class MoodPreset : ScriptableObject
         bottomShade = bottomShade,
         bottomShadeColor = bottomShadeColor,
         bottomShadeHeight = bottomShadeHeight,
+        leak = leak,
+        leakRight = leakRight,
+        leakRightColor = leakRightColor,
+        leakLeft = leakLeft,
+        leakLeftColor = leakLeftColor,
+        leakWidth = leakWidth,
+        leakBurn = leakBurn,
+        leakBurnColor = leakBurnColor,
+        leakBurnCorner = leakBurnCorner,
+        leakStreaks = leakStreaks,
+        leakSway = leakSway,
+        leakFlash = leakFlash,
         grain = grain,
         grainType = grainType,
         bloom = bloom,
@@ -301,6 +363,17 @@ public class MoodPreset : ScriptableObject
         bottomShade = v.bottomShade; bottomShadeColor = v.bottomShadeColor; bottomShadeHeight = v.bottomShadeHeight;
     }
 
+    /// <summary> エディタの道具・確かめ用：光漏れを入れる </summary>
+    public void EditorSetLeak(MoodValues v)
+    {
+        leak = v.leak;
+        leakRight = v.leakRight; leakRightColor = v.leakRightColor;
+        leakLeft = v.leakLeft; leakLeftColor = v.leakLeftColor;
+        leakWidth = v.leakWidth;
+        leakBurn = v.leakBurn; leakBurnColor = v.leakBurnColor; leakBurnCorner = v.leakBurnCorner;
+        leakStreaks = v.leakStreaks; leakSway = v.leakSway; leakFlash = v.leakFlash;
+    }
+
     /// <summary> エディタの道具から塗り替えを入れる </summary>
     public void EditorSetRemap(RemapMode mode, List<RemapStop> stops, float keep)
     {
@@ -322,6 +395,22 @@ public enum RemapMode
 
     [InspectorName("なめらか")]
     Smooth = 1,
+}
+
+/// <summary> 光漏れで焼ける角（番号で保存されるので末尾にだけ足す） </summary>
+public enum LeakCorner
+{
+    [InspectorName("左下")]
+    BottomLeft = 0,
+
+    [InspectorName("右下")]
+    BottomRight = 1,
+
+    [InspectorName("左上")]
+    TopLeft = 2,
+
+    [InspectorName("右上")]
+    TopRight = 3,
 }
 
 /// <summary> 塗り替えの色の段（この明るさから、この色） </summary>
@@ -366,6 +455,19 @@ public struct MoodValues
     public float bottomShade;
     public Color bottomShadeColor;
     public float bottomShadeHeight;
+    /// <summary> 光漏れ（ScreenLensLayer が描く） </summary>
+    public float leak;
+    public float leakRight;
+    public Color leakRightColor;
+    public float leakLeft;
+    public Color leakLeftColor;
+    public float leakWidth;
+    public float leakBurn;
+    public Color leakBurnColor;
+    public LeakCorner leakBurnCorner;
+    public float leakStreaks;
+    public float leakSway;
+    public float leakFlash;
     public float grain;
     public FilmGrainLookup grainType;
     public float bloom;
@@ -390,6 +492,16 @@ public struct MoodValues
         topShadeHeight = 0.45f,
         bottomShadeColor = Color.white,
         bottomShadeHeight = 0.35f,
+        leakRight = 1.0f,
+        leakRightColor = new Color(1.0f, 0.42f, 0.12f, 1.0f),
+        leakLeft = 0.5f,
+        leakLeftColor = new Color(0.25f, 0.85f, 0.85f, 1.0f),
+        leakWidth = 0.3f,
+        leakBurn = 0.6f,
+        leakBurnColor = new Color(1.0f, 0.88f, 0.72f, 1.0f),
+        leakStreaks = 0.3f,
+        leakSway = 0.5f,
+        leakFlash = 2.0f,
         grainType = FilmGrainLookup.Medium3,
         bloomThreshold = 0.9f,
     };
@@ -433,6 +545,9 @@ public struct MoodValues
     /// <summary> 画面の縁（UI の絵）が何もしないか </summary>
     public bool IsEdgeNeutral => edgeFade < 0.001f && topShade < 0.001f && bottomShade < 0.001f;
 
+    /// <summary> 画面のレンズの層（縁・光漏れ）が何もしないか </summary>
+    public bool IsLensNeutral => IsEdgeNeutral && leak < 0.001f;
+
     public static MoodValues Lerp(MoodValues a, MoodValues b, float t)
     {
         return new MoodValues
@@ -460,6 +575,20 @@ public struct MoodValues
             bottomShade = Mathf.Lerp(a.bottomShade, b.bottomShade, t),
             bottomShadeColor = Color.Lerp(Pick(a.bottomShade, a.bottomShadeColor, b.bottomShadeColor), Pick(b.bottomShade, b.bottomShadeColor, a.bottomShadeColor), t),
             bottomShadeHeight = Mathf.Lerp(Pick(a.bottomShade, a.bottomShadeHeight, b.bottomShadeHeight), Pick(b.bottomShade, b.bottomShadeHeight, a.bottomShadeHeight), t),
+            // 光漏れ：全体の強さだけを混ぜ、形と色は光漏れのある側の値を使う（ない側から入る・ない側へ消えるとき、形が変わらずに薄くなる）
+            leak = Mathf.Lerp(a.leak, b.leak, t),
+            leakRight = Mathf.Lerp(Pick(a.leak, a.leakRight, b.leakRight), Pick(b.leak, b.leakRight, a.leakRight), t),
+            leakRightColor = Color.Lerp(Pick(a.leak, a.leakRightColor, b.leakRightColor), Pick(b.leak, b.leakRightColor, a.leakRightColor), t),
+            leakLeft = Mathf.Lerp(Pick(a.leak, a.leakLeft, b.leakLeft), Pick(b.leak, b.leakLeft, a.leakLeft), t),
+            leakLeftColor = Color.Lerp(Pick(a.leak, a.leakLeftColor, b.leakLeftColor), Pick(b.leak, b.leakLeftColor, a.leakLeftColor), t),
+            leakWidth = Mathf.Lerp(Pick(a.leak, a.leakWidth, b.leakWidth), Pick(b.leak, b.leakWidth, a.leakWidth), t),
+            leakBurn = Mathf.Lerp(Pick(a.leak, a.leakBurn, b.leakBurn), Pick(b.leak, b.leakBurn, a.leakBurn), t),
+            leakBurnColor = Color.Lerp(Pick(a.leak, a.leakBurnColor, b.leakBurnColor), Pick(b.leak, b.leakBurnColor, a.leakBurnColor), t),
+            // 焼ける角は混ぜられないので、光漏れの強い方の角
+            leakBurnCorner = b.leak >= a.leak ? b.leakBurnCorner : a.leakBurnCorner,
+            leakStreaks = Mathf.Lerp(Pick(a.leak, a.leakStreaks, b.leakStreaks), Pick(b.leak, b.leakStreaks, a.leakStreaks), t),
+            leakSway = Mathf.Lerp(Pick(a.leak, a.leakSway, b.leakSway), Pick(b.leak, b.leakSway, a.leakSway), t),
+            leakFlash = Mathf.Lerp(Pick(a.leak, a.leakFlash, b.leakFlash), Pick(b.leak, b.leakFlash, a.leakFlash), t),
             grain = Mathf.Lerp(a.grain, b.grain, t),
             // 粒子の種類は混ぜられないので、粒子がある方を使う
             grainType = b.grain > 0.001f ? b.grainType : a.grainType,
