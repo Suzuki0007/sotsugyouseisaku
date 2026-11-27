@@ -128,7 +128,14 @@ public class CinemaMode : MonoBehaviour
     private Coroutine transition;
     private float transitionEnd;
     private Coroutine subtitleFade;
+    private Coroutine movieFade;
     private Coroutine nameFade;
+
+    // 映画の字幕（中央・大きな太字。SubtitleStyle で見た目を決める）
+    private RectTransform movieRect;
+    private TextMeshProUGUI movieText;
+    private CanvasGroup movieGroup;
+    private Material movieMaterial;
     private Coroutine bodyFade;
 
     // 字幕のキー待ちの間と、閉じた直後のフレーム（同じキーで調べる・会話が始まらないように）
@@ -205,6 +212,7 @@ public class CinemaMode : MonoBehaviour
         if(root != null) { Destroy(root); }
         if(featherTexture != null) { Destroy(featherTexture); }
         if(backdropTexture != null) { Destroy(backdropTexture); }
+        if(movieMaterial != null) { Destroy(movieMaterial); }
         if(waitingKey) { waitingKey = false; closedFrame = Time.frameCount; }
     }
 
@@ -388,7 +396,7 @@ public class CinemaMode : MonoBehaviour
             backdrop.color = new Color(1.0f, 1.0f, 1.0f, backdropStrength * open);
         }
 
-        root.SetActive(ratio > 0.0001f || subtitleGroup.alpha > 0.0f);
+        root.SetActive(ratio > 0.0001f || subtitleGroup.alpha > 0.0f || MovieAlpha > 0.0f);
     }
 
     //=====================================================================
@@ -465,7 +473,7 @@ public class CinemaMode : MonoBehaviour
         while(quiet < DialogueReleaseDelay)
         {
             // 字幕が消えきるまでも待つ（文字が溶けて消えてから、帯を引っ込める）
-            bool busy = EventSequence.IsBusy || DialogueManager.IsBusy || subtitleGroup.alpha > 0.0f || stillHolds > 0;
+            bool busy = EventSequence.IsBusy || DialogueManager.IsBusy || subtitleGroup.alpha > 0.0f || MovieAlpha > 0.0f || stillHolds > 0;
             quiet = busy ? 0.0f : quiet + Time.unscaledDeltaTime;
             yield return null;
         }
@@ -488,6 +496,7 @@ public class CinemaMode : MonoBehaviour
         if(nameText != null)     { texts.Add(nameText); }
         if(keyHint != null)      { texts.Add(keyHint); }
         if(nextMarkText != null) { texts.Add(nextMarkText); }
+        if(movieText != null)    { texts.Add(movieText); }
     }
 
     /// <summary>
@@ -635,7 +644,88 @@ public class CinemaMode : MonoBehaviour
         }
         subtitleGroup.alpha = to;
         subtitleFade = null;
-        if(to <= 0.0f && barRatio <= 0.0001f) { root.SetActive(false); }
+        if(to <= 0.0f && barRatio <= 0.0001f && MovieAlpha <= 0.0f) { root.SetActive(false); }
+    }
+
+    //=====================================================================
+    // 映画の字幕（中央・大きな太字）
+    //=====================================================================
+
+    /// <summary> 映画の字幕の濃さ（0 で出ていない） </summary>
+    public float MovieAlpha => movieGroup != null ? movieGroup.alpha : 0.0f;
+
+    /// <summary> 映画の字幕の今の文（確かめ用） </summary>
+    public string MovieText => movieText != null ? movieText.text : "";
+
+    /// <summary>
+    /// 映画の字幕を出す：名前なし・帯なしで、文字だけを画面の中央より少し下に大きく出す（前の文と入れ替える）
+    /// </summary>
+    public void ShowMovieSubtitle(string text, float fadeSeconds)
+    {
+        root.SetActive(true);
+        PlaceMovie();
+        movieText.text = text ?? "";
+        if(movieFade != null) { StopCoroutine(movieFade); }
+        movieGroup.alpha = 0.0f;
+        movieFade = StartCoroutine(MovieFadeTo(1.0f, fadeSeconds));
+    }
+
+    /// <summary> 映画の字幕を消す </summary>
+    public void HideMovieSubtitle(float fadeSeconds)
+    {
+        if(movieGroup == null || movieGroup.alpha <= 0.0f) { return; }
+        if(movieFade != null) { StopCoroutine(movieFade); }
+        movieFade = StartCoroutine(MovieFadeTo(0.0f, fadeSeconds));
+    }
+
+    private IEnumerator MovieFadeTo(float to, float seconds)
+    {
+        float from = movieGroup.alpha;
+        float t = 0.0f;
+        while(t < seconds)
+        {
+            t += Time.unscaledDeltaTime;
+            movieGroup.alpha = Mathf.Lerp(from, to, Mathf.Clamp01(t / seconds));
+            yield return null;
+        }
+        movieGroup.alpha = to;
+        movieFade = null;
+        if(to <= 0.0f && barRatio <= 0.0001f && subtitleGroup.alpha <= 0.0f) { root.SetActive(false); }
+    }
+
+    /// <summary> マップの映る範囲（4:3。Viewport がその大きさ）の中で、映画の字幕の場所を決める </summary>
+    private void PlaceMovie()
+    {
+        SubtitleStyle style = SubtitleStyle.Current;
+        float side = (1.0f - style.Width) * 0.5f;
+        movieRect.anchorMin = new Vector2(side, style.Height);
+        movieRect.anchorMax = new Vector2(1.0f - side, style.Height);
+        movieRect.pivot = new Vector2(0.5f, 0.5f);
+        movieRect.anchoredPosition = Vector2.zero;
+        movieRect.sizeDelta = new Vector2(0.0f, style.FontSize * 3.0f + style.LineSpacing * 2.0f);
+    }
+
+    private void CreateMovieText()
+    {
+        SubtitleStyle style = SubtitleStyle.Current;
+        movieRect = NewRect("MovieSubtitle", viewport);
+        movieGroup = movieRect.gameObject.AddComponent<CanvasGroup>();
+        movieGroup.alpha = 0.0f;
+        movieGroup.blocksRaycasts = false;
+        movieGroup.interactable = false;
+
+        movieText = NewText(movieRect, style.FontSize, TextAlignmentOptions.Center);
+        TMP_FontAsset font = style.FontAsset();
+        if(font != null) { movieText.font = font; }
+        else { movieText.fontStyle = FontStyles.Bold; }
+        movieMaterial = style.MakeMaterial(movieText.font != null ? movieText.font.material : null);
+        if(movieMaterial != null) { movieText.fontSharedMaterial = movieMaterial; }
+        movieText.color = style.TextColor;
+        movieText.characterSpacing = style.CharacterSpacing;
+        movieText.lineSpacing = style.LineSpacing;
+        movieText.textWrappingMode = TextWrappingModes.Normal;
+        movieText.overflowMode = TextOverflowModes.Overflow;
+        movieText.UpdateMeshPadding();
     }
 
     /// <summary>
@@ -773,6 +863,9 @@ public class CinemaMode : MonoBehaviour
         nextMarkText = mark;
         nextMark = markRect.gameObject;
         nextMark.SetActive(false);
+
+        // 映画の字幕（帯の字幕とは別。会話の「シネマ演出で出す」はこれまでどおり帯の字幕）
+        CreateMovieText();
 
         SetBars(0.0f);
     }

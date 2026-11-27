@@ -15,6 +15,7 @@ using UnityEngine;
 /// ・部品「シネマ演出」の「始める」のあとに並べる（帯がなくても出るが、黒い帯の上で読みやすい色にしてある）
 /// ・会話データ（DialogueData）を入れると、その文を上から順に出す（CSV で作った会話がそのまま使える。立ち絵は出ない）
 /// ・送り方：キーで送る（E・Space・Enter）／秒数で次へ
+/// ・字幕の形：映画（名前・帯なしで、中央より少し下に大きな太字。新しく足すとこちら）／帯（下の帯に名前つき）
 /// ・ロードしても字幕は戻らない
 public class SubtitleEventAction : EventAction
 {
@@ -31,9 +32,24 @@ public class SubtitleEventAction : EventAction
         Seconds = 1,
     }
 
+    /// <summary> 字幕の形（番号で保存されるので末尾にだけ足す） </summary>
+    public enum Style
+    {
+        [InspectorName("帯（下の帯に名前つき。会話と同じ形）")]
+        Band = 0,
+
+        [InspectorName("映画（中央より少し下に大きな太字。名前なし）")]
+        Movie = 1,
+    }
+
     //=====================================================================
     // 変数
     //=====================================================================
+
+    // 前からある部品は「帯」のまま（Reset は新しく足したときだけ呼ばれ、「映画」になる）
+    [SerializeField, Label("字幕の形")]
+    [Tooltip("映画：名前も帯もなく、文字だけを画面の中央より少し下に大きな太字で出す（見た目は Resources/Presentation/SubtitleStyle）／帯：下の帯に名前つきで出す（会話と同じ形）")]
+    private Style style = Style.Band;
 
     [SerializeField, Label("会話データ")]
     [Tooltip("入れると、この会話の文を上から順に字幕で出す（下の「字幕の文」は使わない）。空なら「字幕の文」を出す")]
@@ -74,6 +90,12 @@ public class SubtitleEventAction : EventAction
     // アクション関数
     //=====================================================================
 
+    private void Reset()
+    {
+        // 新しく足した字幕は映画の形（11-27 の打ち合わせ：飾らず文字だけを大きく）
+        style = Style.Movie;
+    }
+
     public override void Execute(GameObject gameObject)
     {
         // すべて同時に実行のときは、最初の文を出すだけ
@@ -81,7 +103,7 @@ public class SubtitleEventAction : EventAction
         if(cinema == null) { return; }
 
         if(dialogueData != null && dialogueData.Lines.Length > 0) { ShowLine(cinema, dialogueData.Lines[0]); }
-        else { cinema.ShowSubtitle(SpeakerName(), SpeakerColor(), text, FadeTime); }
+        else { ShowText(cinema, text); }
     }
 
     public override IEnumerator Run(GameObject gameObject)
@@ -102,7 +124,7 @@ public class SubtitleEventAction : EventAction
             }
             else
             {
-                cinema.ShowSubtitle(SpeakerName(), SpeakerColor(), text, FadeTime);
+                ShowText(cinema, text);
                 yield return Wait(cinema);
             }
         }
@@ -113,7 +135,20 @@ public class SubtitleEventAction : EventAction
             if(cinema != null) { cinema.SetKeyHint(null); cinema.SetNextMark(false); }
         }
 
-        if(hideAtEnd && cinema != null) { cinema.HideSubtitle(FadeTime); }
+        if(hideAtEnd && cinema != null)
+        {
+            if(style == Style.Movie) { cinema.HideMovieSubtitle(MovieFadeTime); }
+            else { cinema.HideSubtitle(FadeTime); }
+        }
+    }
+
+    // 映画の字幕はゆっくり出して消す
+    private const float MovieFadeTime = 0.4f;
+
+    private void ShowText(CinemaMode cinema, string body)
+    {
+        if(style == Style.Movie) { cinema.ShowMovieSubtitle(body, MovieFadeTime); }
+        else { cinema.ShowSubtitle(SpeakerName(), SpeakerColor(), body, FadeTime); }
     }
 
     //=====================================================================
@@ -122,6 +157,7 @@ public class SubtitleEventAction : EventAction
 
     private void ShowLine(CinemaMode cinema, DialogueData.Line line)
     {
+        if(style == Style.Movie) { cinema.ShowMovieSubtitle(line.text, MovieFadeTime); return; }
         Color color = line.character != null ? line.character.NameColor : Color.white;
         cinema.ShowSubtitle(line.DisplayName, color, line.text, FadeTime);
     }

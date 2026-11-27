@@ -60,6 +60,16 @@ public static class PresentationPresetBuilder
         MakeMaterial("Mat_UI_Mood", "CT/UI Mood", log);
         MakeMaterial("Mat_UI_Screen", "CT/UI Screen", log);
 
+        // 映画の字幕の見た目（太字の Noto Sans JP）
+        string stylePath = Root + "/SubtitleStyle.asset";
+        if(AssetDatabase.LoadAssetAtPath<SubtitleStyle>(stylePath) == null)
+        {
+            var style = ScriptableObject.CreateInstance<SubtitleStyle>();
+            style.EditorSetFont(AssetDatabase.LoadAssetAtPath<Font>("Assets/Fonts/NotoSansJP-Bold.ttf"));
+            AssetDatabase.CreateAsset(style, stylePath);
+            log.Append("作った SubtitleStyle\n");
+        }
+
         // 回想中フラグ（セーブしない）
         GameFlag flag = AssetDatabase.LoadAssetAtPath<GameFlag>(FlagPath);
         if(flag == null)

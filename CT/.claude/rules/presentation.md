@@ -5,6 +5,8 @@ paths:
   - "Assets/Script/StageDarkness/**"
   - "Assets/Script/Map/Look/AreaTone.cs"
   - "Assets/Script/Map/Look/LightFlicker.cs"
+  - "Assets/Script/Camera/SubtitleStyle.cs"
+  - "Assets/Shaders/UIScreen.shader"
 ---
 
 # 演出の基盤（色調・光・天候・回想・1枚絵）
@@ -29,6 +31,7 @@ paths:
 - 段階 1：画面の縁（`edgeFade`・`edgeRound`＝9 分割の絵、角の大きさ＝`pixelsPerUnitMultiplier`。絵は丸み 0.05 刻みで作り直す）・上下のグラデーション（1×64 の絵、下は scale.y=-1）。色は帯の色 `MapCameraAspect.BarColor`。
 - `MoodValues.Lerp` の縁・グラデーションの形と色は、強さ 0 の側の値に引っぱられないよう**強さがある側の値**を使う（`Pick`）。`IsNeutral`（ポストプロセスを切るか）には入れない。`IsEdgeNeutral` で層を隠す。
 - 段階 2：光漏れ（`leak`＝全体の強さ、左右の帯・角の焼け `LeakCorner`〔番号で保存、末尾にだけ足す〕・縦の筋・揺れ・一瞬光る回数）。絵は実行中にコードで作る（横の帯 64×128・角 128×128・筋 256×32）。重ね方は **`CT/UI Screen`**（`Assets/Shaders/UIScreen.shader`、`Blend One OneMinusSrcColor`＝スクリーン。マテリアル `Resources/Presentation/Materials/Mat_UI_Screen`、`PresentationPresetBuilder` が作る）。並びは グラデーション → 光漏れ → 縁（はみ出した光は縁で消える）。範囲の物に **RectMask2D**（揺れてずれた帯が左右の帯の上に出たため）。`Lerp` は全体の強さだけを混ぜ、形と色は光漏れのある側。揺れは `Time.unscaledTime`＋Perlin、一瞬光るは間をばらつかせる（`System.Random` を 1 つ使い回す）。`IsLensNeutral` で層を隠す。
+- 段階 3：映画の字幕（`Camera/SubtitleStyle`＋`CinemaMode.ShowMovieSubtitle`）。帯の字幕（会話の「シネマ演出で出す」が1文字ずつ書く `subtitle`）とは**別の文字**にした（会話の形を変えないため）。置き場所は Viewport（＝カメラの rect。中の割合で決める。はじめ画面全体の割合で計算して幅が狭くなった）。フォントは実行中に `TMP_FontAsset.CreateFontAsset`（動的、保存しない＝再生でアセットが書き換わらない。static にキャッシュ、SubsystemRegistration でリセット）、マテリアルは縁取り＋Underlay の複製（CinemaMode が持って消す）。部品の `style` の既定は帯（0）、`Reset` で映画（前からある部品の見た目を変えないため）。root を隠す判定に `MovieAlpha` も入れた。
 - 確かめ用：`PresentationDirector.LensVisible`・`LeakFlashAmount`・`FlashLeakNow()`、`MoodPreset.EditorSetEdge` / `EditorSetLeak(MoodValues)`。
 
 ## 書くときの注意
