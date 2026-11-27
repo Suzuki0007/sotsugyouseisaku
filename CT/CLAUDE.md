@@ -15,6 +15,7 @@
 - **仮組み：T字通路（Stage1_4）**（2026-11-20、指示書 `CT_T_corridor_claudecode_instruction_2026-11-20.md`）。入室 → 扉の前のイベントまで仮素材で動く。左右の部屋・扉を開ける大なぞ・2人操作の開始はまだ（受け口だけ）。→ `rules/scenes.md` の Stage1_4。
 - **仮組み：書斎（Stage1_3）**（2026-11-20）。仮素材で全部動く（2問・調律・紹介・ロード）。本番の絵・音・出口の先（廊下・楽器倉庫・合流地点）はまだ。→ `rules/scenes.md` の Stage1_3。
 - **完了：演出の基盤**（2026-11-26、指示書 `CT_presentation_mood_light_weather_still_claudecode_instruction_2026-11-25`）：色調・光・天候・回想・1枚絵。窓口 `PresentationDirector`、プリセットは `Assets/Resources/Presentation/`、試し用のシーン `Test_Presentation`。次は S4（時代・季節の切り替え）。→ `.claude/rules/presentation.md`・`Docs/演出の作り方.md`
+- **完了：見た目 A（11/27 打ち合わせ）**（2026-11-27、`Docs/見た目A_レンズと字幕のプラン.md`）：画面の縁・光漏れ・映画の字幕・太陽のレンズフレア・塔の外の空（見上げる／見下ろす）・白ベースの色調。試し用マップの東の広場の一番南の列。→ `rules/presentation.md`・`Docs/演出の作り方.md`。打ち合わせの方針は `Docs/打ち合わせ_2026-11-27_実装方針.md`、シナリオのシーン分け（38 シーン）は `Docs/シーン分け_願いの塔と壊れた調律師.md`。
 - **進行中：マップの見た目の向上**（2026-11-27、`Docs/マップの見た目の向上プラン.md`）。試し配置マップ（Test_Mapchip）で段階 1〜6 完了（壁の形・崩れた所とがれき・地面の色むらと雲の影・光だまりと窓の光・霧とちり・素材のお願い MAP-12〜19）。段階 7（本番のステージへ広げるか・Pixel Perfect Camera）はユーザーの判断待ち。→ `rules/map-room.md`・`Docs/マップチップの置き方.md`
 - **進行中：性能（計測・チューニング）**。段階1（計測の道具）・段階2（点検のスキル `perf-review`）・段階3（Project Auditor）完了。次は ④ 計測で重い所だけ直す。→ `.claude/rules/performance.md`
 - 段階で進める大きな作業は、**1段階ずつ終わったら報告とコミットメッセージを渡す**。

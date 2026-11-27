@@ -474,7 +474,7 @@ if (hasEast)
     }
     UnityEngine.GameObject SubtitleSeq(string name, string text, float secs)
     {
-        var go = Seq2(name); var sub = go.AddComponent<SubtitleEventAction>(); Set(sub, "text", text); Set(sub, "advance", 1); Set(sub, "seconds", secs); return go;
+        var go = Seq2(name); var sub = go.AddComponent<SubtitleEventAction>(); Set(sub, "style", 0); Set(sub, "text", text); Set(sub, "advance", 1); Set(sub, "seconds", secs); return go;
     }
 
     // --- 北の列：手の動作 ---
@@ -525,7 +525,7 @@ if (hasEast)
         var a1b = go.AddComponent<PresentationValueEventAction>(); Set(a1b, "valueName", "見本_埋葬"); Set(a1b, "mode", 0); Set(a1b, "value", 0f);
         var a2b = go.AddComponent<FlashbackEnterEventAction>(); Set(a2b, "preset", fbBurial); Set(a2b, "seconds", 2f);
         var a3b = go.AddComponent<GestureEventAction>(); Set(a3b, "preset", P<GesturePreset>("Gesture", "Gesture_墓を掘る")); Set(a3b, "countValue", "見本_埋葬");
-        var a4b = go.AddComponent<SubtitleEventAction>(); Set(a4b, "text", "……おやすみなさい。"); Set(a4b, "advance", 1); Set(a4b, "seconds", 2.5f);
+        var a4b = go.AddComponent<SubtitleEventAction>(); Set(a4b, "style", 0); Set(a4b, "text", "……おやすみなさい。"); Set(a4b, "advance", 1); Set(a4b, "seconds", 2.5f);
         var a5b = go.AddComponent<FlashbackExitEventAction>(); Set(a5b, "seconds", 2f);
         EvStation("場面\n埋葬の記憶", V(-99.2f, 25.0f), go, new UnityEngine.Color(0.85f, 0.7f, 0.45f));
     }
@@ -537,8 +537,44 @@ if (hasEast)
         AddStep(g, 0.5f, SubtitleSeq("ひと巻き：半分", "あと、少し……", 2f));
         AddStep(g, 0.9f, SubtitleSeq("ひと巻き：9 割", "……重い。", 2f));
         var r = go.AddComponent<RippleEventAction>(); Set(r, "preset", P<RipplePreset>("Ripple", "Ripple_光が灯る")); Set(r, "center", 0); Set(r, "target", clock2); Set(r, "id", "");
-        var sub = go.AddComponent<SubtitleEventAction>(); Set(sub, "text", "（時計が、また動き出した）"); Set(sub, "advance", 1); Set(sub, "seconds", 2.5f);
+        var sub = go.AddComponent<SubtitleEventAction>(); Set(sub, "style", 0); Set(sub, "text", "（時計が、また動き出した）"); Set(sub, "advance", 1); Set(sub, "seconds", 2.5f);
         EvStation("場面\n最後のひと巻き", V(-95.8f, 25.0f), go, new UnityEngine.Color(0.85f, 0.7f, 0.45f));
+    }
+
+    // --- 一番南の列 y21.8（11-27 見た目 A）：画面のレンズ・映画の字幕・空 ---
+    //   画面の縁と光漏れ（色調の見本）・太陽（レンズフレア）・映画の字幕・空（7 つ）・空の見え方（見上げる／見下ろす）
+    //   空は、広場の東の端（x -98 より東）に立つとカメラが東へ 8 マス先まで動き、マップの外が見える
+    var lc = new UnityEngine.Color(0.75f, 0.85f, 1f);
+    {
+        var st = Station("画面の縁\n光漏れ", PresentationStation.Kind.Mood, V(-105.0f, 21.8f), lc,
+            All<MoodPreset>("Mood", "Mood_見本_画面の縁", "Mood_見本_光漏れ", "Mood_白い廃墟", "Mood_ダリの午後"));
+        st.transform.SetParent(gRoot.transform, true);
+    }
+    {
+        // 太陽は台座の列に立ったときの画面の左上の端あたり（画面の外の遠くだと出ない）
+        var sunGo = Child("太陽（レンズフレア・台座で出す）", gRoot.transform, V(-105.5f, 27.0f));
+        sunGo.AddComponent<LensSun>();
+        sunGo.SetActive(false);
+        var st = Station("太陽\n（レンズフレア）", PresentationStation.Kind.Sun, V(-102.6f, 21.8f), new UnityEngine.Color(1f, 0.92f, 0.6f));
+        Set(st, "sun", sunGo);
+        st.transform.SetParent(gRoot.transform, true);
+    }
+    {
+        var go = Seq2("映画の字幕（見本）"); var sub = go.AddComponent<SubtitleEventAction>(); Set(sub, "style", 1);
+        Set(sub, "text", "彼女は、遠くで波の音がした気がした。けれど、何も聞こえなかった。"); Set(sub, "advance", 1); Set(sub, "seconds", 7.0f);
+        EvStation("映画の字幕", V(-100.2f, 21.8f), go, new UnityEngine.Color(0.95f, 0.95f, 0.95f));
+    }
+    {
+        var st = Station("空", PresentationStation.Kind.Sky, V(-97.0f, 21.8f), new UnityEngine.Color(0.5f, 0.75f, 1f),
+            All<SkyPreset>("Sky", "Sky_青空", "Sky_暗い空", "Sky_夜明け", "Sky_夕焼け", "Sky_夜", "Sky_ダリの空", "Sky_黒"));
+        Set(st, "seconds", 2.0f);
+        st.transform.SetParent(gRoot.transform, true);
+        var sv = Station("空の見え方\n（見上げる／見下ろす）", PresentationStation.Kind.SkyView, V(-94.6f, 21.8f), new UnityEngine.Color(0.6f, 0.7f, 0.9f));
+        sv.transform.SetParent(gRoot.transform, true);
+        // 広場の東の端に立つと、カメラが東へ 8 マス先まで動く（マップの外＝空が見える）
+        var camGo = Child("カメラの範囲（空を見る・広場の東の端から東へ 8 マス）", gRoot.transform, V((-98.0f + eastBounds.max.x + 8f) * 0.5f, eastBounds.center.y));
+        var cbc = camGo.AddComponent<UnityEngine.BoxCollider2D>(); cbc.isTrigger = true; cbc.size = new UnityEngine.Vector2(eastBounds.max.x + 8f + 98.0f, eastBounds.size.y);
+        var ca = camGo.AddComponent<CameraArea>(); Set(ca, "priority", 2);
     }
 }
 

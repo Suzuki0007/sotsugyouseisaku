@@ -114,6 +114,14 @@ public static class PresentationPresetBuilder
         v.bottomShade = 0.25f; v.bottomShadeColor = new Color(1.0f, 0.9f, 0.7f); v.bottomShadeHeight = 0.3f;
         MoodWithLens("Mood_ダリの午後", "ダリの絵（暗い所は青緑・明るい所は橙・上を青緑に落とし、下を淡い黄色にかすませる）。砂浜・白い平原", v, overwrite, log);
 
+        // 見本（試し用マップの台座で、画面の縁・光漏れだけを見る）
+        v = MoodValues.Neutral; v.edgeFade = 0.08f; v.edgeRound = 0.6f;
+        v.topShade = 0.5f; v.topShadeColor = new Color(0.05f, 0.12f, 0.18f); v.topShadeHeight = 0.45f;
+        v.bottomShade = 0.3f; v.bottomShadeColor = new Color(1.0f, 0.95f, 0.82f); v.bottomShadeHeight = 0.3f;
+        MoodWithLens("Mood_見本_画面の縁", "見本：画面の縁（ぼかし 0.08・角の丸み 0.6・上に紺・下に白っぽいかすみ）だけ", v, overwrite, log);
+        v = MoodValues.Neutral; v.edgeFade = 0.04f; v.leak = 0.8f;
+        MoodWithLens("Mood_見本_光漏れ", "見本：光漏れ 0.8（左に青緑・右に橙・左下の焼け・縦の筋・ときどき一瞬光る）", v, overwrite, log);
+
         // 空（塔の外。見た目 A 段階 5）
         Sky("Sky_黒", "真っ黒（今までの見た目と同じ。暗い空からの切り替え用）", Color.black, Color.black, 0.15f, 0.0f, Color.white, 0.0f, 0.0f, Color.black, 0.0f, overwrite, log);
         Sky("Sky_青空", "昔の RPG ツクール・Windows 95 のような青空と白い雲", new Color(0.18f, 0.42f, 0.85f), new Color(0.62f, 0.82f, 0.98f), 0.15f, 0.6f, Color.white, 0.3f, 0.0f, new Color(0.3f, 0.48f, 0.55f), 0.55f, overwrite, log);

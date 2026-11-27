@@ -16,7 +16,8 @@ using UnityEngine;
 /// ・色調・光・天候：調べるたびに「プリセット」の上から順に変わり、最後の次で元（シーンの既定）に戻る。キーの案内に次の名前が出る
 /// ・回想：調べると回想に入り、もう一度調べると戻る
 /// ・暗さ：調べると暗いステージ（StageDarkness の付いた物を表示）にし、もう一度調べると戻す。「暗さの段」を書くと、調べるたびに段を進める（明るい → 薄暗い → 暗い → 真っ暗）
-/// ・全部戻す：色調・光・天候・回想・暗さを最初の状態へ
+/// ・空：調べるたびに空のプリセットを次へ。空の見え方：見上げる／見下ろすを切り替え。太陽：太陽（レンズフレア）の物を出す・消す
+/// ・全部戻す：色調・光・天候・回想・暗さ・空・太陽を最初の状態へ
 /// ・塗り替えの境目を表示：塗り替える色の代わりに、色の段ごとにはっきりした色で塗る（光の中が黄色の段に入っているかを見る）
 /// ・色調の台座に「一緒に変える光」を入れると、色調と一緒にその光にする（青と黄色の色調を見るとき）
 /// ・部品と同じ「イベント」の層に入れるので、部品の動きと同じ（回想の中なら回想の層）
@@ -47,6 +48,15 @@ public class PresentationStation : GimmickInteractable
 
         [InspectorName("塗り替えの境目を表示")]
         Bands = 6,
+
+        [InspectorName("空")]
+        Sky = 7,
+
+        [InspectorName("空の見え方（見上げる／見下ろす）")]
+        SkyView = 8,
+
+        [InspectorName("太陽（レンズフレア）を出す・消す")]
+        Sun = 9,
     }
 
     [SerializeField, Label("種類")]
@@ -95,6 +105,10 @@ public class PresentationStation : GimmickInteractable
     [Tooltip("暗さの台座：調べるたびに上から順にこの段にする（最後の次は最初へ）。空なら「暗さ」のオン／オフだけ")]
     private List<DarkLevel> darknessLevels = new List<DarkLevel>();
 
+    [SerializeField, Label("太陽の物")]
+    [Tooltip("太陽（レンズフレア）の台座：表示・非表示を切り替える物（LensSun が付いた物。最初は非表示で置く）")]
+    private GameObject sun;
+
     private int darkIndex;
 
     private int index = -1;
@@ -127,6 +141,9 @@ public class PresentationStation : GimmickInteractable
                     if(darknessLevels.Count > 0) { DarkLevel n = darknessLevels[(darkIndex + 1) % darknessLevels.Count]; return "明るさを変える（次：" + (n != null ? n.name : "") + "）"; }
                     return IsDark ? "明るく戻す" : "暗くする";
                 case Kind.Bands:     return PresentationDirector.ShowRemapBands ? "境目の表示をやめる" : "塗り替えの境目を表示";
+                case Kind.Sky:       return "空を変える（次：" + NextName("シーンの既定") + "）";
+                case Kind.SkyView:   return PresentationDirector.CurrentSkyMode == SkyViewMode.LookDown ? "見上げる（屋外）にする" : "見下ろす（塔の中）にする";
+                case Kind.Sun:       return sun != null && sun.activeSelf ? "太陽を消す" : "太陽を出す";
                 default:             return "全部戻す";
             }
         }
@@ -210,6 +227,23 @@ public class PresentationStation : GimmickInteractable
                 PresentationDirector.ShowRemapBands = !PresentationDirector.ShowRemapBands;
                 break;
 
+            case Kind.Sky:
+                Advance();
+                if(index < 0) { PresentationDirector.ResetSkyForEvent(seconds); }
+                else { PresentationDirector.SetEventSky(presets[index] as SkyPreset, seconds); }
+                break;
+
+            case Kind.SkyView:
+                {
+                    bool down = PresentationDirector.CurrentSkyMode == SkyViewMode.LookDown;
+                    PresentationDirector.SetSkyMode(down ? SkyViewMode.LookUp : SkyViewMode.LookDown, true);
+                }
+                break;
+
+            case Kind.Sun:
+                if(sun != null) { sun.SetActive(!sun.activeSelf); }
+                break;
+
             default:
                 ResetAll();
                 break;
@@ -228,11 +262,15 @@ public class PresentationStation : GimmickInteractable
         PresentationDirector.ClearMood(PresentationLayer.Event, seconds);
         PresentationDirector.ClearLight(PresentationLayer.Event, seconds);
         PresentationDirector.ClearWeather(PresentationLayer.Event, seconds);
+        PresentationDirector.ResetSkyForEvent(seconds);
+        ScenePresentation sp = ScenePresentation.Current;
+        PresentationDirector.SetSkyMode(sp != null ? sp.DefaultSkyView : SkyViewMode.LookUp, sp == null || sp.TowerWall);
         for(int i = 0; i < all.Count; i++)
         {
             all[i].index = -1;
             all[i].darkIndex = 0;
             if(all[i].kind == Kind.Darkness) { all[i].SetDark(false); }
+            if(all[i].kind == Kind.Sun && all[i].sun != null) { all[i].sun.SetActive(false); }
         }
         if(darkness != null) { SetDark(false); }
         PresentationDirector.ShowRemapBands = false;

@@ -131,6 +131,8 @@ public class ScenePresentation : MonoBehaviour
     public LightPreset DefaultLight => lightPreset;
     public WeatherPreset DefaultWeather => weather;
     public SkyPreset DefaultSky => sky;
+    public SkyViewMode DefaultSkyView => skyView;
+    public bool TowerWall => towerWall;
     public IReadOnlyList<Rule> Rules => rules;
     public MoodPreset RestoredMood => restoredMood;
     public LightPreset RestoredLight => restoredLight;

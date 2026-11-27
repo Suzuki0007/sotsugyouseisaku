@@ -1,0 +1,62 @@
+# 演出の試し用マップ Test_Presentation の東の広場・一番南の列（2026-11-27、見た目 A）
+# 画面の縁・光漏れ（色調の見本）・太陽（レンズフレア）・映画の字幕・空（見上げる／見下ろす）を本当の E キーで。ロードで空が戻る・全部戻す
+scene Test_Presentation
+save on
+wait 2
+# 画面の縁・光漏れの台座（-105, 21.8）：1 回目＝画面の縁、2 回目＝光漏れ
+warp -105.0,21.8
+wait 1
+key E
+wait 2
+expect eval PresentationDirector.LensVisible
+expect eval PresentationDirector.CurrentMoodName == "Mood_見本_画面の縁"
+capture lens_edge
+key E
+wait 2
+expect eval PresentationDirector.CurrentMoodName == "Mood_見本_光漏れ"
+capture lens_leak
+# 太陽の台座（-102.6, 21.8）：太陽を出す → フレアが出る
+warp -102.6,21.8
+wait 1
+key E
+wait 1
+expect eval PresentationDirector.FlareVisible
+capture lens_flare
+# 映画の字幕の台座（-100.2, 21.8）：出る → 7 秒で消える（key E の行だけで 3 秒ほどかかるので、すぐ確かめる）
+warp -100.2,21.8
+wait 1
+key E
+expect eval CinemaMode.Get().MovieAlpha > 0.5f
+capture lens_subtitle
+wait 6
+expect eval CinemaMode.Get().MovieAlpha < 0.01f
+# 空の台座（-97, 21.8）：1 回目＝青空。広場の東の端ではカメラが東へ動き、マップの外に空が見える
+warp -97.0,21.8
+wait 1
+key E
+wait 3
+expect eval PresentationDirector.CurrentSkyName == "Sky_青空"
+expect eval PresentationDirector.SkyPresence > 0.99f
+capture sky_up
+# 空の見え方の台座（-94.6, 21.8）：見下ろす（塔の中）にする
+warp -94.6,21.8
+wait 1
+key E
+wait 1
+expect eval PresentationDirector.CurrentSkyMode == SkyViewMode.LookDown
+capture sky_down
+# ロードしても、イベントで変えた空はそのまま（見え方はシーンの既定＝見上げるに戻る）
+autosave
+reload
+wait 3
+expect eval PresentationDirector.CurrentSkyName == "Sky_青空"
+# 全部戻す（-111.5, 22.5）：色調・空・太陽が消える
+warp -111.5,22.5
+wait 1
+key E
+wait 3
+expect eval !PresentationDirector.LensVisible
+expect eval PresentationDirector.SkyPresence < 0.01f
+expect eval !PresentationDirector.FlareVisible
+expect idle
+expect no-error
