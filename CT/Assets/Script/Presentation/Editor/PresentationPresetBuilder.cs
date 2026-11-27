@@ -1,4 +1,4 @@
-﻿/*********************************************************************/
+/*********************************************************************/
 // * \file   PresentationPresetBuilder.cs
 // * \brief  最初の演出のプリセット（色調 6・光 6・天候 7・回想 2）と、天候の粒の絵・マテリアル・回想中フラグを作る（エディタ用）
 // *
@@ -40,7 +40,7 @@ public static class PresentationPresetBuilder
     public static string Build(bool overwrite)
     {
         var log = new System.Text.StringBuilder();
-        foreach(string f in new[] { Root, Root + "/Mood", Root + "/Light", Root + "/Weather", Root + "/Flashback", Root + "/Materials", TextureFolder })
+        foreach(string f in new[] { Root, Root + "/Mood", Root + "/Light", Root + "/Weather", Root + "/Flashback", Root + "/Materials", Root + "/Sky", TextureFolder })
         {
             EnsureFolder(f);
         }
@@ -101,6 +101,27 @@ public static class PresentationPresetBuilder
         v = MoodValues.Neutral; v.saturation = -10; v.shadows = new Color(0.45f, 0.5f, 0.6f); v.highlights = new Color(0.62f, 0.5f, 0.55f); v.splitBalance = 10; v.bloom = 0.3f; v.bloomThreshold = 0.8f;
         Mood("Mood_夜明け", "ヴェルツィーの墓・エピローグの手前（暗い所は青・明るい所は淡い桃色・彩度 -10・にじみ 弱）", v, overwrite, log);
         _ = gray; _ = nightAlone;
+
+        // 白ベース（11-27 打ち合わせ：白い廃墟・ダリの絵。見た目 A 段階 5）
+        v = MoodValues.Neutral; v.saturation = -25; v.contrast = -15; v.brightness = 0.25f; v.temperature = -8;
+        v.shadows = new Color(0.45f, 0.52f, 0.55f); v.highlights = new Color(0.56f, 0.53f, 0.48f);
+        v.lift = 0.25f; v.liftColor = new Color(0.55f, 0.6f, 0.66f); v.vignette = 0.18f; v.bloom = 0.4f; v.bloomThreshold = 0.75f;
+        v.edgeFade = 0.04f; v.bottomShade = 0.25f; v.bottomShadeColor = Color.white; v.bottomShadeHeight = 0.3f; v.leak = 0.15f;
+        MoodWithLens("Mood_白い廃墟", "白ベース（彩度 -25・コントラスト下げ・明るく・黒を青灰に浮かせる・下を白くかすませる・光漏れ 弱）。白い建物・雪の場面", v, overwrite, log);
+        v = MoodValues.Neutral; v.saturation = 5; v.contrast = 5; v.temperature = 10; v.splitBalance = 10;
+        v.shadows = new Color(0.38f, 0.55f, 0.58f); v.highlights = new Color(0.65f, 0.52f, 0.38f); v.vignette = 0.15f;
+        v.edgeFade = 0.04f; v.topShade = 0.35f; v.topShadeColor = new Color(0.1f, 0.25f, 0.3f); v.topShadeHeight = 0.45f;
+        v.bottomShade = 0.25f; v.bottomShadeColor = new Color(1.0f, 0.9f, 0.7f); v.bottomShadeHeight = 0.3f;
+        MoodWithLens("Mood_ダリの午後", "ダリの絵（暗い所は青緑・明るい所は橙・上を青緑に落とし、下を淡い黄色にかすませる）。砂浜・白い平原", v, overwrite, log);
+
+        // 空（塔の外。見た目 A 段階 5）
+        Sky("Sky_黒", "真っ黒（今までの見た目と同じ。暗い空からの切り替え用）", Color.black, Color.black, 0.15f, 0.0f, Color.white, 0.0f, 0.0f, Color.black, 0.0f, overwrite, log);
+        Sky("Sky_青空", "昔の RPG ツクール・Windows 95 のような青空と白い雲", new Color(0.18f, 0.42f, 0.85f), new Color(0.62f, 0.82f, 0.98f), 0.15f, 0.6f, Color.white, 0.3f, 0.0f, new Color(0.3f, 0.48f, 0.55f), 0.55f, overwrite, log);
+        Sky("Sky_暗い空", "重い灰色の雲（不穏・嵐の前）", new Color(0.12f, 0.13f, 0.17f), new Color(0.32f, 0.33f, 0.38f), 0.1f, 0.85f, new Color(0.24f, 0.25f, 0.3f), 0.6f, 0.0f, new Color(0.25f, 0.27f, 0.3f), 0.35f, overwrite, log);
+        Sky("Sky_夜明け", "上は紺・地平線は桃色と橙。星が少し残る", new Color(0.16f, 0.2f, 0.42f), new Color(1.0f, 0.66f, 0.48f), 0.12f, 0.4f, new Color(0.95f, 0.72f, 0.72f), 0.2f, 0.25f, new Color(0.35f, 0.32f, 0.42f), 0.4f, overwrite, log);
+        Sky("Sky_夕焼け", "上は紫・地平線は橙", new Color(0.35f, 0.25f, 0.5f), new Color(1.0f, 0.5f, 0.22f), 0.12f, 0.5f, new Color(0.9f, 0.45f, 0.35f), 0.25f, 0.0f, new Color(0.45f, 0.33f, 0.3f), 0.45f, overwrite, log);
+        Sky("Sky_夜", "紺の夜空と星", new Color(0.02f, 0.03f, 0.08f), new Color(0.08f, 0.12f, 0.25f), 0.1f, 0.15f, new Color(0.2f, 0.25f, 0.35f), 0.15f, 1.0f, new Color(0.08f, 0.1f, 0.16f), 0.3f, overwrite, log);
+        Sky("Sky_ダリの空", "ダリの絵：上は青緑・地平線は淡い黄色・白い雲", new Color(0.25f, 0.55f, 0.6f), new Color(0.95f, 0.9f, 0.7f), 0.1f, 0.45f, Color.white, 0.2f, 0.0f, new Color(0.7f, 0.62f, 0.45f), 0.55f, overwrite, log);
 
         // 青と黄色の哀愁（11-26 依頼書 CT_mood_blue_yellow。明るさ → 色の塗り替え。値は presets.json から）
         BuildBlueYellow(overwrite, log);
@@ -338,6 +359,35 @@ public static class PresentationPresetBuilder
         MoodPreset p = LoadOrCreate<MoodPreset>(path, out bool created);
         if(created || overwrite) { p.EditorSet(memo, v); EditorUtility.SetDirty(p); log.Append(created ? "作った " : "戻した ").Append(name).Append('\n'); }
         return p;
+    }
+
+    /// <summary> 色調（画面の縁・光漏れも入れる） </summary>
+    private static void MoodWithLens(string name, string memo, MoodValues v, bool overwrite, System.Text.StringBuilder log)
+    {
+        string path = $"{Root}/Mood/{name}.asset";
+        MoodPreset p = LoadOrCreate<MoodPreset>(path, out bool created);
+        if(!created && !overwrite) { return; }
+        p.EditorSet(memo, v);
+        p.EditorSetEdge(v);
+        p.EditorSetLeak(v);
+        EditorUtility.SetDirty(p);
+        log.Append(created ? "作った " : "戻した ").Append(name).Append('\n');
+    }
+
+    private static void Sky(string name, string memo, Color top, Color horizon, float horizonHeight, float clouds, Color cloudColor, float cloudSpeed, float stars, Color ground, float groundVisibility, bool overwrite, System.Text.StringBuilder log)
+    {
+        string path = $"{Root}/Sky/{name}.asset";
+        SkyPreset p = LoadOrCreate<SkyPreset>(path, out bool created);
+        if(!created && !overwrite) { return; }
+        SkyValues v = SkyValues.None;
+        v.presence = 1.0f;
+        v.topColor = top; v.horizonColor = horizon; v.horizon = horizonHeight;
+        v.clouds = clouds; v.cloudColor = cloudColor; v.cloudSpeed = cloudSpeed;
+        v.stars = stars; v.starColor = new Color(1.0f, 0.97f, 0.9f, 1.0f);
+        v.groundColor = ground; v.groundVisibility = groundVisibility;
+        p.EditorSet(memo, v);
+        EditorUtility.SetDirty(p);
+        log.Append(created ? "作った " : "戻した ").Append(name).Append('\n');
     }
 
     private static LightPreset LightPreset(string name, string memo, Color c, float i, List<LightPreset.SceneLightSetting> lights, bool overwrite, System.Text.StringBuilder log)

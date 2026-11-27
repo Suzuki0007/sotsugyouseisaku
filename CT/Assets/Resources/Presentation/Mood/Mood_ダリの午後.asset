@@ -1,0 +1,61 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 052b736d88f04434f96b76de4728e18b, type: 3}
+  m_Name: "Mood_\u30C0\u30EA\u306E\u5348\u5F8C"
+  m_EditorClassIdentifier: Assembly-CSharp::MoodPreset
+  memo: "\u30C0\u30EA\u306E\u7D75\uFF08\u6697\u3044\u6240\u306F\u9752\u7DD1\u30FB\u660E\u308B\u3044\u6240\u306F\u6A59\u30FB\u4E0A\u3092\u9752\u7DD1\u306B\u843D\u3068\u3057\u3001\u4E0B\u3092\u6DE1\u3044\u9EC4\u8272\u306B\u304B\u3059\u307E\u305B\u308B\uFF09\u3002\u7802\u6D5C\u30FB\u767D\u3044\u5E73\u539F"
+  saturation: 5
+  contrast: 5
+  brightness: 0
+  colorFilter: {r: 1, g: 1, b: 1, a: 1}
+  temperature: 10
+  tint: 0
+  shadowsColor: {r: 0.38, g: 0.55, b: 0.58, a: 1}
+  highlightsColor: {r: 0.65, g: 0.52, b: 0.38, a: 1}
+  splitBalance: 10
+  shadowLiftColor: {r: 0.1, g: 0.16, b: 0.4, a: 1}
+  shadowLift: 0
+  vignette: 0.15
+  vignetteSmoothness: 0.4
+  vignetteColor: {r: 0, g: 0, b: 0, a: 1}
+  edgeFade: 0.04
+  edgeRound: 0.5
+  topShade: 0.35
+  topShadeColor: {r: 0.1, g: 0.25, b: 0.3, a: 1}
+  topShadeHeight: 0.45
+  bottomShade: 0.25
+  bottomShadeColor: {r: 1, g: 0.9, b: 0.7, a: 1}
+  bottomShadeHeight: 0.3
+  leak: 0
+  leakRight: 1
+  leakRightColor: {r: 1, g: 0.42, b: 0.12, a: 1}
+  leakLeft: 0.5
+  leakLeftColor: {r: 0.25, g: 0.85, b: 0.85, a: 1}
+  leakWidth: 0.3
+  leakBurn: 0.6
+  leakBurnColor: {r: 1, g: 0.88, b: 0.72, a: 1}
+  leakBurnCorner: 0
+  leakStreaks: 0.3
+  leakSway: 0.5
+  leakFlash: 2
+  flare: 1
+  grain: 0
+  grainType: 4
+  bloom: 0
+  bloomThreshold: 0.9
+  remap: 0
+  remapMode: 0
+  remapStops: []
+  keepOriginal: 0
+  remapStrength: 1
+  applyToDialogue: 0
+  dialogueStrength: 0.8

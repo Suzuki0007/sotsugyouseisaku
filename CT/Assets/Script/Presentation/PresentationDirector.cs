@@ -229,6 +229,56 @@ public class PresentationDirector : MonoBehaviour
     public static float DialogueMoodAmount => instance != null && instance.dialogueMood != null ? instance.dialogueMood.Amount : 0.0f;
 
     private ScreenLensLayer lens;
+    private SkyView sky;
+
+    //=====================================================================
+    // 空（SkyView に任せる）
+    //=====================================================================
+
+    /// <summary> シーンの既定の空（ScenePresentation の「外側の空」から） </summary>
+    public static void SetBaseSky(SkyPreset preset, float seconds)
+    {
+        PresentationDirector d = Get();
+        if(d != null && d.sky != null) { d.sky.SetBase(preset, seconds); }
+    }
+
+    /// <summary> シーンの外側の見え方（見上げる／見下ろす）と、見下ろすときに外壁を下へ続けるか </summary>
+    public static void SetSkyMode(SkyViewMode mode, bool towerWall)
+    {
+        PresentationDirector d = Get();
+        if(d != null && d.sky != null) { d.sky.SetMode(mode, towerWall); }
+    }
+
+    /// <summary> 今の見え方（確かめ用） </summary>
+    public static SkyViewMode CurrentSkyMode => instance != null && instance.sky != null ? instance.sky.Mode : SkyViewMode.LookUp;
+
+    /// <summary> 部品「空を変える」：イベントの層の空（null で空なし） </summary>
+    public static void SetEventSky(SkyPreset preset, float seconds)
+    {
+        PresentationDirector d = Get();
+        if(d != null && d.sky != null) { d.sky.SetEvent(preset, seconds); }
+    }
+
+    /// <summary> 部品「空を変える（シーンの既定に戻す）」 </summary>
+    public static void ResetSkyForEvent(float seconds)
+    {
+        PresentationDirector d = Get();
+        if(d != null && d.sky != null) { d.sky.ClearEvent(seconds); }
+    }
+
+    /// <summary> 今の空の名前（確かめ用。なければ ""） </summary>
+    public static string CurrentSkyName => instance != null && instance.sky != null ? instance.sky.CurrentName : "";
+
+    /// <summary> 空が出ている割合（確かめ用） </summary>
+    public static float SkyPresence => instance != null && instance.sky != null ? instance.sky.Presence : 0.0f;
+
+    public static bool IsSkyBlending => instance != null && instance.sky != null && instance.sky.IsBlending;
+
+    /// <summary> 空のプリセットを Inspector で変えたとき </summary>
+    public static void NotifySkyPresetChanged(SkyPreset preset)
+    {
+        if(instance != null && instance.sky != null) { instance.sky.NotifyChanged(preset); }
+    }
 
     /// <summary> 画面のレンズの層（縁など）を出しているか（確かめ用） </summary>
     public static bool LensVisible => instance != null && instance.lens != null && instance.lens.Visible;
@@ -255,6 +305,7 @@ public class PresentationDirector : MonoBehaviour
     {
         dialogueMood = gameObject.AddComponent<DialogueMoodLayer>();
         lens = gameObject.AddComponent<ScreenLensLayer>();
+        sky = gameObject.AddComponent<SkyView>();
         volume = gameObject.AddComponent<Volume>();
         volume.isGlobal = true;
         volume.priority = 100.0f;
@@ -349,6 +400,7 @@ public class PresentationDirector : MonoBehaviour
             camOriginalPost = camData != null && camData.renderPostProcessing;
         }
         if(lens != null) { lens.SetCamera(cam); }
+        if(sky != null) { sky.ResetForScene(cam, (Save.HasSlot || Save.Count > 0) ? Save.Get(SaveKeyPrefix + scene.name + "/Sky", "") : ""); }
 
         // 全体の光（シーンにある物の今の値を「元」にする）
         globalLight = null;
@@ -630,6 +682,7 @@ public class PresentationDirector : MonoBehaviour
         sb.Append("] 天候[");
         for(int i = 0; i < LayerCount; i++) { if(d.weatherLayers[i].set) { sb.Append(names[i]).Append('=').Append(NameOf(d.weatherLayers[i].preset, "なし")).Append(' '); } }
         sb.Append("] 回想=").Append(d.inFlashback ? NameOf(d.flashback) : "なし");
+        if(d.sky != null && d.sky.CurrentName.Length > 0) { sb.Append(" 空=").Append(d.sky.CurrentName); }
         sb.Append(" 光の値=").Append(d.globalLight != null ? d.globalLight.color.ToString("F2") + "×" + d.globalLight.intensity.ToString("F2") : "なし");
         sb.Append(" ポストプロセス=").Append(d.postOn ? "オン" : "オフ");
         sb.Append(" 天候の数=").Append(d.views.Count);
@@ -1135,6 +1188,7 @@ public class PresentationDirector : MonoBehaviour
         TickMood(dt);
         TickLight(dt);
         TickWeather(dt);
+        if(sky != null) { sky.Tick(dt); }
         if(dialogueMood != null) { dialogueMood.Tick(dt); }
     }
 
@@ -1152,6 +1206,7 @@ public class PresentationDirector : MonoBehaviour
         Save.SetPending(SaveKeyPrefix + scene + "/Mood", Encode(d.moodLayers[ev].set, d.moodLayers[ev].preset));
         Save.SetPending(SaveKeyPrefix + scene + "/Light", Encode(d.lightLayers[ev].set, d.lightLayers[ev].preset));
         Save.SetPending(SaveKeyPrefix + scene + "/Weather", Encode(d.weatherLayers[ev].set, d.weatherLayers[ev].preset));
+        if(d.sky != null) { Save.SetPending(SaveKeyPrefix + scene + "/Sky", d.sky.EncodeEvent()); }
     }
 
     private static string Encode(bool set, Object preset)
@@ -1186,7 +1241,7 @@ public class PresentationDirector : MonoBehaviour
             presetsByName = new Dictionary<string, ScriptableObject>();
             foreach(ScriptableObject so in Resources.LoadAll<ScriptableObject>("Presentation"))
             {
-                if(so is MoodPreset || so is LightPreset || so is WeatherPreset || so is FlashbackPreset || so is RipplePreset || so is GesturePreset)
+                if(so is MoodPreset || so is LightPreset || so is WeatherPreset || so is FlashbackPreset || so is RipplePreset || so is GesturePreset || so is SkyPreset)
                 {
                     presetsByName[so.GetType().Name + "/" + so.name] = so;
                 }

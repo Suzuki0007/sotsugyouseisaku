@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9c5c252bb7ba3694a9ce2f028eddc08b, type: 3}
+  m_Name: "Sky_\u591C"
+  m_EditorClassIdentifier: Assembly-CSharp::SkyPreset
+  memo: "\u7D3A\u306E\u591C\u7A7A\u3068\u661F"
+  topColor: {r: 0.02, g: 0.03, b: 0.08, a: 1}
+  horizonColor: {r: 0.08, g: 0.12, b: 0.25, a: 1}
+  horizon: 0.1
+  clouds: 0.15
+  cloudColor: {r: 0.2, g: 0.25, b: 0.35, a: 1}
+  cloudSpeed: 0.15
+  stars: 1
+  starColor: {r: 1, g: 0.97, b: 0.9, a: 1}
+  groundColor: {r: 0.08, g: 0.1, b: 0.16, a: 1}
+  groundVisibility: 0.3

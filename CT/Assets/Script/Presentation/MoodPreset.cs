@@ -356,6 +356,8 @@ public class MoodPreset : ScriptableObject
         saturation = v.saturation; contrast = v.contrast; brightness = v.brightness;
         colorFilter = v.colorFilter; temperature = v.temperature; tint = v.tint;
         shadowsColor = v.shadows; highlightsColor = v.highlights; splitBalance = v.splitBalance;
+        if(v.lift > 0.0001f) { shadowLiftColor = v.liftColor; }
+        shadowLift = v.lift;
         vignette = v.vignette; vignetteSmoothness = v.vignetteSmoothness; vignetteColor = v.vignetteColor;
         grain = v.grain; grainType = v.grainType; bloom = v.bloom; bloomThreshold = v.bloomThreshold;
         applyToDialogue = v.uiAmount > 0.0f;

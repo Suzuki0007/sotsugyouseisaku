@@ -78,6 +78,18 @@ public class ScenePresentation : MonoBehaviour
     [Tooltip("このシーンの天候。空なら天候なし")]
     private WeatherPreset weather;
 
+    [SerializeField, Label("外側の空")]
+    [Tooltip("マップの絵がない所（塔の外など。今は黒い所）に見せる空。空なら今までどおり（カメラの背景の色）。部品「空を変える」でイベントの途中に変えられる")]
+    private SkyPreset sky;
+
+    [SerializeField, Label("外側の見え方")]
+    [Tooltip("見上げる：屋外・地上（空・雲・星）／見下ろす：塔の中・高い所（塔を輪切りにして斜め上から見ている。外は、かすみの下のはるか下の地面と、下を流れる雲）")]
+    private SkyViewMode skyView = SkyViewMode.LookUp;
+
+    [SerializeField, Label("外壁を下へ続ける")]
+    [Tooltip("見下ろすとき、マップの下の端から塔の外壁が下へ伸びて、かすみに消えるように見せる（マップの絵の下の端が外壁でないときはオフ）")]
+    private bool towerWall = true;
+
     [Header("このシーンの光の合わせ方")]
 
     [SerializeField, Label("全体の光の倍率", 0.1f, 4.0f)]
@@ -118,6 +130,7 @@ public class ScenePresentation : MonoBehaviour
     public MoodPreset DefaultMood => mood;
     public LightPreset DefaultLight => lightPreset;
     public WeatherPreset DefaultWeather => weather;
+    public SkyPreset DefaultSky => sky;
     public IReadOnlyList<Rule> Rules => rules;
     public MoodPreset RestoredMood => restoredMood;
     public LightPreset RestoredLight => restoredLight;
@@ -138,6 +151,8 @@ public class ScenePresentation : MonoBehaviour
         PresentationDirector.SceneGlobalLightScale = globalLightScale;
         Evaluate(out appliedMood, out appliedLight, out appliedWeather, out _);
         PresentationDirector.SetBase(appliedMood, appliedLight, appliedWeather, 0.0f);
+        PresentationDirector.SetSkyMode(skyView, towerWall);
+        PresentationDirector.SetBaseSky(sky, 0.0f);
         started = true;
     }
 

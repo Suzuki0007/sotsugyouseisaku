@@ -42,6 +42,7 @@ public static class EventActionCatalog
         { "LightChangeEventAction",    ("会話・演出", "光を変える") },
         { "LightResetEventAction",     ("会話・演出", "光を戻す") },
         { "WeatherEventAction",        ("会話・演出", "天候を変える") },
+        { "SkyEventAction",            ("会話・演出", "空を変える") },
         { "FlashbackEnterEventAction", ("会話・演出", "回想に入る") },
         { "FlashbackExitEventAction",  ("会話・演出", "回想から戻る") },
         { "StillShowEventAction",      ("会話・演出", "1枚絵を出す") },
