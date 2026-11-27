@@ -228,9 +228,15 @@ public class PresentationDirector : MonoBehaviour
     /// <summary> 会話画面にかけている強さ（0 でかけていない。確かめ用） </summary>
     public static float DialogueMoodAmount => instance != null && instance.dialogueMood != null ? instance.dialogueMood.Amount : 0.0f;
 
+    private ScreenLensLayer lens;
+
+    /// <summary> 画面のレンズの層（縁など）を出しているか（確かめ用） </summary>
+    public static bool LensVisible => instance != null && instance.lens != null && instance.lens.Visible;
+
     private void Awake()
     {
         dialogueMood = gameObject.AddComponent<DialogueMoodLayer>();
+        lens = gameObject.AddComponent<ScreenLensLayer>();
         volume = gameObject.AddComponent<Volume>();
         volume.isGlobal = true;
         volume.priority = 100.0f;
@@ -324,6 +330,7 @@ public class PresentationDirector : MonoBehaviour
             camData = cam.GetUniversalAdditionalCameraData();
             camOriginalPost = camData != null && camData.renderPostProcessing;
         }
+        if(lens != null) { lens.SetCamera(cam); }
 
         // 全体の光（シーンにある物の今の値を「元」にする）
         globalLight = null;
@@ -705,6 +712,8 @@ public class PresentationDirector : MonoBehaviour
 
         // 会話画面（プリセットの「会話画面にもかける」）
         if(dialogueMood != null) { dialogueMood.Apply(v); }
+        // 画面の縁（UI の絵）
+        if(lens != null) { lens.Apply(v); }
 
         colorAdjustments.saturation.value = v.saturation;
         colorAdjustments.contrast.value = v.contrast;

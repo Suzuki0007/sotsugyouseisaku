@@ -41,6 +41,9 @@ public class MapCameraAspect : MonoBehaviour
     // 帯は UI より奥に出す（ほかの Canvas はすべて帯より手前）
     private const int BarSortingOrder = -1000;
 
+    /// <summary> 帯の色（画面の縁のぼかしがこの色へ消える） </summary>
+    public Color BarColor => barColor;
+
     private Camera cam;
     private GameObject barRoot;
     private RectTransform left, right, bottom, top;

@@ -92,6 +92,40 @@ public class MoodPreset : ScriptableObject
     [Tooltip("ふつうは黒")]
     private Color vignetteColor = Color.black;
 
+    [Header("画面の縁（マップの映る 4:3 の端）")]
+
+    [SerializeField, Label("縁をぼかす幅", 0.0f, 0.25f)]
+    [Tooltip("4:3 の端を、左右の帯の色へなめらかに消す幅（画面の高さに対する割合）。0 でくっきり切れたまま、0.04 で少し、0.1 で大きくぼかす。「画面が真四角に見える」のを和らげる")]
+    private float edgeFade = 0.0f;
+
+    [SerializeField, Label("角の丸み", 0.0f, 1.0f)]
+    [Tooltip("ぼかした縁の角の丸さ。0 で四角、1 で丸く（古い写真・ブラウン管のような角）")]
+    private float edgeRound = 0.5f;
+
+    [SerializeField, Label("上のグラデーションの強さ", 0.0f, 1.0f)]
+    [Tooltip("画面の上から色をかぶせる強さ（空を落とす・重たい感じ）。0 でなし、0.3 弱、0.6 強")]
+    private float topShade = 0.0f;
+
+    [SerializeField, Label("上のグラデーションの色")]
+    [Tooltip("上にかぶせる色。黒で暗く、紺で夜空、白で白くかすむ")]
+    private Color topShadeColor = Color.black;
+
+    [SerializeField, Label("上のグラデーションの高さ", 0.05f, 1.0f)]
+    [Tooltip("上からどこまでかかるか（画面の高さに対する割合）")]
+    private float topShadeHeight = 0.45f;
+
+    [SerializeField, Label("下のグラデーションの強さ", 0.0f, 1.0f)]
+    [Tooltip("画面の下から色をかぶせる強さ。0 でなし")]
+    private float bottomShade = 0.0f;
+
+    [SerializeField, Label("下のグラデーションの色")]
+    [Tooltip("下にかぶせる色。白・薄い黄色で地面が明るくかすむ（ダリの絵のような地平線）、黒で足元を暗く")]
+    private Color bottomShadeColor = Color.white;
+
+    [SerializeField, Label("下のグラデーションの高さ", 0.05f, 1.0f)]
+    [Tooltip("下からどこまでかかるか（画面の高さに対する割合）")]
+    private float bottomShadeHeight = 0.35f;
+
     [Header("重い項目（品質「軽い」では外す）")]
 
     [SerializeField, Label("粒子（Film Grain）", 0.0f, 1.0f)]
@@ -165,6 +199,14 @@ public class MoodPreset : ScriptableObject
         vignette = vignette,
         vignetteSmoothness = vignetteSmoothness,
         vignetteColor = vignetteColor,
+        edgeFade = edgeFade,
+        edgeRound = edgeRound,
+        topShade = topShade,
+        topShadeColor = topShadeColor,
+        topShadeHeight = topShadeHeight,
+        bottomShade = bottomShade,
+        bottomShadeColor = bottomShadeColor,
+        bottomShadeHeight = bottomShadeHeight,
         grain = grain,
         grainType = grainType,
         bloom = bloom,
@@ -251,6 +293,14 @@ public class MoodPreset : ScriptableObject
         if(applyToDialogue) { dialogueStrength = v.uiAmount; }
     }
 
+    /// <summary> エディタの道具・確かめ用：画面の縁を入れる </summary>
+    public void EditorSetEdge(MoodValues v)
+    {
+        edgeFade = v.edgeFade; edgeRound = v.edgeRound;
+        topShade = v.topShade; topShadeColor = v.topShadeColor; topShadeHeight = v.topShadeHeight;
+        bottomShade = v.bottomShade; bottomShadeColor = v.bottomShadeColor; bottomShadeHeight = v.bottomShadeHeight;
+    }
+
     /// <summary> エディタの道具から塗り替えを入れる </summary>
     public void EditorSetRemap(RemapMode mode, List<RemapStop> stops, float keep)
     {
@@ -307,6 +357,15 @@ public struct MoodValues
     public float vignette;
     public float vignetteSmoothness;
     public Color vignetteColor;
+    /// <summary> 画面の縁（ScreenLensLayer が UI の絵で描く。ポストプロセスではない） </summary>
+    public float edgeFade;
+    public float edgeRound;
+    public float topShade;
+    public Color topShadeColor;
+    public float topShadeHeight;
+    public float bottomShade;
+    public Color bottomShadeColor;
+    public float bottomShadeHeight;
     public float grain;
     public FilmGrainLookup grainType;
     public float bloom;
@@ -326,6 +385,11 @@ public struct MoodValues
         highlights = new Color(0.5f, 0.5f, 0.5f, 1.0f),
         vignetteSmoothness = 0.4f,
         vignetteColor = Color.black,
+        edgeRound = 0.5f,
+        topShadeColor = Color.black,
+        topShadeHeight = 0.45f,
+        bottomShadeColor = Color.white,
+        bottomShadeHeight = 0.35f,
         grainType = FilmGrainLookup.Medium3,
         bloomThreshold = 0.9f,
     };
@@ -362,6 +426,13 @@ public struct MoodValues
         return Mathf.Abs(a.r - b.r) < 0.002f && Mathf.Abs(a.g - b.g) < 0.002f && Mathf.Abs(a.b - b.b) < 0.002f;
     }
 
+    /// <summary> 強さがある側の値（強さ 0 ならもう一方の値） </summary>
+    private static float Pick(float strength, float own, float other) { return strength > 0.0001f ? own : other; }
+    private static Color Pick(float strength, Color own, Color other) { return strength > 0.0001f ? own : other; }
+
+    /// <summary> 画面の縁（UI の絵）が何もしないか </summary>
+    public bool IsEdgeNeutral => edgeFade < 0.001f && topShade < 0.001f && bottomShade < 0.001f;
+
     public static MoodValues Lerp(MoodValues a, MoodValues b, float t)
     {
         return new MoodValues
@@ -380,6 +451,15 @@ public struct MoodValues
             vignette = Mathf.Lerp(a.vignette, b.vignette, t),
             vignetteSmoothness = Mathf.Lerp(a.vignetteSmoothness, b.vignetteSmoothness, t),
             vignetteColor = Color.Lerp(a.vignetteColor, b.vignetteColor, t),
+            // 縁・グラデーションの形と色は、強さが 0 の側に引っぱられないように、ある側の値を使う
+            edgeFade = Mathf.Lerp(a.edgeFade, b.edgeFade, t),
+            edgeRound = Mathf.Lerp(Pick(a.edgeFade, a.edgeRound, b.edgeRound), Pick(b.edgeFade, b.edgeRound, a.edgeRound), t),
+            topShade = Mathf.Lerp(a.topShade, b.topShade, t),
+            topShadeColor = Color.Lerp(Pick(a.topShade, a.topShadeColor, b.topShadeColor), Pick(b.topShade, b.topShadeColor, a.topShadeColor), t),
+            topShadeHeight = Mathf.Lerp(Pick(a.topShade, a.topShadeHeight, b.topShadeHeight), Pick(b.topShade, b.topShadeHeight, a.topShadeHeight), t),
+            bottomShade = Mathf.Lerp(a.bottomShade, b.bottomShade, t),
+            bottomShadeColor = Color.Lerp(Pick(a.bottomShade, a.bottomShadeColor, b.bottomShadeColor), Pick(b.bottomShade, b.bottomShadeColor, a.bottomShadeColor), t),
+            bottomShadeHeight = Mathf.Lerp(Pick(a.bottomShade, a.bottomShadeHeight, b.bottomShadeHeight), Pick(b.bottomShade, b.bottomShadeHeight, a.bottomShadeHeight), t),
             grain = Mathf.Lerp(a.grain, b.grain, t),
             // 粒子の種類は混ぜられないので、粒子がある方を使う
             grainType = b.grain > 0.001f ? b.grainType : a.grainType,

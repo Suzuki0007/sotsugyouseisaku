@@ -24,6 +24,12 @@ paths:
 - コマ落ち：`SpriteAnimator.GlobalStepFps`（絵を替えるのを1秒に N 回だけ。時間は進む）。Unity の Animator は対象外。
 - S4（時代の切り替え）は `PresentationDirector.SetBase(色調, 光, 天候, 秒)` か、新しい層を足して呼ぶ（既定の層をシーンの既定と取り合うなら、層を1つ足すのがよい）。
 
+## 画面のレンズの層（11-27、`Docs/見た目A_レンズと字幕のプラン.md`）
+- `ScreenLensLayer`（窓口が `AddComponent`）。**色調のプリセットの値（`MoodValues`）として持つ**＝層・切り替え・回想・セーブは色調のまま。ポストプロセスではなく UI の絵（Screen Space - Overlay、並び順 `ScreenLensLayer.SortingOrder` = -10：帯 -1000 の上・シーンの HUD 0・暗転の幕 90・1枚絵 95 の下）。範囲はカメラの `pixelRect`（変わったときだけ合わせ直す）。CanvasScaler なし（画素の単位）。
+- 段階 1：画面の縁（`edgeFade`・`edgeRound`＝9 分割の絵、角の大きさ＝`pixelsPerUnitMultiplier`。絵は丸み 0.05 刻みで作り直す）・上下のグラデーション（1×64 の絵、下は scale.y=-1）。色は帯の色 `MapCameraAspect.BarColor`。
+- `MoodValues.Lerp` の縁・グラデーションの形と色は、強さ 0 の側の値に引っぱられないよう**強さがある側の値**を使う（`Pick`）。`IsNeutral`（ポストプロセスを切るか）には入れない。`IsEdgeNeutral` で層を隠す。
+- 確かめ用：`PresentationDirector.LensVisible`、`MoodPreset.EditorSetEdge(MoodValues)`。
+
 ## 書くときの注意
 - イベントの部品は **1ファイル1クラス**（MonoBehaviour はファイル名とクラス名が合わないとシーンに保存できない）。
 - `ScenePresentation` の光の欄は `lightPreset`（`light` は Component のプロパティと名前がぶつかる）。
