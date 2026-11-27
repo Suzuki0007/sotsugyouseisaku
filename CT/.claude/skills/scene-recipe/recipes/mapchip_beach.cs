@@ -302,6 +302,13 @@ Tone("場所の色味：遺跡の中（部屋 B）", OX + 20, 15f, OX + 36, 23f,
   var tint = MapOverlayMaker.CreateGroundTint(area, 0.45f); tint.transform.SetParent(look, true);
   var cloud = MapOverlayMaker.CreateCloudShadow(area, 0.25f); cloud.transform.SetParent(look, true); }
 
+// ---- 段階 5（11-27）空気を動かす：遺跡の床をはう霧（2〜3 枚をずらして重ねる）・光の中のちり（光だまり・窓の光の中） ----
+foreach (var f in new[]{ new UnityEngine.Vector4(OX + 10.5f, 15.6f, 0.8f, 0.24f), new UnityEngine.Vector4(OX + 14.6f, 16.8f, 0.7f, 0.2f),
+                         new UnityEngine.Vector4(OX + 23.5f, 16.4f, 1.0f, 0.26f), new UnityEngine.Vector4(OX + 31.5f, 16.2f, 1.1f, 0.24f), new UnityEngine.Vector4(OX + 34f, 19.6f, 0.7f, 0.2f) }) {
+  var g = MapAirMaker.CreateFog("床をはう霧", new UnityEngine.Vector3(f.x, f.y, 0f), f.z, f.w); g.transform.SetParent(look, true); }
+{ var d = MapAirMaker.CreateDust("光の中のちり（部屋 B の見せ場）", new UnityEngine.Vector3(OX + 30.5f, 19.2f, 0f), new UnityEngine.Vector2(5f, 3.5f), new UnityEngine.Color(1f, 0.88f, 0.65f, 0.75f)); d.transform.SetParent(look, true); }
+{ var d = MapAirMaker.CreateDust("光の中のちり（部屋 A の窓）", new UnityEngine.Vector3(OX + 13.6f, 18.4f, 0f), new UnityEngine.Vector2(2.4f, 2.4f), new UnityEngine.Color(0.9f, 0.95f, 1f, 0.7f)); d.transform.SetParent(look, true); }
+
 // カメラの範囲＝この場所と通り道（x24〜66）。出現位置＝道の上（試すときの入口）
 var camArea = room.transform.Find("カメラの範囲");
 const float camX0 = 23.8f;   // 通り道の端（23.9）まで入れる
