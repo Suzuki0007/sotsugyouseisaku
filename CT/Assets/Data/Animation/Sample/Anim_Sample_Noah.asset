@@ -53,6 +53,20 @@ MonoBehaviour:
     - {fileID: 524242947044975657, guid: 58959b83057c1624586e227ac77935a6, type: 3}
     fps: 4
     playMode: 0
-    nextClip: 
+    nextClip:
     frameLengths: []
-    events: []
+    events:
+    - frame: 2
+      se: {fileID: 0}
+      effect: {fileID: 0}
+      effectOffset: {x: 0, y: 0}
+      effectFollow: 0
+      effectTriggerName:
+      message: footprint
+    - frame: 4
+      se: {fileID: 0}
+      effect: {fileID: 0}
+      effectOffset: {x: 0, y: 0}
+      effectFollow: 0
+      effectTriggerName:
+      message: footprint
