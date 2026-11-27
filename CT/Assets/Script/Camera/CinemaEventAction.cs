@@ -59,8 +59,8 @@ public class CinemaEventAction : EventAction
     private Mode mode = Mode.Begin;
 
     [SerializeField, Label("帯の太さ", 0.0f, 0.3f)]
-    [Tooltip("上下それぞれの帯の太さ（マップの映る範囲の高さに対する割合）。会話の帯と同じ 0.07 が基本（字幕は帯の上のぼかしの中に出る）")]
-    private float barSize = 0.07f;
+    [Tooltip("上下それぞれの帯の太さ（マップの映る範囲の高さに対する割合）。会話の帯と同じ 0.1 が基本（字幕は帯の上のぼかしの中に出る）")]
+    private float barSize = 0.10f;
 
     [SerializeField, Label("寄る強さ", 1.0f, 3.0f)]
     [Tooltip("1 で寄らない。1.3 で 1.3 倍に大きく映る。寄りすぎると絵が粗く見えるので 1.5 くらいまでがおすすめ")]

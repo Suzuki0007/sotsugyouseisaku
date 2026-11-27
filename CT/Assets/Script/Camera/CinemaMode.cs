@@ -341,6 +341,17 @@ public class CinemaMode : MonoBehaviour
         if(IsActive) { SetTextArea(Mathf.Max(targetRatio, textHeight)); SetBars(barRatio); }
     }
 
+    /// <summary>
+    /// 帯の太さだけを、今すぐ変える（帯が出ているときだけ。見た目の調整用）
+    /// </summary>
+    public void ApplyBarHeight(float ratio)
+    {
+        if(!IsActive) { return; }
+        targetRatio = Mathf.Clamp01(ratio);
+        SetTextArea(Mathf.Max(targetRatio, textHeight));
+        if(transition == null) { SetBars(targetRatio); }
+    }
+
     // 字幕を置く場所を、帯が出きったときの大きさで固定する（帯の動きの間も動かない）
     private void SetTextArea(float ratio)
     {

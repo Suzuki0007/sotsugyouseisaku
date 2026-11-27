@@ -106,7 +106,7 @@ public class DialogueManager : Singleton<DialogueManager>
 
     [SerializeField, Label("帯の太さ", 0.0f, 0.3f)]
     [Tooltip("上下それぞれの黒い帯の太さ（マップの映る範囲の高さに対する割合）。細めにして、字幕は帯の上のぼかしの中に出す")]
-    private float cinemaBarSize = 0.07f;
+    private float cinemaBarHeight = 0.10f;
 
     [SerializeField, Label("字幕の場所の高さ", 0.1f, 0.5f)]
     [Tooltip("下の端から、黒いぼかしの高さ（マップの映る範囲の高さに対する割合）。会話の枠はこのすぐ上に出るので、小さくすると枠が下がる")]
@@ -215,6 +215,30 @@ public class DialogueManager : Singleton<DialogueManager>
     private CanvasGroup panelGroup;
     private Coroutine panelFade;
     private Coroutine bodyFade;
+
+    // 見た目の値：Resources/CinemaLookSettings.asset があればそちら（全部のシーンで共通。Tools > 会話 > シネマ演出の見た目）、なければこの部品の欄
+    private float BarHeight    => CinemaLookSettings.Current != null ? CinemaLookSettings.Current.barHeight    : cinemaBarHeight;
+    private float FadeHeight   => CinemaLookSettings.Current != null ? CinemaLookSettings.Current.fadeHeight   : cinemaFadeHeight;
+    private float FadeStrength => CinemaLookSettings.Current != null ? CinemaLookSettings.Current.fadeStrength : cinemaBackdrop;
+    private float BoxScale     => CinemaLookSettings.Current != null ? CinemaLookSettings.Current.boxScale     : cinemaBoxScale;
+    private float BoxOffset    => CinemaLookSettings.Current != null ? CinemaLookSettings.Current.boxOffset    : cinemaBoxOffset;
+
+    // 会話の枠を、シネマ演出の配置（縮めて黒帯の上）にしているか
+    private bool panelCompact;
+
+    /// <summary>
+    /// 見た目の設定を変えたとき、出ている会話・帯にすぐ反映する（Tools > 会話 > シネマ演出の見た目 から）
+    /// </summary>
+    public void RefreshCinemaLook()
+    {
+        CinemaMode mode = cinema != null ? cinema : CinemaMode.Get();
+        if(mode != null)
+        {
+            mode.SetTextLayout(FadeHeight, FadeStrength);
+            mode.ApplyBarHeight(BarHeight);
+        }
+        if(panelCompact) { LayoutPanel(true); }
+    }
 
     // シネマ演出で、帯の中に字幕で出しているか／会話の枠で出しているか
     private bool SubtitleMode => cinema != null && cinemaTextStyle == CinemaTextStyle.Subtitle;
@@ -426,8 +450,8 @@ public class DialogueManager : Singleton<DialogueManager>
         }
         if(cinema != null)
         {
-            cinema.SetTextLayout(cinemaFadeHeight, cinemaBackdrop);
-            float remaining = cinema.BeginForDialogue(cinemaBarSize, cinemaZoom, cinemaMoveTime);
+            cinema.SetTextLayout(FadeHeight, FadeStrength);
+            float remaining = cinema.BeginForDialogue(BarHeight, cinemaZoom, cinemaMoveTime);
             LayoutPanel(BoxMode);
 
             // 帯が出ている途中なら、出きってから少し待って最初の文を出す（もう出ていれば、すぐ出す）
@@ -525,6 +549,7 @@ public class DialogueManager : Singleton<DialogueManager>
     {
         if(panel == null || !panelLayoutSaved) { return; }
         var rt = (RectTransform)panel.transform;
+        panelCompact = cinemaBox;
 
         // 枠の中身（色・文字の大きさ・配置）は、どちらのときも今までの枠のまま
         RestoreBoxContents();
@@ -543,15 +568,15 @@ public class DialogueManager : Singleton<DialogueManager>
         if(canvas != null) { canvasHeight = ((RectTransform)canvas.rootCanvas.transform).rect.height; }
         Rect vp = CompactViewport();
         // 枠の下の端は、下の黒い帯の上の端から「帯と枠の間」だけ上（黒いぼかしの濃い所には少しかかる）
-        float fadeTop = canvasHeight * (vp.yMin + vp.height * cinemaBarSize);
+        float fadeTop = canvasHeight * (vp.yMin + vp.height * BarHeight);
 
         // 今までの枠をそのまま（元の大きさで）下の真ん中に置き、全体を縮める（文字・名前・▼も一緒に小さくなる）
         rt.anchorMin = new Vector2(0.5f, 0.0f);
         rt.anchorMax = new Vector2(0.5f, 0.0f);
         rt.pivot = new Vector2(0.5f, 0.0f);
         rt.sizeDelta = panelRectSize;
-        rt.localScale = new Vector3(panelScale.x * cinemaBoxScale, panelScale.y * cinemaBoxScale, panelScale.z);
-        rt.anchoredPosition = new Vector2(0.0f, fadeTop + cinemaBoxOffset);
+        rt.localScale = new Vector3(panelScale.x * BoxScale, panelScale.y * BoxScale, panelScale.z);
+        rt.anchoredPosition = new Vector2(0.0f, fadeTop + BoxOffset);
     }
 
     // 枠の中身を元に戻す（シネマ演出でない会話）
