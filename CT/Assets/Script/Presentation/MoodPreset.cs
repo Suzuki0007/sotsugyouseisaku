@@ -176,6 +176,12 @@ public class MoodPreset : ScriptableObject
     [Tooltip("ときどき一瞬だけ強く光る（ピッと入る）回数の目安。0 で光らない。2〜4 くらいがさりげない")]
     private float leakFlash = 2.0f;
 
+    [Header("レンズフレア（場面に「太陽（レンズフレア）」を置いたとき）")]
+
+    [SerializeField, Label("レンズフレアの強さ", 0.0f, 2.0f)]
+    [Tooltip("太陽のレンズフレアにかける倍率。1 でそのまま、0 で出さない（夜・室内・回想の色調で 0 にする）")]
+    private float flare = 1.0f;
+
     [Header("重い項目（品質「軽い」では外す）")]
 
     [SerializeField, Label("粒子（Film Grain）", 0.0f, 1.0f)]
@@ -269,6 +275,7 @@ public class MoodPreset : ScriptableObject
         leakStreaks = leakStreaks,
         leakSway = leakSway,
         leakFlash = leakFlash,
+        flare = flare,
         grain = grain,
         grainType = grainType,
         bloom = bloom,
@@ -372,6 +379,7 @@ public class MoodPreset : ScriptableObject
         leakWidth = v.leakWidth;
         leakBurn = v.leakBurn; leakBurnColor = v.leakBurnColor; leakBurnCorner = v.leakBurnCorner;
         leakStreaks = v.leakStreaks; leakSway = v.leakSway; leakFlash = v.leakFlash;
+        flare = v.flare;
     }
 
     /// <summary> エディタの道具から塗り替えを入れる </summary>
@@ -468,6 +476,8 @@ public struct MoodValues
     public float leakStreaks;
     public float leakSway;
     public float leakFlash;
+    /// <summary> 太陽のレンズフレアの倍率（何もしない値は 1） </summary>
+    public float flare;
     public float grain;
     public FilmGrainLookup grainType;
     public float bloom;
@@ -502,6 +512,7 @@ public struct MoodValues
         leakStreaks = 0.3f,
         leakSway = 0.5f,
         leakFlash = 2.0f,
+        flare = 1.0f,
         grainType = FilmGrainLookup.Medium3,
         bloomThreshold = 0.9f,
     };
@@ -589,6 +600,7 @@ public struct MoodValues
             leakStreaks = Mathf.Lerp(Pick(a.leak, a.leakStreaks, b.leakStreaks), Pick(b.leak, b.leakStreaks, a.leakStreaks), t),
             leakSway = Mathf.Lerp(Pick(a.leak, a.leakSway, b.leakSway), Pick(b.leak, b.leakSway, a.leakSway), t),
             leakFlash = Mathf.Lerp(Pick(a.leak, a.leakFlash, b.leakFlash), Pick(b.leak, b.leakFlash, a.leakFlash), t),
+            flare = Mathf.Lerp(a.flare, b.flare, t),
             grain = Mathf.Lerp(a.grain, b.grain, t),
             // 粒子の種類は混ぜられないので、粒子がある方を使う
             grainType = b.grain > 0.001f ? b.grainType : a.grainType,

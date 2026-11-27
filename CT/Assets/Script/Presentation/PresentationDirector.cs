@@ -236,6 +236,15 @@ public class PresentationDirector : MonoBehaviour
     /// <summary> 光漏れの「一瞬光る」の今の強さ（確かめ用） </summary>
     public static float LeakFlashAmount => instance != null && instance.lens != null ? instance.lens.FlashAmount : 0.0f;
 
+    /// <summary> 太陽（LensSun）が出た・消えたとき：レンズの層を今の色調でかけ直す </summary>
+    public static void RefreshLens()
+    {
+        if(instance != null && instance.lens != null) { instance.lens.Apply(instance.moodCurrent); }
+    }
+
+    /// <summary> レンズフレアを出しているか（確かめ用） </summary>
+    public static bool FlareVisible => instance != null && instance.lens != null && instance.lens.FlareShown;
+
     /// <summary> 確かめ用：光漏れをすぐに一瞬光らせる </summary>
     public static void FlashLeakNow()
     {

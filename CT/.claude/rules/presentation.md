@@ -32,7 +32,8 @@ paths:
 - `MoodValues.Lerp` の縁・グラデーションの形と色は、強さ 0 の側の値に引っぱられないよう**強さがある側の値**を使う（`Pick`）。`IsNeutral`（ポストプロセスを切るか）には入れない。`IsEdgeNeutral` で層を隠す。
 - 段階 2：光漏れ（`leak`＝全体の強さ、左右の帯・角の焼け `LeakCorner`〔番号で保存、末尾にだけ足す〕・縦の筋・揺れ・一瞬光る回数）。絵は実行中にコードで作る（横の帯 64×128・角 128×128・筋 256×32）。重ね方は **`CT/UI Screen`**（`Assets/Shaders/UIScreen.shader`、`Blend One OneMinusSrcColor`＝スクリーン。マテリアル `Resources/Presentation/Materials/Mat_UI_Screen`、`PresentationPresetBuilder` が作る）。並びは グラデーション → 光漏れ → 縁（はみ出した光は縁で消える）。範囲の物に **RectMask2D**（揺れてずれた帯が左右の帯の上に出たため）。`Lerp` は全体の強さだけを混ぜ、形と色は光漏れのある側。揺れは `Time.unscaledTime`＋Perlin、一瞬光るは間をばらつかせる（`System.Random` を 1 つ使い回す）。`IsLensNeutral` で層を隠す。
 - 段階 3：映画の字幕（`Camera/SubtitleStyle`＋`CinemaMode.ShowMovieSubtitle`）。帯の字幕（会話の「シネマ演出で出す」が1文字ずつ書く `subtitle`）とは**別の文字**にした（会話の形を変えないため）。置き場所は Viewport（＝カメラの rect。中の割合で決める。はじめ画面全体の割合で計算して幅が狭くなった）。フォントは実行中に `TMP_FontAsset.CreateFontAsset`（動的、保存しない＝再生でアセットが書き換わらない。static にキャッシュ、SubsystemRegistration でリセット）、マテリアルは縁取り＋Underlay の複製（CinemaMode が持って消す）。部品の `style` の既定は帯（0）、`Reset` で映画（前からある部品の見た目を変えないため）。root を隠す判定に `MovieAlpha` も入れた。
-- 確かめ用：`PresentationDirector.LensVisible`・`LeakFlashAmount`・`FlashLeakNow()`、`MoodPreset.EditorSetEdge` / `EditorSetLeak(MoodValues)`。
+- 段階 4：レンズフレア。`LensSun`「太陽（レンズフレア）」（static の一覧、`Current`＝強い方。OnEnable／OnDisable で `PresentationDirector.RefreshLens()`）。色調の `flare`（倍率。**何もしない値は 1**＝`Neutral` も 1。前からあるプリセットは初期値 1 が入る）。レンズの層は `IsLensNeutral` でも太陽があれば出す（`WantsFlare`）。毎フレーム `cam.WorldToViewportPoint` → 範囲の中の位置、ゴーストは位置×`GhostT`（中心の反対側へ）。範囲の外は `reach` で薄く。かぶり（範囲いっぱいの白・スクリーン）→ ゴースト 6 → 太陽の光 の順。Unity の Lens Flare (SRP) は 2D でエラーが出る報告があるので使わない。重さ（Test_Mapchip、縁＋光漏れ＋フレア全部）：処理 p50 2.40 → 2.52ms、ドローコール 12 → 23（`PerfLog` の `lens_none`・`lens_all`）。
+- 確かめ用：`PresentationDirector.LensVisible`・`FlareVisible`・`LeakFlashAmount`・`FlashLeakNow()`、`MoodPreset.EditorSetEdge` / `EditorSetLeak(MoodValues)`。
 
 ## 書くときの注意
 - イベントの部品は **1ファイル1クラス**（MonoBehaviour はファイル名とクラス名が合わないとシーンに保存できない）。

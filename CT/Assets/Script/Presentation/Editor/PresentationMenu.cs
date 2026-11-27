@@ -27,6 +27,13 @@ public static class PresentationMenu
         go.AddComponent<ScenePresentation>();
     }
 
+    [MenuItem("GameObject/演出/太陽（レンズフレア）", false, 33)]
+    private static void CreateLensSun(MenuCommand command)
+    {
+        GameObject go = Place(command, "太陽（レンズフレア）");
+        go.AddComponent<LensSun>();
+    }
+
     [MenuItem("GameObject/演出/場面の光（点の光）", false, 31)]
     private static void CreatePointLight(MenuCommand command)
     {

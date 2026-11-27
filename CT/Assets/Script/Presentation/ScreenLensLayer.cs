@@ -16,6 +16,7 @@ using UnityEngine.UI;
 /// ・縁をぼかす：4:3 の端を左右の帯の色へなめらかに消す（角の丸みつき）
 /// ・上下のグラデーション：上（下）から色をかぶせる（空を落とす・地面を明るくかすませる）
 /// ・光漏れ：左右の帯・角の焼け・縦の筋を「スクリーン」（CT/UI Screen）で重ね、ゆっくり揺らし、ときどき一瞬強く光らせる
+/// ・レンズフレア：場面の「太陽（LensSun）」の画面の位置に白い光、画面の中心を通る線の上に六角形・玉・虹の輪、全体のかぶり
 /// ・並び順はマップの上・HUD の下（-10）。暗転の幕・1枚絵・会話・シネマの帯はこの上に出る
 public class ScreenLensLayer : MonoBehaviour
 {
@@ -69,6 +70,30 @@ public class ScreenLensLayer : MonoBehaviour
     private float nextFlash = -1.0f;
     private float flashStart = -10.0f;
 
+    // レンズフレア（太陽）：ゴーストは太陽 → 画面の中心 → 反対側 の線の上に並ぶ
+    private enum GhostShape { Hex, Dot, Ring }
+    private static readonly float[] GhostT = { 0.55f, 0.25f, -0.15f, -0.45f, -0.62f, -0.95f };
+    private static readonly float[] GhostSize = { 0.10f, 0.035f, 0.06f, 0.32f, 0.05f, 0.26f };
+    private static readonly GhostShape[] GhostShapes = { GhostShape.Hex, GhostShape.Dot, GhostShape.Dot, GhostShape.Hex, GhostShape.Dot, GhostShape.Ring };
+    private static readonly Color[] GhostColor =
+    {
+        new Color(1.0f, 0.75f, 0.45f, 0.18f),
+        new Color(1.0f, 0.6f, 0.3f, 0.5f),
+        new Color(0.9f, 0.5f, 1.0f, 0.3f),
+        new Color(0.55f, 0.45f, 1.0f, 0.14f),
+        new Color(1.0f, 0.55f, 0.35f, 0.35f),
+        new Color(1.0f, 1.0f, 1.0f, 0.35f),
+    };
+    private const int GlowTex = 128, HexTex = 64, DotTex = 32, RingTex = 128;
+
+    private Image flareVeil, flareGlow;
+    private readonly Image[] ghosts = new Image[6];
+    private Texture2D glowTexture, hexTexture, dotTexture, ringTexture;
+    private Sprite glowSprite, hexSprite, dotSprite, ringSprite;
+
+    /// <summary> レンズフレアを出しているか（確かめ用） </summary>
+    public bool FlareShown { get; private set; }
+
     private Camera cam;
     private Rect lastPixelRect;
     private MoodValues values = MoodValues.Neutral;
@@ -101,10 +126,11 @@ public class ScreenLensLayer : MonoBehaviour
     public void Apply(MoodValues v)
     {
         values = v;
-        bool show = !v.IsLensNeutral;
+        bool show = !v.IsLensNeutral || WantsFlare();
         if(!show)
         {
             if(root != null && root.activeSelf) { root.SetActive(false); }
+            FlareShown = false;
             return;
         }
         if(root == null) { Build(); }
@@ -132,6 +158,9 @@ public class ScreenLensLayer : MonoBehaviour
         // 光漏れ
         LayoutLeak();
         AnimateLeak();
+
+        // レンズフレア
+        UpdateFlare();
     }
 
     //=====================================================================
@@ -143,6 +172,161 @@ public class ScreenLensLayer : MonoBehaviour
         if(root == null || !root.activeSelf) { return; }
         FitToCamera(false);
         if(values.leak >= 0.001f) { AnimateLeak(); }
+        if(flareGlow != null && (flareGlow.enabled || WantsFlare())) { UpdateFlare(); }
+    }
+
+    //=====================================================================
+    // レンズフレア（太陽）
+    //=====================================================================
+
+    private bool WantsFlare()
+    {
+        return cam != null && values.flare > 0.001f && LensSun.Current != null;
+    }
+
+    /// <summary> 太陽の画面の位置からフレアを並べる（毎フレーム。確保なし） </summary>
+    private void UpdateFlare()
+    {
+        if(flareGlow == null) { return; }
+        LensSun sun = WantsFlare() ? LensSun.Current : null;
+        float k = sun != null ? sun.Strength * values.flare : 0.0f;
+
+        // 太陽がマップの映る範囲のどこか（0〜1。外は 0 未満・1 より上）
+        Vector3 vp = sun != null ? cam.WorldToViewportPoint(sun.transform.position) : Vector3.zero;
+        float dx = Mathf.Max(0.0f, Mathf.Abs(vp.x - 0.5f) - 0.5f);
+        float dy = Mathf.Max(0.0f, Mathf.Abs(vp.y - 0.5f) - 0.5f);
+        float outside = Mathf.Max(dx, dy);
+        float vis = sun == null ? 0.0f : (outside <= 0.0f ? 1.0f : (sun.Reach <= 0.001f ? 0.0f : 1.0f - Mathf.Clamp01(outside / sun.Reach)));
+        vis = vis * vis * (3.0f - 2.0f * vis);
+        float a = Mathf.Clamp01(k) * vis;
+        bool on = a > 0.002f;
+        FlareShown = on;
+
+        flareGlow.enabled = on;
+        flareVeil.enabled = on && sun.Veil > 0.001f;
+        bool ghostsOn = on && sun.GhostStrength > 0.001f && !PresentationEase.IsLowQuality;
+        for(int i = 0; i < ghosts.Length; i++) { ghosts[i].enabled = ghostsOn; }
+        if(!on) { return; }
+
+        float w = Mathf.Max(1.0f, lastPixelRect.width), h = Mathf.Max(1.0f, lastPixelRect.height);
+        var local = new Vector2((vp.x - 0.5f) * w, (vp.y - 0.5f) * h);
+        float t = Time.unscaledTime;
+        float shimmer = 1.0f + 0.06f * (Mathf.PerlinNoise(t * 1.7f, 2.2f) * 2.0f - 1.0f);
+
+        // 太陽のまわりの白い光
+        float glow = sun.GlowSize * h * shimmer;
+        RectTransform grt = flareGlow.rectTransform;
+        grt.anchoredPosition = local;
+        grt.sizeDelta = new Vector2(glow, glow);
+        Color gc = sun.Color;
+        gc.a = Mathf.Clamp01(a * (k > 1.0f ? k : 1.0f));
+        flareGlow.color = gc;
+
+        // 全体のかぶり：太陽が画面の真ん中に近いほど強い
+        if(flareVeil.enabled)
+        {
+            float center = Mathf.Clamp01(new Vector2(vp.x - 0.5f, vp.y - 0.5f).magnitude / 0.75f);
+            Color vc = sun.VeilColor;
+            vc.a = Mathf.Clamp01(sun.Veil * a * (1.0f - 0.5f * center));
+            flareVeil.color = vc;
+        }
+
+        // ゴースト
+        if(ghostsOn)
+        {
+            float g = a * sun.GhostStrength;
+            for(int i = 0; i < ghosts.Length; i++)
+            {
+                RectTransform rt = ghosts[i].rectTransform;
+                rt.anchoredPosition = local * GhostT[i];
+                float s = GhostSize[i] * h;
+                rt.sizeDelta = new Vector2(s, s);
+                Color c = GhostColor[i];
+                c.a = Mathf.Clamp01(c.a * g);
+                ghosts[i].color = c;
+            }
+        }
+    }
+
+    /// <summary> レンズフレアの絵を作る（実行中に 1 回） </summary>
+    private void BuildFlare()
+    {
+        glowTexture = NewTexture("フレア・太陽の光（実行中）", GlowTex, GlowTex, (u, v) =>
+        {
+            float x = u * 2.0f - 1.0f, y = v * 2.0f - 1.0f;
+            float r = Mathf.Sqrt(x * x + y * y);
+            float core = Mathf.Pow(Mathf.Clamp01(1.0f - r * 3.0f), 1.5f);
+            float halo = Mathf.Pow(Mathf.Clamp01(1.0f - r), 2.5f) * 0.7f;
+            float rays = Mathf.Pow(Mathf.Abs(Mathf.Cos(Mathf.Atan2(y, x) * 3.0f)), 40.0f) * Mathf.Clamp01(1.0f - r) * 0.3f;
+            return Mathf.Clamp01(core + halo + rays);
+        });
+        glowSprite = Sprite.Create(glowTexture, new Rect(0, 0, GlowTex, GlowTex), new Vector2(0.5f, 0.5f), 100.0f);
+
+        hexTexture = NewTexture("フレア・六角形（実行中）", HexTex, HexTex, (u, v) =>
+        {
+            float x = Mathf.Abs(u * 2.0f - 1.0f), y = Mathf.Abs(v * 2.0f - 1.0f);
+            float hd = Mathf.Max(x * 0.866f + y * 0.5f, y);
+            float body = Mathf.Clamp01((0.95f - hd) / 0.22f);
+            float rim = 0.6f + 0.4f * Mathf.Clamp01((hd - 0.5f) / 0.4f);
+            return body * rim;
+        });
+        hexSprite = Sprite.Create(hexTexture, new Rect(0, 0, HexTex, HexTex), new Vector2(0.5f, 0.5f), 100.0f);
+
+        dotTexture = NewTexture("フレア・玉（実行中）", DotTex, DotTex, (u, v) =>
+        {
+            float x = u * 2.0f - 1.0f, y = v * 2.0f - 1.0f;
+            return Mathf.Pow(Mathf.Clamp01(1.0f - Mathf.Sqrt(x * x + y * y)), 1.5f);
+        });
+        dotSprite = Sprite.Create(dotTexture, new Rect(0, 0, DotTex, DotTex), new Vector2(0.5f, 0.5f), 100.0f);
+
+        // 虹の輪：外が赤・内が紫（色つきの絵。不透明さは輪の形）
+        ringTexture = new Texture2D(RingTex, RingTex, TextureFormat.RGBA32, false) { wrapMode = TextureWrapMode.Clamp, name = "フレア・虹の輪（実行中）" };
+        var rp = new Color32[RingTex * RingTex];
+        for(int y = 0; y < RingTex; y++)
+        {
+            for(int x = 0; x < RingTex; x++)
+            {
+                float fx = (x + 0.5f) / RingTex * 2.0f - 1.0f, fy = (y + 0.5f) / RingTex * 2.0f - 1.0f;
+                float r = Mathf.Sqrt(fx * fx + fy * fy);
+                float band = Mathf.InverseLerp(0.68f, 0.96f, r);
+                float alpha = r < 0.68f || r > 0.96f ? 0.0f : Mathf.Sin(band * Mathf.PI);
+                Color c = Color.HSVToRGB(Mathf.Lerp(0.78f, 0.0f, band), 0.85f, 1.0f);
+                rp[y * RingTex + x] = new Color32((byte)(c.r * 255), (byte)(c.g * 255), (byte)(c.b * 255), (byte)(alpha * 255.0f));
+            }
+        }
+        ringTexture.SetPixels32(rp);
+        ringTexture.Apply(false, true);
+        ringSprite = Sprite.Create(ringTexture, new Rect(0, 0, RingTex, RingTex), new Vector2(0.5f, 0.5f), 100.0f);
+
+        // かぶり（範囲いっぱいの白。色で決める）→ ゴースト → 太陽の光 の順に重ねる
+        flareVeil = NewImage("フレア・かぶり", null);
+        Stretch(flareVeil.rectTransform);
+        for(int i = 0; i < ghosts.Length; i++)
+        {
+            Sprite s = GhostShapes[i] == GhostShape.Hex ? hexSprite : (GhostShapes[i] == GhostShape.Ring ? ringSprite : dotSprite);
+            ghosts[i] = NewImage("フレア・ゴースト " + i, s);
+            SetCentered(ghosts[i].rectTransform);
+        }
+        flareGlow = NewImage("フレア・太陽の光", glowSprite);
+        SetCentered(flareGlow.rectTransform);
+
+        if(screenMaterial != null)
+        {
+            flareVeil.material = screenMaterial;
+            flareGlow.material = screenMaterial;
+            for(int i = 0; i < ghosts.Length; i++) { ghosts[i].material = screenMaterial; }
+        }
+        flareVeil.enabled = false;
+        flareGlow.enabled = false;
+        for(int i = 0; i < ghosts.Length; i++) { ghosts[i].enabled = false; }
+    }
+
+    private static void SetCentered(RectTransform rt)
+    {
+        rt.anchorMin = rt.anchorMax = new Vector2(0.5f, 0.5f);
+        rt.pivot = new Vector2(0.5f, 0.5f);
+        rt.anchoredPosition = Vector2.zero;
+        rt.sizeDelta = Vector2.zero;
     }
 
     //=====================================================================
@@ -424,6 +608,9 @@ public class ScreenLensLayer : MonoBehaviour
         // 光漏れ（グラデーションの上・縁の下：縁の外へはみ出した光は縁で消える）
         BuildLeak();
 
+        // レンズフレア（光漏れの上・縁の下）
+        BuildFlare();
+
         // 縁（9 分割。中は透明）
         int size = EdgeCorner * 2 + 1;
         edgeTexture = new Texture2D(size, size, TextureFormat.RGBA32, false) { wrapMode = TextureWrapMode.Clamp, name = "画面の縁（実行中）" };
@@ -511,5 +698,13 @@ public class ScreenLensLayer : MonoBehaviour
         if(burnTexture != null) { Destroy(burnTexture); }
         if(streakSprite != null) { Destroy(streakSprite); }
         if(streakTexture != null) { Destroy(streakTexture); }
+        if(glowSprite != null) { Destroy(glowSprite); }
+        if(glowTexture != null) { Destroy(glowTexture); }
+        if(hexSprite != null) { Destroy(hexSprite); }
+        if(hexTexture != null) { Destroy(hexTexture); }
+        if(dotSprite != null) { Destroy(dotSprite); }
+        if(dotTexture != null) { Destroy(dotTexture); }
+        if(ringSprite != null) { Destroy(ringSprite); }
+        if(ringTexture != null) { Destroy(ringTexture); }
     }
 }
