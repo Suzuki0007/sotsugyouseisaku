@@ -35530,13 +35530,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 918382029}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f3f2f4d122930ac4898b6cf91afdf240, type: 3}
+  m_Script: {fileID: 11500000, guid: 723fdb3e16cd78f40aaf06dc02edad71, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::SetActiveEventAction
-  show: []
-  hide:
-  - {fileID: 1589054275}
-  revertOnExit: 0
+  m_EditorClassIdentifier: Assembly-CSharp::StillCloseEventAction
+  seconds: 1
+  waitUntilDone: 1
 --- !u!114 &918382036
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -35566,7 +35564,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1d06401cabaabc940bb0f40e1306b877, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WaitEventAction
-  seconds: 1.5
+  seconds: 3
   ignoreTimeScale: 0
 --- !u!114 &918382038
 MonoBehaviour:
@@ -35577,13 +35575,25 @@ MonoBehaviour:
   m_GameObject: {fileID: 918382029}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f3f2f4d122930ac4898b6cf91afdf240, type: 3}
+  m_Script: {fileID: 11500000, guid: e2cac4ee5f1899e4f8db76c94e12b61f, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::SetActiveEventAction
-  show:
-  - {fileID: 1589054275}
-  hide: []
-  revertOnExit: 0
+  m_EditorClassIdentifier: Assembly-CSharp::StillShowEventAction
+  sprite: {fileID: 21300000, guid: 2336dfcf51a69d4499747e836ef5c082, type: 3}
+  fadeSeconds: 1
+  motion: 5
+  motionSeconds: 9
+  scaleFrom: 1.35
+  scaleTo: 1.15
+  panFrom: -1
+  panTo: 1
+  closeMode: 2
+  showSeconds: 5
+  closeSeconds: 1
+  area: 1
+  fit: 0
+  background: 0
+  holdCinemaBars: 1
+  waitUntilDone: 1
 --- !u!114 &918382039
 MonoBehaviour:
   m_ObjectHideFlags: 0

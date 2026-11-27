@@ -107,8 +107,9 @@ public class StillShowEventAction : EventAction
             fadeSeconds = fadeSeconds,
             motion = motion,
             motionSeconds = motionSeconds,
-            scaleFrom = motion == StillView.Motion.ZoomOut ? Mathf.Max(scaleFrom, scaleTo) : Mathf.Min(scaleFrom, scaleTo),
-            scaleTo = motion == StillView.Motion.ZoomOut ? Mathf.Min(scaleFrom, scaleTo) : Mathf.Max(scaleFrom, scaleTo),
+            // 見上げるは始め・終わりの大きさをそのまま（寄ったまま少し引く、など）
+            scaleFrom = motion == StillView.Motion.LookUp ? scaleFrom : (motion == StillView.Motion.ZoomOut ? Mathf.Max(scaleFrom, scaleTo) : Mathf.Min(scaleFrom, scaleTo)),
+            scaleTo = motion == StillView.Motion.LookUp ? scaleTo : (motion == StillView.Motion.ZoomOut ? Mathf.Min(scaleFrom, scaleTo) : Mathf.Max(scaleFrom, scaleTo)),
             panFrom = panFrom,
             panTo = panTo,
             area = area,
