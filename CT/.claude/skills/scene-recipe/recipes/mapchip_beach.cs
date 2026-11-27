@@ -88,6 +88,10 @@ System.Action<int, int, int, int, int[], int[], int[]> BuildRoom = (x0, x1, y0, 
 BuildRoom(8, 16, 14, 20, new[]{ 11, 12 }, new int[0], new[]{ 16, 17 });
 // 部屋 B（奥の広間・見せ場）：左の辺の y16〜17 が廊下から、下の辺 lx26〜28 は崩れて開いている
 BuildRoom(20, 35, 15, 22, new[]{ 26, 27, 28 }, new[]{ 16, 17 }, new int[0]);
+// 段階 2（11-27）：崩れた所の両脇（lx25・29）は壁が 1 段低い（上の段の面と縁を外し、1 段目の上に縁）。開いた所が「切った穴」ではなく崩れた跡に見える
+foreach (int x in new[]{ 25, 29 }) {
+  lFace.SetTile(new UnityEngine.Vector3Int(OX + x, 14, 0), null); lRimA.SetTile(new UnityEngine.Vector3Int(OX + x, 15, 0), null);
+  Put(lRimA, x, 14, rimD); }
 // 廊下 A↔B（lx17〜19・床 y16〜17）：部屋と同じ形の壁（11-27 段階 1。前は上下とも細い縁だけで、線に見えた）
 //  奥＝面 2 段（y18〜19）＋上面の縁（y20 の下の端）、手前＝上面の縁（y16 の下の端）＋外側の面 2 段（y14〜15）＋その下の影
 for (int x = 17; x <= 19; x++) {
@@ -101,16 +105,21 @@ System.Action<float, float, float> SandBlob = (cx, cy, r) => {
     float d = UnityEngine.Mathf.Sqrt((x + 0.5f - cx) * (x + 0.5f - cx) + (y + 0.5f - cy) * (y + 0.5f - cy));
     if (d < r - Hash(x, y) * 1.1f && lFloor.HasTile(new UnityEngine.Vector3Int(OX + x, y, 0))) Put(lSand, x, y, sand); } };
 SandBlob(27.5f, 15.2f, 3.2f);
-SandBlob(8.6f, 14.4f, 2.0f);
+// 段階 2（11-27）：部屋 A の左下の砂はやめた（崩れていない部屋の隅に四角い砂があり、遺跡の暗い色味で床の穴に見えた）。
+// 床の上の砂は少し暗く・暖かくして、明るい穴ではなく「積もった砂」に見せる
+lSand.color = new UnityEngine.Color(0.8f, 0.74f, 0.64f, 1f);
 
 // ---- 石畳の道：西の入口（y8〜9）から東へ → 北へ曲がって部屋 A の扉へ。ところどころ砂に埋もれて途切れる ----
 var path = new System.Collections.Generic.List<UnityEngine.Vector2Int>();
 for (int x = 0; x <= 12; x++) { path.Add(new UnityEngine.Vector2Int(x, 8)); path.Add(new UnityEngine.Vector2Int(x, 9)); }
 for (int y = 10; y <= 13; y++) { path.Add(new UnityEngine.Vector2Int(11, y)); path.Add(new UnityEngine.Vector2Int(12, y)); }
-foreach (var p in path) { bool edge = p.x >= 3 && Hash(p.x * 3, p.y * 7) < 0.16f; if (!edge) Put(lFloor, p.x, p.y, stone); }
-// 道のまわりに残った敷石（遺跡のかけら）
-// （11-27：部屋 B の手前の壁の面の下になる (24,13)(25,13)(31,12) は外した）
-foreach (var p in new[]{ new UnityEngine.Vector2Int(5, 10), new UnityEngine.Vector2Int(9, 7), new UnityEngine.Vector2Int(14, 11), new UnityEngine.Vector2Int(13, 9), new UnityEngine.Vector2Int(18, 12) }) Put(lFloor, p.x, p.y, stone);
+// 段階 2（11-27）：前は乱数で道の中のマスも抜いていて、曲がり角の先が 1 マス幅・十字のような形になった。
+// 道は扉まで 2 マス幅のまま通し、外側の辺だけを数マス欠けさせる（まっすぐな縁を崩す）。東の端は 1 枚だけはみ出して途切れる
+var notches = new System.Collections.Generic.HashSet<UnityEngine.Vector2Int>{ new UnityEngine.Vector2Int(3, 9), new UnityEngine.Vector2Int(4, 9), new UnityEngine.Vector2Int(8, 8), new UnityEngine.Vector2Int(12, 11) };
+foreach (var p in path) if (!notches.Contains(p)) Put(lFloor, p.x, p.y, stone);
+// 道のまわりに残った敷石：(11-27) 部屋 B の手前の壁の面の下になる (24,13)(25,13)(31,12)、道から離れて浮いていた (14,11)(18,12)、
+// 道の辺から飛び出して十字に見えた (5,10)(9,7) を外した。残すのは東の端の 1 枚だけ
+Put(lFloor, 13, 9, stone);
 
 // ---- 崩れた壁のかけら（何もない砂浜に目印を置く）：壁の面 1 段＋上面の縁。歩けない形はあとで ----
 // 11-27 段階 1：面の段の左右にも縁を描いていた（上面ではない所に上面が出て、線で囲んだように見えた）のをやめた。
@@ -221,6 +230,35 @@ var gSmall = Gear("見せ場 小歯車", gear1, OX + 33.4f, 17.4f, 1.3f, 40f, tr
 System.Action<DepthProp> LogProp = p => { UnityEngine.Rect r; float line; p.TryGetFootprint(out r); p.TryGetSortLine(out line); Log.Append("depth ").Append(p.name).Append(" footprint=").Append(r).Append(" line=").Append(line.ToString("0.##")).Append("\n"); };
 LogProp(DepthPropEditor.Wrap(new[]{ gBig, gMid }, "見せ場 大歯車と中歯車（奥行き）", false));
 LogProp(DepthPropEditor.Wrap(new[]{ gSmall }, "見せ場 小歯車（奥行き）", false));
+// 段階 2（11-27）：部屋 A にも見せ場を 1 つ（奥の壁に立てかけた中くらいの歯車。たいまつの明かりが当たる）
+var gA = Gear("部屋 A の見せ場 立てかけた歯車", gear2, OX + 10.4f, 20.1f, 1.7f, 0f, true, white);
+LogProp(DepthPropEditor.Wrap(new[]{ gA }, "部屋 A の見せ場（奥行き）", false));
+
+// ---- 段階 2（11-27）がれき：壁の色に近い小さなかけら（Kabe.1 を小さくした絵）を、壁・崩れた所の近くに「落ちた」ように散らす ----
+// 崩れた辺ほど多く、1 種類を固めない・線や四角に並べない（崖の作り方の解説）。平らな小物（並び順 5）なので歩ける
+var rubble = NewGO(props, "がれき（壁のかけら）", UnityEngine.Vector3.zero).transform;
+int rubbleCount = 0;
+System.Action<float, float, int, float> Rubble = (cx, cy, n, spread) => {
+  for (int i = 0; i < n; i++) {
+    float hx = Hash((int)(cx * 10) + i * 7, (int)(cy * 10) + i * 13), hy = Hash((int)(cy * 10) + i * 11, (int)(cx * 10) - i * 5);
+    float x = OX + cx + (hx - 0.5f) * 2f * spread, y = cy + (hy - 0.5f) * 2f * spread * 0.6f;
+    float s = 0.16f + Hash(i * 31, (int)(cx * 7)) * 0.2f;
+    var g = NewGO(rubble, "がれき", new UnityEngine.Vector3(x, y, 0f));
+    g.transform.localScale = new UnityEngine.Vector3(s, s * (0.7f + hy * 0.4f), 1f);
+    g.transform.rotation = UnityEngine.Quaternion.Euler(0, 0, hx > 0.5f ? 90f : 0f);
+    var sr = g.AddComponent<UnityEngine.SpriteRenderer>(); sr.sprite = UnityEditor.AssetDatabase.LoadAssetAtPath<UnityEngine.Sprite>(Chip + "Kabe.1.png");
+    sr.sharedMaterial = litMat; sr.sortingOrder = 5; float c = 0.72f + hx * 0.18f; sr.color = new UnityEngine.Color(c, c * 0.97f, c * 0.93f, 1f);
+    var ds = g.AddComponent<DropShadow2D>(); SetProp(ds, "strength", 0.25f); SetProp(ds, "offset", new UnityEngine.Vector2(0.03f, -0.04f)); SetProp(ds, "shadowOrder", 4);
+    rubbleCount++; } };
+Rubble(25.6f, 12.3f, 5, 0.9f);    // 部屋 B の崩れた所の左（外へこぼれる。面の下の端 y13 より下）
+Rubble(29.4f, 12.2f, 4, 0.8f);    // 崩れた所の右
+Rubble(27.6f, 16.4f, 3, 1.1f);    // 崩れた所の内側（砂の上）
+Rubble(22.3f, 22.3f, 3, 0.6f);    // 部屋 B の奥の壁ぎわ（左）
+Rubble(34.2f, 18.2f, 2, 0.5f);    // 部屋 B の右の壁ぎわ
+Rubble(9.2f, 14.6f, 2, 0.5f);     // 部屋 A の左下の隅
+foreach (var f in fragments) Rubble(f[0] + (f[1] - f[0] + 1) * 0.5f + 0.4f, f[2] - 0.55f, 3, 0.8f);   // 壁のかけらの足もと
+Log.Append("rubble=").Append(rubbleCount).Append("\n");
+
 // 遺跡の入口の脇に倒れた歯車（立てる）
 var gGate = Gear("入口の脇の歯車", gear2, OX + 6.2f, 12.6f, 1.6f, 8f, true, dull);
 LogProp(DepthPropEditor.Wrap(new[]{ gGate }, "入口の脇の歯車（奥行き）", false));
