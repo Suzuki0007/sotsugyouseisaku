@@ -292,6 +292,11 @@ Tone("場所の色味：遺跡の中（部屋 A）", OX + 8, 14f, OX + 17, 21f, 
 Tone("場所の色味：遺跡の中（廊下）", OX + 17, 16f, OX + 20, 18f, ruin, 0.42f, 1);
 Tone("場所の色味：遺跡の中（部屋 B）", OX + 20, 15f, OX + 36, 23f, ruin, 0.42f, 1);
 
+// ---- 段階 3（11-27）地面の色むら（並び順 2・床の格子を目立たなくする）・流れる雲の影（並び順 120・遺跡は屋根がないので全体に） ----
+{ var area = new UnityEngine.Rect(OX, 0f, BW, BH);
+  var tint = MapOverlayMaker.CreateGroundTint(area, 0.45f); tint.transform.SetParent(look, true);
+  var cloud = MapOverlayMaker.CreateCloudShadow(area, 0.25f); cloud.transform.SetParent(look, true); }
+
 // カメラの範囲＝この場所と通り道（x24〜66）。出現位置＝道の上（試すときの入口）
 var camArea = room.transform.Find("カメラの範囲");
 const float camX0 = 23.8f;   // 通り道の端（23.9）まで入れる

@@ -59,6 +59,8 @@ paths:
 - **B 影を付ける** `DropShadow2D`：隠れた子（HideAndDontSave）に影の SpriteRenderer を作る（シーンに保存しない・OnDisable で消す）。並び順は既定 4（床の影）。
 - **C 隅の影** `AutoShade`＋`AutoShadeEditor.Rebuild`：床のマスごとに、上が壁＝薄い、上と横（左右・同じマスに縁）＝濃い。マスはワールド座標経由で合わせる（Grid が違っても合う）。影の層は「床の上の砂」より下（砂に埋もれた床に影が出ないように）。
 - **E 場所の色味** `AreaTone`：範囲は OnEnable で BoxCollider2D から Rect に（再生中は当たり判定を切る）。（11-26 から）演出の窓口 `PresentationDirector` が操作中のキャラの位置で優先度の大きい範囲を選び、光の「範囲」の層に入れる（`AreaToneDriver` は消した。`rules/presentation.md`）。最初の Global Light の値が「元」。`StageDarkness` があるシーンでも働く（暗さはこの上に掛かる）。
+- **地面の色むら** `GroundTint`・**流れる雲の影** `CloudShadow`（11-27、`Docs/マップの見た目の向上プラン.md` 段階 3）：どちらも Tiled の SpriteRenderer（Sprite-Lit-Default・強さ＝色の不透明さ）。絵は `MapOverlayMaker` が作る（256px・くり返しの周期をもつ値のノイズ。色むら PPU 16＝16 マス、雲 PPU 8＝32 マス＝`CloudShadow.period`）。雲は絵を「範囲＋くり返しの幅×2」の大きさで並べ、LateUpdate で動かして幅で回す（すき間が出ない）。重さ（11-27、Test_Mapchip）：あり 処理 p50 2.71ms・ドローコール 150／なし 2.66ms・147。
+  - 雲の絵の格子は 5（雲 1 つ 5〜7 マス）：はじめ 3 にしたら画面より大きく、画面全体が少し暗いだけに見えた。
 - 見本：Test_Mapchip の「浜辺と遺跡」（たいまつ 4・水面のきらめき 3・夕方の浜辺 0.85・遺跡の中 0.42〔優先度 1〕・隅の影 94 マス・壁の影 9）。シナリオ `mapchip_beach` で色味の切り替えを確かめている。
 
 ## 注意
