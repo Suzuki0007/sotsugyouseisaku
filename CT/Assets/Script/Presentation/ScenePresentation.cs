@@ -90,6 +90,10 @@ public class ScenePresentation : MonoBehaviour
     [Tooltip("見下ろすとき、マップの下の端から塔の外壁が下へ伸びて、かすみに消えるように見せる（マップの絵の下の端が外壁でないときはオフ）")]
     private bool towerWall = true;
 
+    [SerializeField, Label("いつもの画面の縁を使う")]
+    [Tooltip("オン：いつもかける画面の縁（縁のぼかし・上下のグラデーション・周辺の暗さ。Resources/Presentation/ScreenFrame）をこのシーンにもかける／オフ：かけない（画面いっぱいの1枚絵だけの場面など）")]
+    private bool useScreenFrame = true;
+
     [Header("このシーンの光の合わせ方")]
 
     [SerializeField, Label("全体の光の倍率", 0.1f, 4.0f)]
@@ -153,6 +157,7 @@ public class ScenePresentation : MonoBehaviour
         PresentationDirector.SceneGlobalLightScale = globalLightScale;
         Evaluate(out appliedMood, out appliedLight, out appliedWeather, out _);
         PresentationDirector.SetBase(appliedMood, appliedLight, appliedWeather, 0.0f);
+        PresentationDirector.SetFrameSceneDefault(useScreenFrame);
         PresentationDirector.SetSkyMode(skyView, towerWall);
         PresentationDirector.SetBaseSky(sky, 0.0f);
         started = true;

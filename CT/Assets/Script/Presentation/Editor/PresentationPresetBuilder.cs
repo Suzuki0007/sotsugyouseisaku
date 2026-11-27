@@ -60,6 +60,14 @@ public static class PresentationPresetBuilder
         MakeMaterial("Mat_UI_Mood", "CT/UI Mood", log);
         MakeMaterial("Mat_UI_Screen", "CT/UI Screen", log);
 
+        // いつもかける画面の縁（初期値：縁のぼかし 0.04・角の丸み 0.5・周辺の暗さ 0.15）
+        string framePath = Root + "/ScreenFrame.asset";
+        if(AssetDatabase.LoadAssetAtPath<ScreenFrameSettings>(framePath) == null)
+        {
+            AssetDatabase.CreateAsset(ScriptableObject.CreateInstance<ScreenFrameSettings>(), framePath);
+            log.Append("作った ScreenFrame\n");
+        }
+
         // 映画の字幕の見た目（太字の Noto Sans JP）
         string stylePath = Root + "/SubtitleStyle.asset";
         if(AssetDatabase.LoadAssetAtPath<SubtitleStyle>(stylePath) == null)

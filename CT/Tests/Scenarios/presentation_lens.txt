@@ -50,12 +50,13 @@ autosave
 reload
 wait 3
 expect eval PresentationDirector.CurrentSkyName == "Sky_青空"
-# 全部戻す（-111.5, 22.5）：色調・空・太陽が消える
+# 全部戻す（-111.5, 22.5）：色調・空・太陽が消える（いつもの画面の縁は残る）
 warp -111.5,22.5
 wait 1
 key E
 wait 3
-expect eval !PresentationDirector.LensVisible
+expect eval PresentationDirector.CurrentMoodName == ""
+expect eval PresentationDirector.LensVisible && PresentationDirector.FrameWeight > 0.99f
 expect eval PresentationDirector.SkyPresence < 0.01f
 expect eval !PresentationDirector.FlareVisible
 expect idle

@@ -232,6 +232,84 @@ public class PresentationDirector : MonoBehaviour
     private SkyView sky;
 
     //=====================================================================
+    // いつもの画面の縁（ScreenFrameSettings。色調に重ねる）
+    //=====================================================================
+
+    private bool hasMapCamera;
+    private bool frameSceneOn = true;
+    private bool frameEventSet;
+    private bool frameEventOn;
+    private float frameWeight, frameFrom, frameTo, frameTime, frameDuration;
+    private bool frameBlending;
+
+    /// <summary> いつもの画面の縁の今の重さ（0〜1。確かめ用） </summary>
+    public static float FrameWeight => instance != null ? instance.frameWeight : 0.0f;
+
+    /// <summary> シーンの既定（ScenePresentation の「いつもの画面の縁を使う」から。すぐ反映） </summary>
+    public static void SetFrameSceneDefault(bool on)
+    {
+        PresentationDirector d = Get();
+        if(d == null) { return; }
+        d.frameSceneOn = on;
+        d.StartFrame(0.0f);
+    }
+
+    /// <summary> 部品「いつもの画面の縁」：かける／外す（イベントの層。セーブする） </summary>
+    public static void SetFrameForEvent(bool on, float seconds)
+    {
+        PresentationDirector d = Get();
+        if(d == null) { return; }
+        d.frameEventSet = true;
+        d.frameEventOn = on;
+        d.StartFrame(seconds);
+    }
+
+    /// <summary> 部品「いつもの画面の縁（シーンの既定に戻す）」 </summary>
+    public static void ResetFrameForEvent(float seconds)
+    {
+        PresentationDirector d = Get();
+        if(d == null) { return; }
+        d.frameEventSet = false;
+        d.StartFrame(seconds);
+    }
+
+    /// <summary> 色調の見た目をかけ直す（いつもの画面の縁の設定を Inspector で変えたときなど） </summary>
+    public static void RefreshMood()
+    {
+        if(instance != null) { instance.ApplyMood(); }
+    }
+
+    private float FrameTarget => hasMapCamera && (frameEventSet ? frameEventOn : frameSceneOn) ? 1.0f : 0.0f;
+
+    private void StartFrame(float seconds)
+    {
+        frameFrom = frameWeight;
+        frameTo = FrameTarget;
+        frameTime = 0.0f;
+        frameDuration = Mathf.Max(0.0f, seconds);
+        frameBlending = frameDuration > 0.0001f && Mathf.Abs(frameFrom - frameTo) > 0.0001f;
+        if(!frameBlending) { frameWeight = frameTo; }
+        ApplyMood();
+    }
+
+    private void TickFrame(float dt)
+    {
+        if(!frameBlending) { return; }
+        frameTime += dt;
+        float t = Mathf.Clamp01(frameTime / frameDuration);
+        frameWeight = Mathf.Lerp(frameFrom, frameTo, t * t * (3.0f - 2.0f * t));
+        if(frameTime >= frameDuration) { frameWeight = frameTo; frameBlending = false; }
+        ApplyMood();
+    }
+
+    /// <summary> 色調の値に、いつもの画面の縁を重ねた値 </summary>
+    private MoodValues WithFrame(MoodValues m)
+    {
+        ScreenFrameSettings f = ScreenFrameSettings.Current;
+        return f != null ? f.Apply(m, frameWeight) : m;
+    }
+
+    //=====================================================================
     // 空（SkyView に任せる）
     //=====================================================================
 
@@ -289,7 +367,7 @@ public class PresentationDirector : MonoBehaviour
     /// <summary> 太陽（LensSun）が出た・消えたとき：レンズの層を今の色調でかけ直す </summary>
     public static void RefreshLens()
     {
-        if(instance != null && instance.lens != null) { instance.lens.Apply(instance.moodCurrent); }
+        if(instance != null && instance.lens != null) { instance.lens.Apply(instance.WithFrame(instance.moodCurrent)); }
     }
 
     /// <summary> レンズフレアを出しているか（確かめ用） </summary>
@@ -393,7 +471,17 @@ public class PresentationDirector : MonoBehaviour
         {
             if(focus.gameObject.scene == scene && focus.TryGetComponent(out Camera c)) { cam = c; break; }
         }
+        hasMapCamera = cam != null;
         if(cam == null) { cam = Camera.main; }
+
+        // いつもの画面の縁：シーンの既定はオン（ScenePresentation で変わる）。イベントの層はセーブから
+        frameSceneOn = true;
+        frameEventSet = false;
+        string frameSaved = (Save.HasSlot || Save.Count > 0) ? Save.Get(SaveKeyPrefix + scene.name + "/Frame", "") : "";
+        if(frameSaved.Length > 0) { frameEventSet = true; frameEventOn = frameSaved == "1"; }
+        frameBlending = false;
+        frameWeight = FrameTarget;
+
         if(cam != null)
         {
             camData = cam.GetUniversalAdditionalCameraData();
@@ -778,7 +866,7 @@ public class PresentationDirector : MonoBehaviour
     private void ApplyMood()
     {
         if(profile == null) { return; }
-        MoodValues v = moodCurrent;
+        MoodValues v = WithFrame(moodCurrent);
         bool low = PresentationEase.IsLowQuality;
 
         // 会話画面（プリセットの「会話画面にもかける」）
@@ -1189,6 +1277,7 @@ public class PresentationDirector : MonoBehaviour
         TickLight(dt);
         TickWeather(dt);
         if(sky != null) { sky.Tick(dt); }
+        TickFrame(dt);
         if(dialogueMood != null) { dialogueMood.Tick(dt); }
     }
 
@@ -1207,6 +1296,7 @@ public class PresentationDirector : MonoBehaviour
         Save.SetPending(SaveKeyPrefix + scene + "/Light", Encode(d.lightLayers[ev].set, d.lightLayers[ev].preset));
         Save.SetPending(SaveKeyPrefix + scene + "/Weather", Encode(d.weatherLayers[ev].set, d.weatherLayers[ev].preset));
         if(d.sky != null) { Save.SetPending(SaveKeyPrefix + scene + "/Sky", d.sky.EncodeEvent()); }
+        Save.SetPending(SaveKeyPrefix + scene + "/Frame", d.frameEventSet ? (d.frameEventOn ? "1" : "0") : "");
     }
 
     private static string Encode(bool set, Object preset)
