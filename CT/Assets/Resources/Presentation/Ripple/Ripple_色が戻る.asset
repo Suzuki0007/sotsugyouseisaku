@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b44f5685029ca5e41ab64ed4d5eddf25, type: 3}
+  m_Name: "Ripple_\u8272\u304C\u623B\u308B"
+  m_EditorClassIdentifier: Assembly-CSharp::RipplePreset
+  memo: "\u76F4\u3057\u305F\u5834\u6240\u304B\u3089\u5143\u306E\u8272\u304C\u623B\u308B\uFF08\u590F\u306E\u3046\u3061\u306B\u578B\u30FB\u56DE\u60F3\u306A\u3069\u3001\u5143\u306E\u8272\u3092\u6B8B\u3059\u8272\u8ABF\u3067\uFF09"
+  look: 0
+  color: {r: 1, g: 1, b: 1, a: 1}
+  intensity: 0.95
+  radius: 6
+  seconds: 2.5
+  ellipse: 0.75
+  edgeIntensity: 1
+  edgeColor: {r: 0.9, g: 0.95, b: 1, a: 1}
+  edgeWidth: 0.08
+  edgeFadeSeconds: 1
+  after: 0
+  fadeSeconds: 3

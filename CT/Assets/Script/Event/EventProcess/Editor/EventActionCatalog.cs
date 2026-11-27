@@ -46,6 +46,11 @@ public static class EventActionCatalog
         { "FlashbackExitEventAction",  ("会話・演出", "回想から戻る") },
         { "StillShowEventAction",      ("会話・演出", "1枚絵を出す") },
         { "StillCloseEventAction",     ("会話・演出", "1枚絵を閉じる") },
+        { "GestureEventAction",        ("会話・演出", "手の動作を待つ") },
+        { "RippleEventAction",         ("会話・演出", "波紋を広げる") },
+        { "RippleClearEventAction",    ("会話・演出", "波紋を消す") },
+        { "ColorRestoreEventAction",   ("会話・演出", "色の戻り具合を変える") },
+        { "PresentationValueEventAction", ("進行", "演出の数値を変える") },
         { "BgmFlagEventAction",        ("会話・演出", "BGM のフラグ") },
         { "BgmProgressEventAction",    ("会話・演出", "BGM の進み具合") },
 

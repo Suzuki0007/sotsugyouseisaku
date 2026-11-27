@@ -1,0 +1,113 @@
+# 演出の試し用マップ Test_Presentation の東「動作と波紋の広場」（2026-11-27、指示書 CT_presentation_ripple_subtitle_gesture）
+# 砂浜から歩いて入れる・手の動作 3 つを本当の E キーで（回す＝押したまま・長押し・繰り返し 5 回）・波紋（残る・消す）・色の戻り具合・組み合わせの場面 2 つ・ロードで波紋と戻り具合が残る
+scene Test_Presentation
+save on
+wait 2
+# 砂浜の東の端から右へ歩くと広場に入れる
+warp -109.0,28.3
+wait 1
+key RightArrow 1500
+wait 1
+expect eval PlayerSwitchManager.Instance.CurrentPlayer.transform.position.x > -107.0f
+# 回す（最後のひと巻き）：E を押したまま。最後の 1 割は重い
+warp -105.0,34.6
+wait 1
+key E 10000
+wait 1
+expect eval PresentationValues.Get("見本_回す") > 0.99f
+expect eval !GestureEventAction.IsBusy
+# 長押し（手を伸ばす）
+warp -100.6,34.6
+wait 1
+key E 9000
+wait 1
+expect eval PresentationValues.Get("見本_長押し") > 0.99f
+expect eval !GestureEventAction.IsBusy
+# 繰り返し（墓を掘る）：調べる 1 回 → 5 回押す（間を空けて）。墓標が 1 つずつ立つ
+warp -96.2,34.6
+wait 1
+key E
+wait 1
+key E
+wait 1.2
+key E
+wait 1.2
+key E
+wait 1.2
+capture gesture_repeat_3
+key E
+wait 1.2
+key E
+wait 1.5
+expect eval PresentationValues.Get("見本_繰り返し") > 4.5f
+expect eval !GestureEventAction.IsBusy
+# 波紋：色が戻る・光が灯る（残す ID つき）
+warp -105.0,30.0
+wait 1
+key E
+wait 3
+expect eval RippleSystem.Has("見本_色が戻る")
+warp -100.6,30.0
+wait 1
+key E
+wait 3
+expect eval RippleSystem.Has("見本_光が灯る")
+capture ripple_two
+# 色の戻り具合 +0.25 を 2 回
+warp -105.0,25.0
+wait 1
+key E
+wait 3
+key E
+wait 3
+expect eval UnityEngine.Mathf.Abs(PresentationDirector.RestoreAmount - 0.5f) < 0.01f
+capture restore_half
+# ロードしても、残る波紋と色の戻り具合はそのまま
+autosave
+reload
+wait 3
+expect eval RippleSystem.Has("見本_色が戻る") && RippleSystem.Has("見本_光が灯る")
+expect eval UnityEngine.Mathf.Abs(PresentationDirector.RestoreAmount - 0.5f) < 0.01f
+# 波紋を全部消す・戻り具合を 0 に
+warp -96.2,30.0
+wait 1
+key E
+wait 2.5
+expect eval RippleSystem.Count == 0
+warp -102.2,25.0
+wait 1
+key E
+wait 2
+expect eval PresentationDirector.RestoreAmount < 0.01f
+# 組み合わせ①：埋葬の記憶（回想に入る → 5 回掘る → 字幕 → 戻る）。回想中は RippleSpot の波紋が出る
+warp -99.2,25.0
+wait 1
+key E
+wait 3
+expect flag Flag_Flashback_Active on
+expect eval GestureEventAction.IsBusy
+key E
+wait 1.2
+key E
+wait 1.2
+key E
+wait 1.2
+key E
+wait 1.2
+key E
+wait 1
+expect eval PresentationValues.Get("見本_埋葬") > 4.5f
+capture burial_memory
+wait idle
+expect flag Flag_Flashback_Active off
+# 組み合わせ②：最後のひと巻き（回す → 半分・9 割で字幕 → 時計から光が灯る）
+warp -95.8,25.0
+wait 1
+key E 10000
+expect eval PresentationValues.Get("見本_ひと巻き") > 0.99f
+wait 1
+capture last_wind
+expect eval RippleSystem.Count >= 1
+wait idle
+expect idle
+expect no-error

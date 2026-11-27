@@ -84,6 +84,16 @@ public class ScenePresentation : MonoBehaviour
     [Tooltip("光のプリセット（青い夜など）を使っている間だけ、全体の光の強さをこの倍率にする。絵が暗いシーン（塔の中など）で、同じプリセットでも青い夜に見えるように上げる。光のプリセットを使っていないときは効かない（今の見た目は変わらない）")]
     private float globalLightScale = 1.0f;
 
+    [Header("色の戻り具合（波紋で直すほど色が戻る）")]
+
+    [SerializeField, Label("色が戻ったときの色調")]
+    [Tooltip("部品「色の戻り具合を変える」で割合を上げると、既定の色調からこの色調へ近づく（全部直すと 1）。空なら色調は変えない")]
+    private MoodPreset restoredMood;
+
+    [SerializeField, Label("色が戻ったときの光")]
+    [Tooltip("同じく、既定の光からこの光へ近づく。空なら光は変えない")]
+    private LightPreset restoredLight;
+
     [Header("条件で変える")]
 
     [SerializeField]
@@ -109,6 +119,8 @@ public class ScenePresentation : MonoBehaviour
     public LightPreset DefaultLight => lightPreset;
     public WeatherPreset DefaultWeather => weather;
     public IReadOnlyList<Rule> Rules => rules;
+    public MoodPreset RestoredMood => restoredMood;
+    public LightPreset RestoredLight => restoredLight;
 
     //=====================================================================
     // 初期化

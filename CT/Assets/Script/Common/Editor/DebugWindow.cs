@@ -115,6 +115,7 @@ public class DebugWindow : EditorWindow
     private List<LightPreset> lightPresets;
     private List<WeatherPreset> weatherPresets;
     private List<FlashbackPreset> flashbackPresets;
+    private List<RipplePreset> ripplePresets;
 
     /// <summary>
     /// 色調・光・天候・回想のプリセットを一覧から選んで、その場で切り替える（部品と同じ「イベント」の層に入れる）
@@ -130,6 +131,7 @@ public class DebugWindow : EditorWindow
                 lightPresets = PresentationDirector.All<LightPreset>();
                 weatherPresets = PresentationDirector.All<WeatherPreset>();
                 flashbackPresets = PresentationDirector.All<FlashbackPreset>();
+                ripplePresets = PresentationDirector.All<RipplePreset>();
             }
 
             EditorGUILayout.HelpBox(PresentationDirector.Describe(), MessageType.None);
@@ -166,6 +168,19 @@ public class DebugWindow : EditorWindow
             bool bands = EditorGUILayout.ToggleLeft("塗り替えの境目を表示（色の段ごとに 紺・青・水色・黄・橙・赤 で塗る。光の中が黄色の段に入っているかを見る）", PresentationDirector.ShowRemapBands);
             if(bands != PresentationDirector.ShowRemapBands) { PresentationDirector.ShowRemapBands = bands; }
             EditorGUILayout.LabelField("色調の「塗り替え」の値は、今使っている色調ならいじるとすぐ反映されます。ほかの値は、もう一度押すと反映されます。", EditorStyles.miniLabel);
+
+            // 波紋・色の戻り具合・手の動作（11-27）
+            if(ripplePresets == null) { ripplePresets = PresentationDirector.All<RipplePreset>(); }
+            PresetRow("波紋（操作中のキャラの位置に出す。残さない）", ripplePresets, p =>
+                {
+                    PlayerSwitchManager psm = PlayerSwitchManager.Instance;
+                    if(psm != null && psm.CurrentPlayer != null) { RippleSystem.Spawn(p, psm.CurrentPlayer.transform.position, p.Seconds); }
+                },
+                "全部消す", () => RippleSystem.Clear("", presentationSeconds));
+            EditorGUILayout.LabelField($"今ある波紋：{RippleSystem.Count}", EditorStyles.miniLabel);
+            float restore = EditorGUILayout.Slider("色の戻り具合（セーブに残る）", PresentationDirector.RestoreAmount, 0.0f, 1.0f);
+            if(!Mathf.Approximately(restore, PresentationDirector.RestoreAmount)) { PresentationDirector.SetRestoreAmount(restore, false, 0.0f); }
+            EditorGUILayout.LabelField(GestureEventAction.IsBusy ? $"手の動作：待っている（進み具合 {GestureEventAction.CurrentProgress:P0}）" : "手の動作：なし", EditorStyles.miniLabel);
         }
         EditorGUILayout.EndFoldoutHeaderGroup();
     }

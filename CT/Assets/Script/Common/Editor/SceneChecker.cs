@@ -97,6 +97,7 @@ public static class SceneChecker
         }
 
         bool anyEnter = false, anyExit = false, anyStillByAction = false, anyStillClose = false;
+        var rippleIds = new Dictionary<string, int>();
         foreach(EventSequence sequence in ctx.Find<EventSequence>())
         {
             bool inFlashback = false;
@@ -126,8 +127,30 @@ public static class SceneChecker
                     case StillCloseEventAction _:
                         anyStillClose = true;
                         break;
+                    case GestureEventAction gesture when gesture.Preset == null:
+                        ctx.Add(Level.Error, gesture, "部品「手の動作を待つ」の手触りのプリセットが空です（待たずに次へ進みます）");
+                        break;
+                    case RippleEventAction ripple:
+                        if(ripple.Preset == null) { ctx.Add(Level.Error, ripple, "部品「波紋を広げる」の波紋のプリセットが空です（何も出ません）"); }
+                        if(!string.IsNullOrEmpty(ripple.Id))
+                        {
+                            if(!rippleIds.TryGetValue(ripple.Id, out int n)) { n = 0; }
+                            rippleIds[ripple.Id] = n + 1;
+                        }
+                        break;
                 }
             }
+        }
+        foreach(var pair in rippleIds)
+        {
+            if(pair.Value > 1)
+            {
+                ctx.Add(Level.Info, null, $"波紋の残す ID「{pair.Key}」が {pair.Value} か所の部品で使われています（同じ ID は後から出した波紋で置き換わります。別の場所なら別の ID に）");
+            }
+        }
+        foreach(RippleSpot spot in ctx.Find<RippleSpot>())
+        {
+            if(spot.Preset == null) { ctx.Add(Level.Error, spot, "残る波紋（フラグで）の波紋のプリセットが空です（何も出ません）"); }
         }
         if(anyEnter && !anyExit)
         {

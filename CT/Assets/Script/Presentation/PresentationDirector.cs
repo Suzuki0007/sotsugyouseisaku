@@ -111,6 +111,39 @@ public class PresentationDirector : MonoBehaviour
     private readonly List<Color> blendColorFrom = new List<Color>();
     private readonly List<Color> blendColorTo = new List<Color>();
     private Color writtenColor;
+
+    // 色の戻り具合（0〜1。シーンの既定の「色が戻ったときの色調・光」へ近づける割合。セーブ Presentation/<シーン>/Restore）
+    private float restoreAmount;
+
+    /// <summary> 今の全体の光（色×強さ）。波紋の「色が戻る」が使う </summary>
+    public static Color CurrentGlobalLight => instance != null && instance.writtenIntensity >= 0.0f ? instance.writtenColor * instance.writtenIntensity : Color.white;
+
+    /// <summary> 今の色の戻り具合 </summary>
+    public static float RestoreAmount => instance != null ? instance.restoreAmount : 0.0f;
+
+    /// <summary> 色の戻り具合を変える（add なら足す）。セーブに残る </summary>
+    public static void SetRestoreAmount(float value, bool add, float seconds)
+    {
+        PresentationDirector d = Get();
+        if(d == null) { return; }
+        d.restoreAmount = Mathf.Clamp01(add ? d.restoreAmount + value : value);
+        string scene = SceneManager.GetActiveScene().name;
+        Save.SetPending(SaveKeyPrefix + scene + "/Restore", d.restoreAmount);
+        d.StartMood(seconds, PresentationCurve.Smooth, false);
+        d.StartLight(seconds, PresentationCurve.Smooth);
+    }
+
+    private int TopMoodLayerIndex()
+    {
+        for(int i = LayerCount - 1; i >= 0; i--) { if(moodLayers[i].set) { return i; } }
+        return -1;
+    }
+
+    private int TopLightLayerIndex()
+    {
+        for(int i = LayerCount - 1; i >= 0; i--) { if(lightLayers[i].set) { return i; } }
+        return -1;
+    }
     private float writtenIntensity = -1.0f;
 
     // 暗いステージ
@@ -313,6 +346,7 @@ public class PresentationDirector : MonoBehaviour
             RestoreLightLayer(Save.Get(SaveKeyPrefix + sceneName + "/Light", ""));
             RestoreWeatherLayer(Save.Get(SaveKeyPrefix + sceneName + "/Weather", ""));
         }
+        restoreAmount = Save.Get(SaveKeyPrefix + sceneName + "/Restore", 0.0f);
 
         StartMood(0.0f, PresentationCurve.Smooth, false);
         StartLight(0.0f, PresentationCurve.Smooth);
@@ -600,6 +634,12 @@ public class PresentationDirector : MonoBehaviour
     {
         MoodPreset top = TopMood(out _);
         MoodValues target = top != null ? top.Values : MoodValues.Neutral;
+        // 色の戻り具合：いちばん上がシーンの既定の層なら、「色が戻ったときの色調」へ割合だけ近づける
+        ScenePresentation sp = ScenePresentation.Current;
+        if(restoreAmount > 0.0001f && sp != null && sp.RestoredMood != null && TopMoodLayerIndex() == (int)PresentationLayer.Base)
+        {
+            target = MoodValues.Lerp(target, sp.RestoredMood.Values, restoreAmount);
+        }
         moodFrom = moodCurrent;
         moodTo = target;
         moodCurve = curve;
@@ -824,6 +864,13 @@ public class PresentationDirector : MonoBehaviour
         float toIntensity = originalIntensity;
         if(top.custom) { toColor = top.color; toIntensity = top.intensity; }
         else if(top.preset != null) { toColor = top.preset.LightColor; toIntensity = top.preset.Intensity * sceneGlobalScale; }
+        // 色の戻り具合：いちばん上がシーンの既定（または光の層がない）なら、「色が戻ったときの光」へ割合だけ近づける
+        ScenePresentation spl = ScenePresentation.Current;
+        if(restoreAmount > 0.0001f && spl != null && spl.RestoredLight != null && TopLightLayerIndex() <= (int)PresentationLayer.Base)
+        {
+            toColor = Color.Lerp(toColor, spl.RestoredLight.LightColor, restoreAmount);
+            toIntensity = Mathf.Lerp(toIntensity, spl.RestoredLight.Intensity * sceneGlobalScale, restoreAmount);
+        }
 
         lightFromColor = lightColor;
         lightFromIntensity = lightIntensity;
@@ -1112,7 +1159,7 @@ public class PresentationDirector : MonoBehaviour
             presetsByName = new Dictionary<string, ScriptableObject>();
             foreach(ScriptableObject so in Resources.LoadAll<ScriptableObject>("Presentation"))
             {
-                if(so is MoodPreset || so is LightPreset || so is WeatherPreset || so is FlashbackPreset)
+                if(so is MoodPreset || so is LightPreset || so is WeatherPreset || so is FlashbackPreset || so is RipplePreset || so is GesturePreset)
                 {
                     presetsByName[so.GetType().Name + "/" + so.name] = so;
                 }

@@ -33,7 +33,7 @@ paths:
 - ゲームオーバー画面（`SceneGameOver`）：Canvas に `MenuKeyboardNav`（リトライ → タイトルへ、↑↓で回る、最初にリトライを選ぶ、選ばれた色）。ほかのボタンの並びをキーボードで選べるようにするときも、この部品を付ける。
 
 ## セーブのキー（重ならないように）
-`Inventory/Items`、`Flag/<id>`、`Pickup/<scene>/<id か階層パス>`、`Interaction/<scene>/<id か階層パス>`、`<scene>/<宝箱id>`、`Meta/*`、`Party/*`（Mode・Current・Scene・PartnerX/Y・WaitLocked・NoahHP・SigleHP）、`Gimmick/<シーン>/<ID>`（固定は `/Locked`）、`Reaction/…`、`Block/…`、`Rejoin/…`、`Examine/…`、`Note/<ID>`、`Bark/<名前>`、`Switch/…`、`Enemy/…`、`Group/…`、`Battle/…`。
+`Inventory/Items`、`Flag/<id>`、`Pickup/<scene>/<id か階層パス>`、`Interaction/<scene>/<id か階層パス>`、`<scene>/<宝箱id>`、`Meta/*`、`Party/*`（Mode・Current・Scene・PartnerX/Y・WaitLocked・NoahHP・SigleHP）、`Gimmick/<シーン>/<ID>`（固定は `/Locked`）、`Reaction/…`、`Block/…`、`Rejoin/…`、`Examine/…`、`Note/<ID>`、`Bark/<名前>`、`Switch/…`、`Enemy/…`、`Group/…`、`Battle/…`、`Presentation/<scene>/Mood|Light|Weather|Restore`（演出のイベントの層・色の戻り具合）、`Value/<名前>`（演出の数値のセーブする物）、`Ripple/<scene>/list`（残す ID つきの波紋）。
 ID が空のときは階層パスでセーブする物が多い（名前や親を変えると記録がリセットされる）。
 
 ## メニュー画面・セーブポイント

@@ -160,6 +160,56 @@ public static class PresentationPresetBuilder
             S(0.0f, "#1C2340"), S(0.35f, "#4A5C8C"), S(0.6f, "#A69BC0"), S(0.8f, "#F2C9B0"), S(1.0f, "#F8EBA0"), overwrite, log);
     }
 
+    //=====================================================================
+    // 手触り・波紋（11-27 指示書 CT_presentation_ripple_subtitle_gesture）
+    //=====================================================================
+
+    [MenuItem("Tools/演出/手触りと波紋のプリセットを作る（ある物はそのまま）", false, 3)]
+    private static void BuildGestureRippleMenu()
+    {
+        var log = new System.Text.StringBuilder();
+        BuildGestureAndRipple(false, log);
+        Debug.Log(log.Length > 0 ? log.ToString() : "手触りと波紋：すべてそろっている");
+    }
+
+    public static string BuildGestureAndRipple(bool overwrite, System.Text.StringBuilder log)
+    {
+        EnsureFolder(Root + "/Gesture");
+        EnsureFolder(Root + "/Ripple");
+        var flat = AnimationCurve.Constant(0.0f, 1.0f, 1.0f);
+        // 最後の 10% はとても重い
+        var lastHeavy = new AnimationCurve(new Keyframe(0.0f, 1.0f), new Keyframe(0.85f, 0.8f), new Keyframe(0.9f, 0.18f), new Keyframe(1.0f, 0.12f));
+        // 最初は重く、近づくほど軽い
+        var heavyToLight = new AnimationCurve(new Keyframe(0.0f, 0.35f), new Keyframe(1.0f, 1.4f));
+        Gesture("Gesture_カイロスと調律", "長押し・軽い。二人の光がゆっくり重なる", GesturePreset.Kind.Hold, 2.5f, flat, GesturePreset.Release.Return, 6.0f, 1, 0.0f, GesturePreset.Look.None, "", 0.02f, false, overwrite, log);
+        Gesture("Gesture_手を伸ばす", "長押し・最初は重く、ノアに近づくほど軽い（中庭）", GesturePreset.Kind.Hold, 4.0f, heavyToLight, GesturePreset.Release.Return, 5.0f, 1, 0.0f, GesturePreset.Look.None, "", 0.05f, false, overwrite, log);
+        Gesture("Gesture_墓を掘る", "繰り返し 5 回・1 回ごとに少し間がある（埋葬の記憶）", GesturePreset.Kind.Repeat, 1.0f, flat, GesturePreset.Release.Stop, 4.0f, 5, 0.8f, GesturePreset.Look.None, "", 0.08f, false, overwrite, log);
+        Gesture("Gesture_二人で墓を掘る", "繰り返し 5 回（ヴェルツィーの墓。隣のノアも一緒に動く＝1 回ごとのイベントで）", GesturePreset.Kind.Repeat, 1.0f, flat, GesturePreset.Release.Stop, 4.0f, 5, 0.8f, GesturePreset.Look.None, "", 0.08f, false, overwrite, log);
+        Gesture("Gesture_最後の一音", "長押し・押し始めるとまわりの動きと音が止まる", GesturePreset.Kind.Hold, 3.0f, flat, GesturePreset.Release.Stop, 4.0f, 1, 0.0f, GesturePreset.Look.None, "", 0.03f, true, overwrite, log);
+        Gesture("Gesture_最後のひと巻き", "ゆっくり回す・最後の 10% はとても重い。離すと止まるだけ", GesturePreset.Kind.Rotate, 4.0f, lastHeavy, GesturePreset.Release.Stop, 4.0f, 1, 0.0f, GesturePreset.Look.Ring, "", 0.03f, false, overwrite, log);
+
+        Ripple("Ripple_色が戻る", "直した場所から元の色が戻る（夏のうちに型・回想など、元の色を残す色調で）", RipplePreset.Look.RestoreColor, Color.white, 0.95f, 6.0f, 2.5f, 0.75f, 1.0f, new Color(0.9f, 0.95f, 1.0f), 0.08f, RipplePreset.After.Stay, 3.0f, overwrite, log);
+        Ripple("Ripple_光が灯る", "直した場所から黄色い光が灯る（ファミレス型・月夜の砂浜など）", RipplePreset.Look.LightUp, new Color(1.0f, 0.86f, 0.55f), 1.0f, 5.0f, 2.0f, 0.75f, 1.3f, new Color(1.0f, 0.95f, 0.75f), 0.08f, RipplePreset.After.Stay, 3.0f, overwrite, log);
+        Ripple("Ripple_小さな光", "手元から小さく広がって、ゆっくり消える（懐中時計・中庭で掴んだ瞬間）", RipplePreset.Look.LightUp, new Color(1.0f, 0.9f, 0.65f), 1.2f, 2.2f, 1.2f, 0.85f, 1.2f, new Color(1.0f, 0.97f, 0.85f), 0.1f, RipplePreset.After.FadeOut, 4.0f, overwrite, log);
+        AssetDatabase.SaveAssets();
+        return log.ToString();
+    }
+
+    private static void Gesture(string name, string memo, GesturePreset.Kind kind, float secs, AnimationCurve w, GesturePreset.Release r, float ret, int cnt, float interval,
+                                GesturePreset.Look look, string prompt, float shake, bool freeze, bool overwrite, System.Text.StringBuilder log)
+    {
+        string path = $"{Root}/Gesture/{name}.asset";
+        GesturePreset p = LoadOrCreate<GesturePreset>(path, out bool created);
+        if(created || overwrite) { p.EditorSet(memo, kind, secs, w, r, ret, cnt, interval, look, prompt, shake, freeze); EditorUtility.SetDirty(p); log.Append(created ? "作った " : "戻した ").Append(name).Append('\n'); }
+    }
+
+    private static void Ripple(string name, string memo, RipplePreset.Look look, Color c, float i, float r, float secs, float ell, float edgeI, Color edgeC, float edgeW, RipplePreset.After af, float fade, bool overwrite, System.Text.StringBuilder log)
+    {
+        string path = $"{Root}/Ripple/{name}.asset";
+        RipplePreset p = LoadOrCreate<RipplePreset>(path, out bool created);
+        if(created || overwrite) { p.EditorSet(memo, look, c, i, r, secs, ell, edgeI, edgeC, edgeW, af, fade); EditorUtility.SetDirty(p); log.Append(created ? "作った " : "戻した ").Append(name).Append('\n'); }
+    }
+
     /// <summary>
     /// 案ごとの光（11-26 ユーザーの指示「元の絵に光で色味と雰囲気を加える」）：全体の光を案の青に、場面の光（窓・ランプ・月・頂上・時計）を案の黄色にする
     /// </summary>

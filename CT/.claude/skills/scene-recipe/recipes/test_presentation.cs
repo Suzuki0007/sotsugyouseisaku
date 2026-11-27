@@ -263,6 +263,36 @@ else
 }
 UnityEditor.SceneManagement.EditorSceneManager.CloseScene(stage12, true);
 
+// ===== 動作と波紋の広場（11-27 指示書 CT_presentation_ripple_subtitle_gesture）：砂浜の床の絵をもう 1 枚、東の隣に並べる =====
+// 砂浜の床 soto_yuka は x -122.36〜-107.88（幅 14.48）。東の隣 x -107.88〜-93.40 に同じ絵を置き、砂浜の東の端（x -108.0）とつなぐ
+UnityEngine.Bounds eastBounds = default; bool hasEast = false;
+{
+    var floor = UnityEngine.GameObject.Find("soto_yuka");
+    if (floor == null) sb.Append("!! soto_yuka がない\n");
+    else
+    {
+        var east = UnityEngine.Object.Instantiate(floor, floor.transform.parent);
+        east.name = "動作と波紋の広場の床（砂浜の絵のコピー）";
+        var fsr = floor.GetComponent<UnityEngine.SpriteRenderer>();
+        east.transform.position = floor.transform.position + new UnityEngine.Vector3(fsr.bounds.size.x, 0f, 0f);
+        foreach (var mbE in east.GetComponents<MapBounds>()) UnityEngine.Object.DestroyImmediate(mbE);
+        eastBounds = east.GetComponent<UnityEngine.SpriteRenderer>().bounds; hasEast = true;
+        sb.Append("east floor: " + eastBounds + "\n");
+    }
+}
+if (hasEast)
+{
+    var walkEast = Child("歩ける範囲（動作と波紋の広場）", root.transform, V(0f, 0f));
+    walkEast.AddComponent<WalkArea>();
+    void WalkRectE(string name, float x0, float y0, float x1, float y1)
+    {
+        var go = Child(name, walkEast.transform, V((x0 + x1) * 0.5f, (y0 + y1) * 0.5f));
+        var bc = go.AddComponent<UnityEngine.BoxCollider2D>(); bc.isTrigger = true; bc.size = new UnityEngine.Vector2(x1 - x0, y1 - y0);
+    }
+    WalkRectE("つなぎ（砂浜の東の端）", -108.4f, 21.0f, -107.4f, 37.6f);
+    WalkRectE("広場", eastBounds.min.x + 0.15f, 20.3f, eastBounds.max.x - 0.2f, 38.3f);
+}
+
 if (room != null)
 {
     var rb = room.GetComponent<UnityEngine.SpriteRenderer>().bounds;
@@ -283,6 +313,7 @@ if (room != null)
     if (beachSr != null)
     {
         var bb = beachSr.bounds;
+        if (hasEast) bb.Encapsulate(eastBounds);   // 動作と波紋の広場も含める（カメラは砂浜と広場を横に続けて動く）
         float x0 = UnityEngine.Mathf.Min(bb.min.x, rb.min.x), x1 = UnityEngine.Mathf.Max(bb.max.x, rb.max.x), y0 = UnityEngine.Mathf.Min(bb.min.y, rb.min.y), y1 = UnityEngine.Mathf.Max(bb.max.y, rb.max.y);
         var areaGo = Child("マップの範囲（砂浜と室内・見えない絵）", root.transform, V((x0 + x1) * 0.5f, (y0 + y1) * 0.5f));
         var asr = areaGo.AddComponent<UnityEngine.SpriteRenderer>(); asr.sprite = beachSr.sprite; asr.color = new UnityEngine.Color(1f, 1f, 1f, 0f);
@@ -302,7 +333,7 @@ if (room != null)
         }
         // 砂浜のカメラの範囲は上へ 3 マス広げる（砂浜の上の端から、通路の入口と室内の下が見えるように）。重なる所では室内のほうを優先
         var bbUp = bb; bbUp.SetMinMax(bb.min, new UnityEngine.Vector3(bb.max.x, bb.max.y + 3f, bb.max.z));
-        CamArea("カメラの範囲（砂浜・上へ 3 マス広げる）", bbUp);
+        CamArea("カメラの範囲（砂浜と動作と波紋の広場・上へ 3 マス広げる）", bbUp);
         CamArea("カメラの範囲（室内）", rb);
         foreach (var ca in root.GetComponentsInChildren<CameraArea>(true)) if (ca.name == "カメラの範囲（室内）") Set(ca, "priority", 1);
     }
@@ -384,6 +415,132 @@ StillStation("1枚絵\n寄る・キー", V(-121.0f, 29.5f), e3);
 StillStation("1枚絵\n流す・時間", V(-118.5f, 29.5f), e4);
 StillStation("1枚絵\n会話を重ねる", V(-116.0f, 29.5f), e5);
 StillStation("回想の中の会話", V(-109.0f, 28.8f), e6);
+
+// ===== 動作と波紋の広場の中身（11-27）=====
+//   北の列 y35：手の動作 3 つ（回す＝時計の針・長押し＝伸びる手・繰り返し＝墓標）。それぞれの上に「演出の数値で動かす」見た目
+//   真ん中 y30：波紋（色が戻る・光が灯る・消す）　南 y25：色の戻り具合（+0.25・0 に戻す）と、組み合わせの場面 2 つ
+if (hasEast)
+{
+    var gRoot = Child("動作と波紋の見本", root.transform, V(0f, 0f));
+    T P<T>(string folder, string name) where T : UnityEngine.Object => Load<T>(R + folder + "/" + name + ".asset");
+    // 案内は列の間に（画面下は字幕が出るので、南に置くと重なる。11-27）
+    Label(gRoot.transform, "回す・長押しは E を押したまま／繰り返しは E を何度も", V(-100.6f, 32.4f), 2.4f);
+    { var t = gRoot.transform.GetChild(gRoot.transform.childCount - 1).GetComponent<TMPro.TextMeshPro>(); t.rectTransform.sizeDelta = new UnityEngine.Vector2(14f, 1f); }
+
+    UnityEngine.GameObject Seq2(string name) { var go = Child(name, gRoot.transform, V(0f, 0f)); go.AddComponent<EventSequence>(); return go; }
+    void EvStation(string name, UnityEngine.Vector3 pos, UnityEngine.GameObject seq, UnityEngine.Color color)
+    {
+        var go = Child("台座_" + name.Replace("\n", "_"), gRoot.transform, pos);
+        var box = go.AddComponent<UnityEngine.BoxCollider2D>(); box.isTrigger = true; box.size = new UnityEngine.Vector2(1.6f, 1.6f);
+        var ex = go.AddComponent<ExamineSequence>();
+        var so = new UnityEditor.SerializedObject(ex); var p = so.FindProperty("sequences"); p.arraySize = 1; p.GetArrayElementAtIndex(0).objectReferenceValue = seq.GetComponent<EventSequence>();
+        so.FindProperty("afterLast").enumValueIndex = 1; so.ApplyModifiedPropertiesWithoutUndo();
+        var look = Child("見た目", go.transform, pos);
+        var sr = look.AddComponent<UnityEngine.SpriteRenderer>(); sr.sprite = knob; sr.color = color; sr.sortingOrder = 5;
+        look.transform.localScale = new UnityEngine.Vector3(6f, 3.6f, 1f);
+        Label(go.transform, name, pos + V(0f, 1.1f), 2.8f);
+    }
+    UnityEngine.GameObject Shape(string name, UnityEngine.Transform parent, UnityEngine.Vector3 localPos, UnityEngine.Vector3 scale, UnityEngine.Color c, int order)
+    {
+        var go = new UnityEngine.GameObject(name); go.transform.SetParent(parent, false); go.transform.localPosition = localPos; go.transform.localScale = scale;
+        var sr = go.AddComponent<UnityEngine.SpriteRenderer>(); sr.sprite = knob; sr.color = c; sr.sortingOrder = order; return go;
+    }
+    PresentationValueBinder Binder(UnityEngine.GameObject go, string value, int mode, float from, float to)
+    {
+        var b = go.AddComponent<PresentationValueBinder>();
+        Set(b, "valueName", value); Set(b, "mode", mode); Set(b, "valueFrom", from); Set(b, "valueTo", to); return b;
+    }
+    // 時計（文字盤と針。針は軸の子＝軸を回す）
+    UnityEngine.Transform Clock(string name, UnityEngine.Vector3 pos, string value)
+    {
+        var c = Child(name, gRoot.transform, pos);
+        Shape("文字盤", c.transform, UnityEngine.Vector3.zero, new UnityEngine.Vector3(9f, 9f, 1f), new UnityEngine.Color(0.92f, 0.88f, 0.75f), 6);
+        var axis = Child("針の軸", c.transform, pos);
+        Shape("針", axis.transform, new UnityEngine.Vector3(0f, 0.32f, 0f), new UnityEngine.Vector3(0.9f, 4.4f, 1f), new UnityEngine.Color(0.2f, 0.18f, 0.25f), 7);
+        Binder(axis, value, 0, 0f, 1f);   // 回す：0 → -360 度
+        return c.transform;
+    }
+    UnityEngine.GameObject Gesture(string name, GesturePreset preset, string progress, string count)
+    {
+        var go = Seq2(name);
+        var g = go.AddComponent<GestureEventAction>(); Set(g, "preset", preset); Set(g, "progressValue", progress); Set(g, "countValue", count);
+        return go;
+    }
+    void AddStep(GestureEventAction g, float at, UnityEngine.GameObject seq)
+    {
+        var so = new UnityEditor.SerializedObject(g); var st = so.FindProperty("steps"); int i = st.arraySize; st.arraySize = i + 1;
+        var e = st.GetArrayElementAtIndex(i); e.FindPropertyRelative("at").floatValue = at; e.FindPropertyRelative("sequence").objectReferenceValue = seq.GetComponent<EventSequence>();
+        so.ApplyModifiedPropertiesWithoutUndo();
+    }
+    UnityEngine.GameObject SubtitleSeq(string name, string text, float secs)
+    {
+        var go = Seq2(name); var sub = go.AddComponent<SubtitleEventAction>(); Set(sub, "text", text); Set(sub, "advance", 1); Set(sub, "seconds", secs); return go;
+    }
+
+    // --- 北の列：手の動作 ---
+    var col = new UnityEngine.Color(0.95f, 0.75f, 0.55f);
+    Clock("時計（回す）", V(-105.0f, 37.0f), "見本_回す");
+    EvStation("回す\n（時計を巻く）", V(-105.0f, 34.6f), Gesture("手の動作：回す（最後のひと巻き）", P<GesturePreset>("Gesture", "Gesture_最後のひと巻き"), "見本_回す", ""), col);
+
+    var armRoot = Child("伸びる手（長押し）", gRoot.transform, V(-102.6f, 37.0f));
+    Binder(armRoot, "見本_長押し", 1, 0f, 1f);
+    { var b = armRoot.GetComponent<PresentationValueBinder>(); var so = new UnityEditor.SerializedObject(b); so.FindProperty("scaleFrom").vector3Value = new UnityEngine.Vector3(0.08f, 1f, 1f); so.FindProperty("scaleTo").vector3Value = UnityEngine.Vector3.one; so.ApplyModifiedPropertiesWithoutUndo(); }
+    Shape("手", armRoot.transform, new UnityEngine.Vector3(2.0f, 0f, 0f), new UnityEngine.Vector3(25f, 2.4f, 1f), new UnityEngine.Color(1f, 0.85f, 0.7f), 7);
+    Shape("向こうの手（ノア）", gRoot.transform, V(-98.3f, 37.0f) - gRoot.transform.position, new UnityEngine.Vector3(3f, 3f, 1f), new UnityEngine.Color(0.7f, 0.85f, 1f), 7);
+    EvStation("長押し\n（手を伸ばす）", V(-100.6f, 34.6f), Gesture("手の動作：長押し（手を伸ばす）", P<GesturePreset>("Gesture", "Gesture_手を伸ばす"), "見本_長押し", ""), col);
+
+    var graves = Child("墓標（繰り返し）", gRoot.transform, V(-96.2f, 37.0f));
+    for (int i = 0; i < 5; i++) Shape("墓標" + (i + 1), graves.transform, new UnityEngine.Vector3(-1.6f + i * 0.8f, 0f, 0f), new UnityEngine.Vector3(2.4f, 4.2f, 1f), new UnityEngine.Color(0.75f, 0.75f, 0.8f), 7);
+    Binder(graves, "見本_繰り返し", 4, 0f, 5f);
+    EvStation("繰り返し\n（墓を掘る）", V(-96.2f, 34.6f), Gesture("手の動作：繰り返し（墓を掘る）", P<GesturePreset>("Gesture", "Gesture_墓を掘る"), "", "見本_繰り返し"), col);
+
+    // --- 真ん中の列：波紋 ---
+    var rc = new UnityEngine.Color(0.6f, 0.95f, 0.85f);
+    UnityEngine.GameObject RippleSeq(string name, string preset, string id, UnityEngine.Vector3 at)
+    {
+        var go = Seq2(name); var spot = Child("波紋の中心", go.transform, at);
+        var a = go.AddComponent<RippleEventAction>(); Set(a, "preset", P<RipplePreset>("Ripple", preset)); Set(a, "center", 0); Set(a, "target", spot.transform); Set(a, "id", id);
+        return go;
+    }
+    EvStation("波紋\n色が戻る", V(-105.0f, 30.0f), RippleSeq("波紋：色が戻る（残る）", "Ripple_色が戻る", "見本_色が戻る", V(-105.0f, 30.0f)), rc);
+    EvStation("波紋\n光が灯る", V(-100.6f, 30.0f), RippleSeq("波紋：光が灯る（残る）", "Ripple_光が灯る", "見本_光が灯る", V(-100.6f, 30.0f)), rc);
+    { var go = Seq2("波紋を消す（全部）"); var a = go.AddComponent<RippleClearEventAction>(); Set(a, "id", ""); Set(a, "seconds", 1.5f); EvStation("波紋を\n全部消す", V(-96.2f, 30.0f), go, new UnityEngine.Color(0.85f, 0.85f, 0.85f)); }
+    // 回想中だけ残る波紋（RippleSpot：フラグ Flag_Flashback_Active の間）
+    { var go = Child("残る波紋（回想中だけ）", gRoot.transform, V(-102.4f, 27.6f)); var rs = go.AddComponent<RippleSpot>(); Set(rs, "preset", P<RipplePreset>("Ripple", "Ripple_光が灯る"));
+      var so = new UnityEditor.SerializedObject(rs); var l = so.FindProperty("flagConditions"); l.arraySize = 1; l.GetArrayElementAtIndex(0).FindPropertyRelative("flag").objectReferenceValue = flag; so.ApplyModifiedPropertiesWithoutUndo(); }
+
+    // --- 南の列：色の戻り具合と、組み合わせの場面 ---
+    var sp = UnityEngine.Object.FindAnyObjectByType<ScenePresentation>(UnityEngine.FindObjectsInactive.Include);
+    if (sp != null) { Set(sp, "restoredMood", P<MoodPreset>("Mood", "Mood_温かい日常")); Set(sp, "restoredLight", P<LightPreset>("Light", "Light_夜明け")); sb.Append("ScenePresentation: 色が戻ったとき＝温かい日常・夜明け\n"); }
+    else sb.Append("!! ScenePresentation がない（色の戻り具合は効かない）\n");
+    { var go = Seq2("色の戻り具合 +0.25"); var a = go.AddComponent<ColorRestoreEventAction>(); Set(a, "mode", 0); Set(a, "amount", 0.25f); Set(a, "seconds", 2f); EvStation("色の戻り\n+0.25", V(-105.0f, 25.0f), go, new UnityEngine.Color(0.95f, 0.95f, 0.6f)); }
+    { var go = Seq2("色の戻り具合 0 に戻す"); var a = go.AddComponent<ColorRestoreEventAction>(); Set(a, "mode", 1); Set(a, "amount", 0f); Set(a, "seconds", 1f); EvStation("色の戻り\n0 に戻す", V(-102.2f, 25.0f), go, new UnityEngine.Color(0.85f, 0.85f, 0.85f)); }
+
+    // 組み合わせ①：埋葬の記憶（回想に入る → 墓を 5 回掘る〔墓標が 1 つずつ立つ〕→ 字幕 → 回想から戻る）
+    var graves2 = Child("墓標（埋葬の記憶）", gRoot.transform, V(-99.2f, 27.0f));
+    for (int i = 0; i < 5; i++) Shape("墓標" + (i + 1), graves2.transform, new UnityEngine.Vector3(-1.2f + i * 0.6f, 0f, 0f), new UnityEngine.Vector3(1.8f, 3.2f, 1f), new UnityEngine.Color(0.8f, 0.78f, 0.72f), 7);
+    Binder(graves2, "見本_埋葬", 4, 0f, 5f);
+    {
+        var go = Seq2("組み合わせ：埋葬の記憶");
+        var a1b = go.AddComponent<PresentationValueEventAction>(); Set(a1b, "valueName", "見本_埋葬"); Set(a1b, "mode", 0); Set(a1b, "value", 0f);
+        var a2b = go.AddComponent<FlashbackEnterEventAction>(); Set(a2b, "preset", fbBurial); Set(a2b, "seconds", 2f);
+        var a3b = go.AddComponent<GestureEventAction>(); Set(a3b, "preset", P<GesturePreset>("Gesture", "Gesture_墓を掘る")); Set(a3b, "countValue", "見本_埋葬");
+        var a4b = go.AddComponent<SubtitleEventAction>(); Set(a4b, "text", "……おやすみなさい。"); Set(a4b, "advance", 1); Set(a4b, "seconds", 2.5f);
+        var a5b = go.AddComponent<FlashbackExitEventAction>(); Set(a5b, "seconds", 2f);
+        EvStation("場面\n埋葬の記憶", V(-99.2f, 25.0f), go, new UnityEngine.Color(0.85f, 0.7f, 0.45f));
+    }
+    // 組み合わせ②：最後のひと巻き（回す。半分・9 割で字幕、巻き終わると時計から光が灯る）
+    var clock2 = Clock("時計（最後のひと巻き）", V(-95.0f, 27.2f), "見本_ひと巻き");
+    {
+        var go = Seq2("組み合わせ：最後のひと巻き");
+        var g = go.AddComponent<GestureEventAction>(); Set(g, "preset", P<GesturePreset>("Gesture", "Gesture_最後のひと巻き")); Set(g, "progressValue", "見本_ひと巻き");
+        AddStep(g, 0.5f, SubtitleSeq("ひと巻き：半分", "あと、少し……", 2f));
+        AddStep(g, 0.9f, SubtitleSeq("ひと巻き：9 割", "……重い。", 2f));
+        var r = go.AddComponent<RippleEventAction>(); Set(r, "preset", P<RipplePreset>("Ripple", "Ripple_光が灯る")); Set(r, "center", 0); Set(r, "target", clock2); Set(r, "id", "");
+        var sub = go.AddComponent<SubtitleEventAction>(); Set(sub, "text", "（時計が、また動き出した）"); Set(sub, "advance", 1); Set(sub, "seconds", 2.5f);
+        EvStation("場面\n最後のひと巻き", V(-95.8f, 25.0f), go, new UnityEngine.Color(0.85f, 0.7f, 0.45f));
+    }
+}
 
 UnityEditor.SceneManagement.EditorSceneManager.MarkSceneDirty(s);
 sb.Append("saved " + s.name + " = " + UnityEditor.SceneManagement.EditorSceneManager.SaveScene(s) + "\n");
