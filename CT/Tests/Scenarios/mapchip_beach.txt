@@ -3,51 +3,51 @@ scene Test_Mapchip
 wait 1
 expect eval !UnityEditor.EditorApplication.isPaused                     # 始めたときのエラーで止まっていない
 warp 21,9                                # 試しの場所の右の壁の手前（通り道 y8〜9 の前）
-key RightArrow 2500                      # 東へ歩いて通り道を抜ける
+key RightArrow 3500                      # 東へ歩いて通り道を抜ける
 expect eval UnityEngine.Object.FindAnyObjectByType<PlayerSwitchManager>().CurrentPlayer.transform.position.x > 26.5f
 warp 35,8.5                              # 浜辺の石畳の上（この列の波打ち際は y5）
-key DownArrow 3000                       # 海へ向かって歩き続ける
+key DownArrow 4000                       # 海へ向かって歩き続ける
 expect eval UnityEngine.Object.FindAnyObjectByType<PlayerSwitchManager>().CurrentPlayer.transform.position.y > 5.4f   # 海に入っていない
 expect eval UnityEngine.Object.FindAnyObjectByType<PlayerSwitchManager>().CurrentPlayer.transform.position.y < 6.5f   # 波打ち際までは歩けた
 warp 38,17.5                             # 部屋 A の中（床 y14〜20、壁の面は y21 から）
-key UpArrow 2500                         # 北の壁へ向かって歩く
+key UpArrow 3500                         # 北の壁へ向かって歩く
 expect eval UnityEngine.Object.FindAnyObjectByType<PlayerSwitchManager>().CurrentPlayer.transform.position.y < 21.05f  # 壁の面に入っていない
 expect eval NavMesh2D.Instance.IsReachable(new UnityEngine.Vector2(38f, 17.5f), new UnityEngine.Vector2(54f, 17f), EnemySize.Small)   # 部屋 A から廊下を通って部屋 B（見せ場の前）へ道がつながっている
 expect eval NavMesh2D.Instance.IsReachable(new UnityEngine.Vector2(38f, 17.5f), new UnityEngine.Vector2(35f, 8.5f), EnemySize.Small)   # 部屋 A の下の扉から浜辺へ出られる
 expect eval !NavMesh2D.Instance.SamplePosition(new UnityEngine.Vector2(38f, 22.2f), 0.05f, EnemySize.Small, out UnityEngine.Vector2 _)   # 壁の面（壁の中）に床がない
 warp 50,17                               # 部屋 B の中、大きな歯車（56.5, 20.2）の左下
-key RightArrow 2500
+key RightArrow 3500
 expect eval UnityEngine.Vector2.Distance(UnityEngine.Object.FindAnyObjectByType<PlayerSwitchManager>().CurrentPlayer.transform.position, new UnityEngine.Vector2(56.5f, 20.2f)) > 1.2f   # 大きな歯車の中に入っていない
 # 足が壁の縁からはみ出ない（11-25 の不具合）：ノアの絵は位置から 0.61 下まで。縁の下の端より足が下へ出ないか
 warp 52,27.5                             # 部屋 B の上の壁（上の縁の下の端 y25）の外側
-key DownArrow 2000
+key DownArrow 3000
 expect eval UnityEngine.Object.FindAnyObjectByType<PlayerSwitchManager>().CurrentPlayer.transform.position.y - 0.61f > 24.98f   # 足が上の壁の縁より下へ出ていない
 warp 58,18                               # 部屋 B の中（下の縁 y15〜15.33）
-key DownArrow 2000
+key DownArrow 3000
 expect eval UnityEngine.Object.FindAnyObjectByType<PlayerSwitchManager>().CurrentPlayer.transform.position.y - 0.61f > 14.98f   # 足が下の壁の縁より外へ出ていない
 warp 44.5,22.5                           # 廊下の奥の壁（面 y18〜20・上面の縁の下の端 y20。11-27 段階 1）の外側
-key DownArrow 2000
+key DownArrow 3000
 expect eval UnityEngine.Object.FindAnyObjectByType<PlayerSwitchManager>().CurrentPlayer.transform.position.y - 0.61f > 19.98f
 warp 44.5,17.6                           # 廊下の中（手前の壁の縁 y16〜16.33）
-key DownArrow 2000
+key DownArrow 3000
 expect eval UnityEngine.Object.FindAnyObjectByType<PlayerSwitchManager>().CurrentPlayer.transform.position.y - 0.61f > 15.98f
 # 手前の壁の外側の面（11-27 段階 1）：外から歩いても面に乗らない（足が面の下の端 y12 より上へ行かない）
 warp 35,10                               # 部屋 A の手前の壁（面 y12〜14、扉は x37〜39）の下の砂浜
-key UpArrow 2000
+key UpArrow 3000
 expect eval UnityEngine.Object.FindAnyObjectByType<PlayerSwitchManager>().CurrentPlayer.transform.position.y - 0.61f < 12.05f
 expect eval UnityEngine.Object.FindAnyObjectByType<PlayerSwitchManager>().CurrentPlayer.transform.position.y > 11.5f   # 面の前までは歩けた
 warp 38,10                               # 扉の列の下
-key UpArrow 2500
+key UpArrow 3500
 expect eval UnityEngine.Object.FindAnyObjectByType<PlayerSwitchManager>().CurrentPlayer.transform.position.y > 14.5f   # 扉から部屋 A へ入れる
 warp 42.5,27.6                           # 崩れた壁のかけら（lx15〜17・面 y25・縁の下の端 y26）の外側
-key DownArrow 2000
+key DownArrow 3000
 expect eval UnityEngine.Object.FindAnyObjectByType<PlayerSwitchManager>().CurrentPlayer.transform.position.y - 0.61f > 25.98f
 # 歯車は「奥行きのある物」（11-25）：当たり判定＝大と中 x52.65〜57.55・y18.1〜20.2 の 1 つ（前後の境目 y19.95）、小 x58.95〜59.86・y16.75〜17.4（境目 y17.15）
 warp 51,21.5                             # 大歯車の後ろ（四角より上）の左
-key RightArrow 3000
+key RightArrow 4000
 expect eval UnityEngine.Object.FindAnyObjectByType<PlayerSwitchManager>().CurrentPlayer.transform.position.x > 58.5f   # 歯車の後ろを通り抜けられる
 warp 55,16.3                             # 大歯車の前（四角より下）
-key UpArrow 1500
+key UpArrow 2500
 expect eval UnityEngine.Object.FindAnyObjectByType<PlayerSwitchManager>().CurrentPlayer.transform.position.y < 18.12f   # 前からは入れない
 # 押し続けても位置が行ったり来たりしない（右へ押したまま 2 回測る）
 warp 50.5,19.2                           # 四角の左（y は四角の中ほど）
@@ -86,6 +86,7 @@ wait 1.5                                 # 場所の色味が「遺跡の中」�
 expect eval System.Array.Find(UnityEngine.Object.FindObjectsByType<UnityEngine.Rendering.Universal.Light2D>(), l => l.lightType == UnityEngine.Rendering.Universal.Light2D.LightType.Global).intensity < 0.5f  # 遺跡の中は暗い（場所の色味 0.42）
 expect eval UnityEngine.GameObject.Find("浜辺と遺跡（Test_Mapchip_Beach）/歯車（見せ場と散らばり）/見せ場 大歯車と中歯車（奥行き）/見せ場 大歯車").transform.childCount >= 1   # 影を付ける（DropShadow2D）の影と、明かりをさえぎる形がある
 capture mapchip_beach_ruins
+expect looks mapchip_beach_ruins                 # 基準の画像（Tests/Baselines/mapchip_beach_ruins.png）と比べる
 warp 38,8.5                              # 浜辺へ出る
 wait 1.5
 expect eval System.Array.Find(UnityEngine.Object.FindObjectsByType<UnityEngine.Rendering.Universal.Light2D>(), l => l.lightType == UnityEngine.Rendering.Universal.Light2D.LightType.Global).intensity > 0.75f && System.Array.Find(UnityEngine.Object.FindObjectsByType<UnityEngine.Rendering.Universal.Light2D>(), l => l.lightType == UnityEngine.Rendering.Universal.Light2D.LightType.Global).intensity < 0.95f   # 浜辺は夕方（0.85）

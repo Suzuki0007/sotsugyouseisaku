@@ -23,7 +23,7 @@ warp -115.2,14.0                # 海の上（歩けない）→ 砂浜へ戻さ
 wait 1
 expect eval PlayerSwitchManager.Instance.CurrentPlayer.transform.position.y > 20
 warp -117.0,35.3                # 奥の振動（中）の範囲のすぐ手前
-key UpArrow 600                 # 本当の上キーで歩いて範囲に入る
+key UpArrow 1600                 # 本当の上キーで歩いて範囲に入る
 wait 1
 expect talk また                 # OP_02g：振動（中）
 advance all

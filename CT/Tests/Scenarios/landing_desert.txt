@@ -14,12 +14,12 @@ expect flag Flag_Land_TowerStill on
 expect eval UnityEngine.GameObject.Find("演出の画像（手紙・スチル）/塔の全景スチル（仮画像）") == null
 expect idle
 warp -115.2,20.6                # 鐘の言い伝え（OP_03）の帯の手前
-key UpArrow 500
+key UpArrow 1500
 wait 1
 expect talk 鐘が鳴った
 advance all
 warp -115.2,22.6                # 扉の爪痕の帯の手前
-key UpArrow 400
+key UpArrow 1400
 wait 1
 expect talk この扉
 advance 3

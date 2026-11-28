@@ -17,7 +17,7 @@ advance all
 expect flag Flag_TC_EnterSeen on
 expect idle
 warp 0,-0.6                           # 縦の通路の途中（E2 の範囲 y=700 の手前）
-key UpArrow 1200                      # 本当のキーで北へ歩く → E2（震え）→ 開始ライン → E3
+key UpArrow 2200                      # 本当のキーで北へ歩く → E2（震え）→ 開始ライン → E3
 wait 3
 expect flag Flag_TC_Rumble on
 expect talk 遅えぞ                    # E3 の始まり（ノアが扉の前まで歩いた）
@@ -37,6 +37,8 @@ expect eval UnityEngine.GameObject.Find("T字通路（Stage1_4）/物/シグル�
 expect reach 西の出口
 expect reach 東の出口
 expect reach 扉を調べる
+wait until 5 !InputBlock.IsBlocked    # イベントのあとの入力の止まりが解けるまで（11-28：前の実行役は遅かったので待たずに済んでいた）
+wait 0.5
 key E                                 # 扉の前のまま調べる（ランプ0つ）
 wait 1
 expect talk 光ったまま

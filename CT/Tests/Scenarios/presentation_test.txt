@@ -37,7 +37,7 @@ expect eval PresentationDirector.CurrentWeatherName == "Weather_雨・弱"
 warp -115.0,38.0
 wait 2
 expect scene Test_Presentation
-key UpArrow 800
+key UpArrow 1800
 wait 2
 expect scene Test_Presentation
 # 場所の色味の範囲（北西の角）：範囲の層に入る（部品の光「昼」のほうが強いので見た目は昼のまま）
@@ -65,6 +65,7 @@ key E
 wait 2
 expect eval StageDarkness.IsDarkStage
 capture test_dark
+expect looks test_dark                 # 基準の画像（Tests/Baselines/test_dark.png）と比べる
 key E
 wait 3
 expect eval !StageDarkness.IsDarkStage
@@ -75,6 +76,7 @@ key E
 wait 6
 expect eval StillView.IsShowing && StillView.IsBusy
 capture test_still
+expect looks test_still                 # 基準の画像（Tests/Baselines/test_still.png）と比べる
 key Space
 wait 3
 expect eval !StillView.IsShowing
@@ -94,7 +96,7 @@ expect eval !System.Array.Exists(UnityEngine.Object.FindObjectsByType<UnityEngin
 # 室内（Stage1_2 の通路の絵を砂浜の北につないだ）：本当の上キーで砂浜から歩いて入る
 warp -115.2,30.0                # 広場の真ん中（始まる場所の真上。まっすぐ上へ歩くと室内）
 wait 1
-key UpArrow 4000
+key UpArrow 5000
 wait 1
 expect eval PlayerSwitchManager.Instance.CurrentPlayer.transform.position.y > 40.0f
 expect reach 室内の明るさ
@@ -127,6 +129,7 @@ wait 2
 expect eval PresentationDirector.CurrentLightName == "場所の色味"
 expect eval System.Array.Exists(UnityEngine.Object.FindObjectsByType<UnityEngine.Rendering.Universal.Light2D>(), l => l.lightType == UnityEngine.Rendering.Universal.Light2D.LightType.Global && UnityEngine.Mathf.Abs(l.intensity - 0.9f) < 0.01f)
 capture test_area_tone
+expect looks test_area_tone                 # 基準の画像（Tests/Baselines/test_area_tone.png）と比べる
 warp -117.5,31.5
 wait 2
 expect eval PresentationDirector.CurrentLightName == "Light_夜"

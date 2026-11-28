@@ -30,7 +30,11 @@ param(
     [switch]$NoLog,
     [switch]$Profile,
     [switch]$SkipProfile,
-    [int]$ProfileSeconds = 3
+    [int]$ProfileSeconds = 3,
+    # -AB -Off "<C# statements>" -On "<C# statements>" [-Seconds 10]: measure with it off, then on, print both and the difference
+    [switch]$AB,
+    [string]$Off,
+    [string]$On
 )
 
 . (Join-Path $PSScriptRoot "..\..\unity-check\scripts\lib.ps1")
@@ -158,6 +162,32 @@ function Get-Snapshot {
     Invoke-UnityEval -Code 'return PerfMonitor.CollectNow();' -Quiet | Out-Null
     Start-Sleep -Milliseconds 1500
     return (Invoke-UnityEval -Code 'return PerfMonitor.Snapshot();')
+}
+
+if ($AB) {
+    # Same scene, same place: off -> measure -> on -> measure. No CSV row (use -Measure for the record).
+    if (-not $On -or -not $Off) { Write-Output "[ERROR] -AB needs -Off and -On (C# statements, e.g. -On 'MapDebugView.Show = true;')"; return }
+    if (-not (Test-Playing)) { return }
+    if (-not $PSBoundParameters.ContainsKey("Seconds")) { $Seconds = 10 }
+    function Measure-One([string]$code, [string]$tag) {
+        $c = $code.Trim(); if (-not $c.EndsWith(";")) { $c += ";" }
+        $r = Invoke-UnityEval -Code ($c + ' return "ok";')
+        if ($r -ne "ok") { Write-Output "[ERROR] $tag code failed"; return $null }
+        Start-Sleep -Seconds 2
+        Invoke-UnityEval -Code ('return PerfMonitor.BeginRecord("ab_' + $tag + '");') -Quiet | Out-Null
+        Start-Sleep -Seconds $Seconds
+        return (ConvertFrom-KV (Invoke-UnityEval -Code 'return PerfMonitor.EndRecord();'))
+    }
+    $a = Measure-One $Off "off"; if (-not $a) { return }
+    $b = Measure-One $On "on"; if (-not $b) { return }
+    Write-Output ("A/B {0} s each   off -> on" -f $Seconds)
+    foreach ($k in @("avgFps", "p50ms", "p95ms", "workP50ms", "workP95ms", "scriptP95ms", "drawCallsAvg", "drawCallsMax", "gcKBPerFrame")) {
+        $x = 0.0; $y = 0.0
+        if (-not [double]::TryParse([string]$a[$k], [ref]$x) -or -not [double]::TryParse([string]$b[$k], [ref]$y)) { continue }
+        Write-Output ("  {0,-14} {1,9} -> {2,9}   ({3:+0.00;-0.00;0})" -f $k, $x, $y, ($y - $x))
+    }
+    Write-Output "  (Editor numbers: compare only. 'work' = PlayerLoop minus the 60 fps wait. Measure twice before concluding.)"
+    return
 }
 
 if ($Overlay) {

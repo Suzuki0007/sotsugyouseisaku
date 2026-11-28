@@ -7,9 +7,10 @@ key E                           # ランタンを調べる
 advance battle                  # 化け物が降る → 追跡が始まる
 wait 8                          # 動かずに捕まる → 暗転 → やり直す位置から始め直す
 wait battle
+wait 1.5                        # やり直しの直後はワープが元に戻される（11-28：前の実行役は遅かったので待たずに済んでいた）
 warp -119.0,13.0                # 化け物から離れる（すぐまた捕まってやり直しを繰り返さないように）
 wait 3.5                        # やり直しのあと少し止まっている時間（2 秒）が過ぎるまで
 expect eval BattleArea.AnyActive
 expect eval !UnityEngine.Object.FindAnyObjectByType<Enemy>().Paused   # 止まったままにならない
-expect eval UnityEngine.Object.FindAnyObjectByType<Enemy>().transform.position.x < -105.0   # やり直しの位置（-104.4）から追いかけて動いた
+expect within 6 UnityEngine.Object.FindAnyObjectByType<Enemy>().transform.position.x < -105.0   # やり直しの位置（-104.4）から追いかけて動いた（11-28：時間で決まるので within）
 expect no-error

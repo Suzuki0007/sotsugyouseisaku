@@ -5,27 +5,28 @@ expect near 12,5.5 0.5
 expect eval UnityEngine.Camera.main.GetComponent<UnityEngine.Rendering.Universal.PixelPerfectCamera>().enabled
 expect eval UnityEngine.Mathf.Abs(UnityEngine.Camera.main.orthographicSize - 5.390625f) < 0.01f   # 920x690・PPU 64 → 写す高さ 10.78 マス（ステージは 10.8）
 expect eval UnityEngine.Mathf.Abs(UnityEngine.Camera.main.aspect - 4f / 3f) < 0.01f              # マップは画面の中央 4:3（ステージと同じ）
-key RightArrow 3000                      # 右（床 Yuka の方）へ歩く（エディタが裏だとフレームが遅いので長めに押す）
+key RightArrow 4000                      # 右（床 Yuka の方）へ歩く（エディタが裏だとフレームが遅いので長めに押す）
 expect eval UnityEngine.Object.FindAnyObjectByType<PlayerSwitchManager>().CurrentPlayer.transform.position.x > 12.5f
-key DownArrow 3000                       # 下の海へ向かって歩き続ける
+key DownArrow 4000                       # 下の海へ向かって歩き続ける
 expect eval UnityEngine.Object.FindAnyObjectByType<PlayerSwitchManager>().CurrentPlayer.transform.position.y > 3f   # 海（y 3 より下）に入っていない
 expect eval UnityEngine.Object.FindAnyObjectByType<PlayerSwitchManager>().CurrentPlayer.transform.position.y < 4.6f  # 海のふちまでは歩けた
 expect eval !UnityEditor.EditorApplication.isPaused                                                           # 始めたときのエラーで一時停止していない（expect no-error は再生を始めた後のエラーしか数えない）
 expect eval UnityEngine.Camera.main.transform.position.y - UnityEngine.Camera.main.orthographicSize > -0.02f      # カメラがマップの下の端より外を映さない
-key LeftArrow 6000                       # 左の壁まで歩く
+key LeftArrow 7000                       # 左の壁まで歩く
 expect eval UnityEngine.Object.FindAnyObjectByType<PlayerSwitchManager>().CurrentPlayer.transform.position.x > 0.9f   # 左の壁（x 0〜1）に入っていない
 expect eval UnityEngine.Object.FindAnyObjectByType<PlayerSwitchManager>().CurrentPlayer.transform.position.x < 2f     # 壁のふちまでは歩けた
 expect eval UnityEngine.Camera.main.transform.position.x - UnityEngine.Camera.main.orthographicSize * UnityEngine.Camera.main.aspect > -0.02f
 capture mapchip_ppc_on
-key P 600                                # Pixel Perfect Camera を切る（短く押すとフレームの間に離してしまい届かない）
+expect looks mapchip_ppc_on                 # 基準の画像（Tests/Baselines/mapchip_ppc_on.png）と比べる
+key P 1600                                # Pixel Perfect Camera を切る（短く押すとフレームの間に離してしまい届かない）
 wait 0.5
 expect eval !UnityEngine.Camera.main.GetComponent<UnityEngine.Rendering.Universal.PixelPerfectCamera>().enabled
 expect eval UnityEngine.Mathf.Abs(UnityEngine.Camera.main.orthographicSize - 5.4f) < 0.01f
 capture mapchip_ppc_off
-key Z 600                                # ズーム ×1.25
+key Z 1600                                # ズーム ×1.25
 wait 0.5
 expect eval UnityEngine.Mathf.Abs(UnityEngine.Camera.main.orthographicSize - 4.32f) < 0.01f
-key P 600                                # Pixel Perfect Camera を戻す（ズームはそのまま）
+key P 1600                                # Pixel Perfect Camera を戻す（ズームはそのまま）
 wait 0.5
 expect eval UnityEngine.Camera.main.orthographicSize < 4.5f
 capture mapchip_ppc_zoom

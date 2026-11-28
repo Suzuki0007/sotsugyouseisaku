@@ -7,20 +7,12 @@
 **作業の記録は `Docs/変更履歴.md` だけ**（新しい作業はそちらの一番上に足す。ここと code-map には「最終更新」を書かない。2026-11-20 ユーザーと合意）。
 
 
-## 進み具合
-- **完了：敵の仕組み**（段階0〜7）。→ `.claude/rules/enemy.md`
-- **進行中：謎解き・2人の仕掛け**。頼まれた範囲まで完了：段階0〜5、段階6 は相棒の一言だけ（ユーザーの指示：ヒント・待っている相棒の振る舞い・絆の段階・通信・ピンチの助けは作らない）、段階7 は一言のツール・仕掛けの一覧・サンプルの部屋。→ `.claude/rules/gimmick-party.md`
-- **完了：ティンパニ部屋（Stage_1_Boss）**。全6段階（①部屋・歩ける範囲・遷移 ②ペグとリズムゲーム ③敵とガードのリチャージ ④アイテムと連動 ⑤会話と流れ・戦闘中の一言 ⑥調整と手順書）。→ `.claude/rules/timpani.md`・`Docs/ティンパニ部屋の作り方と調整.md`。左の出口の先（台本 F1_13・二層）のシーンはまだない。
-- **仮組み：上陸（Stage1_0〜Stage1_2 入口）**（2026-11-20、指示書 `CT_landing_to_chase_claudecode_instruction_2026-11-20.md`）。仮素材で全部動く。本番の絵・音・怪物の見た目・砂浜の歩ける範囲のマスクはまだ。→ `rules/scenes.md` の Stage1_0・Stage1_1・Stage1_2。
-- **仮組み：T字通路（Stage1_4）**（2026-11-20、指示書 `CT_T_corridor_claudecode_instruction_2026-11-20.md`）。入室 → 扉の前のイベントまで仮素材で動く。左右の部屋・扉を開ける大なぞ・2人操作の開始はまだ（受け口だけ）。→ `rules/scenes.md` の Stage1_4。
-- **仮組み：書斎（Stage1_3）**（2026-11-20）。仮素材で全部動く（2問・調律・紹介・ロード）。本番の絵・音・出口の先（廊下・楽器倉庫・合流地点）はまだ。→ `rules/scenes.md` の Stage1_3。
-- **完了：演出の基盤**（2026-11-26、指示書 `CT_presentation_mood_light_weather_still_claudecode_instruction_2026-11-25`）：色調・光・天候・回想・1枚絵。窓口 `PresentationDirector`、プリセットは `Assets/Resources/Presentation/`、試し用のシーン `Test_Presentation`。次は S4（時代・季節の切り替え）。→ `.claude/rules/presentation.md`・`Docs/演出の作り方.md`
-- **完了：見た目 A（11/27 打ち合わせ）**（2026-11-27、`Docs/見た目A_レンズと字幕のプラン.md`）：画面の縁・光漏れ・映画の字幕・太陽のレンズフレア・塔の外の空（見上げる／見下ろす）・白ベースの色調。試し用マップの東の広場の一番南の列。→ `rules/presentation.md`・`Docs/演出の作り方.md`。打ち合わせの方針は `Docs/打ち合わせ_2026-11-27_実装方針.md`、シナリオのシーン分け（38 シーン）は `Docs/シーン分け_願いの塔と壊れた調律師.md`。
-- **進行中：マップの見た目の向上**（2026-11-27、`Docs/マップの見た目の向上プラン.md`）。試し配置マップ（Test_Mapchip）で段階 1〜6 完了（壁の形・崩れた所とがれき・地面の色むらと雲の影・光だまりと窓の光・霧とちり・素材のお願い MAP-12〜19）。段階 7（本番のステージへ広げるか・Pixel Perfect Camera）はユーザーの判断待ち。→ `rules/map-room.md`・`Docs/マップチップの置き方.md`
-- **進行中：性能（計測・チューニング）**。段階1（計測の道具）・段階2（点検のスキル `perf-review`）・段階3（Project Auditor）完了。次は ④ 計測で重い所だけ直す。→ `.claude/rules/performance.md`
+## 進み具合（詳しくは `Docs/進み具合.md`。段階が進んだら両方を直す）
+- 完了：敵の仕組み（`rules/enemy.md`）／ティンパニ部屋 Stage_1_Boss（`rules/timpani.md`）／演出の基盤（`rules/presentation.md`）／見た目 A（11/27 打ち合わせ。`Docs/見た目A_レンズと字幕のプラン.md`）
+- 進行中：謎解き・2人の仕掛け（頼まれた範囲まで完了。`rules/gimmick-party.md`）／マップの見た目（段階 7 はユーザーの判断待ち。`rules/map-room.md`）／性能（次は ④ 重い所だけ直す。`rules/performance.md`）
+- 仮組み（仮素材で動く）：上陸 Stage1_0〜1_2・書斎 Stage1_3・T字通路 Stage1_4（`rules/scenes.md`）
+- 未着手：⑦ 古い仕組みの整理。シナリオのシーン分け（38 シーン）は `Docs/シーン分け_願いの塔と壊れた調律師.md`
 - 段階で進める大きな作業は、**1段階ずつ終わったら報告とコミットメッセージを渡す**。
-
-- 初めの提案①〜⑥は完了。**未着手は⑦ 古い仕組みの整理**（`Treasure`・`NoahData.hasKey` を ItemInteraction に寄せる、`EventZone` の「1回だけ」をセーブする）。
 
 ---
 
@@ -56,7 +48,7 @@
 |---|---|---|
 | スキル | `unity-check` | C# を変えたら毎回（再コンパイル → コンソールの警告・エラー要約、`-SceneCheck` でシーンチェック）。`scripts/lib.ps1` の `Invoke-UnityEval` で単発の C# も。**シーンに触る作業の最初に `scripts/preflight.ps1`**（保存していないシーン・再生中・コンパイルエラー・ブランチ。`[ASK]` は作業の前にまとめて聞く） |
 | スキル | `spec-intake` | MUSE.AI などの指示書を受け取って実装するとき（`scan.ps1`＝名前の対応表・ぶつかり・座標の変換 → 1回で合意 → 実装 → 撮影・流れ図 → 「指示書との違いの報告」） |
-| スキル | `unity-playtest` | 再生して確かめるとき（セーブのバックアップと復元・run_in_background・無敵・シーンを開く・キー入力・後片付け）。**通しの確認はテストシナリオ `scripts/scenario.ps1 -Name <名前>|all`**（`Tests/Scenarios/*.txt`。本当のキー入力・ロード・合格／不合格。書き方 `Docs/テストシナリオの書き方.md`）。**イベントの確認は `scripts/event.ps1`**（状態を1行・会話を進める・終わるまで進める・ワープ・調べる代わりに実行・フラグ・撮影・**ロードの確かめ `-SaveOn`／`-AutoSave`／`-Reload`・E キーの経路 `-CheckInteract`・キーの案内 `-Prompt`**。追跡のやり直しの落とし穴など注意も SKILL.md に）。**重さを測るのは `scripts/perf.ps1`**（`-Measure -Label`・`-Profile`・`-LeakCheck`。性能に関わる変更の前後で同じラベルを測って比べる） |
+| スキル | `unity-playtest` | 再生して確かめるとき（セーブのバックアップと復元・run_in_background・無敵・シーンを開く・キー入力・後片付け）。**通しの確認はテストシナリオ `scripts/scenario.ps1 -Name <名前>|all`**（エディタの中でまとめて動かす。**どれを流すかは `-Affected -WhatIf`**、見た目は `expect looks`）（`Tests/Scenarios/*.txt`。本当のキー入力・ロード・合格／不合格。書き方 `Docs/テストシナリオの書き方.md`）。**イベントの確認は `scripts/event.ps1`**（状態を1行・会話を進める・終わるまで進める・ワープ・調べる代わりに実行・フラグ・撮影・**ロードの確かめ `-SaveOn`／`-AutoSave`／`-Reload`・E キーの経路 `-CheckInteract`・キーの案内 `-Prompt`**。追跡のやり直しの落とし穴など注意も SKILL.md に）。**重さを測るのは `scripts/perf.ps1`**（`-Measure -Label`・`-Profile`・`-LeakCheck`。性能に関わる変更の前後で同じラベルを測って比べる） |
 | スキル | `scene-recipe` | シーンに物をまとめて置く・作り直すとき（組み立ての C#＝レシピを `recipes/` に残し `run.ps1` で実行。今あるレシピと作り直す順番・レシピに入っていない調整値は SKILL.md） |
 | スキル | `asset-audit` | 素材チェックリスト（`Docs/素材チェックリスト.xlsx`）を Unity と照らし合わせて更新するとき（`audit.ps1`：調べ直して行ごとに解決したかを判定・`-Apply` で書く・`-NewSlots` で新しい空き欄）。素材を入れた後・素材の進み具合を聞かれたとき |
 | スキル | `room-build` | 部屋・マップを作るとき（部屋の型 → マスク画像から歩ける範囲 → 中身 → 点検 → 再生で範囲の表示・届くか・ロード）。設計は `rules/map-room.md`。**部屋を作った・配置を変えたら `scripts/mapshot.ps1 -Scene <名前>`**（範囲を重ねた上からの撮影 → 報告に添付）。謎・仕掛けを作ったら **`FlowMap.Build()`**（`Docs/仕掛けの流れ/`：何をすると何が開くかの図・詰みの候補・一度に変わる物が多い所） |

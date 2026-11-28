@@ -40,6 +40,9 @@ if (Test-Path $marker) {
     Write-Output "[WARN] no marker file; nothing to restore (start.ps1 was not used?)"
 }
 
+# --- 2b. font assets (TMP dynamic atlas grows while playing -> the .asset file changes)
+if ($info -and $info.fonts) { Write-Output ("font assets: " + (Restore-FontAssets $info.fonts)) }
+
 # --- 3. test assets
 if (-not $KeepTestAssets) {
     $r = Invoke-UnityEval -Code "UnityEditor.AssetDatabase.IsValidFolder(`"Assets/__ClaudeTest`") ? (UnityEditor.AssetDatabase.DeleteAsset(`"Assets/__ClaudeTest`") ? `"deleted`" : `"delete failed`") : `"none`""

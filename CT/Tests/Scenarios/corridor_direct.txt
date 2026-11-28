@@ -6,7 +6,7 @@ expect near 0,-5.85 0.6               # 入口 (1080,1305)
 advance all                           # E1
 wait 1
 expect scene Stage1_4
-key DownArrow 1500                    # 南へ歩くと、ちゃんと出口で書斎へ移る
+key DownArrow 2500                    # 南へ歩くと、ちゃんと出口で書斎へ移る
 wait scene Stage1_3
 expect scene Stage1_3
 expect no-error

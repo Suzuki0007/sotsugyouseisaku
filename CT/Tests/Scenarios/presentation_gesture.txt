@@ -6,20 +6,20 @@ wait 2
 # 砂浜の東の端から右へ歩くと広場に入れる
 warp -109.0,28.3
 wait 1
-key RightArrow 1500
+key RightArrow 2500
 wait 1
 expect eval PlayerSwitchManager.Instance.CurrentPlayer.transform.position.x > -107.0f
 # 回す（最後のひと巻き）：E を押したまま。最後の 1 割は重い
 warp -105.0,34.6
 wait 1
-key E 10000
+key E 11000
 wait 1
 expect eval PresentationValues.Get("見本_回す") > 0.99f
 expect eval !GestureEventAction.IsBusy
 # 長押し（手を伸ばす）
 warp -100.6,34.6
 wait 1
-key E 9000
+key E 10000
 wait 1
 expect eval PresentationValues.Get("見本_長押し") > 0.99f
 expect eval !GestureEventAction.IsBusy
@@ -99,11 +99,12 @@ wait 1
 expect eval PresentationValues.Get("見本_埋葬") > 4.5f
 capture burial_memory
 wait idle
+wait until 10 !PresentationDirector.InFlashback   # 回想が抜けきるまで（11-28：前の実行役は遅かったので待たずに済んでいた）
 expect flag Flag_Flashback_Active off
 # 組み合わせ②：最後のひと巻き（回す → 半分・9 割で字幕 → 時計から光が灯る）
 warp -95.8,25.0
 wait 1
-key E 10000
+key E 11000
 expect eval PresentationValues.Get("見本_ひと巻き") > 0.99f
 wait 1
 capture last_wind

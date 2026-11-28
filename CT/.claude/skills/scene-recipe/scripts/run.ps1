@@ -40,10 +40,15 @@ if ($body -match "//\s*@helpers") {
 }
 $tmp = Join-Path $env:TEMP ("ct_recipe_" + [guid]::NewGuid().ToString("N") + ".cs")
 [IO.File]::WriteAllText($tmp, $body, (New-Object Text.UTF8Encoding($false)))
+# A recipe that places Japanese text and saves makes the Editor add characters to the TMP font assets (2026-11-28).
+$fontBackup = Join-Path $env:TEMP ("ct_recipe_fonts_" + [guid]::NewGuid().ToString("N"))
+[void](Backup-FontAssets $fontBackup)
 try {
     $r = Invoke-UnityEval -File $tmp -Timeout $Timeout
     Write-Output $r
 } finally {
     Remove-Item $tmp -Force -ErrorAction SilentlyContinue
+    Write-Output ("font assets: " + (Restore-FontAssets $fontBackup))
+    Remove-Item $fontBackup -Recurse -Force -ErrorAction SilentlyContinue
 }
 Write-Output "[NEXT] check the references the recipe set (flags, dialogues), then run unity-check -SceneCheck."

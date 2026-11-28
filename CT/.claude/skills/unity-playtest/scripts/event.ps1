@@ -16,6 +16,8 @@
 #   event.ps1 -Prompt                      what the key prompt ([E] ...) is showing now
 #   event.ps1 -Reach                       from the current player: can it walk to every interactable / exit / spawn point? (MapReach)
 #   event.ps1 -ShowArea -Value 1           draw the walk area outline in the Game view (0 = hide); combine with -Capture
+#   event.ps1 -CaptureAB name -Before "<C#>" -After "<C#>" [-Wait 1.5] [-Labels "off,on"]
+#                                          run Before, capture, run After, capture, save the two side by side as name.png
 # Each eval round trip takes ~1.5 s, so effects shorter than that (flash, shot) cannot be captured.
 # ASCII only.
 param(
@@ -34,7 +36,12 @@ param(
     [switch]$Prompt,
     [switch]$Reach,
     [switch]$ShowArea,
-    [int]$MaxSteps = 200
+    [int]$MaxSteps = 200,
+    [string]$CaptureAB,
+    [string]$Before,
+    [string]$After,
+    [double]$Wait = 1.5,
+    [string]$Labels = "before,after"
 )
 
 . (Join-Path $PSScriptRoot "..\..\unity-check\scripts\lib.ps1")
@@ -124,6 +131,41 @@ if ($Flag) {
     $on = if ($Value -ne 0) { "true" } else { "false" }
     $code = "var f = UnityEditor.AssetDatabase.LoadAssetAtPath<GameFlag>(`"Assets/Data/Flags/$Flag.asset`"); if (f == null) return `"no flag $Flag`"; GameFlags.Set(f, $on); return `"$Flag = `" + GameFlags.Get(f);"
     Invoke-UnityEval -Code $code
+    return
+}
+
+if ($CaptureAB) {
+    $dir = Join-Path $env:TEMP "ct_playtest_capture"
+    New-Item -ItemType Directory -Force $dir | Out-Null
+    $shots = @()
+    foreach ($pair in @(@("a", $Before), @("b", $After))) {
+        $c = "$($pair[1])".Trim()
+        if ($c) {
+            if (-not $c.EndsWith(";") -and -not $c.EndsWith("}")) { $c += ";" }
+            $r = Invoke-UnityEval -Code ($c + ' return "ok";')
+            if ($r -ne "ok") { Write-Output "[ERROR] the $($pair[0]) code failed:"; $r | ForEach-Object { Write-Output ("  " + $_) }; return }
+        }
+        Start-Sleep -Milliseconds ([int]($Wait * 1000))
+        $f = Join-Path $dir ($CaptureAB + "_" + $pair[0] + ".png")
+        unity command capture game_view --output-path $f --result-only 2>$null | Out-Null
+        if (-not (Test-Path $f)) { Write-Output "[ERROR] capture failed ($f)"; return }
+        $shots += $f
+    }
+    # side by side with a label on each (System.Drawing is part of Windows PowerShell 5.1)
+    Add-Type -AssemblyName System.Drawing
+    $ia = [Drawing.Image]::FromFile($shots[0]); $ib = [Drawing.Image]::FromFile($shots[1])
+    $gap = 16; $bar = 44
+    $bmp = New-Object Drawing.Bitmap ($ia.Width + $gap + $ib.Width), ([math]::Max($ia.Height, $ib.Height) + $bar)
+    $g = [Drawing.Graphics]::FromImage($bmp)
+    $g.Clear([Drawing.Color]::FromArgb(24, 24, 24))
+    $g.DrawImage($ia, 0, $bar, $ia.Width, $ia.Height); $g.DrawImage($ib, $ia.Width + $gap, $bar, $ib.Width, $ib.Height)
+    $font = New-Object Drawing.Font("Yu Gothic UI", 20, [Drawing.FontStyle]::Bold)
+    $lb = $Labels -split ","
+    $g.DrawString($lb[0], $font, [Drawing.Brushes]::White, 12, 6); $g.DrawString($(if ($lb.Count -gt 1) { $lb[1] } else { "B" }), $font, [Drawing.Brushes]::White, $ia.Width + $gap + 12, 6)
+    $out = Join-Path $dir ($CaptureAB + ".png")
+    $bmp.Save($out, [Drawing.Imaging.ImageFormat]::Png)
+    $g.Dispose(); $bmp.Dispose(); $ia.Dispose(); $ib.Dispose(); $font.Dispose()
+    Write-Output $out
     return
 }
 

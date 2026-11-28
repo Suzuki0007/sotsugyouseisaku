@@ -95,8 +95,7 @@ public class SubtitleStyle : ScriptableObject
     private static void ResetOnPlay()
     {
         loaded = null;
-        fontAsset = null;
-        fontAssetSource = null;
+        // フォントのアセットは再生をまたいで使い回す（エディタでは再生のたびに作り直すと、前の物が残ってメモリがたまった。2026-11-28）
     }
 
     /// <summary> 設定（なければ最初の値の物を作る） </summary>
@@ -117,18 +116,40 @@ public class SubtitleStyle : ScriptableObject
     public TMP_FontAsset FontAsset()
     {
         if(font == null) { return null; }
-        if(fontAsset != null && fontAssetSource == font) { return fontAsset; }
+        // 中の文字の絵（アトラス）が消されていたら作り直す（再生の合間に片付けられることがあった。11-28）
+        if(fontAsset != null && fontAssetSource == font && fontAsset.atlasTexture != null) { return fontAsset; }
+        DestroyFontAsset();
         fontAsset = TMP_FontAsset.CreateFontAsset(font, 90, 9, GlyphRenderMode.SDFAA, 2048, 2048, AtlasPopulationMode.Dynamic, true);
         fontAssetSource = font;
         if(fontAsset != null)
         {
             fontAsset.name = font.name + "（字幕・実行中）";
+            // 保存しない・使っていないアセットの片付けで消さない（使い回すため）。中の絵とマテリアルにも付ける
+            fontAsset.hideFlags = HideFlags.DontSave;
+            if(fontAsset.atlasTextures != null)
+            {
+                foreach(var t in fontAsset.atlasTextures) { if(t != null) { t.hideFlags = HideFlags.DontSave; } }
+            }
+            if(fontAsset.material != null) { fontAsset.material.hideFlags = HideFlags.DontSave; }
             if(TMP_Settings.defaultFontAsset != null)
             {
                 fontAsset.fallbackFontAssetTable = new List<TMP_FontAsset> { TMP_Settings.defaultFontAsset };
             }
         }
         return fontAsset;
+    }
+
+    /// <summary> 前に作ったフォントのアセット（と文字の絵・マテリアル）を消す </summary>
+    private static void DestroyFontAsset()
+    {
+        if(fontAsset == null) { return; }
+        if(fontAsset.atlasTextures != null)
+        {
+            foreach(var t in fontAsset.atlasTextures) { if(t != null) { DestroyImmediate(t); } }
+        }
+        if(fontAsset.material != null) { DestroyImmediate(fontAsset.material); }
+        DestroyImmediate(fontAsset);
+        fontAsset = null;
     }
 
     /// <summary> 縁取りと影を入れたマテリアルを作る（呼んだ側が持つ・消す） </summary>

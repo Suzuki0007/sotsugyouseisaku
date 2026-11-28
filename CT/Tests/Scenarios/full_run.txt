@@ -13,7 +13,7 @@ expect flag Flag_OP_Done on
 expect flag Flag_Land_LetterRead on
 expect eval !PlayerSwitchManager.Instance.Sigle.activeSelf   # まだノア1人
 warp -117.0,35.3                # 砂浜の奥の振動（中）の範囲のすぐ手前
-key UpArrow 600
+key UpArrow 1600
 wait 1
 advance 4                       # OP_02g（4文）→ Stage1_1 へ（all だと移った先のスチルの会話まで送ってしまう）
 wait scene Stage1_1
@@ -22,12 +22,12 @@ expect talk あれが、塔          # 着いたら塔の全景スチル
 advance all
 expect flag Flag_Land_TowerStill on
 warp -115.2,20.6                # 鐘の言い伝え（OP_03）の帯の手前
-key UpArrow 500
+key UpArrow 1500
 wait 1
 expect talk 鐘が鳴った
 advance all
 warp -115.2,22.6                # 扉の爪痕の帯の手前
-key UpArrow 400
+key UpArrow 1400
 wait 1
 expect talk この扉
 advance 3

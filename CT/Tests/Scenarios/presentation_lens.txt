@@ -11,6 +11,7 @@ wait 2
 expect eval PresentationDirector.LensVisible
 expect eval PresentationDirector.CurrentMoodName == "Mood_見本_画面の縁"
 capture lens_edge
+expect looks lens_edge                 # 基準の画像（Tests/Baselines/lens_edge.png）と比べる
 key E
 wait 2
 expect eval PresentationDirector.CurrentMoodName == "Mood_見本_光漏れ"
@@ -22,14 +23,13 @@ key E
 wait 1
 expect eval PresentationDirector.FlareVisible
 capture lens_flare
-# 映画の字幕の台座（-100.2, 21.8）：出る → 7 秒で消える（key E の行だけで 3 秒ほどかかるので、すぐ確かめる）
+# 映画の字幕の台座（-100.2, 21.8）：出る → 7 秒で消える（時間で決まるので within で）
 warp -100.2,21.8
 wait 1
 key E
-expect eval CinemaMode.Get().MovieAlpha > 0.5f
+expect within 3 CinemaMode.Get().MovieAlpha > 0.5f
 capture lens_subtitle
-wait 6
-expect eval CinemaMode.Get().MovieAlpha < 0.01f
+expect within 10 CinemaMode.Get().MovieAlpha < 0.01f
 # 空の台座（-97, 21.8）：1 回目＝青空。広場の東の端ではカメラが東へ動き、マップの外に空が見える
 warp -97.0,21.8
 wait 1
@@ -38,6 +38,7 @@ wait 3
 expect eval PresentationDirector.CurrentSkyName == "Sky_青空"
 expect eval PresentationDirector.SkyPresence > 0.99f
 capture sky_up
+expect looks sky_up                 # 基準の画像（Tests/Baselines/sky_up.png）と比べる
 # 空の見え方の台座（-94.6, 21.8）：見下ろす（塔の中）にする
 warp -94.6,21.8
 wait 1
@@ -45,6 +46,7 @@ key E
 wait 1
 expect eval PresentationDirector.CurrentSkyMode == SkyViewMode.LookDown
 capture sky_down
+expect looks sky_down                 # 基準の画像（Tests/Baselines/sky_down.png）と比べる
 # ロードしても、イベントで変えた空はそのまま（見え方はシーンの既定＝見上げるに戻る）
 autosave
 reload

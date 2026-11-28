@@ -18,14 +18,39 @@ $env:UNITY_NO_PAGER = "1"
 $Script:CtRoot = (Resolve-Path (Join-Path $PSScriptRoot "..\..\..\..")).Path
 Set-Location $Script:CtRoot
 
+# True when an Editor (not the CLI, not an import worker) has this project open.
+function Test-UnityEditorRunning {
+    $want = ($Script:CtRoot -replace "/", "\").TrimEnd("\").ToLowerInvariant()
+    foreach ($p in @(Get-CimInstance Win32_Process -Filter "Name='Unity.exe'" -ErrorAction SilentlyContinue)) {
+        $c = "$($p.CommandLine)"
+        if ($c -match "-batchMode" -or $c -match "AssetImportWorker") { continue }
+        if ("$($p.ExecutablePath)" -match "\\Unity\\bin\\") { continue }
+        if (($c -replace "/", "\").ToLowerInvariant().Contains($want)) { return $true }
+    }
+    return $false
+}
+
 function Wait-UnityReady {
     param([int]$Timeout = 300)
-    $out = unity status --until-ready --timeout $Timeout 2>$null
-    if ($LASTEXITCODE -ne 0) {
-        Write-Output "[ERROR] Unity Editor is not ready (not running?). Start it with: unity open ."
+    # An Editor that is closed never becomes ready: say so at once instead of waiting the whole timeout (2026-11-28).
+    if (-not (Test-UnityEditorRunning)) {
+        Write-Host "[ERROR] Unity Editor is not running for this project. Ask the user, then: unity open ."
         return $false
     }
-    return $true
+    # Right after a recompile (domain reload) "status --until-ready" can fail at once instead of waiting: try again
+    # until the timeout while the Editor process is alive. (Hidden until 2026-11-28: the old error path returned an
+    # array that was always true, so nothing ever stopped here.)
+    $deadline = (Get-Date).AddSeconds($Timeout)
+    while ($true) {
+        $left = [int][math]::Max(5, ($deadline - (Get-Date)).TotalSeconds)
+        $out = unity status --until-ready --timeout $left 2>$null
+        if ($LASTEXITCODE -eq 0) { return $true }
+        if ((Get-Date) -ge $deadline) { break }
+        if (-not (Test-UnityEditorRunning)) { Write-Host "[ERROR] Unity Editor closed while waiting."; return $false }
+        Start-Sleep -Seconds 2
+    }
+    Write-Host "[ERROR] Unity Editor is not ready after $Timeout s (a dialog open? still importing?)."
+    return $false
 }
 
 # Prints console entries as one short line each (no stack traces).
@@ -43,6 +68,54 @@ function Show-UnityConsole {
         if ($msg.Length -gt $Width) { $msg = $msg.Substring(0, $Width) + "..." }
         Write-Output ("[{0}] #{1} {2}" -f $e.level, $e.seq, $msg)
     }
+}
+
+# TMP font assets (dynamic atlas) in Assets/Fonts are rewritten by the Editor when new characters are drawn
+# (play mode, or a recipe that places Japanese text and saves). Back them up before and put them back after.
+function Backup-FontAssets {
+    param([string]$Dir)
+    New-Item -ItemType Directory -Force $Dir | Out-Null
+    $fonts = @(Get-ChildItem -Path (Join-Path $Script:CtRoot "Assets\Fonts") -Filter "*.asset" -ErrorAction SilentlyContinue)
+    foreach ($f in $fonts) { Copy-Item $f.FullName $Dir -Force }
+    return $fonts.Count
+}
+
+# Returns one line: "unchanged" or the restored names. Also reloads fonts that are only changed in memory (dirty).
+function Restore-FontAssets {
+    param([string]$Dir)
+    if (-not $Dir -or -not (Test-Path $Dir)) { return "no backup" }
+    $fontDir = Join-Path $Script:CtRoot "Assets\Fonts"
+    $put = @()
+    foreach ($b in @(Get-ChildItem -Path $Dir -Filter "*.asset")) {
+        $cur = Join-Path $fontDir $b.Name
+        if (-not (Test-Path $cur)) { continue }
+        if ((Get-FileHash $cur).Hash -ne (Get-FileHash $b.FullName).Hash) { Copy-Item $b.FullName $cur -Force; $put += ("Assets/Fonts/" + $b.Name) }
+    }
+    $list = ($put | ForEach-Object { '"' + $_ + '"' }) -join ","
+    $code = @"
+var put = new System.Collections.Generic.List<string>(new string[]{ $list });
+var sb = new System.Text.StringBuilder();
+foreach (var g in UnityEditor.AssetDatabase.FindAssets("t:TMP_FontAsset", new[]{ "Assets/Fonts" })) {
+  var p = UnityEditor.AssetDatabase.GUIDToAssetPath(g);
+  var a = UnityEditor.AssetDatabase.LoadMainAssetAtPath(p);
+  bool dirty = a != null && UnityEditor.EditorUtility.IsDirty(a);
+  if (!dirty && !put.Contains(p)) continue;
+  if (dirty) UnityEditor.EditorUtility.ClearDirty(a);
+  UnityEditor.AssetDatabase.ImportAsset(p, UnityEditor.ImportAssetOptions.ForceUpdate);
+  sb.Append(System.IO.Path.GetFileName(p)).Append(dirty ? " (was dirty)" : " (file restored)").Append("; ");
+}
+// TMP keeps fallback materials / lookups made for the old atlas; without this the next play threw
+// IndexOutOfRange in TMP_MaterialManager.GetFallbackMaterial ~1900 times (2026-11-28).
+if (sb.Length > 0) {
+  TMPro.TMP_MaterialManager.CleanupFallbackMaterials();
+  foreach (var g in UnityEditor.AssetDatabase.FindAssets("t:TMP_FontAsset", new[]{ "Assets/Fonts" })) {
+    var fa = UnityEditor.AssetDatabase.LoadAssetAtPath<TMPro.TMP_FontAsset>(UnityEditor.AssetDatabase.GUIDToAssetPath(g));
+    if (fa != null) { fa.ReadFontAssetDefinition(); TMPro.TMPro_EventManager.ON_FONT_PROPERTY_CHANGED(true, fa); }
+  }
+}
+return sb.Length == 0 ? "unchanged" : sb.ToString();
+"@
+    return (Invoke-UnityEval -Code $code -Timeout 60)
 }
 
 # Hidden cameras left in the Editor (HideAndDontSave, enabled, not the Scene view camera).
@@ -86,10 +159,20 @@ function Invoke-UnityEval {
         $File = $tmp
     }
     $args2 = @("command", "script", "eval", "--result-only", "--timeout", "$Timeout", "--file", $File)
-    $raw = & unity @args2 2>$null
+    # Right after a recompile / domain reload the pipeline server is not up yet (PIPELINE_UNREACHABLE).
+    # The code never ran in that case, so retrying is safe: up to 10 tries, 2 s apart (about 20 s).
+    $json = $null; $text = ""
+    for ($try = 0; $try -lt 10; $try++) {
+        $raw = & unity @args2 2>$null
+        $text = ($raw -join "`n")
+        $json = $null
+        try { $json = $text | ConvertFrom-Json } catch { }
+        $unreachable = ($text -match "PIPELINE_UNREACHABLE") -and ($null -eq $json -or -not $json.success)
+        if (-not $unreachable) { break }
+        Start-Sleep -Seconds 2
+    }
     if ($tmp) { Remove-Item $tmp -Force -ErrorAction SilentlyContinue }
-    $text = ($raw -join "`n")
-    try { $json = $text | ConvertFrom-Json } catch {
+    if ($null -eq $json) {
         if (-not $Quiet) { Write-Output "[ERROR] eval output was not JSON:"; Write-Output $text }
         return $null
     }

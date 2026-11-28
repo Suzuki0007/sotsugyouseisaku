@@ -1,0 +1,51 @@
+# 変えたファイル → 流すシナリオ（scenario.ps1 -Affected / affected.ps1）。上から順に見て、最初に当たった行を使う。
+# 1 列目：CT からの相対パスのワイルドカード（** は何階層でも、* は 1 階層の中）。2 列目：シナリオ名をカンマで並べる、または
+#   @self  ＝ そのシナリオ自身（Tests/Scenarios の .txt を変えたとき）
+#   @scene ＝ そのシーン（Assets/Scenes/<名前>.unity）を使うシナリオ全部（scene・wait scene の行で探す）
+#   @all   ＝ 全部（土台の変更。rules/tests.md の「いつ全部を流すか」）
+#   -      ＝ 流さない（文書・Claude の道具・エディタだけのコード）
+# 3 列目：理由（出力にそのまま出る）。シナリオを足したら、関係する行に名前を足す。
+pattern	scenarios	reason
+Tests/Scenarios/*.txt	@self	シナリオ自身
+Assets/Scenes/*.unity	@scene	そのシーンを使うシナリオ
+Assets/Script/Debug/Editor/ScenarioRunner.cs	presentation_lens,title_newgame_continue	シナリオの実行役（代表の 2 本）
+Assets/Script/Save/**	@all	セーブの土台
+Assets/Script/Event/EventProcess/**	@all	イベントの土台
+Assets/Script/Scene/**	@all	シーン遷移の土台
+**/InputBlock.cs	@all	入力を止める土台
+Assets/Script/**/Editor/**	-	エディタだけのコード
+Assets/Script/Title/**	title_newgame_continue,full_run	タイトル
+Assets/Script/Timpani/**	timpani,gameover_retry	ティンパニ部屋
+Assets/Script/Enemy/**	timpani,gameover_retry,stage1_2_chase_retry,landing_desert	敵
+Assets/Script/Attack/**	timpani,gameover_retry	攻撃
+Assets/Script/Bullet/**	timpani,gameover_retry	弾
+Assets/Script/Health/**	timpani,gameover_retry	体力
+Assets/Script/Player/**	stage1_2_rescue,timpani,corridor	プレイヤー
+Assets/Script/Party/**	stage1_2_rescue,timpani,corridor	2人・相棒の一言
+Assets/Script/Gimmick/**	shosai,corridor,timpani	仕掛け
+Assets/Script/Intaract/**	shosai,corridor,stage1_2_rescue	調べる
+Assets/Script/Item/**	shosai,stage1_2_rescue	アイテム
+Assets/Script/Map/**	mapchip_test,mapchip_beach,timpani	マップの範囲・見た目
+Assets/Script/Presentation/**	presentation_test,presentation_save,presentation_lens,presentation_gesture	演出
+Assets/Resources/Presentation/**	presentation_test,presentation_save,presentation_lens	演出のプリセット
+Assets/Script/Camera/**	presentation_lens,op,landing_desert	カメラ・シネマ演出・字幕
+Assets/Script/StageDarkness/**	stage1_2_rescue,presentation_test	暗さ
+Assets/Script/Talk/**	op,landing_beach,stage1_2_rescue,shosai	会話の仕組み
+Assets/Data/Dialogue/**	op,landing_beach,landing_desert,stage1_2_rescue,shosai,corridor	会話の文（文だけなら rules/tests.md：検索で当たった物だけでもよい）
+Assets/Script/Signal/**	timpani,corridor	合図
+Assets/Script/Flag/**	shosai,corridor,stage1_2_rescue	フラグ
+Assets/Script/Bgm/**	title_newgame_continue	BGM
+Assets/Script/Se/**	-	音（耳で確かめる）
+Assets/Script/UI/**	title_newgame_continue,gameover_retry	UI
+Assets/Fonts/**	-	フォント（再生で変わる。end.ps1 が戻す）
+.claude/skills/scene-recipe/recipes/test_presentation.cs	presentation_test,presentation_lens,presentation_gesture	試し用の演出のシーン
+.claude/skills/scene-recipe/recipes/mapchip_*.cs	mapchip_test,mapchip_beach	試し配置マップ
+.claude/skills/scene-recipe/recipes/shosai_*.cs	shosai,corridor	書斎
+.claude/skills/scene-recipe/recipes/corridor_*.cs	corridor,corridor_direct	T字通路
+.claude/skills/scene-recipe/recipes/landing_*.cs	landing_beach,landing_desert,op	上陸
+.claude/skills/scene-recipe/recipes/stage1_2_*.cs	stage1_2_rescue,stage1_2_chase_retry	Stage1_2
+.claude/skills/scene-recipe/recipes/stage1_3_*.cs	timpani,gameover_retry	ティンパニ部屋
+.claude/**	-	Claude の道具（変えたスクリプトを1回動かす）
+Docs/**	-	文書
+PerfLog/**	-	計測の記録
+CLAUDE.md	-	文書

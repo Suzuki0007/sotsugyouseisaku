@@ -25,6 +25,8 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .claude/skills/unity-playtes
 - 再生中なら start は止まる（ユーザーがテスト中かもしれない）。前のテストの片付けが残っていても止まる → `end.ps1` を先に。
 - バックアップは `%TEMP%\ct_playtest_backup\<日時>\` に残る（end のあとも消さない）。
 - `end.ps1 -KeepTestAssets`：`Assets/__ClaudeTest/` を残す。
+- **フォント（TMP の動的なアトラス）は自動で戻る**（2026-11-28）：start が `Assets/Fonts/*.asset` を写し、end が中身の変わった物を書き戻して読み直す（メモリの上だけで変わった〔dirty〕物も読み直す）。`NotoSansJP-Regular SDF.asset` を手で戻す必要はない。end の出力の `font assets:` の行で確かめる。2026-11-28 に試したときは、再生だけではファイルは変わらなかった（unchanged）。前に変わっていたのは、レシピでシーンに日本語の文字を置いて保存したときに、エディタが字を足して書いた分らしい（再生ではなく保存のとき）。
+- 再コンパイルの直後の `PIPELINE_UNREACHABLE` は `Invoke-UnityEval` が 2 秒おきに 10 回までやり直す（コードは動いていないので、やり直しても安全）。
 - エディタのドメインリロードは無効なので、再生開始はすぐ。static は `SubsystemRegistration` でリセットされる（無敵は再生のたびに start が付け直す）。
 
 ## キー入力
@@ -50,6 +52,13 @@ powershell -NoProfile -ExecutionPolicy Bypass -File $ev -Warp "-128.6,13.0" # �
 powershell -NoProfile -ExecutionPolicy Bypass -File $ev -Run "Stage1_2_イベント/ランタン（調べると拾う）"  # 調べる・エリアに入る の代わり
 powershell -NoProfile -ExecutionPolicy Bypass -File $ev -Flag Flag_Sigle_Joined -Value 1   # フラグを ON/OFF
 powershell -NoProfile -ExecutionPolicy Bypass -File $ev -Capture s1         # ゲームビューを撮る（%TEMP%\ct_playtest_capture\s1.png を Read で見る）
+powershell -NoProfile -ExecutionPolicy Bypass -File $ev -CaptureAB frame -Before "PresentationDirector.SetFrameForEvent(false, 0f);" -After "PresentationDirector.SetFrameForEvent(true, 0f);" -Labels "なし,あり"
+                                                                            # 前後を撮って横に並べる（frame.png。報告に添える比較画像）
+```
+
+重さを前後で比べる（同じ場所で切り替えるだけの比較。CSV には書かない）：
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .claude/skills/unity-playtest/scripts/perf.ps1 -AB -Off "MapDebugView.Show = false;" -On "MapDebugView.Show = true;" -Seconds 10
 ```
 
 ### テストシナリオ（11-14 に追加。**通しの確認・壊れていないかの確認はまずこれ**）
@@ -60,9 +69,19 @@ powershell -NoProfile -ExecutionPolicy Bypass -File $sc -Name stage1_2_rescue   
 powershell -NoProfile -ExecutionPolicy Bypass -File $sc -Name all               # 全部（1本 1〜2 分）
 ```
 
-- 書き方は `Docs/テストシナリオの書き方.md`（プランナー向け）と、`scenario.ps1` の先頭のコメント（命令の一覧）。
-- `scene` の最初の行で `start.ps1` を呼び、最後に必ず `end.ps1`（セーブを戻す）。`-KeepPlaying` で再生を止めない。`-StopOnFail` で最初の不合格で止まる。
+- 書き方は `Docs/テストシナリオの書き方.md`（プランナー向け）と、`scenario_legacy.ps1` の先頭のコメント（命令の一覧。新旧で同じ）。
+- **エディタの中でまとめて動かす**（2026-11-28〜）：最初の `scene` の行だけ `start.ps1`、残りは 1 回の eval で `Assets/Script/Debug/Editor/ScenarioRunner.cs` に渡す（`expect eval`・`expect within`・`wait until`・`eval` の C# はラムダにして一緒に翻訳）。実行役が `EditorApplication.update` で 1 行ずつ進め、結果を `%TEMP%\ct_scenario_<名前>.txt` に書き、scenario.ps1 はそれを表示するだけ。1 本 約 2 分 → 約 1 分（残りはシナリオの中の wait）。
+  - **C# の式が 1 つでも翻訳できないと、シナリオ全体が始まらない**（`runner did not start` と、翻訳のエラーの行番号＝生成したコードの中の行）。前は、その行だけ不合格だった。
+  - `key X 1200` の数字は**本当に押している時間**。前の実行役は呼び出しの往復（約 1 秒）が足されていたので、11-28 に全シナリオの数字を +1000 した。
+  - `expect no-error` は `Application.logMessageReceivedThreaded` で数える。前の実行役はコンソールのウィンドウの表示（`LogEntries`）を読んでいたので、**表示の絞り込みによってはエラーを見逃していた**（11-28：TMP の例外 1900 件を見逃した）。
+  - 前の実行役は `-Legacy` で使える（`scenario_legacy.ps1`。新しい方の不具合を疑うときに比べる）。ただし今のシナリオは新しい方に合わせてある（`key` の数字 +1000 など）ので、前の方では押す時間が 1 秒ほど長くなる。
+  - **前の実行役の遅さに頼っていた所**（11-28 に全部を流して見つけ、直した）：`advance 数` を会話が出る前に呼ぶ（→ 実行役が会話が出るまで最大 5 秒待つ）・会話を続けてすぐ送ると飛ばされる（→ 1 文ごとに次の文に変わるのを待つ）・やり直しの直後のワープが戻される（`stage1_2_chase_retry` に `wait 1.5`）・イベントのあとの入力の止まりの間に E を押す（`corridor` に `wait until 5 !InputBlock.IsBlocked`）・回想が抜けきる前に確かめる（`presentation_gesture` に `wait until`）。**新しいシナリオでも同じことに気をつける**。
+- **変えたファイルから選ぶ**：`scenario.ps1 -Affected`（`-WhatIf` で一覧だけ）。対応表は `data/affected.tsv`（上から最初に当たった行。`@self`・`@scene`＝そのシーンを使うシナリオ・`@all`・`-`）。表にないファイルは `NOMAP` と出る → 手で決めて、表に行を足す。シナリオを足したら関係する行に名前を足す。
+- **見た目の比較** `expect looks <名前> [許す割合%]`：ゲームビューを撮って 192×108 の升目に縮め、`Tests/Baselines/<名前>.png` と比べる。色の差が 0.12 を超える升目の割合が許す割合（既定 5%）以下なら合格。不合格なら違う所を赤くした `%TEMP%\ct_playtest_capture\looks_<名前>_diff.png` を見る。**見た目を変えて、それが正しいとユーザーが言ったら `-UpdateBaselines`** で基準を作り直す（基準は Git に入れる）。光漏れ・雲など動く物があるので、許す割合はシナリオごとに決める。
+- `scene` の最初の行で `start.ps1` を呼び、最後に必ず `end.ps1`（セーブを戻す）。`-KeepPlaying` で再生を止めない。`-StopOnFail` で最初の不合格で止まる。`-Name a,b,c` で続けて流す。
 - **本当のキー入力**：実行中だけ `InputSystem.settings.editorInputBehaviorInPlayMode = AllDeviceInputAlwaysGoesToGameView`・`backgroundBehavior = IgnoreFocus` にして `QueueStateEvent` で押す（エディタが手前になくても届く。E で調べる・Enter で UI の決定まで確かめた）。終わったら元の設定（`PointersAndKeyboardsRespectGameViewFocus`・`ResetAndDisableNonBackgroundDevices`）に戻す。press.ps1 を単体で使うときは設定を変えないので届かない。設定を変えたあと `InputSystem.EnableDevice(Keyboard.current)` も呼ぶ（2026-11-25、学校の PC：エディタが裏のまま再生を始めると、設定を変えてもキーボードが止まったままで、どのキーも届かなかった）。
+- `key` の 1 行は呼び出し 1 回（押す → エディタの `EditorApplication.update` が決まった時間のあとに離す）。2026-11-28 までは押す・離すで 2 回呼び、1 行に約 3 秒かかっていた。
+- **時間で消える物・時間がかかる物は、`wait 秒` の当て推量ではなく `expect within 秒 式`（その秒数のうちに真になれば合格）と `wait until 秒 式`（真になるまで待つ）**で書く。字幕・フェード・空の切り替えなど（2026-11-27、決まった秒数で書いて字幕の確認が 2 回落ちた）。
 - 追跡は `advance battle`（戦闘エリアが始まった瞬間に止まる）のすぐ後に `warp`。遅いと捕まって最初からやり直しになる。
 - 戦闘中に `invincible off` で会話を送ると倒れる。倒す確認は `kill`（自分で無敵を切る）。
 - `expect no-error` は、始めてからのコンソールのエラー（Pipeline・Account API の通信のエラーは除く）。

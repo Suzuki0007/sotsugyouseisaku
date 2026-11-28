@@ -38,9 +38,13 @@ $saves = @(Get-ChildItem -Path $pdp -Filter "save*.json" -ErrorAction SilentlyCo
 foreach ($f in $saves) { Copy-Item $f.FullName $backup }
 Write-Output ("backed up {0} save file(s) from {1} to {2}" -f $saves.Count, $pdp, $backup)
 
+# TMP font assets (dynamic atlas) are rewritten while playing; end.ps1 puts them back byte for byte if they changed.
+$fontBackup = Join-Path $backup "fonts"
+Write-Output ("backed up {0} font asset(s)" -f (Backup-FontAssets $fontBackup))
+
 $origScene = Invoke-UnityEval -Code "UnityEngine.SceneManagement.SceneManager.GetActiveScene().path"
 
-$info = [ordered]@{ pdp = $pdp; backup = $backup; scene = $origScene; started = $stamp }
+$info = [ordered]@{ pdp = $pdp; backup = $backup; scene = $origScene; started = $stamp; fonts = $fontBackup }
 ($info | ConvertTo-Json) | Set-Content -Path $marker -Encoding UTF8
 
 # --- 2. open scene
@@ -75,12 +79,13 @@ unity command editor.playmode set_run_in_background --enabled true --result-only
 unity command editor.playmode start --result-only 2>$null | Out-Null
 
 $ok = $false
-for ($i = 0; $i -lt 60; $i++) {
+# Pressing play after a script change recompiles first (can take a minute), so wait up to 2 minutes.
+for ($i = 0; $i -lt 240; $i++) {
     Start-Sleep -Milliseconds 500
     $p = Invoke-UnityEval -Quiet -Code "UnityEditor.EditorApplication.isPlaying && !UnityEditor.EditorApplication.isCompiling"
     if ($p -eq $true) { $ok = $true; break }
 }
-if (-not $ok) { Write-Output "[ERROR] play mode did not start within 30s. Run end.ps1."; exit 7 }
+if (-not $ok) { Write-Output "[ERROR] play mode did not start within 2 minutes. Run end.ps1."; exit 7 }
 
 if (-not $NoInvincible) {
     Start-Sleep -Milliseconds 500
