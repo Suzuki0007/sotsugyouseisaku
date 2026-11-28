@@ -35,6 +35,9 @@ public class StillView : MonoBehaviour
 
         [InspectorName("縦に流す")]
         PanVertical = 4,
+
+        [InspectorName("見上げる（寄って、下から上へ）")]
+        LookUp = 5,
     }
 
     public enum Area
@@ -285,7 +288,8 @@ public class StillView : MonoBehaviour
         if(request.holdCinemaBars && heldBars == null)
         {
             heldBars = CinemaMode.Get();
-            if(heldBars != null) { heldBars.HoldForStill(BarSize); }
+            // 帯の太さは会話と同じ（シネマ演出の見た目の設定があればそちら）
+            if(heldBars != null) { heldBars.HoldForStill(CinemaLookSettings.Current != null ? CinemaLookSettings.Current.barHeight : BarSize); }
         }
 
         StartFade(1.0f, request.fadeSeconds, false);
@@ -358,6 +362,16 @@ public class StillView : MonoBehaviour
                 float p = Mathf.Lerp(q.panFrom, q.panTo, t);
                 Vector2 over = (pic.rect.size - frame.rect.size) * 0.5f;
                 offset = q.motion == Motion.PanHorizontal ? new Vector2(-p * Mathf.Max(0.0f, over.x), 0.0f) : new Vector2(0.0f, -p * Mathf.Max(0.0f, over.y));
+                break;
+            }
+            case Motion.LookUp:
+            {
+                // 見上げる：大きくして（範囲より大きくなった分を縦に動かせる）、下の端から上の端へ。大きさも始め→終わりへ
+                // （絵が範囲と同じ比率でも、寄った分だけ上下に動く）
+                scale = Mathf.Lerp(q.scaleFrom, q.scaleTo, t);
+                float p = Mathf.Lerp(q.panFrom, q.panTo, t);
+                float overY = (pic.rect.height * scale - frame.rect.height) * 0.5f;
+                offset = new Vector2(0.0f, -p * Mathf.Max(0.0f, overY));
                 break;
             }
         }
