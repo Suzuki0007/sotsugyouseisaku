@@ -17,7 +17,7 @@ key UpArrow 1600
 wait 1
 advance 4                       # OP_02g（4文）→ Stage1_1 へ（all だと移った先のスチルの会話まで送ってしまう）
 wait scene Stage1_1
-wait 4                          # 暗くする → スチル → 会話まで 3 秒くらい
+wait until 15 DialogueManager.Instance != null && DialogueManager.Instance.IsTalking   # 暗くする → 塔を見上げる（11-27 kura_study）→ 会話まで 4〜5 秒
 expect talk あれが、塔          # 着いたら塔の全景スチル
 advance all
 expect flag Flag_Land_TowerStill on

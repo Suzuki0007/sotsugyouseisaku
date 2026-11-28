@@ -6,9 +6,10 @@ save on
 flag Flag_OP_Done on            # 直接再生なので Stage1_1 の古い OP を止めて、砂浜から来た扱いで読み直す
 flag Flag_Land_WreckAny on
 eval PlayerSpawnPoint.PendingSpawnPointId = "FromStage1_0"; UnityEngine.SceneManagement.SceneManager.LoadScene("Stage1_1"); return "load";
-wait 3
+wait 1.5                        # 読み直す前のシーンの会話（古いプロローグ）が消えるまで
+wait until 15 DialogueManager.Instance != null && DialogueManager.Instance.IsTalking   # 塔を見上げる演出（11-27 kura_study）のあと会話まで 4〜5 秒
 expect talk あれが、塔          # E6：スチル
-expect eval UnityEngine.GameObject.Find("演出の画像（手紙・スチル）/塔の全景スチル（仮画像）") != null
+expect eval StillView.IsShowing   # 塔の全景スチル（部品「1枚絵を出す」の見上げる。11-27 から。前は物の表示・非表示）
 advance all
 expect flag Flag_Land_TowerStill on
 expect eval UnityEngine.GameObject.Find("演出の画像（手紙・スチル）/塔の全景スチル（仮画像）") == null
